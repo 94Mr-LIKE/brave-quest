@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<!-- 內容安全政策（GitHub Pages 不能設 HTTP 標頭，所以用 meta）：只允許本站的腳本，不連任何外部網址。
+     style 'unsafe-inline'：介面圖示用 style 屬性、Phaser 在 iPad 量高度時用 setAttribute('style')。
+     img data: blob:：Phaser 內建貼圖是 data URI、Phaser 以 XHR 載圖後轉 blob URL；file:// 模式用打包的 data URI。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self' data: blob:; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="勇者大冒險：給國小三年級的學習冒險遊戲">
+<title>勇者大冒險</title>
+<link rel="icon" href="assets/ui/icon-192.png" type="image/png">
+<!-- 加入主畫面：Android／Chrome 用 manifest；iPad／iPhone Safari 用下面的 apple-* 設定 -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d2b5e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="勇者大冒險">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="assets/ui/icon-180.png">
+<link rel="stylesheet" href="src/ui/style.css">
+</head>
+<body>
+<!-- 遊戲畫面（Phaser 畫布會放在這裡） -->
+<div id="game" aria-hidden="true"></div>
+
+<!-- 文字介面（DOM，疊在畫布上） -->
+<div id="ui" role="application" aria-label="勇者大冒險">
+  <div id="hud" hidden></div>
+  <div id="prompt" hidden></div>
+  <div id="pad" hidden></div>
+  <div id="layer"></div>
+  <div id="toasts" aria-live="polite" aria-atomic="false"></div>
+  <div id="sr-live" class="sr-only" aria-live="assertive"></div>
+</div>
+<noscript><p class="noscript">這個遊戲需要開啟 JavaScript 才能玩。</p></noscript>
+
+<!-- 遊戲引擎：Phaser 4.2.1（MIT，本機保存一份，不連 CDN） -->
+<script src="lib/phaser.min.js"></script>
+<!-- QR Code：qrcode-generator 2.0.4（MIT，本機保存一份） -->
+<script src="lib/qrcode.js"></script>
+
+<!-- 題庫：正式題庫 → 範例題庫（只在正式題庫沒載入時生效） -->
+<script src="data/questions.js"></script>
+<script src="data/sample_questions.js"></script>
+
+<!-- 世界資料（劇情設計師、CTO 撰寫） -->
+<script src="data/tilesets.js"></script>
+<script src="data/tile_frames.js"></script>
+<script src="data/maps.js"></script>
+<script src="data/quests.js"></script>
+<script src="data/dialogs.js"></script>
+<script src="data/monsters.js"></script>
+<script src="data/items.js"></script>
+<script src="data/jobs.js"></script>
+<script src="data/world.js"></script>
+<script src="data/sprites.js"></script>
+<script src="data/dev_world.js"></script>
+<script src="data/art_manifest.js"></script>
+<script src="data/dev_sprites.js"></script>
+
+<!-- 可調參數 -->
+<script src="src/config.js"></script>
+
+<!-- 系統邏輯（可在 node 測試） -->
+<script src="src/systems/exp.js"></script>
+<script src="src/systems/answer.js"></script>
+<script src="src/systems/rewards.js"></script>
+<script src="src/systems/adaptive.js"></script>
+<script src="src/systems/hints.js"></script>
+<script src="src/systems/guard.js"></script>
+<script src="src/systems/daily.js"></script>
+<script src="src/systems/playtime.js"></script>
+<script src="src/systems/state.js"></script>
+<script src="src/systems/save.js"></script>
+<script src="src/systems/savecode.js"></script>
+<script src="src/systems/saveprovider.js"></script>
+<script src="src/systems/quest.js"></script>
+<script src="src/systems/report.js"></script>
+<script src="src/systems/session.js"></script>
+<script src="src/systems/shop.js"></script>
+<script src="src/systems/world.js"></script>
+<script src="src/systems/character.js"></script>
+<script src="src/systems/battle.js"></script>
+<script src="src/systems/questlog.js"></script>
+<script src="src/systems/chests.js"></script>
+<script src="src/systems/pathfind.js"></script>
+<script src="src/systems/worldmap.js"></script>
+<script src="src/systems/dialogtext.js"></script>
+
+<!-- 引擎與畫面 -->
+<script src="src/engine/audio.js"></script>
+<script src="src/engine/tts.js"></script>
+<script src="src/engine/assets.js"></script>
+<script src="src/ui/dom.js"></script>
+<script src="src/ui/quiz.js"></script>
+<script src="src/ui/hud.js"></script>
+<script src="src/ui/menus.js"></script>
+<script src="src/ui/settings.js"></script>
+<script src="src/ui/title.js"></script>
+<script src="src/ui/qr.js"></script>
+<script src="src/ui/worldmap.js"></script>
+<script src="src/scenes/MapScene.js"></script>
+<script src="src/scenes/BattleScene.js"></script>
+<script src="src/game.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
