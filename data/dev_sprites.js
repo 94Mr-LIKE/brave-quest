@@ -78,6 +78,24 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 23,
   "frameH": 28
  },
+ "npc_auntie_market": {
+  "file": "assets/npcs/npc_auntie_market.png",
+  "type": "single",
+  "frameW": 26,
+  "frameH": 50
+ },
+ "npc_auntie_taro": {
+  "file": "assets/npcs/npc_auntie_taro.png",
+  "type": "single",
+  "frameW": 25,
+  "frameH": 50
+ },
+ "npc_auntie_yam": {
+  "file": "assets/npcs/npc_auntie_yam.png",
+  "type": "single",
+  "frameW": 27,
+  "frameH": 50
+ },
  "npc_blacksmith": {
   "file": "assets/npcs/npc_blacksmith.png",
   "type": "single",

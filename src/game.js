@@ -189,6 +189,7 @@
     var s = G.state.settings;
     J.Audio.setEnabled(s.sound !== false);
     J.TTS.setEnabled(s.tts !== false);
+    J.Voice.configure({ volume: typeof s.voiceVolume === 'number' ? s.voiceVolume : 0.9, rateMult: s.voiceRate || 1, pref: s.voiceLang || 'taigi' });
     J.HUD.setTouchMode(s.touchControls || 'auto');
     if (G.limitHandle && !J.Playtime.isOverLimit(G.state.playtime, s, Date.now())) { G.limitHandle.close(true); G.limitHandle = null; }
   };
@@ -215,7 +216,11 @@
     var D = G.data.dialogs || {};
     var lines = (id && D[id]) || fallback || [];
     G.busy = true;
-    return J.UI.dialog(lines, { speaker: G.speaker, playerName: G.state.player.name, taigiSub: G.state.settings.taigiSub, tts: G.state.settings.tts !== false }).then(function () { G.busy = false; });
+    var s = G.state.settings;
+    return J.UI.dialog(lines, {
+      speaker: G.speaker, playerName: G.state.player.name, playerGender: G.state.player.gender, taigiSub: s.taigiSub,
+      tts: s.tts !== false, voiceAuto: s.voiceAuto !== false, dialogId: (id && D[id]) ? id : null
+    }).then(function () { G.busy = false; });
   };
 
   /** 職業公會所在地圖的名字（jobs.js 的 JOB_RULES.change_map） */

@@ -25,8 +25,9 @@
 
 ## 聲音
 
-- 音效全部用 Web Audio 即時合成，沒有音檔。
-- 朗讀使用瀏覽器內建的語音合成（speechSynthesis）；台語句子朗讀華語翻譯。
+- 音效與怪物叫聲全部用 Web Audio 即時合成（`src/engine/sfx.js`），沒有外部音檔。
+- 朗讀使用裝置內建的語音合成（speechSynthesis，`src/engine/voice.js`）。台語句子沒有預錄音檔時，先響提示音再念華語翻譯。
+- 預錄語音（之後由 CTO 產生，放在 `assets/voice/`）：來源與授權請在此補記。
 
 ## 題目與故事
 

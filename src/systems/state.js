@@ -59,7 +59,8 @@
       adaptive: Adaptive.createState(),
       daily: Daily.create(),
       playtime: Playtime.create(),
-      settings: { dailyLimitMin: Playtime.DEFAULT_LIMIT, tts: true, sound: true, answerTime: 'standard', touchControls: 'auto', taigiSub: 'both' },
+      settings: { dailyLimitMin: Playtime.DEFAULT_LIMIT, tts: true, sound: true, answerTime: 'standard', touchControls: 'auto', taigiSub: 'both',
+        voiceAuto: true, voiceVolume: 0.9, voiceRate: 1, voiceLang: 'taigi' },
       ending: false
     };
   }

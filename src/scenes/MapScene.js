@@ -534,6 +534,9 @@
 
     beginStep(nx, ny) {
       var p = this.p;
+      // 腳步聲：依腳下圖塊分草地／石板／木棧道／泥地（每兩步一聲，避免太吵）
+      this.stepCount = (this.stepCount || 0) + 1;
+      if (this.stepCount % 2 === 0) J.Audio.play('footstep', J.Sfx ? J.Sfx.terrainOf(this.defAt(nx, ny).tile) : 'grass');
       var dx = nx - p.tx, dy = ny - p.ty;
       p.facing = dx > 0 ? 'right' : dx < 0 ? 'left' : dy > 0 ? 'down' : 'up';
       p.moving = true; p.t = 0;

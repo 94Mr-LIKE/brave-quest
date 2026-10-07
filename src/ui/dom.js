@@ -113,12 +113,14 @@
   function announce(text) { if (live) { live.textContent = ''; setTimeout(function () { live.textContent = text; }, 30); } }
 
   /**
-   * 對話框：lines = [{who, text}]；ctx.speaker(who) → {name, sprite}；ctx.playerName
+   * 對話框：lines = [{who, text, taigi?, emotion?}]；ctx.speaker(who) → {name, sprite}；ctx.playerName
+   * ctx.dialogId：對話 ID（找預錄音檔用）；ctx.voiceAuto：每句自動念；ctx.playerGender
    * 回傳 Promise（看完全部句子後 resolve）
    */
   function dialog(lines, ctx) {
     ctx = ctx || {};
-    lines = (lines || []).filter(function (l) { return l && l.text; });
+    // 記住原本的句序（預錄音檔用 <對話ID>_<句序> 命名），再拿掉空句
+    lines = (lines || []).map(function (l, idx) { return l && l.text ? { line: l, idx: idx } : null; }).filter(Boolean);
     if (!lines.length) return Promise.resolve();
     return new Promise(function (resolve) {
       var i = 0;
@@ -128,13 +130,17 @@
       var tailo = h('div.tailo', { lang: 'nan-Latn-TW' });
       var huayu = h('div.huayu');
       var current = null;
-      var speakBtn = h('button', { onclick: function () { if (current) window.JQ.TTS.speak(current.speak, 'zh-TW'); }, 'aria-label': '朗讀這句（台語句子讀華語翻譯）' }, ['🔊']);
+      var speakBtn = h('button', { onclick: function () { say(); }, 'aria-label': '朗讀這句（台語句子有台語錄音就播錄音，沒有就讀華語翻譯）' }, ['🔊']);
       var nextBtn = h('button.primary', { onclick: advance }, ['下一句 ▶']);
       var skipBtn = h('button.ghost', { onclick: finish }, ['略過']);
       var box = h('div.win.dialog', {}, [portrait, h('div.grow', {}, [speaker, text, tailo, huayu, h('div.row.end', {}, [ctx.tts === false ? null : speakBtn, h('span.grow'), skipBtn, nextBtn])])]);
       var handle = open(box, { modal: true, label: '對話', escClose: true, onClose: function () { resolve(); }, focus: nextBtn });
+      function say() {
+        var it = lines[i], sp = ctx.speaker ? ctx.speaker(it.line.who) : { name: it.line.who };
+        window.JQ.Voice.sayLine({ line: it.line, dialogId: ctx.dialogId, index: it.idx, who: it.line.who, name: sp.name, playerGender: ctx.playerGender, playerName: ctx.playerName });
+      }
       function render() {
-        var l = lines[i];
+        var l = lines[i].line;
         var sp = ctx.speaker ? ctx.speaker(l.who) : { name: l.who };
         speaker.textContent = sp.name || '';
         speaker.hidden = !sp.name;
@@ -147,9 +153,10 @@
         portrait.style.visibility = l.who === 'narrator' ? 'hidden' : 'visible';
         nextBtn.textContent = i === lines.length - 1 ? '好 ✓' : '下一句 ▶';
         skipBtn.hidden = lines.length <= 2;
+        if (ctx.tts !== false && ctx.voiceAuto) say();
       }
-      function advance() { window.JQ.TTS.stop(); window.JQ.Audio.play('select'); i++; if (i >= lines.length) finish(); else render(); }
-      function finish() { handle.close(); }
+      function advance() { window.JQ.Voice.stop(); window.JQ.Audio.play('select'); i++; if (i >= lines.length) finish(); else render(); }
+      function finish() { window.JQ.Voice.stop(); handle.close(); }
       render();
     });
   }

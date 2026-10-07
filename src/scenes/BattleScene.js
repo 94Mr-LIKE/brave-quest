@@ -53,13 +53,19 @@
         var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(1, 0, 2, 4); g.fillRect(0, 1, 4, 2);
         this.textures.addCanvas('ui:spark', c);
       }
+      var self0 = this;
+      this.time.delayedCall(320, function () { self0.cry('appear'); });   // 出場叫聲
       J.Game.battleSceneReady(this);
     }
 
+    /** 怪物叫聲（sfx.js 依怪物的 family／size／mood 合成） */
+    cry(kind) { if (J.Sfx && J.Audio.isEnabled()) J.Sfx.monster(this.data_.mon.id, this.data_.mon, kind); }
+
     /** 主角打中：怪物閃一下、跳數字 */
     hitEffect(dmg, crit) {
-      var m = this.monster;
+      var m = this.monster, self = this;
       J.Audio.play(crit ? 'crit' : 'hit');
+      this.time.delayedCall(90, function () { self.cry('hurt'); });
       this.tweens.add({ targets: m, alpha: 0.2, duration: 70, yoyo: true, repeat: crit ? 3 : 1 });
       this.tweens.add({ targets: m, x: m.x + (crit ? 10 : 5), duration: 50, yoyo: true, repeat: 2 });
       if (crit) this.cameras.main.shake(180, 0.012);
@@ -75,7 +81,8 @@
 
     /** 怪物攻擊：畫面紅閃、晃動 */
     hurtEffect() {
-      J.Audio.play('hurt');
+      this.cry('attack');   // 威嚇聲，接著主角受擊聲
+      this.time.delayedCall(260, function () { J.Audio.play('hurt'); });
       var m = this.monster;
       this.tweens.add({ targets: m, scale: this.baseScale * 1.15, duration: 120, yoyo: true });
       this.cameras.main.shake(220, 0.015);
@@ -92,12 +99,14 @@
       var m = this.monster, self = this;
       if (this.idle) this.idle.stop();
       J.Audio.play('win');
+      this.cry('wake');   // 清醒了，開心的上揚聲
       this.tweens.add({ targets: m, y: m.y - 16, duration: 180, yoyo: true, repeat: 1, onComplete: function () {
         self.tweens.add({ targets: [m, self.shadow], x: m.x + 420, alpha: 0, duration: 800, onComplete: function () { if (done) done(); } });
       } });
     }
 
     phaseEffect() {
+      this.cry('phase');   // 頭目換階段：怒吼（低八度＋殘響）
       this.cameras.main.flash(300, 200, 220, 255);
       this.tweens.add({ targets: this.monster, angle: 6, duration: 90, yoyo: true, repeat: 3 });
     }

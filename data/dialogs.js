@@ -35,21 +35,21 @@ window.DIALOGS = {
 
   // ═════════════ 系統與主線 ═════════════
   D_INTRO: [
-    { who: "narrator", text: "美麗島的北海岸，有個小鎮叫金包里。" },
-    { who: "narrator", text: "有一天，灰灰的「遺忘霧」從海上飄來。" },
-    { who: "chief", text: "糟了！公園的知識燈都熄了！",
+    { who: "narrator", emotion: "平靜", text: "美麗島的北海岸，有個小鎮叫金包里。" },
+    { who: "narrator", emotion: "擔心", text: "有一天，灰灰的「遺忘霧」從海上飄來。" },
+    { who: "chief", emotion: "驚訝", text: "糟了！公園的知識燈都熄了！",
       taigi: { hanji: "害矣！公園的智識燈攏化去矣！", tailo: "Hāi--ah! Kong-hn̂g ê tì-sik-ting lóng hua--khì--ah!", huayu: "糟了！公園的知識燈都熄了！" } },
-    { who: "chief", text: "被霧碰到的人，會把學過的東西忘掉。" },
-    { who: "pet", text: "我是番薯仔！我們一起把光找回來吧！" },
-    { who: "pet", text: "走到人旁邊按對話鍵，就能聊天喔。" },
-    { who: "pet", text: "有些阿伯阿姨會說台語，下面有華語喔。" }
+    { who: "chief", emotion: "擔心", text: "被霧碰到的人，會把學過的東西忘掉。" },
+    { who: "pet", emotion: "開心", text: "我是番薯仔！我們一起把光找回來吧！" },
+    { who: "pet", emotion: "平靜", text: "走到人旁邊按對話鍵，就能聊天喔。" },
+    { who: "pet", emotion: "開心", text: "有些阿伯阿姨會說台語，下面有華語喔。" }
   ],
   D_FAINT: [
-    { who: "pet", text: "我們累倒了……先回旅店休息一下吧。" },
-    { who: "pet", text: "沒關係！金幣和道具都還在喔。" }
+    { who: "pet", emotion: "擔心", text: "我們累倒了……先回旅店休息一下吧。" },
+    { who: "pet", emotion: "開心", text: "沒關係！金幣和道具都還在喔。" }
   ],
   D_INN_REST: [
-    { who: "narrator", text: "好好休息了一下，體力和魔力都全滿了！" }
+    { who: "narrator", emotion: "平靜", text: "好好休息了一下，體力和魔力都全滿了！" }
   ],
   D_CHEST_LOCKED: [
     { who: "pet", text: "寶箱上有數學鎖，答對才打得開！" }
@@ -58,11 +58,11 @@ window.DIALOGS = {
     { who: "pet", text: "這個寶箱已經打開過了。" }
   ],
   D_LAMP_LIT: [
-    { who: "narrator", text: "知識燈亮了起來！" }
+    { who: "narrator", emotion: "開心", text: "知識燈亮了起來！" }
   ],
   D_LIGHT_GET: [
-    { who: "narrator", text: "你拿回了一道知識之光！" },
-    { who: "pet", text: "快看任務日誌，下一步要去哪裡！" }
+    { who: "narrator", emotion: "開心", text: "你拿回了一道知識之光！" },
+    { who: "pet", emotion: "開心", text: "快看任務日誌，下一步要去哪裡！" }
   ],
   D_STATION: [
     { who: "narrator", text: "這裡可以搭車。打開世界地圖，選要去哪裡吧！" }
@@ -73,58 +73,58 @@ window.DIALOGS = {
 
   // ═════════════ 金包里教學 ═════════════
   D_TUT_1A: [
-    { who: "chief", text: "{name}，你來得正好！",
+    { who: "chief", emotion: "開心", text: "{name}，你來得正好！",
       taigi: { hanji: "你來甲拄仔好！", tailo: "Lí lâi kah tú-á-hó!", huayu: "你來得正好！" } },
-    { who: "chief", text: "公園燈座上刻著字，霧讓我看不清楚。",
+    { who: "chief", emotion: "擔心", text: "公園燈座上刻著字，霧讓我看不清楚。",
       taigi: { hanji: "燈座頂懸有刻字，霧予我看袂清楚。", tailo: "Ting-tsō tíng-kuân ū khik-jī, bū hōo guá khuànn bē tshing-tshó.", huayu: "燈座上面有刻字，霧讓我看不清楚。" } },
-    { who: "chief", text: "你可以幫我讀一讀嗎？答對 2 題就好。",
+    { who: "chief", emotion: "平靜", text: "你可以幫我讀一讀嗎？答對 2 題就好。",
       taigi: { hanji: "你會使共我讀看覓無？回答著兩題就好。", tailo: "Lí ē-sái kā guá tha̍k khuànn-māi--bô? Huê-tap tio̍h nn̄g tê tō hó.", huayu: "你可以幫我讀讀看嗎？答對兩題就好。" } },
-    { who: "pet", text: "不會的話，按「提示」看課本哪裡有教！" }
+    { who: "pet", emotion: "開心", text: "不會的話，按「提示」看課本哪裡有教！" }
   ],
   D_TUT_1B: [
-    { who: "chief", text: "太好了！燈座上寫著「知識是光」。" },
-    { who: "chief", text: "這是藥草，累了就吃一個。",
+    { who: "chief", emotion: "開心", text: "太好了！燈座上寫著「知識是光」。" },
+    { who: "chief", emotion: "平靜", text: "這是藥草，累了就吃一個。",
       taigi: { hanji: "這是藥草，忝矣就食一个。", tailo: "Tse sī io̍h-tsháu, thiám--ah tō tsia̍h tsi̍t ê.", huayu: "這是藥草，累了就吃一個。" } },
-    { who: "chief", text: "漁港的漁夫阿伯好像也遇到麻煩了。",
+    { who: "chief", emotion: "擔心", text: "漁港的漁夫阿伯好像也遇到麻煩了。",
       taigi: { hanji: "漁港的討海阿伯，敢若嘛拄著麻煩矣。", tailo: "Hî-káng ê thó-hái a-peh, kánn-ná mā tú-tio̍h mâ-huân--ah.", huayu: "漁港的漁夫阿伯，好像也遇到麻煩了。" } },
-    { who: "pet", text: "漁港在金包里的東北邊，我們去看看！" }
+    { who: "pet", emotion: "開心", text: "漁港在金包里的東北邊，我們去看看！" }
   ],
   D_TUT_2A: [
-    { who: "fisher", text: "唉，霧一來，我賣魚的錢都算不清了。",
+    { who: "fisher", emotion: "擔心", text: "唉，霧一來，我賣魚的錢都算不清了。",
       taigi: { hanji: "唉，霧一來，阮賣魚的錢攏算袂清矣。", tailo: "Haih, bū tsi̍t lâi, guán bē hî ê tsînn lóng sǹg bē tshing--ah.", huayu: "唉，霧一來，我賣魚的錢都算不清了。" } },
-    { who: "fisher", text: "客人給的錢、要找的錢，全亂了。",
+    { who: "fisher", emotion: "擔心", text: "客人給的錢、要找的錢，全亂了。",
       taigi: { hanji: "人客予的錢、愛找的錢，攏亂操操矣。", tailo: "Lâng-kheh hōo ê tsînn, ài tsāu ê tsînn, lóng luān-tshau-tshau--ah.", huayu: "客人給的錢、要找的錢，全都亂糟糟了。" } },
-    { who: "fisher", text: "幫阿伯算 3 題，好不好？",
+    { who: "fisher", emotion: "平靜", text: "幫阿伯算 3 題，好不好？",
       taigi: { hanji: "共阿伯算三題，好無？", tailo: "Kā a-peh sǹg sann tê, hó--bô?", huayu: "幫阿伯算三題，好不好？" } }
   ],
   D_TUT_2B: [
-    { who: "fisher", text: "算得又快又對！謝謝喔！",
+    { who: "fisher", emotion: "開心", text: "算得又快又對！謝謝喔！",
       taigi: { hanji: "算甲閣緊閣著！多謝喔！", tailo: "Sǹg kah koh kín koh tio̍h! To-siā--ooh!", huayu: "算得又快又對！謝謝喔！" } },
-    { who: "fisher", text: "阿伯送你 50 枚金幣。",
+    { who: "fisher", emotion: "開心", text: "阿伯送你 50 枚金幣。",
       taigi: { hanji: "阿伯送你五十个金幣。", tailo: "A-peh sàng lí gōo-tsa̍p ê kim-pè.", huayu: "阿伯送你 50 枚金幣。" } },
-    { who: "fisher", text: "老街的商店有賣木劍和皮衣。",
+    { who: "fisher", emotion: "平靜", text: "老街的商店有賣木劍和皮衣。",
       taigi: { hanji: "老街的店頭有賣柴劍佮皮衫。", tailo: "Lāu-ke ê tiàm-thâu ū bē tshâ-kiàm kah phuê-sann.", huayu: "老街的商店有賣木劍和皮衣。" } },
-    { who: "pet", text: "買東西前，先看看自己有幾枚金幣喔！" }
+    { who: "pet", emotion: "平靜", text: "買東西前，先看看自己有幾枚金幣喔！" }
   ],
   D_TUT_3A: [
-    { who: "innkeeper", text: "歡迎來泡溫泉喔！",
+    { who: "innkeeper", emotion: "開心", text: "歡迎來泡溫泉喔！",
       taigi: { hanji: "歡迎來浸溫泉喔！", tailo: "Huan-gîng lâi tsìm un-tsuânn--ooh!", huayu: "歡迎來泡溫泉喔！" } },
-    { who: "innkeeper", text: "旅館的窗戶被海風吹破一個洞。" },
-    { who: "innkeeper", text: "南邊擎天草原的迷糊團子會掉黏黏球。" },
-    { who: "innkeeper", text: "幫我帶 2 顆回來補窗戶，好嗎？",
+    { who: "innkeeper", emotion: "擔心", text: "旅館的窗戶被海風吹破一個洞。" },
+    { who: "innkeeper", emotion: "平靜", text: "南邊擎天草原的迷糊團子會掉黏黏球。" },
+    { who: "innkeeper", emotion: "平靜", text: "幫我帶 2 顆回來補窗戶，好嗎？",
       taigi: { hanji: "共我紮兩粒轉來補窗仔，好無？", tailo: "Kā guá tsah nn̄g lia̍p tńg-lâi póo thang-á, hó--bô?", huayu: "幫我帶兩顆回來補窗戶，好嗎？" } },
-    { who: "innkeeper", text: "累了就回來泡溫泉，不用錢喔。",
+    { who: "innkeeper", emotion: "開心", text: "累了就回來泡溫泉，不用錢喔。",
       taigi: { hanji: "忝矣就轉來浸溫泉，免錢喔。", tailo: "Thiám--ah tō tńg-lâi tsìm un-tsuânn, bián-tsînn--ooh.", huayu: "累了就回來泡溫泉，不用錢喔。" } },
-    { who: "pet", text: "碰到怪物就會開始戰鬥，答對就能攻擊！" },
-    { who: "pet", text: "越快答對，打得越用力喔！" }
+    { who: "pet", emotion: "平靜", text: "碰到怪物就會開始戰鬥，答對就能攻擊！" },
+    { who: "pet", emotion: "開心", text: "越快答對，打得越用力喔！" }
   ],
   D_TUT_3B: [
-    { who: "innkeeper", text: "窗戶補好了，辛苦你了！",
+    { who: "innkeeper", emotion: "開心", text: "窗戶補好了，辛苦你了！",
       taigi: { hanji: "窗仔補好矣，勞力喔！", tailo: "Thang-á póo hó--ah, lóo-la̍t--ooh!", huayu: "窗戶補好了，謝謝你喔！" } },
-    { who: "innkeeper", text: "送你一張刪去卡，可以刪掉一個錯的選項。" },
-    { who: "innkeeper", text: "客運站可以搭車去遠方的神木森林。" },
-    { who: "innkeeper", text: "往東走，還有熱鬧的山城市集。" },
-    { who: "pet", text: "任務日誌會寫下一步要去哪裡喔！" }
+    { who: "innkeeper", emotion: "開心", text: "送你一張刪去卡，可以刪掉一個錯的選項。" },
+    { who: "innkeeper", emotion: "平靜", text: "客運站可以搭車去遠方的神木森林。" },
+    { who: "innkeeper", emotion: "平靜", text: "往東走，還有熱鬧的山城市集。" },
+    { who: "pet", emotion: "平靜", text: "任務日誌會寫下一步要去哪裡喔！" }
   ],
 
   // ═════════════ 神木森林・精靈族 ═════════════
@@ -133,50 +133,50 @@ window.DIALOGS = {
     { who: "elf_elder", text: "先回金包里，幫溫泉旅館的忙吧。" }
   ],
   D_ELF_1A: [
-    { who: "elf_elder", text: "歡迎來到神木森林。" },
-    { who: "elf_elder", text: "霧來了以後，大家忘了怎麼照顧植物。" },
-    { who: "elf_elder", text: "葉子黃了，風也亂吹，真讓人擔心。" },
-    { who: "elf_elder", text: "請幫我想起植物和風的知識，好嗎？" }
+    { who: "elf_elder", emotion: "平靜", text: "歡迎來到神木森林。" },
+    { who: "elf_elder", emotion: "擔心", text: "霧來了以後，大家忘了怎麼照顧植物。" },
+    { who: "elf_elder", emotion: "擔心", text: "葉子黃了，風也亂吹，真讓人擔心。" },
+    { who: "elf_elder", emotion: "平靜", text: "請幫我想起植物和風的知識，好嗎？" }
   ],
   D_ELF_1B: [
-    { who: "elf_elder", text: "對了！植物需要陽光、空氣和水。" },
-    { who: "elf_elder", text: "南邊小路旁的葉葉，指北針好像壞了。" }
+    { who: "elf_elder", emotion: "開心", text: "對了！植物需要陽光、空氣和水。" },
+    { who: "elf_elder", emotion: "擔心", text: "南邊小路旁的葉葉，指北針好像壞了。" }
   ],
   D_ELF_2A: [
-    { who: "elf_kid", text: "我的指北針一直亂轉，找不到北邊！" },
-    { who: "elf_kid", text: "指北針裡面，有一根小磁針對不對？" },
-    { who: "elf_kid", text: "還有，風車也不轉了……幫幫我！" }
+    { who: "elf_kid", emotion: "擔心", text: "我的指北針一直亂轉，找不到北邊！" },
+    { who: "elf_kid", emotion: "平靜", text: "指北針裡面，有一根小磁針對不對？" },
+    { who: "elf_kid", emotion: "擔心", text: "還有，風車也不轉了……幫幫我！" }
   ],
   D_ELF_2B: [
-    { who: "elf_kid", text: "指北針又指向北邊了！謝謝你！" },
-    { who: "elf_kid", text: "長老說森林裡的毒菇怪變多了。" }
+    { who: "elf_kid", emotion: "開心", text: "指北針又指向北邊了！謝謝你！" },
+    { who: "elf_kid", emotion: "擔心", text: "長老說森林裡的毒菇怪變多了。" }
   ],
   D_ELF_3A: [
-    { who: "elf_elder", text: "南邊密林的毒菇怪被霧弄迷糊了。" },
-    { who: "elf_elder", text: "讓牠們清醒，帶回 3 個「毒菇帽」。" },
-    { who: "elf_elder", text: "我要用它們找出霧從哪裡來。" }
+    { who: "elf_elder", emotion: "擔心", text: "南邊密林的毒菇怪被霧弄迷糊了。" },
+    { who: "elf_elder", emotion: "平靜", text: "讓牠們清醒，帶回 3 個「毒菇帽」。" },
+    { who: "elf_elder", emotion: "平靜", text: "我要用它們找出霧從哪裡來。" }
   ],
   D_ELF_3B: [
-    { who: "elf_elder", text: "找到了！霧是從北邊的千年神木飄出來的。" },
-    { who: "elf_elder", text: "守護森林的神木，被霧附身了……" }
+    { who: "elf_elder", emotion: "驚訝", text: "找到了！霧是從北邊的千年神木飄出來的。" },
+    { who: "elf_elder", emotion: "擔心", text: "守護森林的神木，被霧附身了……" }
   ],
   D_ELF_4A: [
-    { who: "elf_elder", text: "神木變成了「枯萎樹王」。" },
-    { who: "elf_elder", text: "請到森林最北邊，讓神木清醒過來。" },
-    { who: "pet", text: "頭目戰不能逃跑，先去樹屋休息吧！" }
+    { who: "elf_elder", emotion: "擔心", text: "神木變成了「枯萎樹王」。" },
+    { who: "elf_elder", emotion: "平靜", text: "請到森林最北邊，讓神木清醒過來。" },
+    { who: "pet", emotion: "平靜", text: "頭目戰不能逃跑，先去樹屋休息吧！" }
   ],
   D_ELF_4B: [
-    { who: "elf_elder", text: "神木醒了，綠葉又長出來了！" },
-    { who: "narrator", text: "你拿回了「自然之光」！" },
-    { who: "elf_elder", text: "紅樹林濕地的地精族也很煩惱。" },
-    { who: "pet", text: "可以搭車去紅樹林濕地了！" }
+    { who: "elf_elder", emotion: "開心", text: "神木醒了，綠葉又長出來了！" },
+    { who: "narrator", emotion: "開心", text: "你拿回了「自然之光」！" },
+    { who: "elf_elder", emotion: "擔心", text: "紅樹林濕地的地精族也很煩惱。" },
+    { who: "pet", emotion: "開心", text: "可以搭車去紅樹林濕地了！" }
   ],
   D_BOSS_TREE_A: [
-    { who: "tree_king", text: "嗚……我……想不起來……葉子要什麼……" },
-    { who: "pet", text: "樹王被霧弄迷糊了！答對題目叫醒它！" }
+    { who: "tree_king", emotion: "神祕", text: "嗚……我……想不起來……葉子要什麼……" },
+    { who: "pet", emotion: "驚訝", text: "樹王被霧弄迷糊了！答對題目叫醒它！" }
   ],
   D_BOSS_TREE_B: [
-    { who: "tree_king", text: "啊……我想起來了。謝謝你。" }
+    { who: "tree_king", emotion: "開心", text: "啊……我想起來了。謝謝你。" }
   ],
 
   // ═════════════ 山城市集・外國商人 ═════════════
@@ -185,236 +185,236 @@ window.DIALOGS = {
     { who: "merchant", text: "先回金包里，幫溫泉旅館的忙吧。" }
   ],
   D_MER_1A: [
-    { who: "merchant", text: "Hello!（你好！）我從遠方來做生意。" },
-    { who: "merchant", text: "霧讓大家聽不懂我說的話。" },
-    { who: "merchant", text: "你可以幫我和客人打招呼嗎？" }
+    { who: "merchant", emotion: "開心", text: "Hello!（你好！）我從遠方來做生意。" },
+    { who: "merchant", emotion: "擔心", text: "霧讓大家聽不懂我說的話。" },
+    { who: "merchant", emotion: "平靜", text: "你可以幫我和客人打招呼嗎？" }
   ],
   D_MER_1B: [
-    { who: "merchant", text: "Thank you!（謝謝你！）客人都聽懂了！" },
-    { who: "merchant", text: "可是我還有別的煩惱……" }
+    { who: "merchant", emotion: "開心", text: "Thank you!（謝謝你！）客人都聽懂了！" },
+    { who: "merchant", emotion: "擔心", text: "可是我還有別的煩惱……" }
   ],
   D_MER_2A: [
-    { who: "merchant", text: "客人問我累不累、開不開心。" },
-    { who: "merchant", text: "我也要數清楚有幾箱貨，幫幫我！" }
+    { who: "merchant", emotion: "擔心", text: "客人問我累不累、開不開心。" },
+    { who: "merchant", emotion: "擔心", text: "我也要數清楚有幾箱貨，幫幫我！" }
   ],
   D_MER_2B: [
-    { who: "merchant", text: "Great!（太棒了！）你的英文真好！" },
-    { who: "merchant", text: "可是海鷗把我的羽毛筆全搶走了。" }
+    { who: "merchant", emotion: "開心", text: "Great!（太棒了！）你的英文真好！" },
+    { who: "merchant", emotion: "擔心", text: "可是海鷗把我的羽毛筆全搶走了。" }
   ],
   D_MER_3A: [
-    { who: "merchant", text: "巷子裡的搶食海鷗被霧弄糊塗了。" },
-    { who: "merchant", text: "讓牠們清醒，找回 3 根羽毛。" }
+    { who: "merchant", emotion: "擔心", text: "巷子裡的搶食海鷗被霧弄糊塗了。" },
+    { who: "merchant", emotion: "平靜", text: "讓牠們清醒，找回 3 根羽毛。" }
   ],
   D_MER_3B: [
-    { who: "merchant", text: "有羽毛筆就能寫信了，謝謝！" },
-    { who: "merchant", text: "可是金包里的漁港冒出了大觸手！" }
+    { who: "merchant", emotion: "開心", text: "有羽毛筆就能寫信了，謝謝！" },
+    { who: "merchant", emotion: "驚訝", text: "可是金包里的漁港冒出了大觸手！" }
   ],
   D_MER_4A: [
-    { who: "merchant", text: "迷霧章魚把漁船都擋住了。" },
-    { who: "merchant", text: "牠只聽得懂英文，拜託你了！" },
-    { who: "pet", text: "回金包里的漁港，沿著木橋走到底！" }
+    { who: "merchant", emotion: "擔心", text: "迷霧章魚把漁船都擋住了。" },
+    { who: "merchant", emotion: "擔心", text: "牠只聽得懂英文，拜託你了！" },
+    { who: "pet", emotion: "平靜", text: "回金包里的漁港，沿著木橋走到底！" }
   ],
   D_MER_4B: [
-    { who: "merchant", text: "漁船可以出海了！Thank you!（謝謝你！）" },
-    { who: "narrator", text: "你拿回了「英語之光」！" },
-    { who: "merchant", text: "金包里東北邊的海蝕洞窟裡，" },
-    { who: "merchant", text: "住著哥布林，也需要你的幫忙。" }
+    { who: "merchant", emotion: "開心", text: "漁船可以出海了！Thank you!（謝謝你！）" },
+    { who: "narrator", emotion: "開心", text: "你拿回了「英語之光」！" },
+    { who: "merchant", emotion: "平靜", text: "金包里東北邊的海蝕洞窟裡，" },
+    { who: "merchant", emotion: "平靜", text: "住著哥布林，也需要你的幫忙。" }
   ],
   D_BOSS_OCTO_A: [
-    { who: "fog_octopus", text: "你……是誰……？我好睏……" },
-    { who: "pet", text: "牠聽得懂英文！答對英文題叫醒牠！" }
+    { who: "fog_octopus", emotion: "神祕", text: "你……是誰……？我好睏……" },
+    { who: "pet", emotion: "驚訝", text: "牠聽得懂英文！答對英文題叫醒牠！" }
   ],
   D_BOSS_OCTO_B: [
-    { who: "fog_octopus", text: "謝謝你！我要回大海了，再見！" },
-    { who: "fisher", text: "章魚走了！漁船可以出海了！",
+    { who: "fog_octopus", emotion: "開心", text: "謝謝你！我要回大海了，再見！" },
+    { who: "fisher", emotion: "開心", text: "章魚走了！漁船可以出海了！",
       taigi: { hanji: "石距走矣！漁船會使出海矣！", tailo: "Tsio̍h-kī tsáu--ah! Hî-tsûn ē-sái tshut-hái--ah!", huayu: "章魚走了！漁船可以出海了！" } }
   ],
 
   // ═════════════ 紅樹林濕地・地精族 ═════════════
   D_GNO_LOCK: [
-    { who: "gnome_chief", text: "濕地的霧太濃，什麼都看不清楚。" },
-    { who: "gnome_chief", text: "聽說精靈的「自然之光」能照亮霧。" },
-    { who: "pet", text: "先去神木森林，幫精靈長老吧！" }
+    { who: "gnome_chief", emotion: "擔心", text: "濕地的霧太濃，什麼都看不清楚。" },
+    { who: "gnome_chief", emotion: "平靜", text: "聽說精靈的「自然之光」能照亮霧。" },
+    { who: "pet", emotion: "平靜", text: "先去神木森林，幫精靈長老吧！" }
   ],
   D_GNO_1A: [
-    { who: "gnome_chief", text: "自然之光照亮了濕地！你好厲害。" },
-    { who: "gnome_chief", text: "我們要在紅樹林蓋新的木棧道。" },
-    { who: "gnome_chief", text: "可是霧讓大家秤不準、量不準。" },
-    { who: "gnome_chief", text: "你能幫我們算一算嗎？" }
+    { who: "gnome_chief", emotion: "驚訝", text: "自然之光照亮了濕地！你好厲害。" },
+    { who: "gnome_chief", emotion: "平靜", text: "我們要在紅樹林蓋新的木棧道。" },
+    { who: "gnome_chief", emotion: "擔心", text: "可是霧讓大家秤不準、量不準。" },
+    { who: "gnome_chief", emotion: "平靜", text: "你能幫我們算一算嗎？" }
   ],
   D_GNO_1B: [
-    { who: "gnome_chief", text: "材料都準備好了，太感謝了！" },
-    { who: "gnome_chief", text: "去找旁邊的工匠，木板還要分一分。" }
+    { who: "gnome_chief", emotion: "開心", text: "材料都準備好了，太感謝了！" },
+    { who: "gnome_chief", emotion: "平靜", text: "去找旁邊的工匠，木板還要分一分。" }
   ],
   D_GNO_2A: [
-    { who: "gnome", text: "這塊木板要分成好幾段……" },
-    { who: "gnome", text: "每段多長？要做幾個？頭好暈喔。" }
+    { who: "gnome", emotion: "擔心", text: "這塊木板要分成好幾段……" },
+    { who: "gnome", emotion: "擔心", text: "每段多長？要做幾個？頭好暈喔。" }
   ],
   D_GNO_2B: [
-    { who: "gnome", text: "剛剛好！一點都沒有浪費。" },
-    { who: "gnome", text: "可是做棧道的齒輪被泥泥怪吞走了。" }
+    { who: "gnome", emotion: "開心", text: "剛剛好！一點都沒有浪費。" },
+    { who: "gnome", emotion: "擔心", text: "可是做棧道的齒輪被泥泥怪吞走了。" }
   ],
   D_GNO_3A: [
-    { who: "gnome_chief", text: "泥泥怪把齒輪當成點心吞下去了。" },
-    { who: "gnome_chief", text: "讓牠們清醒，帶回 3 個齒輪。" }
+    { who: "gnome_chief", emotion: "擔心", text: "泥泥怪把齒輪當成點心吞下去了。" },
+    { who: "gnome_chief", emotion: "平靜", text: "讓牠們清醒，帶回 3 個齒輪。" }
   ],
   D_GNO_3B: [
-    { who: "gnome_chief", text: "齒輪都回來了，棧道可以動工了！" },
-    { who: "gnome_chief", text: "只是西南邊的泥灘，有隻好大的蛙……" }
+    { who: "gnome_chief", emotion: "開心", text: "齒輪都回來了，棧道可以動工了！" },
+    { who: "gnome_chief", emotion: "擔心", text: "只是西南邊的泥灘，有隻好大的蛙……" }
   ],
   D_GNO_4A: [
-    { who: "gnome_chief", text: "泥巴大蛙一直把泥巴丟到棧道上。" },
-    { who: "gnome_chief", text: "牠在濕地西南邊的泥灘，拜託你！" }
+    { who: "gnome_chief", emotion: "擔心", text: "泥巴大蛙一直把泥巴丟到棧道上。" },
+    { who: "gnome_chief", emotion: "擔心", text: "牠在濕地西南邊的泥灘，拜託你！" }
   ],
   D_GNO_4B: [
-    { who: "gnome_chief", text: "棧道蓋好了！你真是算數高手。" },
-    { who: "narrator", text: "你拿回了「數學之光」！" }
+    { who: "gnome_chief", emotion: "開心", text: "棧道蓋好了！你真是算數高手。" },
+    { who: "narrator", emotion: "開心", text: "你拿回了「數學之光」！" }
   ],
   D_BOSS_FROG_A: [
-    { who: "mud_frog", text: "呱！一、二、五、三……數不清了呱！" },
-    { who: "pet", text: "牠的數字亂掉了，我們幫牠數對！" }
+    { who: "mud_frog", emotion: "驚訝", text: "呱！一、二、五、三……數不清了呱！" },
+    { who: "pet", emotion: "平靜", text: "牠的數字亂掉了，我們幫牠數對！" }
   ],
   D_BOSS_FROG_B: [
-    { who: "mud_frog", text: "呱呱！我又會數數了，謝謝！" }
+    { who: "mud_frog", emotion: "開心", text: "呱呱！我又會數數了，謝謝！" }
   ],
 
   // ═════════════ 哥布林部落 ═════════════
   D_GOB_LOCK: [
-    { who: "goblin_chief", text: "外面來的？我們現在很忙。" },
-    { who: "goblin_chief", text: "山城市集的外國商人，你幫過了嗎？" },
-    { who: "pet", text: "先去山城市集，幫商人的忙吧！" }
+    { who: "goblin_chief", emotion: "平靜", text: "外面來的？我們現在很忙。" },
+    { who: "goblin_chief", emotion: "平靜", text: "山城市集的外國商人，你幫過了嗎？" },
+    { who: "pet", emotion: "平靜", text: "先去山城市集，幫商人的忙吧！" }
   ],
   D_GOB_1A: [
-    { who: "goblin_chief", text: "嘿，冒險者，你看得懂字嗎？" },
-    { who: "goblin_chief", text: "霧來了以後，大家看不懂告示了。" },
-    { who: "goblin_chief", text: "幾點吃飯、幾點睡覺，全亂了！" }
+    { who: "goblin_chief", emotion: "平靜", text: "嘿，冒險者，你看得懂字嗎？" },
+    { who: "goblin_chief", emotion: "擔心", text: "霧來了以後，大家看不懂告示了。" },
+    { who: "goblin_chief", emotion: "擔心", text: "幾點吃飯、幾點睡覺，全亂了！" }
   ],
   D_GOB_1B: [
-    { who: "goblin_chief", text: "原來告示寫的是作息時間！" },
-    { who: "goblin_chief", text: "咕嚕想寫卡片，你去幫幫咕嚕吧。" }
+    { who: "goblin_chief", emotion: "驚訝", text: "原來告示寫的是作息時間！" },
+    { who: "goblin_chief", emotion: "平靜", text: "咕嚕想寫卡片，你去幫幫咕嚕吧。" }
   ],
   D_GOB_2A: [
-    { who: "goblin_kid", text: "我想寫一張祝福卡給阿嬤。" },
-    { who: "goblin_kid", text: "可是我忘了好聽的句子……" }
+    { who: "goblin_kid", emotion: "平靜", text: "我想寫一張祝福卡給阿嬤。" },
+    { who: "goblin_kid", emotion: "擔心", text: "可是我忘了好聽的句子……" }
   ],
   D_GOB_2B: [
-    { who: "goblin_kid", text: "卡片寫好了！阿嬤一定很開心。" },
-    { who: "goblin_kid", text: "部落南邊的哥布林，把告示撕碎了。" }
+    { who: "goblin_kid", emotion: "開心", text: "卡片寫好了！阿嬤一定很開心。" },
+    { who: "goblin_kid", emotion: "擔心", text: "部落南邊的哥布林，把告示撕碎了。" }
   ],
   D_GOB_3A: [
-    { who: "goblin_chief", text: "迷糊的哥布林把告示撕碎帶走了。" },
-    { who: "goblin_chief", text: "讓哥布林們清醒，找回 3 張告示卷軸。" }
+    { who: "goblin_chief", emotion: "生氣", text: "迷糊的哥布林把告示撕碎帶走了。" },
+    { who: "goblin_chief", emotion: "平靜", text: "讓哥布林們清醒，找回 3 張告示卷軸。" }
   ],
   D_GOB_3B: [
-    { who: "goblin_chief", text: "告示拼回來了！上面寫著……" },
-    { who: "goblin_chief", text: "「蝙蝠王在東邊的洞裡大吵大鬧」！" }
+    { who: "goblin_chief", emotion: "開心", text: "告示拼回來了！上面寫著……" },
+    { who: "goblin_chief", emotion: "驚訝", text: "「蝙蝠王在東邊的洞裡大吵大鬧」！" }
   ],
   D_GOB_4A: [
-    { who: "goblin_chief", text: "噪音蝙蝠王吵得大家睡不著。" },
-    { who: "goblin_chief", text: "牠在部落東邊的小洞裡，拜託你！" }
+    { who: "goblin_chief", emotion: "生氣", text: "噪音蝙蝠王吵得大家睡不著。" },
+    { who: "goblin_chief", emotion: "擔心", text: "牠在部落東邊的小洞裡，拜託你！" }
   ],
   D_GOB_4B: [
-    { who: "goblin_chief", text: "終於安靜了！大家可以好好睡覺。" },
-    { who: "narrator", text: "你拿回了「國語之光」！" },
-    { who: "goblin_chief", text: "聽說月世界的獸人也在吵架。" }
+    { who: "goblin_chief", emotion: "開心", text: "終於安靜了！大家可以好好睡覺。" },
+    { who: "narrator", emotion: "開心", text: "你拿回了「國語之光」！" },
+    { who: "goblin_chief", emotion: "擔心", text: "聽說月世界的獸人也在吵架。" }
   ],
   D_BOSS_BAT_A: [
-    { who: "noise_bat", text: "吱吱吱！好吵好吵，字都亂跑了！" },
-    { who: "pet", text: "一個字一個字讀，讓牠安靜下來！" }
+    { who: "noise_bat", emotion: "生氣", text: "吱吱吱！好吵好吵，字都亂跑了！" },
+    { who: "pet", emotion: "平靜", text: "一個字一個字讀，讓牠安靜下來！" }
   ],
   D_BOSS_BAT_B: [
-    { who: "noise_bat", text: "吱……好安靜。我可以好好睡了。" }
+    { who: "noise_bat", emotion: "平靜", text: "吱……好安靜。我可以好好睡了。" }
   ],
 
   // ═════════════ 月世界泥岩丘・獸人族 ═════════════
   D_ORC_LOCK: [
-    { who: "orc_chief", text: "大家在吵架，現在沒空聽你說。" },
-    { who: "pet", text: "先拿回「數學之光」和「國語之光」吧！" },
-    { who: "pet", text: "有了這兩道光，族長才聽得進去。" }
+    { who: "orc_chief", emotion: "生氣", text: "大家在吵架，現在沒空聽你說。" },
+    { who: "pet", emotion: "平靜", text: "先拿回「數學之光」和「國語之光」吧！" },
+    { who: "pet", emotion: "平靜", text: "有了這兩道光，族長才聽得進去。" }
   ],
   D_ORC_1A: [
-    { who: "orc_chief", text: "月世界的泥岩丘，草少，獵物也少。" },
-    { who: "orc_chief", text: "霧來了以後，大家都在搶獵場。" },
-    { who: "orc_chief", text: "你能幫我們想出公平的辦法嗎？" }
+    { who: "orc_chief", emotion: "擔心", text: "月世界的泥岩丘，草少，獵物也少。" },
+    { who: "orc_chief", emotion: "生氣", text: "霧來了以後，大家都在搶獵場。" },
+    { who: "orc_chief", emotion: "擔心", text: "你能幫我們想出公平的辦法嗎？" }
   ],
   D_ORC_1B: [
-    { who: "orc_chief", text: "一起討論、一起遵守，真好！" },
-    { who: "orc_chief", text: "大門外的獵人也需要幫忙。" }
+    { who: "orc_chief", emotion: "開心", text: "一起討論、一起遵守，真好！" },
+    { who: "orc_chief", emotion: "平靜", text: "大門外的獵人也需要幫忙。" }
   ],
   D_ORC_2A: [
-    { who: "orc", text: "營地裡每天都吵吵鬧鬧的。" },
-    { who: "orc", text: "要怎麼照顧自己、和家人好好相處？" }
+    { who: "orc", emotion: "擔心", text: "營地裡每天都吵吵鬧鬧的。" },
+    { who: "orc", emotion: "擔心", text: "要怎麼照顧自己、和家人好好相處？" }
   ],
   D_ORC_2B: [
-    { who: "orc", text: "謝謝你！營地變得好和氣。" },
-    { who: "orc", text: "可是柵欄的鑰匙被野豬叼走了。" }
+    { who: "orc", emotion: "開心", text: "謝謝你！營地變得好和氣。" },
+    { who: "orc", emotion: "擔心", text: "可是柵欄的鑰匙被野豬叼走了。" }
   ],
   D_ORC_3A: [
-    { who: "orc_chief", text: "泥岩溝裡的野豬叼走了柵欄鑰匙。" },
-    { who: "orc_chief", text: "讓牠們清醒，找回 3 把鑰匙。" }
+    { who: "orc_chief", emotion: "生氣", text: "泥岩溝裡的野豬叼走了柵欄鑰匙。" },
+    { who: "orc_chief", emotion: "平靜", text: "讓牠們清醒，找回 3 把鑰匙。" }
   ],
   D_ORC_3B: [
-    { who: "orc_chief", text: "柵欄可以關好了，謝謝！" },
-    { who: "orc_chief", text: "可是南邊的石像突然動起來了！" }
+    { who: "orc_chief", emotion: "開心", text: "柵欄可以關好了，謝謝！" },
+    { who: "orc_chief", emotion: "驚訝", text: "可是南邊的石像突然動起來了！" }
   ],
   D_ORC_4A: [
-    { who: "orc_chief", text: "暴躁石像在南邊的泥岩溝裡亂撞。" },
-    { who: "orc_chief", text: "它忘了大家一起訂的規則，拜託你！" }
+    { who: "orc_chief", emotion: "擔心", text: "暴躁石像在南邊的泥岩溝裡亂撞。" },
+    { who: "orc_chief", emotion: "擔心", text: "它忘了大家一起訂的規則，拜託你！" }
   ],
   D_ORC_4B: [
-    { who: "orc_chief", text: "石像安靜下來了，月世界又和平了。" },
-    { who: "narrator", text: "你拿回了「社會之光」！" },
-    { who: "pet", text: "五道光都到齊了嗎？搭車回金包里吧！" }
+    { who: "orc_chief", emotion: "開心", text: "石像安靜下來了，月世界又和平了。" },
+    { who: "narrator", emotion: "開心", text: "你拿回了「社會之光」！" },
+    { who: "pet", emotion: "開心", text: "五道光都到齊了嗎？搭車回金包里吧！" }
   ],
   D_BOSS_GOLEM_A: [
-    { who: "angry_golem", text: "咚！咚！規則是什麼？我不記得！" },
-    { who: "pet", text: "我們一起想想，大家要怎麼相處！" }
+    { who: "angry_golem", emotion: "生氣", text: "咚！咚！規則是什麼？我不記得！" },
+    { who: "pet", emotion: "平靜", text: "我們一起想想，大家要怎麼相處！" }
   ],
   D_BOSS_GOLEM_B: [
-    { who: "angry_golem", text: "咚……我想起來了。要輪流，要分享。" }
+    { who: "angry_golem", emotion: "平靜", text: "咚……我想起來了。要輪流，要分享。" }
   ],
 
   // ═════════════ 主線收尾 ═════════════
   D_LAMPS_A: [
-    { who: "chief", text: "五道光都拿回來了！真厲害！",
+    { who: "chief", emotion: "開心", text: "五道光都拿回來了！真厲害！",
       taigi: { hanji: "五葩燈的光攏提轉來矣！真讚！", tailo: "Gōo pha ting ê kng lóng the̍h tńg--lâi--ah! Tsin tsán!", huayu: "五盞燈的光都拿回來了！真棒！" } },
-    { who: "chief", text: "每盞燈前答對一題，燈就會亮。",
+    { who: "chief", emotion: "平靜", text: "每盞燈前答對一題，燈就會亮。",
       taigi: { hanji: "每葩燈頭前回答著一題，燈就會光。", tailo: "Muí pha ting thâu-tsîng huê-tap tio̍h tsi̍t tê, ting tō ē kng.", huayu: "每盞燈前答對一題，燈就會亮。" } }
   ],
   D_LAMPS_B: [
-    { who: "narrator", text: "五盞知識燈一起亮了起來！" },
-    { who: "chief", text: "可是霧還沒散……霧魔在古城塔頂。" },
-    { who: "chief", text: "搭客運到府城古城，去找城主吧。",
+    { who: "narrator", emotion: "開心", text: "五盞知識燈一起亮了起來！" },
+    { who: "chief", emotion: "擔心", text: "可是霧還沒散……霧魔在古城塔頂。" },
+    { who: "chief", emotion: "平靜", text: "搭客運到府城古城，去找城主吧。",
       taigi: { hanji: "坐客運去府城，去揣城主。", tailo: "Tsē kheh-ūn khì Hú-siânn, khì tshuē siânn-tsú.", huayu: "搭客運去府城，去找城主。" } },
-    { who: "pet", text: "我們一起把霧趕走！" }
+    { who: "pet", emotion: "開心", text: "我們一起把霧趕走！" }
   ],
   D_FINAL_LOCK: [
-    { who: "king", text: "歡迎來到府城古城，小冒險者。" },
-    { who: "king", text: "先點亮金包里的五盞燈，再來找我。" }
+    { who: "king", emotion: "平靜", text: "歡迎來到府城古城，小冒險者。" },
+    { who: "king", emotion: "平靜", text: "先點亮金包里的五盞燈，再來找我。" }
   ],
   D_FINAL_A: [
-    { who: "king", text: "你就是點亮五盞燈的冒險者嗎？" },
-    { who: "king", text: "霧魔在古城塔頂，樓梯在城主府後面。" },
-    { who: "king", text: "它會用五科的題目考你，要小心。" },
-    { who: "pet", text: "不怕！學過的東西都在心裡！" }
+    { who: "king", emotion: "驚訝", text: "你就是點亮五盞燈的冒險者嗎？" },
+    { who: "king", emotion: "擔心", text: "霧魔在古城塔頂，樓梯在城主府後面。" },
+    { who: "king", emotion: "擔心", text: "它會用五科的題目考你，要小心。" },
+    { who: "pet", emotion: "開心", text: "不怕！學過的東西都在心裡！" }
   ],
   D_FINAL_B: [
-    { who: "king", text: "霧散了！大家都想起來了！" },
-    { who: "king", text: "謝謝你，{name}。你是美麗島的勇者。" }
+    { who: "king", emotion: "開心", text: "霧散了！大家都想起來了！" },
+    { who: "king", emotion: "開心", text: "謝謝你，{name}。你是美麗島的勇者。" }
   ],
   D_BOSS_FOG_A: [
-    { who: "fog_demon", text: "呼呼……把學過的，全部忘掉吧……" },
+    { who: "fog_demon", emotion: "神祕", text: "呼呼……把學過的，全部忘掉吧……" },
     { who: "pet", text: "才不會忘！五道光，一起亮起來！" }
   ],
   D_BOSS_FOG_B: [
-    { who: "fog_demon", text: "好亮……原來，知識是忘不掉的……" }
+    { who: "fog_demon", emotion: "神祕", text: "好亮……原來，知識是忘不掉的……" }
   ],
   D_ENDING: [
-    { who: "narrator", text: "遺忘霧散了，天空變得好藍。" },
-    { who: "narrator", text: "金包里的漁港點起燈火，大家一起慶祝。" },
-    { who: "chief", text: "謝謝你！金包里又亮起來了！",
+    { who: "narrator", emotion: "開心", text: "遺忘霧散了，天空變得好藍。" },
+    { who: "narrator", emotion: "開心", text: "金包里的漁港點起燈火，大家一起慶祝。" },
+    { who: "chief", emotion: "開心", text: "謝謝你！金包里又亮起來了！",
       taigi: { hanji: "多謝你！金包里閣光起來矣！", tailo: "To-siā--lí! Kim-pau-lí koh kng khí-lâi--ah!", huayu: "謝謝你！金包里又亮起來了！" } },
-    { who: "pet", text: "{name}，下次冒險還要一起去喔！" }
+    { who: "pet", emotion: "開心", text: "{name}，下次冒險還要一起去喔！" }
   ],
 
   // ═════════════ 村民委託 ═════════════

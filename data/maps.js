@@ -126,7 +126,7 @@ window.MAPS = {
       { x: 0,  y: 9, to: "M03", tx: 26, ty: 9 }
     ],
     npcs: [
-      { id: "potato_seller", x: 16, y: 2, sprite: "npc_shopkeeper", dialog: "D_POTATO_IDLE", quest: "Q_SIDE_POTATO", quests: ["Q_SIDE_POTATO"] }
+      { id: "potato_seller", x: 16, y: 2, sprite: "npc_auntie_yam", dialog: "D_POTATO_IDLE", quest: "Q_SIDE_POTATO", quests: ["Q_SIDE_POTATO"] }
     ],
     chests: [
       { id: "C_M02_1", x: 4,  y: 15, subject: "數學", level: 1, reward: { gold: 30, item: null } },
@@ -447,9 +447,9 @@ window.MAPS = {
       { id: "innkeeper_port", x: 3,  y: 2, sprite: "npc_innkeeper",  dialog: "D_PORT_INN_IDLE",   quest: null,            quests: [] },
       { id: "blacksmith",     x: 9,  y: 2, sprite: "npc_blacksmith", dialog: "D_BLACKSMITH_IDLE", quest: "Q_SIDE_MAGNET", quests: ["Q_SIDE_MAGNET"] },
       { id: "armor_keeper",   x: 20, y: 2, sprite: "npc_shopkeeper", dialog: "D_ARMOR_IDLE",      quest: null,            quests: [] },
-      { id: "item_keeper",    x: 26, y: 2, sprite: "npc_shopkeeper", dialog: "D_ITEM_IDLE",       quest: null,            quests: [] },
+      { id: "item_keeper",    x: 26, y: 2, sprite: "npc_auntie_market", dialog: "D_ITEM_IDLE",       quest: null,            quests: [] },
       { id: "merchant",       x: 3,  y: 6, sprite: "npc_merchant",   dialog: "D_MERCHANT_IDLE",   quest: "Q_MER_1",       quests: ["Q_MER_1", "Q_MER_2", "Q_MER_3", "Q_MER_4"] },
-      { id: "taro_seller",    x: 25, y: 6, sprite: "npc_shopkeeper", dialog: "D_TARO_IDLE",       quest: "Q_SIDE_TARO",   quests: ["Q_SIDE_TARO"] }
+      { id: "taro_seller",    x: 25, y: 6, sprite: "npc_auntie_taro", dialog: "D_TARO_IDLE",       quest: "Q_SIDE_TARO",   quests: ["Q_SIDE_TARO"] }
     ],
     chests: [
       { id: "C_M09_1", x: 29, y: 5, subject: "數學", level: 2, reward: { gold: 30, item: "snack" } }

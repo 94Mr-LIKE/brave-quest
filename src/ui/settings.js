@@ -63,7 +63,19 @@
       body.appendChild(radioRow('戰鬥答題時間', 'time', ['relaxed', 'standard', 'off'].map(function (k) { return { value: k, label: TIME_LABEL[k] }; }),
         st.settings.answerTime, function (v) { st.settings.answerTime = v; G.save(); }));
       body.appendChild(h('p.small', { text: '標準：1 星題 30 秒、2 星 40 秒、3 星 60 秒、4 星 90 秒。朗讀時時間條會暫停。' }));
-      body.appendChild(radioRow('朗讀', 'tts', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.tts, function (v) { st.settings.tts = v; G.save(); }));
+      // 語音（對話與題目朗讀）：家長可以整個關掉
+      var apply = function () { G.save(); G.applySettings(); };
+      body.appendChild(radioRow('語音（對話、題目朗讀）', 'tts', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.tts, function (v) { st.settings.tts = v; apply(); }));
+      if (st.settings.tts !== false) {
+        body.appendChild(radioRow('對話自動念出來', 'vauto', [{ value: true, label: '自動' }, { value: false, label: '按 🔊 才念' }], st.settings.voiceAuto !== false, function (v) { st.settings.voiceAuto = v; apply(); }));
+        body.appendChild(radioRow('語音音量', 'vvol', [{ value: 0.4, label: '小' }, { value: 0.7, label: '中' }, { value: 0.9, label: '大' }],
+          [0.4, 0.7, 0.9].reduce(function (a, b) { return Math.abs(b - st.settings.voiceVolume) < Math.abs(a - st.settings.voiceVolume) ? b : a; }), function (v) { st.settings.voiceVolume = v; apply(); }));
+        body.appendChild(radioRow('語速', 'vrate', [{ value: 0.8, label: '慢' }, { value: 0.9, label: '稍慢' }, { value: 1, label: '標準' }, { value: 1.15, label: '稍快' }],
+          st.settings.voiceRate || 1, function (v) { st.settings.voiceRate = v; apply(); }));
+        body.appendChild(radioRow('台語台詞', 'vlang', [{ value: 'taigi', label: '台語優先（有台語錄音就播）' }, { value: 'huayu', label: '華語優先' }],
+          st.settings.voiceLang || 'taigi', function (v) { st.settings.voiceLang = v; apply(); }));
+        body.appendChild(h('p.small', { text: '朗讀用的是這台裝置內建的語音；台語台詞還沒有錄音時，會先響一聲提示音，再念華語翻譯。' }));
+      }
       body.appendChild(radioRow('音效', 'sound', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.sound, function (v) { st.settings.sound = v; G.save(); }));
       body.appendChild(radioRow('螢幕搖桿與 A／B 鍵', 'touch', [{ value: 'auto', label: '自動（觸控裝置才顯示）' }, { value: 'on', label: '一直顯示' }, { value: 'off', label: '不顯示' }],
         st.settings.touchControls || 'auto', function (v) { st.settings.touchControls = v; G.save(); G.applySettings(); }));
