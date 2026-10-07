@@ -362,6 +362,10 @@
     hit: function (c, o, t) { burst(c, o, t, 0.08, 'bandpass', 1800, 1.5, 0.18); tone(c, o, 220, t, 0.08, 'square', 0.06, 120); },
     crit: function (c, o, t) { burst(c, o, t, 0.14, 'bandpass', 2400, 1.2, 0.2); chord(c, o, t + 0.02, [523, 784, 1047, 1319], 0.05, 0.16, 'triangle', 0.12); },
     hurt: function (c, o, t) { burst(c, o, t, 0.18, 'lowpass', 700, 1, 0.22); tone(c, o, 180, t, 0.2, 'sawtooth', 0.07, 110); },
+    heal: function (c, o, t) { tone(c, o, 660, t, 0.25, 'sine', 0.09, 880); tone(c, o, 990, t + 0.12, 0.3, 'sine', 0.06, 1320); },   // 補血：輕柔上滑（和升級不同）
+    rage: function (c, o, t) {   // 頭目生氣：低沉的轟隆＋下滑
+      burst(c, o, t, 0.5, 'lowpass', 260, 1.2, 0.2); tone(c, o, 110, t, 0.55, 'sawtooth', 0.07, 70); tone(c, o, 147, t + 0.05, 0.45, 'square', 0.04, 98);
+    },
     levelup: function (c, o, t) { chord(c, o, t, [523, 659, 784, 1047, 1319], 0.08, 0.22, 'triangle', 0.13); chord(c, o, t + 0.4, [1047, 1319, 1568], 0, 0.5, 'sine', 0.06); },
     chest: function (c, o, t) {   // 木箱「喀」一聲，再閃亮琶音
       burst(c, o, t, 0.05, 'bandpass', 900, 3, 0.18); tone(c, o, 160, t, 0.08, 'sine', 0.12, 120);

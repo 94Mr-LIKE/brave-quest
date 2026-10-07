@@ -92,7 +92,19 @@
           st.settings.voiceRate || 1, function (v) { st.settings.voiceRate = v; apply(); }));
         body.appendChild(radioRow('台語台詞', 'vlang', [{ value: 'taigi', label: '台語優先（有台語錄音就播）' }, { value: 'huayu', label: '華語優先' }],
           st.settings.voiceLang || 'taigi', function (v) { st.settings.voiceLang = v; apply(); }));
-        body.appendChild(h('p.small', { text: '朗讀用的是這台裝置內建的語音；台語台詞還沒有錄音時，會先響一聲提示音，再念華語翻譯。' }));
+        body.appendChild(radioRow('允許使用雲端高品質語音（不會傳送名字）', 'vcloud', [{ value: true, label: '允許' }, { value: false, label: '只用本機語音' }],
+          st.settings.voiceCloud !== false, function (v) { st.settings.voiceCloud = v; apply(); }));
+        // 目前用的語音＋試聽
+        var cur = J.Voice.currentVoice('narrator');
+        var curText = cur ? '目前的語音：' + cur.name + (cur.cloud ? '（雲端）' : '（本機）') + (cur.quality ? '・高品質' : '') : '目前的語音：這台裝置沒有中文語音（會用瀏覽器預設的聲音）';
+        body.appendChild(h('div.row.voice-now', {}, [h('span', { text: curText }),
+          h('button', { onclick: function () { J.Voice.sayLine({ line: { who: 'narrator', text: '你好！我是勇者大冒險的說書人，歡迎來到金包里。' }, who: 'narrator' }); }, 'aria-label': '試聽目前的語音' }, ['🔊 試聽'])]));
+        body.appendChild(h('p.small', { text: '朗讀是裝置內建的電腦合成語音（不是真人錄音）。台語台詞還沒有錄音時，會先響一聲提示音，再念華語翻譯；對話框照常顯示台語漢字和台羅。' }));
+        body.appendChild(h('details.voice-tips', {}, [h('summary', { text: '🎧 讓聲音更自然' }),
+          h('ul', {}, [
+            h('li', { text: 'iPad：設定 → 輔助使用 → 朗讀與說話（舊版叫「朗讀內容」）→ 聲音 → 中文（台灣）→ 下載標示「增強版」的聲音（請用 Wi-Fi，約 100 MB 以上）。下載後重新打開遊戲就會自動使用。' }),
+            h('li', { text: '電腦：建議用 Microsoft Edge 瀏覽器，會自動使用比較自然的「Natural」語音（需要連網，玩家名字會換成「勇者」再念）。' }),
+            h('li', { text: '說明來源：Apple 支援 https://support.apple.com/en-us/111798' })])]));
       }
       body.appendChild(radioRow('音效', 'sound', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.sound, function (v) { st.settings.sound = v; G.save(); G.applySettings(); }));
       body.appendChild(radioRow('音樂', 'music', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.music !== false, function (v) { st.settings.music = v; G.save(); G.applySettings(); }));

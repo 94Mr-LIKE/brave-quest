@@ -9,7 +9,12 @@
  *    - 依說話者（window.VOICES）的性別、年齡、個性與這句的情緒（emotion）算出 pitch、rate；
  *      同一類角色再依 id 雜湊加一點固定差異，避免每個人聽起來一樣。
  *    - 挑音色：男性角色優先男聲；沒有男聲時用較低的 pitch 模擬。
- *    - 自然化：依標點切成短句逐段念，句間停 120～350ms；驚嘆句尾稍微提高；去掉括號裡的舞台說明；英文照舊用英文語音。
+ *    - 自然化：依標點切成短句逐段念，句間停 120～400ms；驚嘆句稍快稍高；疑問句尾的語助詞（嗎、呢、吧…）上揚；去掉括號裡的舞台說明；英文照舊用英文語音。
+ *    - v0.7 挑語音：語言分＞品質分（Natural、Neural、Enhanced、Premium、增強、高品質）＞性別分；同一個角色每次都用同一個語音
+ *      （同分的高品質語音依角色 id 固定分配，讓不同角色有不同聲音）。
+ *    - v0.7 雲端語音（localService＝false，例如 Edge 的 Natural 語音）不再扣分，但送去雲端念的文字一律把玩家名字換成「勇者」；
+ *      家長設定可以關掉雲端語音（關掉後只用本機語音）。
+ *    - 不使用任何非官方或沒有授權的語音服務；只用瀏覽器內建的 speechSynthesis。
  *
  * 純計算的部分可以在 node 測試（module.exports）。
  */
@@ -29,28 +34,78 @@
     return 'n';   // 例如「Google 國語（臺灣）」：不知道性別，當中性
   }
 
+  /** 語音品質分：名稱含 Natural／Neural（例如 Edge 的「Microsoft HsiaoChen Online (Natural)」）40；Enhanced／Premium／增強／高品質（iPad 增強版「美佳」）35 */
+  var QUALITY = [[/natural|neural/i, 40], [/enhanced|premium|增強|高品質|優化/i, 35]];
+  function voiceQuality(v) {
+    var n = String((v && (v.name || '')) + ' ' + (v && v.voiceURI || ''));
+    for (var i = 0; i < QUALITY.length; i++) if (QUALITY[i][0].test(n)) return QUALITY[i][1];
+    return 0;
+  }
+
   /**
-   * 從語音清單挑一個：語言 zh-TW ＞ zh-HK ＞ 其他 zh；同語言裡「性別相符」＞「中性」＞「其他」；本機語音優先（不把文字送到雲端）。
-   * 回傳 { voice, gender, matched }；沒有任何中文語音時 voice 為 null。
+   * 從語音清單挑一個。分數：語言（zh-TW 100 ＞ zh-HK 50 ＞ 其他 zh 20）＞ 品質（35～40）＞ 性別（相符 30、中性 10）。
+   * opts = { allowCloud（預設 true；false 時不用雲端語音）, key（角色 id：同分時依 id 固定挑其中一個，讓不同角色聲音不同） }
+   * 回傳 { voice, gender, matched, score, cloud }；沒有符合的語音時 voice 為 null。
    */
-  function pickVoice(voices, want, lang) {
+  function pickVoice(voices, want, lang, opts) {
+    opts = opts || {};
     lang = (lang || 'zh-TW').toLowerCase();
     var pre = lang.split('-')[0];
-    var best = null, bestScore = -1;
+    var cands = [];
     (voices || []).forEach(function (v) {
       var vl = String(v.lang || '').replace('_', '-').toLowerCase();
       if (vl.indexOf(pre) !== 0) return;
+      if (opts.allowCloud === false && v.localService === false) return;
       var g = voiceGender(v.name);
       var score = 0;
       if (vl === lang) score += 100; else if (pre === 'zh' && vl === 'zh-hk') score += 50; else score += 20;
+      score += voiceQuality(v);
       if (want && want !== 'n') score += g === want ? 30 : (g === 'n' ? 10 : 0);
-      if (v.localService !== false) score += 5;
-      if (score > bestScore) { bestScore = score; best = { voice: v, gender: g }; }
+      cands.push({ voice: v, gender: g, score: score });
     });
-    if (!best) return { voice: null, gender: 'n', matched: false };
+    if (!cands.length) return { voice: null, gender: 'n', matched: false, score: -1, cloud: false };
+    var top = Math.max.apply(null, cands.map(function (c) { return c.score; }));
+    var tier = cands.filter(function (c) { return c.score === top; });
+    var best = tier[opts.key ? hash(String(opts.key)) % tier.length : 0];
     best.matched = !want || want === 'n' || best.gender === want;
+    best.cloud = best.voice.localService === false;
     return best;
   }
+
+  // 名字裡可能有的標點、括號、空白（半形與全形）
+  var NAME_PUNCT = /[\s!-\/:-@\[-`{-~\u2018-\u201F\u2026\u3000-\u303F\uFF01-\uFF0F\uFF1A-\uFF20\uFF3B-\uFF40\uFF5B-\uFF65]/g;
+  function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  /** 名字要遮蔽的寫法：整個名字、拿掉標點括號空白後的名字（由長到短，避免先換掉一部分） */
+  function nameVariants(name) {
+    var n = String(name || '').trim();
+    if (!n) return [];
+    var out = [n], core = n.replace(NAME_PUNCT, '');
+    if (core && core !== n) out.push(core);
+    return out.sort(function (a, b) { return b.length - a.length; });
+  }
+
+  /**
+   * 送去雲端語音念的文字：把玩家自訂的名字換成「勇者」（兒童的名字不送到雲端）。
+   * 整個名字與拿掉標點括號後的名字都換；英文字母不分大小寫（Ken／ken）。
+   */
+  function maskName(text, name) {
+    var s = String(text || '');
+    nameVariants(name).forEach(function (v) { s = s.replace(new RegExp(escRe(v), 'gi'), '勇者'); });
+    return s;
+  }
+
+  /**
+   * 這次朗讀有沒有可能用到雲端語音（裝置上有雲端語音、或語音清單還沒載入不知道）。
+   * 有可能就在「切句之前」先把整句的名字遮掉（切句會拿掉括號、把英文切成另一段，名字被切開就比對不到）。
+   * 不看「允許雲端」開關：關掉時某一段若找不到本機語音，瀏覽器會改用它的預設語音，而預設語音可能是雲端的（夜班審查 F1）。
+   * 代價：關掉雲端時，本機語音念到名字也會說「勇者」。
+   */
+  function cloudPossible() {
+    var list = voicesList();
+    return !list.length || list.some(function (v) { return v.localService === false; });
+  }
+  function premask(text) { return cloudPossible() ? maskName(text, settings.playerName) : String(text || ''); }
 
   // ---------------------------------------------------------------- 說話者設定
   var GENDER_ALIAS = { m: 'm', male: 'm', man: 'm', boy: 'm', '男': 'm', f: 'f', female: 'f', woman: 'f', girl: 'f', '女': 'f' };
@@ -162,7 +217,7 @@
   }
 
   // ---------------------------------------------------------------- 分段
-  var PAUSE = { '，': 140, ',': 140, '、': 120, '；': 200, ';': 200, '：': 160, '。': 300, '.': 300, '！': 320, '!': 320, '？': 320, '?': 320, '…': 350 };
+  var PAUSE = { '，': 180, ',': 180, '、': 130, '；': 230, ';': 230, '：': 180, '。': 380, '.': 380, '！': 340, '!': 340, '？': 360, '?': 360, '…': 420 };
 
   /** 去掉括號裡的舞台說明：（笑）、(小聲)、【動作】、［…］ */
   function stripStage(text) {
@@ -186,9 +241,17 @@
       var last = punct.charAt(punct.length - 1);
       var pause = PAUSE[last] || 0;
       if (/…/.test(punct)) pause = PAUSE['…'];
-      var rise = /[！!]/.test(punct);
-      var parts = splitLatin(body + (/[？?]/.test(punct) ? '？' : ''), latinLang);
-      parts.forEach(function (pt, i) { out.push({ text: pt.text, lang: pt.lang, pauseAfter: i === parts.length - 1 ? pause : 0, rise: rise && i === parts.length - 1 }); });
+      var rise = /[！!]/.test(punct), ask = /[？?]/.test(punct);
+      var parts = splitLatin(body + (ask ? '？' : ''), latinLang);
+      parts.forEach(function (pt, i) {
+        var lastPart = i === parts.length - 1;
+        // 疑問句：句尾的語助詞（嗎、呢、吧…）單獨念、音調上揚（例：「你準備好了」＋「嗎？」）
+        var m2 = lastPart && ask && pt.lang === 'zh-TW' ? /^(.{3,}?)([嗎呢吧啊呀喔哦嘛咧捏麼])？$/.exec(pt.text) : null;
+        if (m2) {
+          out.push({ text: m2[1], lang: pt.lang, pauseAfter: 0, ask: true });
+          out.push({ text: m2[2] + '？', lang: pt.lang, pauseAfter: pause, askTail: true });
+        } else out.push({ text: pt.text, lang: pt.lang, pauseAfter: lastPart ? pause : 0, rise: rise && lastPart, ask: ask && lastPart });
+      });
     }
     if (out.length) out[out.length - 1].pauseAfter = 0;
     return out;
@@ -224,7 +287,8 @@
   // ---------------------------------------------------------------- 播放（瀏覽器）
   var synth = typeof window !== 'undefined' ? (window.speechSynthesis || null) : null;
   var enabled = true, speaking = false, token = 0, audioEl = null, timers = [];
-  var settings = { volume: 0.9, rateMult: 1, pref: 'taigi' };
+  var settings = { volume: 0.9, rateMult: 1, pref: 'taigi', allowCloud: true, playerName: '' };
+  var voiceCache = {};   // 角色 id＋語言 → 語音名稱（同一個角色每次都用同一個語音）
   var stats = { utterances: 0, files: 0, cues: 0 };   // 給測試看
 
   function voicesList() { try { return synth && synth.getVoices ? synth.getVoices() || [] : []; } catch (e) { return []; } }
@@ -238,6 +302,22 @@
     speaking = false;
   }
 
+  /**
+   * 角色固定用的語音：第一次挑好就記住（同一個角色不會這句男聲、下一句女聲）。
+   * 記住的語音不在清單裡了（例如換了裝置設定）或雲端設定改了，才重新挑。
+   */
+  function voiceFor(profile, lang, list) {
+    var key = (profile.id || 'narrator') + '|' + lang + '|' + (settings.allowCloud ? 'c' : 'l');
+    var cached = voiceCache[key];
+    if (cached) {
+      var still = list.filter(function (v) { return v.name === cached.name && v.lang === cached.lang; })[0];
+      if (still) return { voice: still, gender: cached.gender, matched: cached.matched, cloud: still.localService === false };
+    }
+    var pick = pickVoice(list, profile.gender, lang, { allowCloud: settings.allowCloud, key: profile.id });
+    if (pick.voice) voiceCache[key] = { name: pick.voice.name, lang: pick.voice.lang, gender: pick.gender, matched: pick.matched };
+    return pick;
+  }
+
   /** 依序念一串短句；每句念完（或保險時間到）才停頓、念下一句。回傳 false＝不能朗讀 */
   function speakChunks(list, profile, emotion, onStart, onEnd) {
     if (!synth || !enabled || typeof SpeechSynthesisUtterance === 'undefined' || !list.length) { if (onEnd) onEnd(); return false; }
@@ -245,7 +325,15 @@
     var my = token;
     speaking = true;
     if (onStart) onStart();
-    var pick = pickVoice(voicesList(), profile.gender, 'zh-TW');
+    // 語音清單還沒載入（有些瀏覽器要等一下）：先等最多 0.7 秒，免得第一句用預設聲音、之後換成別的聲音
+    if (!voicesList().length && !speakChunks.waited) {
+      speakChunks.waited = true;
+      var resume = function () { if (my === token) speakChunks(list, profile, emotion, null, onEnd); };
+      try { synth.addEventListener('voiceschanged', function once() { synth.removeEventListener('voiceschanged', once); resume(); }); } catch (e) { /* 忽略 */ }
+      later(resume, 700);
+      return true;
+    }
+    var pick = voiceFor(profile, 'zh-TW', voicesList());
     var base = prosody(profile, { emotion: emotion, rateMult: settings.rateMult, volume: settings.volume, lowerForMale: profile.gender === 'm' && !pick.matched });
     var i = 0;
     function finish() { if (my !== token) return; speaking = false; if (onEnd) onEnd(); }
@@ -253,12 +341,17 @@
       if (my !== token) return;
       if (i >= list.length) { finish(); return; }
       var c = list[i++];
-      var u = new SpeechSynthesisUtterance(c.text);
+      var vp = c.lang === 'zh-TW' ? pick : voiceFor(profile, c.lang, voicesList());
+      // 雲端語音：玩家名字換成「勇者」再送出（第二道防線；第一道在切句之前 premask）
+      var text = vp.cloud || !vp.voice ? maskName(c.text, settings.playerName) : c.text;
+      var u = new SpeechSynthesisUtterance(text);
       u.lang = c.lang;
-      if (c.lang === 'zh-TW') { if (pick.voice) u.voice = pick.voice; }
-      else { var en = pickVoice(voicesList(), profile.gender, c.lang).voice; if (en) u.voice = en; }
-      u.pitch = clamp(base.pitch + (c.rise ? 0.08 : 0), 0, 2);
-      u.rate = c.lang === 'zh-TW' ? base.rate : clamp(base.rate * 0.9, 0.5, 1.4);
+      if (vp.voice) u.voice = vp.voice;
+      // 韻律：驚嘆句稍快稍高；疑問句整句略高、句尾語助詞再上揚
+      var dp = (c.rise ? 0.07 : 0) + (c.ask ? 0.04 : 0) + (c.askTail ? 0.16 : 0);
+      var dr = c.rise ? 1.08 : (c.askTail ? 0.95 : 1);
+      u.pitch = clamp(base.pitch + dp, 0, 2);
+      u.rate = clamp((c.lang === 'zh-TW' ? base.rate : base.rate * 0.9) * dr, 0.5, 1.6);
       u.volume = base.volume;
       var done = false;
       var go = function () { if (done || my !== token) return; done = true; later(next, c.pauseAfter || 0); };
@@ -273,7 +366,7 @@
   /** 題目朗讀（相容舊 tts.js）：lang＝題目的 tts_lang，英文段落用英文語音 */
   function speak(text, lang, onStart, onEnd) {
     var latin = lang && lang.indexOf('en') === 0 ? lang : 'en-US';
-    return speakChunks(chunks(text, latin), { id: 'narrator', gender: 'n', age: 'adult', persona: 'calm', pitch: 1, rate: 1 }, null, onStart, onEnd);
+    return speakChunks(chunks(premask(text), latin), { id: 'narrator', gender: 'n', age: 'adult', persona: 'calm', pitch: 1, rate: 1 }, null, onStart, onEnd);
   }
 
   /** 播預錄音檔（只會播 manifest 列出的檔案） */
@@ -284,7 +377,7 @@
     var src = String(url || '').replace(/^\.\//, '').replace(/^docs\//, '');
     if (!src || /^[a-z]+:\/\//i.test(src) || src.charAt(0) === '/') return false;   // 只播本站的相對路徑
     try {
-      var a = new Audio(src);
+      var a = new Audio(window.JQ && window.JQ.Assets && window.JQ.Assets.versioned ? window.JQ.Assets.versioned(src) : src);   // 網址加版本號，避免快取到舊錄音
       a.volume = clamp(settings.volume, 0, 1);
       // 依說話者微調播放速度（±10%）；preservesPitch=false 讓小孩更高、老人更低一點
       var p = prosody(profile, { rateMult: 1 });
@@ -316,11 +409,11 @@
       stop();
       if (window.JQ.Audio) { window.JQ.Audio.play('taigi'); stats.cues++; }
       var my = token;
-      later(function () { if (my === token) speakChunks(chunks(view.speak, 'en-US'), profile, line.emotion, null, onEnd); }, 320);
+      later(function () { if (my === token) speakChunks(chunks(premask(view.speak), 'en-US'), profile, line.emotion, null, onEnd); }, 320);
       speaking = true;
       return true;
     }
-    return speakChunks(chunks(view.speak, 'en-US'), profile, line.emotion, null, onEnd);
+    return speakChunks(chunks(premask(view.speak), 'en-US'), profile, line.emotion, null, onEnd);
   }
 
   function warmUp() {
@@ -335,10 +428,20 @@
     if (typeof s.volume === 'number') settings.volume = clamp(s.volume, 0, 1);
     if (typeof s.rateMult === 'number') settings.rateMult = clamp(s.rateMult, 0.6, 1.5);
     if (s.pref === 'taigi' || s.pref === 'huayu') settings.pref = s.pref;
+    if (typeof s.allowCloud === 'boolean') settings.allowCloud = s.allowCloud;
+    if (typeof s.playerName === 'string') settings.playerName = s.playerName;
+  }
+
+  /** 設定頁顯示用：說話者（預設旁白）現在會用哪一個語音 */
+  function currentVoice(who) {
+    var profile = profileFor(who || 'narrator', typeof window !== 'undefined' ? window.VOICES : null, {});
+    var p = voiceFor(profile, 'zh-TW', voicesList());
+    return p.voice ? { name: p.voice.name, lang: p.voice.lang, cloud: p.voice.localService === false, quality: voiceQuality(p.voice) } : null;
   }
 
   var Voice = {
-    FEMALE: FEMALE, MALE: MALE, voiceGender: voiceGender, pickVoice: pickVoice, inferProfile: inferProfile, profileFor: profileFor,
+    FEMALE: FEMALE, MALE: MALE, voiceGender: voiceGender, pickVoice: pickVoice, voiceQuality: voiceQuality, maskName: maskName, nameVariants: nameVariants, voiceFor: voiceFor, currentVoice: currentVoice,
+    _settings: settings, _cache: voiceCache, inferProfile: inferProfile, profileFor: profileFor,
     prosody: prosody, stripStage: stripStage, chunks: chunks, splitLatin: splitLatin, voiceFile: voiceFile, hash: hash,
     sayLine: sayLine, speak: speak, stop: stop, warmUp: warmUp, configure: configure, stats: stats,
     isSpeaking: function () { return speaking; },

@@ -23,7 +23,17 @@
     if (/^data:/.test(path)) return path;
     path = path.replace(/^\.\//, '').replace(/^docs\//, '');
     if (FILE_MODE) return packed(path);
-    return path;
+    return versioned(path);
+  }
+
+  /**
+   * 網址加上這一版的版本號 ?v=<JQ_VERSION>（tools/stamp_version.py 寫在 data/version.js）。
+   * GitHub Pages 會讓瀏覽器快取 10 分鐘；換版後網址不同，就不會拿到舊的圖檔、音檔。file:// 與 data: 不加。
+   */
+  function versioned(url) {
+    var v = typeof window !== 'undefined' && window.JQ_VERSION;
+    if (!url || !v || FILE_MODE || /^(data|blob):/.test(url) || /[?&]v=/.test(url)) return url;
+    return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'v=' + encodeURIComponent(v);
   }
 
   function folderFor(key) {
@@ -243,7 +253,7 @@
 
   window.JQ = window.JQ || {};
   window.JQ.Assets = {
-    FILE_MODE: FILE_MODE, resolveUrl: resolveUrl, info: info, has: has, heroKey: heroKey, texKey: texKey,
+    FILE_MODE: FILE_MODE, resolveUrl: resolveUrl, versioned: versioned, info: info, has: has, heroKey: heroKey, texKey: texKey,
     dirRow: dirRow, art: art, queue: queue, queueTileset: queueTileset, queueBattleBg: queueBattleBg, queueMapImage: queueMapImage, mapImagePath: mapImagePath, watch: watch, finalize: finalize,
     isPlaceholder: isPlaceholder, domIcon: domIcon, esc: esc, preparePack: preparePack, failed: failed
   };

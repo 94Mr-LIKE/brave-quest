@@ -29,10 +29,10 @@ window.ART = {
    "bg": "bg_M09.webp"
   },
   "M10": {
-   "bg": "bg_M10.png"
+   "bg": "bg_M10.webp"
   },
   "M11": {
-   "bg": "bg_M11.png"
+   "bg": "bg_M11.webp"
   }
  },
  "battle": {

@@ -26,6 +26,7 @@
     return {
       state: state, questions: questions, subject: subject, rng: opts.rng || Math.random,
       mode: mode, expMult: opts.expMult || 1, filter: opts.filter || null, noRepeat: !!opts.noRepeat,
+      deferExp: !!opts.deferExp, pendingExp: 0,   // v0.7 戰鬥：答對的經驗值先記在存檔 player.pendingExp，戰鬥結束才一起加（pendingExp＝這場累積多少，顯示用）
       asked: [], guard: J.Guard.create(), q: null, isVariant: false,
       wrongCount: 0, hintsOpened: 0, hintsUsed: false, erased: [], submitted: false, solved: false,
       shownAt: 0, finished: false
@@ -122,7 +123,13 @@
     });
     if (sess.isVariant) st.pendingVariant = null;
     if (reward.needVariant) st.pendingVariant = J.Rewards.makePending(q, reward.variantBonus);
-    var levels = J.Exp.addExp(st.player, reward.exp);
+    var levels = 0;
+    if (sess.deferExp) {
+      // 記在存檔裡（不是只在記憶體）：戰鬥中重新整理，下次讀檔時一樣會結算，不會不見
+      st.player.pendingExp = (st.player.pendingExp || 0) + reward.exp;
+      sess.pendingExp += reward.exp;
+    }
+    else levels = J.Exp.addExp(st.player, reward.exp);
     st.player.coins += reward.coins;
     st.answered[q.id] = true;
     J.Report.recordDone(st, q, reward.firstTry);
@@ -173,7 +180,22 @@
     return { ok: true, index: idx };
   }
 
-  var Session = { create: create, next: next, markShown: markShown, abandon: abandon, submit: submit, openHint: openHint, useEraser: useEraser };
+  /** 戰鬥結束：把戰鬥中答對累積的經驗值加到主角身上，回傳升了幾級 */
+  function settleExp(sess) {
+    if (!sess) return 0;
+    sess.pendingExp = 0;
+    return settlePlayerExp(sess.state);
+  }
+
+  /** 存檔裡還沒結算的戰鬥經驗值（player.pendingExp）加到主角身上並歸零，回傳升了幾級。讀檔時也會呼叫 */
+  function settlePlayerExp(state) {
+    var p = state && state.player;
+    var exp = p ? Number(p.pendingExp) || 0 : 0;
+    if (p) p.pendingExp = 0;
+    return exp > 0 ? J.Exp.addExp(p, exp) : 0;
+  }
+
+  var Session = { settleExp: settleExp, settlePlayerExp: settlePlayerExp, create: create, next: next, markShown: markShown, abandon: abandon, submit: submit, openHint: openHint, useEraser: useEraser };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Session = Session; }
   if (typeof module !== 'undefined') module.exports = Session;
 })();

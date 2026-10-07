@@ -569,17 +569,5 @@ window.SPRITES = {
   "type": "single",
   "frameW": 177,
   "frameH": 176
- },
- "bg_M10": {
-  "file": "assets/maps/bg_M10.png",
-  "type": "map",
-  "frameW": 896,
-  "frameH": 608
- },
- "bg_M11": {
-  "file": "assets/maps/bg_M11.png",
-  "type": "map",
-  "frameW": 768,
-  "frameH": 448
  }
 };

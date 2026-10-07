@@ -257,3 +257,13 @@ body.panel-open #toasts { top: auto; right: auto; left: 50%; bottom: max(14px, e
 .load-bar .label { font-size: 20px; margin-bottom: 8px; text-align: center; }
 .load-bar .track { height: 16px; border-radius: 8px; background: rgba(255, 255, 255, .18); overflow: hidden; }
 .load-bar .fill { height: 100%; width: 0; background: linear-gradient(90deg, #ffd34d, #ffb02e); transition: width .15s; }
+
+/* v0.7 頭目生氣（換階段）：紅色、會抖動的橫幅，和金色的「等級提升」明顯不同 */
+.rage-banner { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); font-size: 34px; font-weight: bold; padding: 14px 30px; text-align: center; pointer-events: none;
+  color: #fff; background: rgba(150, 20, 20, .9); border: 4px solid #ff8a7a; border-radius: 14px; animation: rageshake .12s 6 alternate, fadeout 2.4s forwards; }
+@keyframes rageshake { from { margin-left: -6px; } to { margin-left: 6px; } }
+
+/* v0.7 設定頁：目前語音、讓聲音更自然 */
+.voice-now { align-items: center; gap: 10px; flex-wrap: wrap; }
+.voice-tips summary { cursor: pointer; font-weight: bold; margin: 6px 0; }
+.voice-tips li { margin: 4px 0; line-height: 1.5; }

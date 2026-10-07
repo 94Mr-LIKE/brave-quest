@@ -10,16 +10,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="勇者大冒險：給國小三年級的學習冒險遊戲">
 <title>勇者大冒險</title>
-<link rel="icon" href="assets/ui/icon-192.png" type="image/png">
+<link rel="icon" href="assets/ui/icon-192.png?v=f3ba19d3ea" type="image/png">
 <!-- 加入主畫面：Android／Chrome 用 manifest；iPad／iPhone Safari 用下面的 apple-* 設定 -->
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest?v=f3ba19d3ea">
 <meta name="theme-color" content="#1d2b5e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="勇者大冒險">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="assets/ui/icon-180.png">
-<link rel="stylesheet" href="src/ui/style.css">
+<link rel="apple-touch-icon" href="assets/ui/icon-180.png?v=f3ba19d3ea">
+<link rel="stylesheet" href="src/ui/style.css?v=f3ba19d3ea">
 </head>
 <body>
 <!-- 遊戲畫面（Phaser 畫布會放在這裡） -->
@@ -37,86 +37,87 @@
 <noscript><p class="noscript">這個遊戲需要開啟 JavaScript 才能玩。</p></noscript>
 
 <!-- 遊戲引擎：Phaser 4.2.1（MIT，本機保存一份，不連 CDN） -->
-<script src="lib/phaser.min.js"></script>
+<script src="data/version.js?v=f3ba19d3ea"></script>
+<script src="lib/phaser.min.js?v=f3ba19d3ea"></script>
 <!-- QR Code：qrcode-generator 2.0.4（MIT，本機保存一份） -->
-<script src="lib/qrcode.js"></script>
+<script src="lib/qrcode.js?v=f3ba19d3ea"></script>
 
 <!-- 題庫：正式題庫 → 範例題庫（只在正式題庫沒載入時生效） -->
-<script src="data/questions.js"></script>
-<script src="data/sample_questions.js"></script>
+<script src="data/questions.js?v=f3ba19d3ea"></script>
+<script src="data/sample_questions.js?v=f3ba19d3ea"></script>
 
 <!-- 世界資料（劇情設計師、CTO 撰寫） -->
-<script src="data/tilesets.js"></script>
-<script src="data/tile_frames.js"></script>
-<script src="data/maps.js"></script>
-<script src="data/quests.js"></script>
-<script src="data/dialogs.js"></script>
-<script src="data/monsters.js"></script>
-<script src="data/items.js"></script>
-<script src="data/jobs.js"></script>
-<script src="data/world.js"></script>
-<script src="data/sprites.js"></script>
-<script src="data/dev_world.js"></script>
-<script src="data/art_manifest.js"></script>
+<script src="data/tilesets.js?v=f3ba19d3ea"></script>
+<script src="data/tile_frames.js?v=f3ba19d3ea"></script>
+<script src="data/maps.js?v=f3ba19d3ea"></script>
+<script src="data/quests.js?v=f3ba19d3ea"></script>
+<script src="data/dialogs.js?v=f3ba19d3ea"></script>
+<script src="data/monsters.js?v=f3ba19d3ea"></script>
+<script src="data/items.js?v=f3ba19d3ea"></script>
+<script src="data/jobs.js?v=f3ba19d3ea"></script>
+<script src="data/world.js?v=f3ba19d3ea"></script>
+<script src="data/sprites.js?v=f3ba19d3ea"></script>
+<script src="data/dev_world.js?v=f3ba19d3ea"></script>
+<script src="data/art_manifest.js?v=f3ba19d3ea"></script>
 <!-- 語音：說話者音色設定（劇情設計師）、預錄音檔清單（tools/pack_assets.py 產生） -->
-<script src="data/voices.js"></script>
-<script src="data/voice_manifest.js"></script>
-<script src="data/dev_sprites.js"></script>
+<script src="data/voices.js?v=f3ba19d3ea"></script>
+<script src="data/voice_manifest.js?v=f3ba19d3ea"></script>
+<script src="data/dev_sprites.js?v=f3ba19d3ea"></script>
 
 <!-- 可調參數 -->
-<script src="src/config.js"></script>
+<script src="src/config.js?v=f3ba19d3ea"></script>
 
 <!-- 系統邏輯（可在 node 測試） -->
-<script src="src/systems/exp.js"></script>
-<script src="src/systems/answer.js"></script>
-<script src="src/systems/rewards.js"></script>
-<script src="src/systems/adaptive.js"></script>
-<script src="src/systems/hints.js"></script>
-<script src="src/systems/guard.js"></script>
-<script src="src/systems/daily.js"></script>
-<script src="src/systems/playtime.js"></script>
-<script src="src/systems/state.js"></script>
-<script src="src/systems/bestiary.js"></script>
-<script src="src/systems/parentgate.js"></script>
-<script src="src/systems/save.js"></script>
-<script src="src/systems/savecode.js"></script>
-<script src="src/systems/saveprovider.js"></script>
-<script src="src/systems/quest.js"></script>
-<script src="src/systems/report.js"></script>
-<script src="src/systems/session.js"></script>
-<script src="src/systems/shop.js"></script>
-<script src="src/systems/world.js"></script>
-<script src="src/systems/character.js"></script>
-<script src="src/systems/battle.js"></script>
-<script src="src/systems/questlog.js"></script>
-<script src="src/systems/chests.js"></script>
-<script src="src/systems/pathfind.js"></script>
-<script src="src/systems/worldmap.js"></script>
-<script src="src/systems/dialogtext.js"></script>
-<script src="src/systems/mapinfo.js"></script>
-<script src="src/systems/petfollow.js"></script>
+<script src="src/systems/exp.js?v=f3ba19d3ea"></script>
+<script src="src/systems/answer.js?v=f3ba19d3ea"></script>
+<script src="src/systems/rewards.js?v=f3ba19d3ea"></script>
+<script src="src/systems/adaptive.js?v=f3ba19d3ea"></script>
+<script src="src/systems/hints.js?v=f3ba19d3ea"></script>
+<script src="src/systems/guard.js?v=f3ba19d3ea"></script>
+<script src="src/systems/daily.js?v=f3ba19d3ea"></script>
+<script src="src/systems/playtime.js?v=f3ba19d3ea"></script>
+<script src="src/systems/state.js?v=f3ba19d3ea"></script>
+<script src="src/systems/bestiary.js?v=f3ba19d3ea"></script>
+<script src="src/systems/parentgate.js?v=f3ba19d3ea"></script>
+<script src="src/systems/save.js?v=f3ba19d3ea"></script>
+<script src="src/systems/savecode.js?v=f3ba19d3ea"></script>
+<script src="src/systems/saveprovider.js?v=f3ba19d3ea"></script>
+<script src="src/systems/quest.js?v=f3ba19d3ea"></script>
+<script src="src/systems/report.js?v=f3ba19d3ea"></script>
+<script src="src/systems/session.js?v=f3ba19d3ea"></script>
+<script src="src/systems/shop.js?v=f3ba19d3ea"></script>
+<script src="src/systems/world.js?v=f3ba19d3ea"></script>
+<script src="src/systems/character.js?v=f3ba19d3ea"></script>
+<script src="src/systems/battle.js?v=f3ba19d3ea"></script>
+<script src="src/systems/questlog.js?v=f3ba19d3ea"></script>
+<script src="src/systems/chests.js?v=f3ba19d3ea"></script>
+<script src="src/systems/pathfind.js?v=f3ba19d3ea"></script>
+<script src="src/systems/worldmap.js?v=f3ba19d3ea"></script>
+<script src="src/systems/dialogtext.js?v=f3ba19d3ea"></script>
+<script src="src/systems/mapinfo.js?v=f3ba19d3ea"></script>
+<script src="src/systems/petfollow.js?v=f3ba19d3ea"></script>
 
 <!-- 引擎與畫面 -->
-<script src="src/engine/audio.js"></script>
-<script src="src/engine/sfx.js"></script>
-<script src="src/engine/voice.js"></script>
+<script src="src/engine/audio.js?v=f3ba19d3ea"></script>
+<script src="src/engine/sfx.js?v=f3ba19d3ea"></script>
+<script src="src/engine/voice.js?v=f3ba19d3ea"></script>
 <!-- 音樂（作曲家）：music.js 還沒完成時，遊戲用 typeof JQ.Music 檢查後略過 -->
-<script src="data/music.js"></script>
-<script src="src/engine/music.js"></script>
-<script src="src/engine/assets.js"></script>
-<script src="src/engine/bigpilot.js"></script>
-<script src="src/ui/dom.js"></script>
-<script src="src/ui/quiz.js"></script>
-<script src="src/ui/hud.js"></script>
-<script src="src/ui/menus.js"></script>
-<script src="src/ui/settings.js"></script>
-<script src="src/ui/title.js"></script>
-<script src="src/ui/qr.js"></script>
-<script src="src/ui/worldmap.js"></script>
-<script src="src/ui/minimap.js"></script>
-<script src="src/scenes/MapScene.js"></script>
-<script src="src/scenes/BattleScene.js"></script>
-<script src="src/game.js"></script>
-<script src="src/main.js"></script>
+<script src="data/music.js?v=f3ba19d3ea"></script>
+<script src="src/engine/music.js?v=f3ba19d3ea"></script>
+<script src="src/engine/assets.js?v=f3ba19d3ea"></script>
+<script src="src/engine/bigpilot.js?v=f3ba19d3ea"></script>
+<script src="src/ui/dom.js?v=f3ba19d3ea"></script>
+<script src="src/ui/quiz.js?v=f3ba19d3ea"></script>
+<script src="src/ui/hud.js?v=f3ba19d3ea"></script>
+<script src="src/ui/menus.js?v=f3ba19d3ea"></script>
+<script src="src/ui/settings.js?v=f3ba19d3ea"></script>
+<script src="src/ui/title.js?v=f3ba19d3ea"></script>
+<script src="src/ui/qr.js?v=f3ba19d3ea"></script>
+<script src="src/ui/worldmap.js?v=f3ba19d3ea"></script>
+<script src="src/ui/minimap.js?v=f3ba19d3ea"></script>
+<script src="src/scenes/MapScene.js?v=f3ba19d3ea"></script>
+<script src="src/scenes/BattleScene.js?v=f3ba19d3ea"></script>
+<script src="src/game.js?v=f3ba19d3ea"></script>
+<script src="src/main.js?v=f3ba19d3ea"></script>
 </body>
 </html>

@@ -45,6 +45,7 @@
       s = Math.min(s, maxH / this.monster.height, maxW / this.monster.width);
       this.monster.setScale(s);
       this.baseScale = s;
+      this.baseX = this.monster.x;
       this.shadow = this.add.ellipse(W / 2, footY - 2, this.monster.displayWidth * 0.7, 12, 0x000000, 0.25).setDepth(-1);
       this.idle = this.tweens.add({ targets: this.monster, y: this.monster.y - 5, duration: 650, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
       this.cameras.main.fadeIn(300, 255, 255, 255);
@@ -66,8 +67,14 @@
       var m = this.monster, self = this;
       J.Audio.play(crit ? 'crit' : 'hit');
       this.time.delayedCall(90, function () { self.cry('hurt'); });
-      this.tweens.add({ targets: m, alpha: 0.2, duration: 70, yoyo: true, repeat: crit ? 3 : 1 });
-      this.tweens.add({ targets: m, x: m.x + (crit ? 10 : 5), duration: 50, yoyo: true, repeat: 2 });
+      // v0.7：閃爍與晃動都從「原本的狀態」開始。以前連續打兩下（技能二連擊、會心一擊閃 4 次）時，
+      // 第二個閃爍從半透明開始、結束時又回到半透明，怪物就一直半透明（看得到背後的背景）
+      if (this.flashTw) this.flashTw.stop();
+      if (this.shakeTw) this.shakeTw.stop();
+      m.setAlpha(1).setX(this.baseX);
+      var self1 = this;
+      this.flashTw = this.tweens.add({ targets: m, alpha: 0.25, duration: 70, yoyo: true, repeat: crit ? 3 : 1, onComplete: function () { m.setAlpha(1); }, onStop: function () { m.setAlpha(1); } });
+      this.shakeTw = this.tweens.add({ targets: m, x: this.baseX + (crit ? 10 : 5), duration: 50, yoyo: true, repeat: 2, onComplete: function () { m.setX(self1.baseX); }, onStop: function () { m.setX(self1.baseX); } });
       if (crit) this.cameras.main.shake(180, 0.012);
       var t = this.add.text(m.x, m.y - m.displayHeight * 0.6, String(dmg), {
         fontFamily: 'sans-serif', fontSize: crit ? '36px' : '28px', fontStyle: 'bold', color: crit ? '#ffd34d' : '#ffffff', stroke: '#2a1e22', strokeThickness: 4
@@ -84,13 +91,15 @@
       this.cry('attack');   // 威嚇聲，接著主角受擊聲
       this.time.delayedCall(260, function () { J.Audio.play('hurt'); });
       var m = this.monster;
-      this.tweens.add({ targets: m, scale: this.baseScale * 1.15, duration: 120, yoyo: true });
+      var bs = this.baseScale;
+      this.tweens.add({ targets: m, scale: bs * 1.15, duration: 120, yoyo: true, onComplete: function () { m.setScale(bs); } });
       this.cameras.main.shake(220, 0.015);
       this.cameras.main.flash(200, 255, 80, 60);
     }
 
+    /** 主角補血、技能：綠色閃光＋補血音效（v0.7：不再用升級音效，免得以為升級了） */
     healEffect() {
-      J.Audio.play('levelup');
+      J.Audio.play('heal');
       this.cameras.main.flash(250, 120, 255, 140);
     }
 
@@ -105,10 +114,24 @@
       } });
     }
 
+    /**
+     * 頭目換階段（v0.7）：「生氣了」的演出 —— 怒吼聲、畫面紅閃與震動、頭目變紅並脹大一下、頭上冒出「💢」。
+     * 不用任何升級的音效或金色光，避免小朋友以為自己升級了。
+     */
     phaseEffect() {
-      this.cry('phase');   // 頭目換階段：怒吼（低八度＋殘響）
-      this.cameras.main.flash(300, 200, 220, 255);
-      this.tweens.add({ targets: this.monster, angle: 6, duration: 90, yoyo: true, repeat: 3 });
+      var m = this.monster, self = this;
+      this.cry('phase');   // 怒吼（低八度＋殘響）
+      J.Audio.play('rage');
+      this.cameras.main.flash(260, 255, 60, 40);
+      this.cameras.main.shake(420, 0.02);
+      m.setTint(0xff5a4a);
+      this.raging = true;
+      var bs = this.baseScale;
+      this.tweens.add({ targets: m, scale: bs * 1.18, duration: 160, yoyo: true, repeat: 1, ease: 'Quad.out', onComplete: function () { m.setScale(bs); } });
+      this.tweens.add({ targets: m, angle: 6, duration: 90, yoyo: true, repeat: 3, onComplete: function () { m.setAngle(0); } });
+      var mark = this.add.text(m.x + m.displayWidth * 0.3, m.y - m.displayHeight - 4, '💢', { fontSize: '40px' }).setOrigin(0.5, 1).setDepth(60);
+      this.tweens.add({ targets: mark, y: mark.y - 18, alpha: 0, duration: 1100, delay: 300, onComplete: function () { mark.destroy(); } });
+      this.time.delayedCall(1100, function () { if (self.monster) { self.monster.clearTint(); self.raging = false; } });
     }
   }
 

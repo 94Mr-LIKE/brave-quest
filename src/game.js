@@ -144,6 +144,8 @@
     // v0.5：地圖放大後，舊存檔的位置（location、lastInn）換算到新地圖最近能站的格子
     var moved = J.MapInfo.migrateCoords(st, G.data.maps, G.data.tilesets);
     if (moved.length) console.info('[存檔] 地圖尺寸改變，位置已換算：', moved);
+    // v0.7：上次在戰鬥中關掉或重新整理 → 存檔裡還有沒結算的經驗值，現在結算（進地圖後再顯示升級）
+    G.pendingLevelUp = J.Session.settlePlayerExp(st);
     G.applySettings(true);
     G.save(true);
     J.HUD.show(true);
@@ -201,7 +203,8 @@
     var s = G.state.settings;
     J.Audio.setEnabled(s.sound !== false);
     J.TTS.setEnabled(s.tts !== false);
-    J.Voice.configure({ volume: typeof s.voiceVolume === 'number' ? s.voiceVolume : 0.9, rateMult: s.voiceRate || 1, pref: s.voiceLang || 'taigi' });
+    J.Voice.configure({ volume: typeof s.voiceVolume === 'number' ? s.voiceVolume : 0.9, rateMult: s.voiceRate || 1, pref: s.voiceLang || 'taigi',
+      allowCloud: s.voiceCloud !== false, playerName: G.state.player.name || '' });   // 雲端語音念的文字會把這個名字換成「勇者」
     J.HUD.setTouchMode(s.touchControls || 'auto');
     if (G.musicReady()) {
       try { window.JQ.Music.setEnabled(s.music !== false); window.JQ.Music.setVolume(typeof s.musicVolume === 'number' ? s.musicVolume : 0.55); } catch (e) { /* 忽略 */ }
@@ -294,6 +297,7 @@
   // ---------------------------------------------------------------- 地圖
   G.onMapReady = function (scene) {
     G.mapScene = scene;
+    if (G.pendingLevelUp > 0) { var plv = G.pendingLevelUp; G.pendingLevelUp = 0; setTimeout(function () { G.afterReward(plv); }, 800); }
     var st = G.state, map = scene.map;
     st.location = { map: scene.mapId, x: scene.p.tx, y: scene.p.ty };
     st.visited[scene.mapId] = true;
@@ -617,7 +621,7 @@
     ctx.b = J.Battle.create(mon);
     var lv = mon.q_levels;
     ctx.sess = J.Session.create(st, G.questions, mon.subjects ? mon.subjects[0] : mon.subject, {
-      mode: 'free', noRepeat: true, expMult: G.coef(ctx.mapId),
+      mode: 'free', noRepeat: true, expMult: G.coef(ctx.mapId), deferExp: true,   // 經驗值到戰鬥結束才結算
       filter: function (x) { return !J.Chests.isChestQuestion(x) && (!lv || (x.level >= lv[0] && x.level <= lv[1])); }
     });
     ctx.qn = 0;
@@ -733,7 +737,8 @@
       var h = J.Battle.hit(b, d.damage);
       sc.hitEffect(h.dealt, d.crit);
       if (h.phaseUp) sc.phaseEffect();
-      msgs.push((d.crit ? '會心一擊！' : '') + (favored && i === 0 ? '拿手科目！' : '') + '打出 ' + h.dealt + ' 點傷害！' + (h.phaseUp ? '頭目進入第 ' + b.phase + ' 階段！' : ''));
+      if (h.phaseUp) J.UI.banner(G.battleCtx.mon.name + '生氣了！', 'rage-banner');
+      msgs.push((d.crit ? '會心一擊！' : '') + (favored && i === 0 ? '拿手科目！' : '') + '打出 ' + h.dealt + ' 點傷害！' + (h.phaseUp ? G.battleCtx.mon.name + '生氣了！（第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段）' : ''));
       G.brender();
       i++;
       setTimeout(next, 450);
@@ -792,6 +797,8 @@
     ctx.scene.wakeEffect();
     var lvl = st.player.level;
     var vr = J.Battle.victoryReward(mon, G.coef(ctx.mapId));
+    var answerExp = st.player.pendingExp || 0;
+    J.Session.settleExp(ctx.sess);            // 戰鬥中答對的經驗值，現在才一起加
     J.Exp.addExp(st.player, vr.exp);
     st.player.coins += vr.gold;
     var drops = J.Battle.rollDrops(mon);
@@ -800,7 +807,7 @@
     J.Bestiary.defeated(st, mon.id);   // 怪物名冊：打倒
     G.stopBgm(200);
     G.jingle(mon.boss && drops.length ? 'rare_item' : 'victory', null, null, 7000);
-    var lines = [mon.wake, '經驗值 +' + vr.exp + '　金幣 +' + vr.gold];
+    var lines = [mon.wake, '經驗值 +' + (vr.exp + answerExp) + '　金幣 +' + vr.gold];
     if (drops.length) lines.push('得到：' + drops.map(function (d) { return (G.data.items[d] || {}).name || d; }).join('、'));
     G.bmsg(lines.join('　'));
     G.refreshHud();
@@ -836,6 +843,9 @@
     var ctx = G.battleCtx;
     if (!ctx || ctx.over) return;
     ctx.over = true;
+    // 逃跑、累倒：戰鬥中答對的經驗值照樣算，回到地圖後才結算（打贏時 bvictory 已經結算過）
+    var lateLevels = J.Session.settleExp(ctx.sess);
+    if (lateLevels > 0) setTimeout(function () { G.afterReward(lateLevels); }, 900);
     if (ctx.ui) ctx.ui.close(true);
     J.TTS.stop();
     G.phaser.scene.stop('Battle');
@@ -876,6 +886,24 @@
 
   /** 拿到珍貴道具（職業武器、頭目掉落、名冊獎勵）時的短曲 */
   G.rareItem = function () { G.jingle('rare_item', null, 'chest'); };
+
+  /**
+   * v0.7：資料與圖檔不是同一版（瀏覽器快取到舊檔：背景尺寸≠格子數×32，或背景圖已經換掉讀不到）。
+   * 顯示「遊戲剛更新，請重新整理」並提供重新整理按鈕；同一次開遊戲只問一次。
+   */
+  G.versionIssues = [];
+  G.versionMismatch = function (info) {
+    G.versionIssues.push(info);
+    console.warn('[版本] 地圖資料和圖檔不是同一版：', info);
+    if (G.versionAsked) return;
+    G.versionAsked = true;
+    setTimeout(function () {
+      J.UI.confirm('遊戲剛更新了！請按「重新整理」，載入最新的地圖。（進度已經自動存好，不會不見。）', '重新整理', '等一下').then(function (yes) {
+        if (!yes) return;
+        Promise.resolve(G.state ? G.save(true) : null).then(function () { location.reload(); }, function () { location.reload(); });
+      });
+    }, 300);
+  };
 
   // ---------------------------------------------------------------- 台灣世界地圖
   G.openWorldMap = function () {

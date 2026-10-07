@@ -221,6 +221,7 @@
       var r = res.reward;
       var lines = [];
       if (r.outcome === 'repeat') lines.push('這題以前答對過囉：金幣 +' + r.coins);
+      else if (o.session && o.session.deferExp) lines.push('經驗值 +' + r.exp + '（戰鬥結束時一起算）　金幣 +' + r.coins);
       else lines.push('經驗值 +' + r.exp + '　金幣 +' + r.coins);
       if (r.bonusPaid) lines.push('（變化題一次答對，補回 ' + r.bonusPaid + ' 經驗值！）');
       if (res.needVariant) lines.push('下一題是類似的題目，第一次就答對可以補回另一半獎勵！');

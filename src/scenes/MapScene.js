@@ -20,6 +20,7 @@
   var ROW = { down: 0, left: 1, right: 2, up: 3 };
   var STEP_MS = C.STEP_MS;
   var RESPAWN_MS = C.MONSTER_RESPAWN_MS;
+  var GLOW_DEPTH = 1;       // 燈光光暈：背景（0）與傳送光圈（0.5）之上、所有角色（深度＝腳底 y ≥ 32）之下
   var BUCKET = 8;          // 大地圖備援圖塊的分區大小（格）：鏡頭外的分區隱藏
 
   function G() { return J.Game; }
@@ -110,6 +111,15 @@
       if (this.bgFile && !this.hasBg && J.Assets.FILE_MODE && !g.fileBgNoticeShown) {
         g.fileBgNoticeShown = true;
         J.UI.toast('這張地圖的背景圖很大，直接開檔案時看不到；請用網址開啟遊戲，就能看到完整的地圖畫面。', 7000);
+      }
+      // v0.7 快取混版：背景圖讀不到，或背景尺寸不等於「格子數×32」→ 資料（maps.js）和圖檔不是同一版，請玩家重新整理（不默默改畫備援）
+      if (this.bgFile && !J.Assets.FILE_MODE) {
+        var bgk = 'map:' + this.bgFile, need = [this.size.w * T, this.size.h * T];
+        if (!this.hasBg && J.Assets.failed[bgk]) g.versionMismatch({ map: this.mapId, file: this.bgFile, reason: 'missing', grid: need });
+        else if (this.hasBg) {
+          var bsrc = this.textures.get(bgk).getSourceImage();
+          if (Math.abs(bsrc.width - need[0]) > 2 || Math.abs(bsrc.height - need[1]) > 2) g.versionMismatch({ map: this.mapId, file: this.bgFile, reason: 'size', image: [bsrc.width, bsrc.height], grid: need });
+        }
       }
       if (this.hasBg) this.buildBackground(); else this.buildTiles();
       this.buildExits();
@@ -457,7 +467,8 @@
     }
 
     addGlow(x, y, r) {
-      var img = this.add.image(x, y, this.glowTexture()).setBlendMode(Phaser.BlendModes.ADD).setDepth(39000);
+      // v0.7：光暈畫在角色「下面」（地面上的一圈光）。以前畫在最上層（加法混合），洞窟裡暗色的蝙蝠走進光裡會被洗白、看起來像半透明
+      var img = this.add.image(x, y, this.glowTexture()).setBlendMode(Phaser.BlendModes.ADD).setDepth(GLOW_DEPTH);
       var sc = (T * 3 * (r || 1)) / 128;
       img.setScale(sc).setAlpha(0.7);
       this.tweens.add({ targets: img, alpha: 0.5, scale: sc * 0.93, duration: 1100 + Math.random() * 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });

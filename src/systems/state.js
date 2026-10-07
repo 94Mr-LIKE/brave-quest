@@ -38,7 +38,8 @@
       player: {
         name: cleanName(name), gender: cleanGender(gender),
         level: 1, exp: 0, totalExp: 0, coins: 30, job: 'novice', hp: -1, mp: -1,   // hp/mp = -1 代表「補滿」
-        title: ''                                                                   // 怪物名冊拿到的稱號（顯示在名字旁）
+        title: '',                                                                  // 怪物名冊拿到的稱號（顯示在名字旁）
+        pendingExp: 0                                                               // v0.7 戰鬥中答對、還沒結算的經驗值（戰鬥結束或下次讀檔時結算）
       },
       inventory: { herb: 2, eraser: 1, guide: 1, snack: 1 },
       equipment: { weapon: null, armor: null },
@@ -66,7 +67,7 @@
       daily: Daily.create(),
       playtime: Playtime.create(),
       settings: { dailyLimitMin: Playtime.DEFAULT_LIMIT, tts: true, sound: true, answerTime: 'standard', touchControls: 'auto', taigiSub: 'both',
-        voiceAuto: true, voiceVolume: 0.9, voiceRate: 1, voiceLang: 'taigi', music: true, musicVolume: 0.55 },
+        voiceAuto: true, voiceVolume: 0.9, voiceRate: 1, voiceLang: 'taigi', voiceCloud: true, music: true, musicVolume: 0.55 },
       ending: false
     };
   }
