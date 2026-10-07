@@ -369,29 +369,68 @@
     return speakChunks(chunks(premask(text), latin), { id: 'narrator', gender: 'n', age: 'adult', persona: 'calm', pitch: 1, rate: 1 }, null, onStart, onEnd);
   }
 
-  /** 播預錄音檔（只會播 manifest 列出的檔案） */
+  /**
+   * 播預錄音檔（只會播 manifest 列出的檔案，例如台語合成語音 assets/voice/<對話ID>_<句序>.wav）。
+   * http(s)：用 Web Audio 播（fetch → decodeAudioData → AudioBufferSourceNode，接到 audio.js 的主音量與限制器）。
+   *   iPad Safari 的 <audio> 每次 play() 都要使用者手勢，自動朗讀下一句時會被擋；
+   *   Web Audio 在第一次點擊解鎖後就能一直播，所以優先用它。解碼過的音檔記住最近 12 個。
+   * file:// 或 Web Audio 不能用（例如音效關閉）時：退回 <audio>。
+   */
+  var bufCache = {}, bufOrder = [];
+  function getBuffer(ac, url) {
+    if (bufCache[url]) return Promise.resolve(bufCache[url]);
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); }).then(function (ab) {
+      return new Promise(function (res, rej) { var pr = ac.decodeAudioData(ab, res, rej); if (pr && pr.then) pr.then(res, rej); });
+    }).then(function (buf) {
+      bufCache[url] = buf; bufOrder.push(url);
+      while (bufOrder.length > 12) delete bufCache[bufOrder.shift()];
+      return buf;
+    });
+  }
+
+  function playElement(url, rate, end) {
+    var a = new Audio(url);
+    a.volume = clamp(settings.volume, 0, 1);
+    a.playbackRate = rate;
+    try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (e) { /* 忽略 */ }
+    audioEl = a;
+    a.onended = end; a.onerror = end;
+    var pr = a.play();
+    if (pr && pr.catch) pr.catch(end);
+  }
+
   function playFile(url, profile, onEnd) {
     stop();
     var my = token;
-    // 相對路徑（例 assets/voice/D_X_0.mp3）：<audio> 不經過 WebGL，http 與 file:// 都能直接播
     var src = String(url || '').replace(/^\.\//, '').replace(/^docs\//, '');
     if (!src || /^[a-z]+:\/\//i.test(src) || src.charAt(0) === '/') return false;   // 只播本站的相對路徑
+    var full = window.JQ && window.JQ.Assets && window.JQ.Assets.versioned ? window.JQ.Assets.versioned(src) : src;   // 網址加版本號，避免快取到舊錄音
+    // 依說話者微調播放速度（±10%）：小孩稍高、老人稍低
+    var p = prosody(profile, { rateMult: 1 });
+    var rate = clamp(1 + (p.pitch - 1) * 0.15, 0.9, 1.1) * clamp(settings.rateMult, 0.8, 1.2);
+    speaking = true;
+    stats.files++;
+    var end = function () { if (my !== token) return; speaking = false; audioEl = null; if (onEnd) onEnd(); };
     try {
-      var a = new Audio(window.JQ && window.JQ.Assets && window.JQ.Assets.versioned ? window.JQ.Assets.versioned(src) : src);   // 網址加版本號，避免快取到舊錄音
-      a.volume = clamp(settings.volume, 0, 1);
-      // 依說話者微調播放速度（±10%）；preservesPitch=false 讓小孩更高、老人更低一點
-      var p = prosody(profile, { rateMult: 1 });
-      a.playbackRate = clamp(1 + (p.pitch - 1) * 0.15, 0.9, 1.1) * clamp(settings.rateMult, 0.8, 1.2);
-      try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (e) { /* 忽略 */ }
-      audioEl = a;
-      speaking = true;
-      var end = function () { if (my !== token) return; speaking = false; audioEl = null; if (onEnd) onEnd(); };
-      a.onended = end; a.onerror = end;
-      var pr = a.play();
-      if (pr && pr.catch) pr.catch(end);
-      stats.files++;
+      var A = window.JQ && window.JQ.Audio && window.JQ.Audio.context ? window.JQ.Audio.context() : null;
+      if (A && typeof fetch === 'function' && location.protocol !== 'file:') {
+        getBuffer(A.ctx, full).then(function (buf) {
+          if (my !== token) return;
+          var s = A.ctx.createBufferSource(), g = A.ctx.createGain();
+          s.buffer = buf;
+          s.playbackRate.value = rate;
+          g.gain.value = clamp(settings.volume, 0, 1) * 1.3;   // 主音量是 0.7，語音補回一點
+          s.connect(g); g.connect(A.out);
+          s.onended = end;
+          audioEl = { pause: function () { try { s.stop(); } catch (e) { /* 忽略 */ } } };
+          s.start();
+          stats.webAudio = (stats.webAudio || 0) + 1;
+        }).catch(function () { if (my === token) playElement(full, rate, end); });
+        return true;
+      }
+      playElement(full, rate, end);
       return true;
-    } catch (e) { return false; }
+    } catch (e) { speaking = false; return false; }
   }
 
   /**

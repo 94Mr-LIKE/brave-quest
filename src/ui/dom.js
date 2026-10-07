@@ -151,7 +151,7 @@
       var tailo = h('div.tailo', { lang: 'nan-Latn-TW' });
       var huayu = h('div.huayu');
       var current = null;
-      var speakBtn = h('button', { onclick: function () { say(); }, 'aria-label': '朗讀這句（台語句子有台語錄音就播錄音，沒有就讀華語翻譯）' }, ['🔊']);
+      var speakBtn = h('button', { onclick: function () { say(); }, 'aria-label': '朗讀這句（台語句子播台語語音；設定成華語時念華語翻譯）' }, ['🔊']);
       var nextBtn = h('button.primary', { onclick: advance }, ['下一句 ▶']);
       var skipBtn = h('button.ghost', { onclick: finish }, ['略過']);
       var box = h('div.win.dialog', {}, [portrait, h('div.grow', {}, [speaker, text, tailo, huayu, h('div.row.end', {}, [ctx.tts === false ? null : speakBtn, h('span.grow'), skipBtn, nextBtn])])]);

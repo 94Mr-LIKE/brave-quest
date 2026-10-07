@@ -90,7 +90,7 @@
           [0.4, 0.7, 0.9].reduce(function (a, b) { return Math.abs(b - st.settings.voiceVolume) < Math.abs(a - st.settings.voiceVolume) ? b : a; }), function (v) { st.settings.voiceVolume = v; apply(); }));
         body.appendChild(radioRow('語速', 'vrate', [{ value: 0.8, label: '慢' }, { value: 0.9, label: '稍慢' }, { value: 1, label: '標準' }, { value: 1.15, label: '稍快' }],
           st.settings.voiceRate || 1, function (v) { st.settings.voiceRate = v; apply(); }));
-        body.appendChild(radioRow('台語台詞', 'vlang', [{ value: 'taigi', label: '台語優先（有台語錄音就播）' }, { value: 'huayu', label: '華語優先' }],
+        body.appendChild(radioRow('台語台詞', 'vlang', [{ value: 'taigi', label: '台語語音（電腦合成）' }, { value: 'huayu', label: '華語（提示音＋念華語翻譯）' }],
           st.settings.voiceLang || 'taigi', function (v) { st.settings.voiceLang = v; apply(); }));
         body.appendChild(radioRow('允許使用雲端高品質語音（不會傳送名字）', 'vcloud', [{ value: true, label: '允許' }, { value: false, label: '只用本機語音' }],
           st.settings.voiceCloud !== false, function (v) { st.settings.voiceCloud = v; apply(); }));
@@ -99,7 +99,8 @@
         var curText = cur ? '目前的語音：' + cur.name + (cur.cloud ? '（雲端）' : '（本機）') + (cur.quality ? '・高品質' : '') : '目前的語音：這台裝置沒有中文語音（會用瀏覽器預設的聲音）';
         body.appendChild(h('div.row.voice-now', {}, [h('span', { text: curText }),
           h('button', { onclick: function () { J.Voice.sayLine({ line: { who: 'narrator', text: '你好！我是勇者大冒險的說書人，歡迎來到金包里。' }, who: 'narrator' }); }, 'aria-label': '試聽目前的語音' }, ['🔊 試聽'])]));
-        body.appendChild(h('p.small', { text: '朗讀是裝置內建的電腦合成語音（不是真人錄音）。台語台詞還沒有錄音時，會先響一聲提示音，再念華語翻譯；對話框照常顯示台語漢字和台羅。' }));
+        body.appendChild(h('p.small', { text: '朗讀是裝置內建的電腦合成語音（不是真人錄音）。選「華語」時，台語台詞會先響一聲提示音，再念華語翻譯；對話框照常顯示台語漢字和台羅。' }));
+        body.appendChild(h('p.small.voice-credit', { text: '台語語音：以 Meta MMS-TTS 閩南語模型（facebook/mms-tts-nan，CC BY-NC 4.0）依教育部台羅合成，非真人錄音' }));
         body.appendChild(h('details.voice-tips', {}, [h('summary', { text: '🎧 讓聲音更自然' }),
           h('ul', {}, [
             h('li', { text: 'iPad：設定 → 輔助使用 → 朗讀與說話（舊版叫「朗讀內容」）→ 聲音 → 中文（台灣）→ 下載標示「增強版」的聲音（請用 Wi-Fi，約 100 MB 以上）。下載後重新打開遊戲就會自動使用。' }),
