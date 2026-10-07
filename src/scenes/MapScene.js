@@ -550,6 +550,27 @@
     /** 某個方向站著不動的影格（每列中間那格） */
     idleFrame(spriteKey, dir) { return J.Assets.dirRow(spriteKey, dir) * 3 + 1; }
 
+    /** 番薯仔跟隨。邏輯在 JQ.PetFollow（可單元測試），這裡只負責套到精靈上。 */
+    updatePet(delta) {
+      var pet = this.pet;
+      if (!this.petState) this.petState = J.PetFollow.create('down');
+      var r = J.PetFollow.step(this.petState, {
+        x: pet.x, y: pet.y, tx: this.petTarget.x, ty: this.petTarget.y,
+        delta: delta, speed: 0.085 * S * G().moveSpeed()
+      });
+      pet.x = r.x; pet.y = r.y;
+      if (r.moving) {
+        var pk = pet.texture.key + '-' + r.dir;
+        if (!pet.anims.isPlaying || pet.anims.currentAnim.key !== pk) pet.anims.play(pk);
+      } else if (pet.anims.isPlaying) {
+        pet.anims.stop();
+        pet.setFrame(this.idleFrame('pet_imo', r.dir));
+      }
+      // 走到障礙或 NPC 上面（例如轉角時）才慢慢變半透明，離開後慢慢恢復，不會忽明忽暗
+      var ptx = Math.floor(pet.x / T), pty = Math.floor((pet.y - 1) / T);
+      pet.setAlpha(J.PetFollow.fadeAlpha(this.petState, this.walkable(ptx, pty), delta));
+    }
+
     ensureWalkAnims(texKey, spriteKey) {
       var self = this;
       if (this.anims.exists(texKey + '-down')) return;
@@ -579,6 +600,7 @@
       if (!this.walkable(bx, by)) { bx = sx; by = sy; }
       this.pet = this.add.sprite(bx * T + T / 2, by * T + T, pk, 1).setOrigin(0.5, 1);
       this.petTarget = { x: this.pet.x, y: this.pet.y };
+      this.petState = null;   // 換地圖時重設跟隨狀態（場景物件會沿用），從朝下站姿重新開始
 
       this.npcList().forEach(function (n) {
         var tk = J.Assets.texKey(n.sprite || 'npc_unknown');
@@ -887,19 +909,8 @@
           if (this.walkable(n.c, n.r)) this.beginStep(n.c, n.r); else p.path = [];
         } else if (this.player.anims.isPlaying) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, p.facing)); }
       }
-      // 番薯仔跟在後面
-      var dx = this.petTarget.x - this.pet.x, dy = this.petTarget.y - this.pet.y;
-      var dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > 0.5) {
-        var sp = Math.min(dist, delta * 0.085 * S * G().moveSpeed());
-        this.pet.x += dx / dist * sp; this.pet.y += dy / dist * sp;
-        var pdir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
-        var pk = this.pet.texture.key + '-' + pdir;
-        if (!this.pet.anims.isPlaying || this.pet.anims.currentAnim.key !== pk) this.pet.anims.play(pk);
-      } else if (this.pet.anims.isPlaying) { this.pet.anims.stop(); this.pet.setFrame(this.idleFrame('pet_imo', 'down')); }
-      // 番薯仔走到障礙或 NPC 上面（例如轉角時）就變半透明，像是暫時穿過去
-      var ptx = Math.floor(this.pet.x / T), pty = Math.floor((this.pet.y - 1) / T);
-      this.pet.setAlpha(this.walkable(ptx, pty) ? 1 : 0.5);
+      // 番薯仔跟在後面（防閃爍：方向有遲滯、短暫停頓不切站姿、站姿沿用目前方向、透明度平滑變化）
+      this.updatePet(delta);
       this.updateGhost();
 
       if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); }

@@ -147,8 +147,8 @@ window.SPRITES = {
  "pet_imo": {
   "file": "assets/chars/pet_imo.png",
   "type": "walk",
-  "frameW": 23,
-  "frameH": 28,
+  "frameW": 29,
+  "frameH": 29,
   "rows": [
    "down",
    "left",

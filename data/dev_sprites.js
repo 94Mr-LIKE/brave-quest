@@ -75,8 +75,8 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
  "pet_imo": {
   "file": "assets/chars/pet_imo.png",
   "type": "walk",
-  "frameW": 23,
-  "frameH": 28
+  "frameW": 29,
+  "frameH": 29
  },
  "npc_auntie_market": {
   "file": "assets/npcs/npc_auntie_market.png",
