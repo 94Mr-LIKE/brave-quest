@@ -36,8 +36,21 @@
     });
   }
 
+  /**
+   * 打開家長設定（v0.4）：通過家長確認一次後，設定開著的期間與關掉後 10 分鐘內不再詢問；
+   * 設定已經開著、或確認視窗已經開著時，不會再開第二個。
+   */
   function open(G) {
-    return gate().then(function (ok) { if (ok) panel(G); });
+    var pass = G.gatePass || (G.gatePass = J.ParentGate.create());
+    if (G.settingsHandle) return Promise.resolve(true);
+    if (!J.ParentGate.needAsk(pass, Date.now())) { panel(G); return Promise.resolve(true); }
+    if (!J.ParentGate.beginAsk(pass)) return Promise.resolve(false);
+    G.gateAsks = (G.gateAsks || 0) + 1;   // 測試用：確認視窗開過幾次
+    return gate().then(function (ok) {
+      J.ParentGate.endAsk(pass);
+      if (ok) { J.ParentGate.grant(pass, Date.now()); panel(G); }
+      return ok;
+    });
   }
 
   function panel(G) {
@@ -45,7 +58,12 @@
     var body = h('div');
     var handle;
     var root = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']), h('h2', { text: '⚙️ 家長設定' }), body]);
-    handle = J.UI.open(root, { label: '家長設定', onClose: function () { G.applySettings(); } });
+    handle = J.UI.open(root, { label: '家長設定', onClose: function () {
+      G.settingsHandle = null;
+      if (G.gatePass) J.ParentGate.closePanel(G.gatePass, Date.now());
+      G.applySettings();
+    } });
+    G.settingsHandle = handle;
 
     function radioRow(title, name, options, current, onPick) {
       var row = h('div.row', { role: 'radiogroup', 'aria-label': title });
@@ -76,7 +94,12 @@
           st.settings.voiceLang || 'taigi', function (v) { st.settings.voiceLang = v; apply(); }));
         body.appendChild(h('p.small', { text: '朗讀用的是這台裝置內建的語音；台語台詞還沒有錄音時，會先響一聲提示音，再念華語翻譯。' }));
       }
-      body.appendChild(radioRow('音效', 'sound', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.sound, function (v) { st.settings.sound = v; G.save(); }));
+      body.appendChild(radioRow('音效', 'sound', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.sound, function (v) { st.settings.sound = v; G.save(); G.applySettings(); }));
+      body.appendChild(radioRow('音樂', 'music', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.music !== false, function (v) { st.settings.music = v; G.save(); G.applySettings(); }));
+      if (st.settings.music !== false) {
+        body.appendChild(radioRow('音樂音量', 'mvol', [{ value: 0.3, label: '小' }, { value: 0.55, label: '中' }, { value: 0.8, label: '大' }],
+          [0.3, 0.55, 0.8].reduce(function (a, b) { return Math.abs(b - st.settings.musicVolume) < Math.abs(a - st.settings.musicVolume) ? b : a; }), function (v) { st.settings.musicVolume = v; G.save(); G.applySettings(); }));
+      }
       body.appendChild(radioRow('螢幕搖桿與 A／B 鍵', 'touch', [{ value: 'auto', label: '自動（觸控裝置才顯示）' }, { value: 'on', label: '一直顯示' }, { value: 'off', label: '不顯示' }],
         st.settings.touchControls || 'auto', function (v) { st.settings.touchControls = v; G.save(); G.applySettings(); }));
       body.appendChild(radioRow('台語對話的小字', 'taigi', [{ value: 'both', label: '台羅＋華語' }, { value: 'huayu', label: '只有華語翻譯' }, { value: 'tailo', label: '只有台羅' }, { value: 'none', label: '不顯示' }],

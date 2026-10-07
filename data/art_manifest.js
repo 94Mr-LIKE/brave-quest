@@ -47,9 +47,17 @@ window.ART = {
   "volcano": "bb_volcano.png"
  },
  "ui": {
+  "chest_closed": "assets/ui/chest_closed.png",
+  "chest_open": "assets/ui/chest_open.png",
   "icon-180": "assets/ui/icon-180.png",
   "icon-192": "assets/ui/icon-192.png",
   "icon-512": "assets/ui/icon-512.png",
+  "light_glow": "assets/ui/light_glow.png",
+  "sign_armor": "assets/ui/sign_armor.png",
+  "sign_general": "assets/ui/sign_general.png",
+  "sign_inn": "assets/ui/sign_inn.png",
+  "sign_item": "assets/ui/sign_item.png",
+  "sign_weapon": "assets/ui/sign_weapon.png",
   "title": "assets/ui/title.png",
   "world_taiwan": "assets/ui/world_taiwan.png"
  }

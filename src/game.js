@@ -40,6 +40,7 @@
     J.UI.init();
     J.HUD.init({
       journal: function () { if (!G.blocked()) J.Menus.journal(G); },
+      quests: function () { if (!G.blocked()) J.Menus.questList(G); },
       bag: function () { if (!G.blocked()) J.Menus.bag(G); },
       settings: function () { if (!G.blocked()) J.Settings.open(G); },
       joystick: function (dir, force) { G.joy = { dir: dir, force: force }; },
@@ -191,9 +192,39 @@
     J.TTS.setEnabled(s.tts !== false);
     J.Voice.configure({ volume: typeof s.voiceVolume === 'number' ? s.voiceVolume : 0.9, rateMult: s.voiceRate || 1, pref: s.voiceLang || 'taigi' });
     J.HUD.setTouchMode(s.touchControls || 'auto');
+    if (G.musicReady()) {
+      try { window.JQ.Music.setEnabled(s.music !== false); window.JQ.Music.setVolume(typeof s.musicVolume === 'number' ? s.musicVolume : 0.55); } catch (e) { /* 忽略 */ }
+    }
     if (G.limitHandle && !J.Playtime.isOverLimit(G.state.playtime, s, Date.now())) { G.limitHandle.close(true); G.limitHandle = null; }
   };
   G.resume = function () { };
+
+  // ---------------------------------------------------------------- 音樂（作曲家的 music.js；還沒完成時安全略過）
+  /** JQ.Music 有沒有載入（API：playBgm(id)、stopBgm(ms)、jingle(id,onEnd)、setVolume、setEnabled） */
+  G.musicReady = function () { return typeof window.JQ.Music !== 'undefined' && !!window.JQ.Music && typeof window.JQ.Music.playBgm === 'function'; };
+  G.musicLog = [];   // 測試用：遊戲要求播過哪些音樂
+  G.bgm = function (id) {
+    G.musicLog.push('bgm:' + id);
+    G.currentBgm = id;
+    if (!G.musicReady() || (G.state && G.state.settings.music === false)) return;
+    try { window.JQ.Music.playBgm(id); } catch (e) { /* 音樂出錯不影響遊戲 */ }
+  };
+  G.stopBgm = function (ms) { if (G.musicReady()) { try { window.JQ.Music.stopBgm(ms || 300); } catch (e) { /* 忽略 */ } } };
+  /**
+   * 短曲（勝利、升級、委託完成、旅店休息、珍貴道具、點燈、累倒、開寶箱、結局）。
+   * 沒有 music.js 時改播音效 fallback；onEnd 一定會被呼叫（最多等 maxMs）。
+   */
+  G.jingle = function (id, onEnd, fallback, maxMs) {
+    G.musicLog.push('jingle:' + id);
+    var called = false;
+    var done = function () { if (called) return; called = true; if (onEnd) onEnd(); };
+    var useMusic = G.musicReady() && !(G.state && G.state.settings.music === false) && typeof window.JQ.Music.jingle === 'function';
+    if (useMusic) {
+      try { window.JQ.Music.jingle(id, done); } catch (e) { useMusic = false; }
+    }
+    if (!useMusic) { if (fallback) J.Audio.play(fallback); setTimeout(done, Math.min(maxMs || 1500, 1500)); }
+    else setTimeout(done, maxMs || 9000);   // 保險：music.js 沒呼叫 onEnd 時也會繼續
+  };
   G.heroKey = function () { return J.Assets.heroKey(G.state.player.gender, G.state.player.job); };
 
   /** 說話的人：名字與頭像 sprite */
@@ -241,7 +272,7 @@
     G.refreshHud();
     if (levels > 0) {
       J.Character.onLevelUp(G.state, G.data);
-      J.Audio.play('levelup');
+      G.jingle('levelup', null, 'levelup');
       J.UI.banner('等級提升！現在是 ' + G.state.player.level + ' 級');
       var unlock = (G.data.jobRules && G.data.jobRules.unlock_level) || 5;
       if (G.state.player.level >= unlock && G.state.player.level - levels < unlock) J.UI.toast('可以到' + G.jobMapName() + '的職業公會轉職了！', 4000);
@@ -261,6 +292,8 @@
       if (spot) J.Character.setInn(st, scene.mapId, spot.c, spot.r);
     }
     J.HUD.mapBanner(map.name || scene.mapId);
+    G.bgm(J.MapInfo.bgmFor(map));
+    if (J.Minimap) J.Minimap.attach(G, scene);
     G.refreshHud();
     G.save();
     if (G.pendingIntro) {
@@ -340,7 +373,7 @@
     var f = ids.length ? J.QuestLog.forNpc(st, Q, npc.id, ids) : null;
     // 旅店、商店老闆如果也有委託，先處理委託
     if (f && r.role !== 'quest') r = { role: 'quest' };
-    if (r.role === 'inn') { G.say(npc.dialog, [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info).then(function (ok) { if (ok) G.say('D_INN_REST', []); }); }); return; }
+    if (r.role === 'inn') { G.say(npc.dialog, [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
     if (r.role === 'shop') { G.say(npc.dialog, []).then(function () { J.Menus.shop(G, r.info.shop_id || 'general'); }); return; }
     if (r.role === 'travel') { G.say(npc.dialog, [{ who: npc.id, text: '要搭車去哪裡呢？' }]).then(function () { G.openWorldMap(); }); return; }
     if (r.role === 'guild') {
@@ -417,11 +450,11 @@
       if (r.reward.gold) parts.push('金幣 +' + r.reward.gold);
       if (r.reward.exp) parts.push('經驗值 +' + r.reward.exp);
       if (r.reward.item) parts.push('得到「' + ((G.data.items[r.reward.item] || {}).name || r.reward.item) + '」');
-      J.Audio.play('chest');
+      G.jingle('quest_clear', null, 'chest');
       J.UI.banner('委託完成：「' + q.title + '」' + (parts.length ? '\n' + parts.join('、') : ''));
       G.afterReward(levels || 0);
       if (r.reward.light) {
-        J.Audio.play('lamp');
+        G.jingle('rare_item', null, 'lamp');
         return G.say('D_LIGHT_GET', [{ who: 'pet', text: '拿回了' + r.reward.light + '之光！' }]).then(function () { J.UI.banner('拿回了「' + r.reward.light + '之光」！'); });
       }
     }).then(function () {
@@ -435,6 +468,7 @@
     G.state.ending = true;
     G.save();
     if (G.mapScene && G.mapScene.fireworks) G.mapScene.fireworks();
+    G.jingle('ending', null, 'win', 20000);
     J.UI.banner('遺忘霧散了！五盞知識燈把大家的知識都照亮了！');
     return G.say(q.dialog_ending || 'D_ENDING', []).then(function () { J.UI.toast('冒險可以繼續：解委託、開寶箱、練習五科！', 6000); });
   };
@@ -465,7 +499,7 @@
           if (Array.isArray(q.subjects) && scene.map.lamps && scene.map.lamps.some(function (l) { return l.subject === subj; })) {
             st.lamps[subj] = true;
             scene.updateLamps();
-            J.Audio.play('lamp');
+            G.jingle('lamp_lit', null, 'lamp');
             J.UI.banner(subj + '燈亮了！');
           }
           G.save();
@@ -496,7 +530,7 @@
           var o = J.Chests.open(st, chest, G.data.quests, G.data);
           if (!o.ok) return;
           scene.setChestOpen(chest.id);
-          J.Audio.play('chest');
+          G.jingle('chest', null, 'chest');
           var parts = [];
           if (o.gold) parts.push('金幣 +' + o.gold);
           if (o.item) parts.push('得到「' + ((G.data.items[o.item] || {}).name || o.item) + '」');
@@ -550,6 +584,8 @@
     var map = scene.map, mon = mob.mon;
     G.battleCtx = { mob: mob, mon: mon, mapId: scene.mapId, over: false };
     var bg = G.battleBgFor(mon, scene.mapId);
+    J.Bestiary.seen(G.state, mon.id);   // 怪物名冊：遇見
+    G.bgm(J.MapInfo.battleBgm(mon, map));
     scene.scene.sleep();
     J.HUD.show(false);
     Array.prototype.forEach.call(document.querySelectorAll('.map-banner'), function (n) { n.parentNode.removeChild(n); });
@@ -750,6 +786,9 @@
     var drops = J.Battle.rollDrops(mon);
     drops.forEach(function (it) { J.Character.addItem(st, it, 1); });
     st.stats.battles.won = (st.stats.battles.won || 0) + 1;
+    J.Bestiary.defeated(st, mon.id);   // 怪物名冊：打倒
+    G.stopBgm(200);
+    G.jingle(mon.boss && drops.length ? 'rare_item' : 'victory', null, null, 6000);
     var lines = [mon.wake, '經驗值 +' + vr.exp + '　金幣 +' + vr.gold];
     if (drops.length) lines.push('得到：' + drops.map(function (d) { return (G.data.items[d] || {}).name || d; }).join('、'));
     G.bmsg(lines.join('　'));
@@ -777,6 +816,8 @@
   G.bko = function () {
     var ctx = G.battleCtx;
     G.bmsg('累倒了……');
+    G.stopBgm(200);
+    G.jingle('faint', null, 'hurt', 4000);
     G.say('D_FAINT', [{ who: 'pet', text: '我們累倒了……先回旅店休息一下吧。' }, { who: 'pet', text: '沒關係！金幣和道具都還在喔。' }]).then(function () { G.bend('ko'); });
   };
 
@@ -799,7 +840,32 @@
     }
     G.save();
     G.phaser.scene.wake('Map', { result: result, mob: ctx.mob });
+    if (G.mapScene) G.bgm(J.MapInfo.bgmFor(G.mapScene.map));   // 回到地圖音樂
   };
+
+  /** 旅店休息：畫面慢慢變暗，播旅店短曲，播完才亮回來（沒有音樂時約 1.5 秒） */
+  G.innRest = function () {
+    return new Promise(function (resolve) {
+      G.busy = true;
+      var veil = J.UI.h('div.inn-veil', { 'aria-hidden': 'true' }, [J.UI.h('div', { text: '💤 休息中……' })]);
+      document.getElementById('ui').appendChild(veil);
+      G.resting = true;
+      setTimeout(function () { veil.classList.add('on'); }, 20);
+      G.stopBgm(400);
+      G.jingle('inn_rest', function () {
+        veil.classList.remove('on');
+        setTimeout(function () {
+          if (veil.parentNode) veil.parentNode.removeChild(veil);
+          G.resting = false; G.busy = false;
+          if (G.mapScene) G.bgm(J.MapInfo.bgmFor(G.mapScene.map));
+          resolve();
+        }, 450);
+      }, 'levelup', 8000);
+    });
+  };
+
+  /** 拿到珍貴道具（職業武器、頭目掉落、名冊獎勵）時的短曲 */
+  G.rareItem = function () { G.jingle('rare_item', null, 'chest'); };
 
   // ---------------------------------------------------------------- 台灣世界地圖
   G.openWorldMap = function () {
@@ -886,6 +952,26 @@
     battle: function () { var c = G.battleCtx; return c && c.b ? { hp: c.b.hp, maxHp: c.b.maxHp, phase: c.b.phase, boss: c.b.boss, over: c.over } : null; },
     heroTexture: function () { return G.mapScene && G.mapScene.player.texture.key; },
     openWorldMap: function () { G.openWorldMap(); },
+    /** 前景（上層格 'U'）示範：把主角所在格與上面兩格改成上層格，重新載入地圖，主角就會被前景擋住並顯示剪影 */
+    fgDemo: function () {
+      var sc = G.mapScene, m = sc.map, x = sc.p.tx, y = sc.p.ty;
+      m.grid = m.grid.map(function (row, ry) {
+        if (ry < y - 2 || ry > y) return row;
+        var a = row.split('');
+        for (var rx = x - 1; rx <= x + 1; rx++) if (a[rx] && sc.walkable(rx, ry) && !J.World.exitAt(m, rx, ry)) a[rx] = 'U';
+        return a.join('');
+      });
+      sc.scene.restart({ mapId: sc.mapId, x: x, y: y, facing: 'down' });
+      return true;
+    },
+    ghostVisible: function () { return !!(G.mapScene && G.mapScene.ghost && G.mapScene.ghost.visible); },
+    seeMonsters: function (n, defeatedTimes) {
+      Object.keys(G.data.monsters).slice(0, n).forEach(function (id) { var r = J.Bestiary.rec(G.state, id); r.seen = Math.max(r.seen, 1); if (defeatedTimes) r.defeated = Math.max(r.defeated, defeatedTimes); });
+      G.save();
+    },
+    musicLog: function () { return G.musicLog.slice(); },
+    gateAsks: function () { return G.gateAsks || 0; },
+    monsterTiles: function () { return G.mapScene.monsters.filter(function (m) { return m.active; }).map(function (m) { return { id: m.id, idx: m.idx, x: m.tx, y: m.ty, visited: m.visited || 0, area: m.spawn.area }; }); },
     setLevel: function (lv) { G.state.player.level = lv; J.Character.restoreFull(G.state, G.data); G.refreshHud(); }
   };
 

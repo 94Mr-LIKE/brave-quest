@@ -10,6 +10,7 @@
   'use strict';
   var isNode = typeof module !== 'undefined' && typeof require === 'function';
   var State = isNode ? require('./state.js') : window.JQ.State;
+  var Bestiary = isNode ? require('./bestiary.js') : window.JQ.Bestiary;
 
   var KEY_PREFIX = 'bq_';
   var SAVE_KEY = 'bq_save';
@@ -123,6 +124,7 @@
     var defaults = State.createNewState(s.player && s.player.name, s.player && s.player.gender, s.createdAt || 0);
     State.fillDefaults(s, defaults);
     repairState(s);
+    Bestiary.backfill(s);   // v0.4 怪物名冊：舊存檔把已淨化的頭目補記為遇見、打倒各 1 次
     s.player.name = State.cleanName(s.player.name);
     s.player.gender = State.cleanGender(s.player.gender);
     s.version = State.SCHEMA_VERSION;

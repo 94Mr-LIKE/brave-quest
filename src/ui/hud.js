@@ -27,7 +27,10 @@
       refs.name, refs.level, h('span', {}, ['經驗值 ', refs.exp.el]),
       h('span', {}, ['體力 ', refs.hp.el, ' ', refs.hpText]), h('span', {}, ['魔力 ', refs.mp.el, ' ', refs.mpText]), refs.coins
     ]);
+    refs.questCount = h('span.badge', { 'aria-hidden': 'true' });
+    refs.questBtn = h('button', { onclick: handlers.quests, 'aria-label': '任務列表' }, ['📜 任務', refs.questCount]);
     var btns = h('div.hud-buttons', {}, [
+      refs.questBtn,
       h('button', { onclick: handlers.journal, 'aria-label': '冒險手帳' }, ['📔 手帳']),
       h('button', { onclick: handlers.bag, 'aria-label': '背包與裝備' }, ['🎒 背包']),
       h('button', { onclick: handlers.settings, 'aria-label': '家長設定' }, ['⚙️ 設定'])
@@ -103,7 +106,11 @@
   function update(state, s) {
     if (!hudEl || hudEl.hidden && !refs.name) return;
     var p = state.player;
-    refs.name.textContent = p.name;
+    refs.name.textContent = p.name + (p.title ? '〔' + p.title + '〕' : '');
+    var n = (J.Game && J.Game.data) ? J.QuestLog.journal(state, J.Game.data.quests, J.Game.data).active.length : 0;
+    refs.questCount.textContent = n ? String(n) : '';
+    refs.questCount.hidden = !n;
+    refs.questBtn.setAttribute('aria-label', '任務列表（進行中 ' + n + ' 個）');
     refs.level.textContent = '等級 ' + p.level + '・' + (s.jobName || '');
     setBar(refs.exp, p.exp, J.Exp.expToNext(p.level));
     refs.exp.el.title = p.exp + ' / ' + J.Exp.expToNext(p.level);

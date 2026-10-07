@@ -15,12 +15,15 @@
  *   water   true = 水面（相鄰的陸地邊會畫岸線）
  *   house   true = 房屋牆（引擎會在最下排自動交錯加窗戶）
  *   near    {字元: 圖塊}：上下左右有這個字元時改畫成指定圖塊（例：王城的 K 旁邊是地毯 c 才畫王座）
+ *   upper   true = 「上層格」：可以走，但背景圖這一格會畫在角色上方（例：拱門、橋下、屋簷下、樹冠下）；
+ *           角色被擋住時，引擎在最上層畫一個半透明剪影表示位置（DQ6 式）。
  *
  * ──────── maps.js 使用的字元 ────────
  *  .  可走地面        ,  花草（可走）       =  路／石板（可走）   %  淺灘／泥地（可走）
  *  T  樹／柱（擋）    #  牆／岩壁／城牆（擋） ~  水（擋）           *  灌木／岩石（擋）
- *  H  房屋牆（擋）    R  屋頂（擋）          D  門（可走，裝飾）    B  橋（可走）
+ *  H  房屋牆（擋）    R  屋頂（擋）          D  門（擋；在門前一格對話）  B  橋（可走）
  *  F  柵欄（擋）      S  樓梯（可走）        c  地毯（可走）        K  王座／大型擺設（擋）
+ *  U  上層格（可走，背景這格畫在角色上方；v0.4 新增，目前地圖尚未使用）
  * ──────── 另外可用（目前地圖沒用到）────────
  *  :  沙地   _  木地板   +  石磚地   W  有窗的牆   ^  屋頂   X  櫃檯   L/l  路燈（暗/亮）
  *  i  鐘乳石   b  灌木   r  岩石   C  懸崖   w  沼澤水   o  傳送光圈   P  牆上旗幟   (空白)  地圖外
@@ -38,7 +41,8 @@ window.TILESETS = (function () {
     '*': { tile: 'rock', walk: false },
     'H': { tile: 'wall', walk: false, house: true },
     'R': { tile: 'roof', walk: false, overlay: true },
-    'D': { tile: 'door', walk: true },
+    'D': { tile: 'door', walk: false },          // v0.4：門不能站上去（不然看起來像站在房子上），在門前一格互動
+    'U': { tile: 'grass', walk: true, upper: true },  // v0.4：上層格
     'B': { tile: 'bridge', walk: true },
     'F': { tile: 'fence', walk: false },
     'S': { tile: 'stairs', walk: true },

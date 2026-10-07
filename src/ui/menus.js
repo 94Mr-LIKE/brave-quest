@@ -109,8 +109,8 @@
     function buy(id) {
       var r = J.Shop.buy(st, id, D.items);
       if (!r.ok) { J.UI.toast(r.reason === 'coins' ? '金幣不夠喔。' : '買不到。'); return; }
-      J.Audio.play('chest');
       var it = D.items[id];
+      if (it.job && it.type === 'weapon') G.rareItem(); else J.Audio.play('chest');   // 職業武器＝珍貴道具
       if ((it.type === 'weapon' || it.type === 'armor') && !st.equipment[it.type]) {
         var e = J.Character.equip(st, id, D);
         J.UI.toast('買了' + it.name + (e.ok ? '，已經裝備上了！' : '！'));
@@ -129,15 +129,69 @@
   // ---------------------------------------------------------------- 冒險手帳
   function journal(G) {
     var st = G.state, D = G.data;
-    var tab = 'quests';
+    var tab = (arguments[1] && arguments[1].tab) || 'quests';
     var body = h('div');
     var tabs = h('div.tabs', { role: 'tablist' });
     var handle;
-    [['quests', '委託'], ['lights', '五道光'], ['study', '學習紀錄'], ['daily', '每日小任務']].forEach(function (t) {
+    [['quests', '委託'], ['book', '怪物名冊'], ['lights', '五道光'], ['study', '學習紀錄'], ['daily', '每日小任務']].forEach(function (t) {
       tabs.appendChild(h('button', { role: 'tab', 'data-tab': t[0], onclick: function () { tab = t[0]; render(); } }, [t[1]]));
     });
     var panel = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']), h('h2', { text: '📔 冒險手帳' }), tabs, body]);
     handle = J.UI.open(panel, { label: '冒險手帳' });
+    // ---------- 怪物名冊：遇見過的顯示圖、名稱、出沒地區、叫聲、打倒次數；沒遇見顯示剪影「？？？」
+    function renderBook() {
+      var c = J.Bestiary.counts(st, D.monsters);
+      body.appendChild(h('p', { text: '遇見 ' + c.seen + '／' + c.total + ' 種・小怪各打倒 3 次：' + c.mobsDefeated3 + '／' + c.mobs + '・頭目：' + c.bossesDefeated + '／' + c.bosses }));
+      var rw = h('ul.list.book-rewards', { 'aria-label': '收集獎勵' });
+      J.Bestiary.rewards(st, D.monsters).forEach(function (r) {
+        var label = [];
+        if (r.reward.gold) label.push('金幣 ' + r.reward.gold);
+        if (r.reward.item) label.push((D.items[r.reward.item] || {}).name + ' ×' + (r.reward.n || 1));
+        if (r.reward.title) label.push('稱號「' + r.reward.title + '」');
+        if (r.reward.sticker) label.push(J.Bestiary.STICKER_NAME[r.reward.sticker] || '貼紙');
+        var btn = r.claimed ? h('button.selected', { disabled: true }, ['已領取']) :
+          h('button' + (r.ready ? '.primary' : ''), { disabled: !r.ready, onclick: function () { claim(r.id); } }, [r.ready ? '領獎' : (r.have + '／' + r.need)]);
+        rw.appendChild(h('li', {}, [h('div.what', {}, [h('b', { text: r.text }), h('div.small', { text: '獎勵：' + label.join('、') })]), btn]));
+      });
+      body.appendChild(h('h3', { text: '收集獎勵' }));
+      body.appendChild(rw);
+      var V = (window.VOICES && window.VOICES.monsters) || {};
+      var grid = h('ul.list.book', { 'aria-label': '怪物名冊' });
+      J.Bestiary.split(D.monsters).all.forEach(function (id) {
+        var m = D.monsters[id], r = (st.bestiary || {})[id] || { seen: 0, defeated: 0 };
+        var known = r.seen > 0;
+        var icon = h('span.icon.book-icon' + (known ? '' : '.unknown'), { html: J.Assets.domIcon(m.sprite, { size: 56, label: known ? m.name : '?', alt: '' }) });
+        var where = J.Bestiary.habitats(id, D.maps);
+        grid.appendChild(h('li', {}, [icon, h('div.what', {}, known ? [
+          h('b', { text: m.name + (m.boss ? '（頭目）' : '') + '　等級 ' + m.level }),
+          h('div.small', { text: '出沒：' + (where.join('、') || '—') + (V[id] && V[id].cry ? '　叫聲：「' + V[id].cry + '」' : '') }),
+          h('div.small', { text: '遇見 ' + r.seen + ' 次・打倒 ' + r.defeated + ' 次' })
+        ] : [h('b', { text: '？？？' }), h('div.small', { text: '還沒遇見過。' + (where.length ? '聽說在「' + where[0] + '」出沒。' : '') })])]));
+      });
+      body.appendChild(h('h3', { text: '名冊' }));
+      body.appendChild(grid);
+      var titles = st.titles || [];
+      if (titles.length) {
+        var row = h('div.row', { role: 'radiogroup', 'aria-label': '稱號' });
+        [''].concat(titles).forEach(function (t) {
+          row.appendChild(h('button', { role: 'radio', 'aria-checked': String((st.player.title || '') === t), 'aria-pressed': String((st.player.title || '') === t), onclick: function () { st.player.title = t; G.save(); G.refreshHud(); render(); } }, [t || '不戴稱號']));
+        });
+        body.appendChild(h('h3', { text: '稱號（顯示在名字旁）' }));
+        body.appendChild(row);
+      }
+    }
+    function claim(id) {
+      var r = J.Bestiary.claim(st, D.monsters, id);
+      if (!r.ok) return;
+      G.rareItem();   // 名冊獎勵＝珍貴道具短曲 rare_item
+      var rw = r.reward, msg = [];
+      if (rw.gold) msg.push('金幣 +' + rw.gold);
+      if (rw.item) msg.push('得到「' + (D.items[rw.item] || {}).name + '」×' + (rw.n || 1));
+      if (rw.title) msg.push('稱號「' + rw.title + '」');
+      if (rw.sticker) msg.push('得到「' + (J.Bestiary.STICKER_NAME[rw.sticker] || '貼紙') + '」');
+      J.UI.banner('名冊獎勵：' + msg.join('、'));
+      G.save(); G.refreshHud(); render();
+    }
     function render() {
       Array.prototype.forEach.call(tabs.children, function (b) { b.setAttribute('aria-selected', String(b.dataset.tab === tab)); });
       body.innerHTML = '';
@@ -168,8 +222,12 @@
         SUBJECTS.forEach(function (s) { l2.appendChild(h('span' + (st.lamps[s] ? '.on' : ''), { text: (st.lamps[s] ? '🏮 ' : '・ ') + s + '燈' })); });
         body.appendChild(h('h3', { text: G.lampMapName() + '的知識燈' })); body.appendChild(l2);
         var bosses = Object.keys(st.bosses).filter(function (k) { return st.bosses[k]; });
+        var bk = (st.stickers || []).filter(function (x) { return J.Bestiary.STICKER_NAME[x]; });
+        if (bk.length) { body.appendChild(h('h3', { text: '貼紙' })); body.appendChild(h('div.lights', {}, bk.map(function (x) { return h('span.on', { text: '⭐ ' + J.Bestiary.STICKER_NAME[x] }); }))); }
         body.appendChild(h('h3', { text: '清醒過來的頭目' }));
         body.appendChild(h('p', { text: bosses.length ? bosses.map(function (b) { return (D.monsters[b] || {}).name || b; }).join('、') : '還沒有。' }));
+      } else if (tab === 'book') {
+        renderBook();
       } else if (tab === 'study') {
         var t = h('table.report');
         t.appendChild(h('tr', {}, [h('th', { text: '科目' }), h('th', { text: '答對題數' }), h('th', { text: '一次就答對' })]));
@@ -198,8 +256,7 @@
       if (!yes) return false;
       if (price && G.state.player.coins < price) { J.UI.toast('金幣不夠喔。'); return false; }
       G.state.player.coins -= price;
-      J.Character.rest(G.state, G.data);
-      J.Audio.play('levelup');
+      J.Character.rest(G.state, G.data);   // 音樂（旅店短曲）由 G.innRest 播
       J.UI.banner('體力和魔力都回滿了！');
       G.save(); G.refreshHud();
       return true;
@@ -242,5 +299,31 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.Menus = { bag: bag, shop: shop, journal: journal, inn: inn, guild: guild };
+  // ---------------------------------------------------------------- 任務列表（HUD「任務」按鈕）
+  function questList(G) {
+    var st = G.state, D = G.data, handle;
+    var j = J.QuestLog.journal(st, D.quests, D);
+    var mapName = function (id) { return D.maps[id] ? D.maps[id].name : ''; };
+    var act = h('ul.list', { 'aria-label': '進行中的委託' });
+    if (!j.active.length) act.appendChild(h('li', { text: '目前沒有進行中的委託。找頭上有「！」的人說話吧！' }));
+    j.active.forEach(function (q) {
+      act.appendChild(h('li', {}, [h('div.what', {}, [
+        h('b', { text: (q.side ? '【支線】' : '【主線】') + q.title }),
+        h('div', { text: '📍 地點：' + (mapName(q.map) || '—') }),
+        h('div', { text: '🎯 目標：' + (q.goal || '') }),
+        h('div.small', { text: '進度：' + q.objective + (q.ready ? '　✅ 可以回報了！' : '') }),
+        q.next ? h('div.small', { text: '➡️ 完成後：' + q.next }) : null
+      ])]));
+    });
+    var doneList = h('ul.list', { 'aria-label': '已完成的委託' });
+    j.done.slice().reverse().forEach(function (q) { doneList.appendChild(h('li', {}, [h('div.what', {}, [h('b', { text: '✔ ' + q.title }), h('span.small', { text: mapName(q.map) ? '（' + mapName(q.map) + '）' : '' })])])); });
+    if (!j.done.length) doneList.appendChild(h('li', { text: '還沒有完成的委託。' }));
+    var details = h('details.done-quests', {}, [h('summary', { text: '已完成（' + j.done.length + '）— 點一下展開' }), doneList]);
+    var panel = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']),
+      h('h2', { text: '📜 任務列表' }), h('h3', { text: '進行中（' + j.active.length + '）' }), act, details]);
+    handle = J.UI.open(panel, { label: '任務列表' });
+    return handle;
+  }
+
+  window.JQ.Menus = { bag: bag, shop: shop, journal: journal, inn: inn, guild: guild, questList: questList };
 })();

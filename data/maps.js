@@ -72,7 +72,7 @@ window.MAPS = {
       { id: "chief",         x: 19, y: 17, sprite: "npc_chief",      dialog: "D_CHIEF_IDLE",  quest: "Q_TUT_1",     quests: ["Q_TUT_1", "Q_LAMPS"] },
       { id: "temple_keeper", x: 20, y: 17, sprite: "npc_chief",      dialog: "D_TEMPLE_IDLE", quest: null,          quests: [] },
       { id: "bookstore",     x: 5,  y: 17, sprite: "npc_bookstore",  dialog: "D_BOOK_IDLE",   quest: "Q_SIDE_BOOK", quests: ["Q_SIDE_BOOK"] },
-      { id: "shopkeeper",    x: 3,  y: 13, sprite: "npc_shopkeeper", dialog: "D_SHOP_IDLE",   quest: null,          quests: [] },
+      { id: "shopkeeper",    x: 2,  y: 13, sprite: "npc_shopkeeper", dialog: "D_SHOP_IDLE",   quest: null,          quests: [] },
       { id: "innkeeper",     x: 30, y: 10, sprite: "npc_innkeeper",  dialog: "D_INN_IDLE",    quest: "Q_TUT_3",     quests: ["Q_TUT_3"] },
       { id: "fisher",        x: 26, y: 4,  sprite: "npc_fisher",     dialog: "D_FISHER_IDLE", quest: "Q_TUT_2",     quests: ["Q_TUT_2"] }
     ],
@@ -90,7 +90,7 @@ window.MAPS = {
       { monster: "fog_octopus", count: 1, area: [24, 3, 1, 1], boss: true, quest: "Q_MER_4" }
     ],
     inn:  { x: 30, y: 10, npc: "innkeeper", price: 0 },
-    shop: { x: 3, y: 13, shop_id: "general", npc: "shopkeeper" }
+    shop: { x: 2, y: 13, shop_id: "general", npc: "shopkeeper" }
   },
 
   // ───────────────────────────── M02 擎天草原 ─────────────────────────────
@@ -134,8 +134,8 @@ window.MAPS = {
     ],
     spawns: [
       { monster: "dango",  count: 3, area: [6, 5, 18, 7] },
-      { monster: "dango",  count: 2, area: [1, 13, 10, 4] },
-      { monster: "rabbit", count: 3, area: [14, 13, 15, 4] }
+      { monster: "dango",  count: 2, area: [1, 11, 12, 6] },
+      { monster: "rabbit", count: 3, area: [14, 11, 15, 6] }
     ],
     inn: null, shop: null
   },
@@ -153,7 +153,7 @@ window.MAPS = {
       "**.**..=*****....~~=.......*",
       "*..**..=*~~~*..*..~=.T.**..*",
       "*......=*****......=.T.....*",
-      "*T.....=========FF==========",
+      "*T.....=========BB==========",
       "*...............~~..........",
       "*..***...T.*....~~.....**...",
       "*..***..TT...*..~~....*....*",
@@ -177,8 +177,8 @@ window.MAPS = {
     ],
     spawns: [
       { monster: "mushroom", count: 3, area: [1, 1, 15, 7] },
-      { monster: "owl",      count: 2, area: [1, 10, 14, 4] },
-      { monster: "mushroom", count: 1, area: [18, 10, 9, 4] }
+      { monster: "owl",      count: 2, area: [1, 8, 14, 6] },
+      { monster: "mushroom", count: 1, area: [18, 8, 9, 6] }
     ],
     inn: null, shop: null
   },
@@ -223,9 +223,9 @@ window.MAPS = {
       { id: "C_M04_2", x: 3,  y: 14, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } }
     ],
     spawns: [
-      { monster: "mushroom",  count: 3, area: [1, 11, 11, 5] },
-      { monster: "sprout",    count: 2, area: [16, 11, 13, 5] },
-      { monster: "owl",       count: 2, area: [6, 11, 18, 5] },
+      { monster: "mushroom",  count: 3, area: [1, 11, 12, 7] },
+      { monster: "sprout",    count: 2, area: [15, 11, 14, 7] },
+      { monster: "owl",       count: 2, area: [6, 6, 17, 6] },
       { monster: "tree_king", count: 1, area: [14, 4, 1, 1], boss: true, quest: "Q_ELF_4" }
     ],
     inn: { x: 27, y: 4, npc: null, price: 0 },
@@ -271,8 +271,8 @@ window.MAPS = {
       { id: "C_M05_2", x: 28, y: 12, subject: "數學", level: 3, reward: { gold: 60, item: null } }
     ],
     spawns: [
-      { monster: "mudslime", count: 3, area: [10, 8, 19, 6] },
-      { monster: "frog",     count: 3, area: [1, 8, 28, 7] },
+      { monster: "mudslime", count: 3, area: [10, 7, 19, 8] },
+      { monster: "frog",     count: 3, area: [1, 7, 8, 9] },
       { monster: "mud_frog", count: 1, area: [2, 10, 1, 1], boss: true, quest: "Q_GNO_4" }
     ],
     inn: { x: 21, y: 3, npc: null, price: 0 },
@@ -319,7 +319,7 @@ window.MAPS = {
     spawns: [
       { monster: "crab", count: 3, area: [1, 3, 13, 11] },
       { monster: "bat",  count: 3, area: [15, 6, 12, 8] },
-      { monster: "rock", count: 2, area: [15, 1, 12, 4] }
+      { monster: "rock", count: 2, area: [15, 1, 12, 8] }
     ],
     inn: null, shop: null
   },
@@ -352,14 +352,14 @@ window.MAPS = {
       { x: 0, y: 2, to: "M06", tx: 26, ty: 2 }
     ],
     npcs: [
-      { id: "goblin_chief", x: 9,  y: 4, sprite: "npc_goblin_chief", dialog: "D_GOB_CHIEF_IDLE", quest: "Q_GOB_1", quests: ["Q_GOB_1", "Q_GOB_3", "Q_GOB_4"] },
-      { id: "goblin_kid",   x: 15, y: 4, sprite: "npc_goblin_kid",   dialog: "D_GOBKID_IDLE",    quest: "Q_GOB_2", quests: ["Q_GOB_2"] }
+      { id: "goblin_chief", x: 8,  y: 4, sprite: "npc_goblin_chief", dialog: "D_GOB_CHIEF_IDLE", quest: "Q_GOB_1", quests: ["Q_GOB_1", "Q_GOB_3", "Q_GOB_4"] },
+      { id: "goblin_kid",   x: 16, y: 4, sprite: "npc_goblin_kid",   dialog: "D_GOBKID_IDLE",    quest: "Q_GOB_2", quests: ["Q_GOB_2"] }
     ],
     chests: [
       { id: "C_M07_1", x: 21, y: 2, subject: "數學", level: 3, reward: { gold: 50, item: "guide" } }
     ],
     spawns: [
-      { monster: "goblin",    count: 3, area: [4, 10, 21, 3] },
+      { monster: "goblin",    count: 3, area: [2, 6, 24, 7] },
       { monster: "noise_bat", count: 1, area: [23, 4, 1, 1], boss: true, quest: "Q_GOB_4" }
     ],
     inn: { x: 13, y: 9, npc: null, price: 0 },
@@ -377,7 +377,7 @@ window.MAPS = {
       "#.##...###..##...F.RRR.RRR.F.#",
       "#..##...###..##..F.HHH.HHH.F.#",
       "#..###...###..#..F.HDH.HDH.F.#",
-      "#...###...###....FFFF..FFFFF.#",
+      "#...###...###....F.........F.#",
       "#....###...###...FFFF..FFFFF.#",
       "#.......##.............~~~...#",
       "#..###....##..........~~~~~..#",
@@ -419,23 +419,23 @@ window.MAPS = {
     art_note: "依山而建的老山城：中間一條從下往上的長石階（'S'），三條橫向窄巷（'='）把一排排擠在一起的小屋隔開，屋頂掛紅燈籠；店主人站在自家門口。最下面是寬一點的公路，西邊通回金包里，左下角是山城公車站。",
     grid: [
       "################################",
-      "#HHHHHTHHHHHHT#S#HHHHHHTHHHHHH##",
-      "#HHDHH*HHDHHH##S#HHHDHH*HHDHHH##",
-      "#F===========================SF#",
-      "#*RRRR*RRRRR**#S##RRRRR*RRRR*S*#",
-      "#*HHHH*HHHHH**#S##HHHHH*HHHH*,T#",
-      "#FHDHH#HHDHH*##S#HHHDHH*HDHHHFF#",
+      "#HHHHHTHHHHHHTSS#HHHHHHTHHHHHH##",
+      "#HHDHH*HHDHHH#SS#HHHDHH*HHDHHH##",
+      "#F===========================S=#",
+      "#*RRRR*RRRRR**SS##RRRRR*RRRR*SS#",
+      "#*HHHH*HHHHH**SS##HHHHH*HHHH*,T#",
+      "#FHDHH#HHDHH*#SS#HHHDHH*HDHHHFF#",
       "#============================T*#",
-      "#TTTTTTRRRRRR*#S#RRRRRR**KS**T*#",
-      "#TTTTTTHHHHHH*#S#HHHHHH*,,,***##",
-      "#TTTTTTHHDHHH##S#HHHDHHFFFFFF###",
+      "#TTTTTTRRRRRR*SS#RRRRRR**SS**T*#",
+      "#TTTTTTHHHHHH*SS#HHHHHH*,,,***##",
+      "#TTTTTTHHDHHH#SS#HHHDHHFFFFFF###",
       "#=============================##",
-      "#*RRRRR**SS***#S#**SS**RRRRR**##",
-      "#*HHDHHKFFFFK*#S#FFFF**HHDHH**##",
-      "#KKK===FFFFF###=FFFFF##FF===FFF#",
+      "#*RRRRR**SS***SS#**SS**RRRRR**##",
+      "#*HHDHHKFFFFK*SS#FFFF**HHDHH**##",
+      "#KKK===FFFFF##SSFFFFF##FF===FFF#",
       "==============================##",
-      "#####################S##########",
-      "#********************S*********#",
+      "#####################SS#########",
+      "#********************SS********#",
       "################################"
     ],
     start: { x: 6, y: 15 },
@@ -506,8 +506,8 @@ window.MAPS = {
       { id: "C_M10_1", x: 8, y: 8, subject: "數學", level: 4, reward: { gold: 60, item: "guide" } }
     ],
     spawns: [
-      { monster: "armor", count: 2, area: [1, 10, 10, 5] },
-      { monster: "wisp",  count: 2, area: [17, 10, 10, 5] }
+      { monster: "armor", count: 2, area: [5, 6, 7, 11] },
+      { monster: "wisp",  count: 2, area: [16, 6, 7, 11] }
     ],
     inn: { x: 9, y: 15, npc: null, price: 0 },
     shop: null

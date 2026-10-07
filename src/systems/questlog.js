@@ -153,7 +153,7 @@
     Object.keys(quests).forEach(function (id) {
       var s = status(state, quests, id);
       var q = quests[id];
-      if (s === 'active') active.push({ id: id, title: q.title || id, map: q.map, kind: q.kind || 'help', goal: q.goal || '', objective: progress(state, quests, id, data).text, ready: canComplete(state, quests, id, data), side: /SIDE/.test(id) });
+      if (s === 'active') active.push({ id: id, title: q.title || id, map: q.map, kind: q.kind || 'help', goal: q.goal || '', next: q.log_next || '', objective: progress(state, quests, id, data).text, ready: canComplete(state, quests, id, data), side: /SIDE/.test(id) });
       else if (s === 'done') done.push({ id: id, title: q.title || id, map: q.map, next: q.log_next || '' });
     });
     return { active: active, done: done };

@@ -37,7 +37,8 @@
       createdAt: now || 0,
       player: {
         name: cleanName(name), gender: cleanGender(gender),
-        level: 1, exp: 0, totalExp: 0, coins: 30, job: 'novice', hp: -1, mp: -1   // hp/mp = -1 代表「補滿」
+        level: 1, exp: 0, totalExp: 0, coins: 30, job: 'novice', hp: -1, mp: -1,   // hp/mp = -1 代表「補滿」
+        title: ''                                                                   // 怪物名冊拿到的稱號（顯示在名字旁）
       },
       inventory: { herb: 2, eraser: 1, guide: 1, snack: 1 },
       equipment: { weapon: null, armor: null },
@@ -53,6 +54,10 @@
       location: null,             // {map, x, y}
       lastInn: null,              // 最近去過的旅店 {map, x, y}
       visited: {},
+      qhist: {},                  // 每科最近 80 題的出題紀錄（最近最少出現優先）
+      bestiary: {},               // 怪物名冊 { 怪物id: {seen, defeated} }
+      bestiaryClaims: {},         // 名冊獎勵領過了 { 獎勵id: true }
+      titles: [],                 // 拿到的稱號
       pendingVariant: null,       // 待補回的一半 經驗值（ADR-005）
       answered: {},               // {questionId: true} 曾經答對過
       stats: { subjects: emptyBySubject(function () { return { done: 0, firstTry: 0, submissions: 0 }; }), units: {}, battles: { won: 0, fled: 0, ko: 0 } },
@@ -60,7 +65,7 @@
       daily: Daily.create(),
       playtime: Playtime.create(),
       settings: { dailyLimitMin: Playtime.DEFAULT_LIMIT, tts: true, sound: true, answerTime: 'standard', touchControls: 'auto', taigiSub: 'both',
-        voiceAuto: true, voiceVolume: 0.9, voiceRate: 1, voiceLang: 'taigi' },
+        voiceAuto: true, voiceVolume: 0.9, voiceRate: 1, voiceLang: 'taigi', music: true, musicVolume: 0.55 },
       ending: false
     };
   }
@@ -70,7 +75,7 @@
    * 根因（審查 F-06）：inventory 的預設是 {herb:2, eraser:1, guide:1, snack:1}，而 removeItem 用完時會刪掉該鍵，
    * 以前逐鍵補預設值會讓用完的道具在讀檔後「長回來」。
    */
-  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered'];
+  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered', 'qhist', 'bestiary', 'bestiaryClaims'];
 
   /** 以預設值補齊缺漏欄位（舊存檔、匯入存檔用），不覆蓋已有的值；字典型欄位只在整個不存在時才補 */
   function fillDefaults(target, defaults, path) {

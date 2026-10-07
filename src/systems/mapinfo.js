@@ -1,0 +1,121 @@
+/*
+ * 地圖上的輔助計算（v0.4）：上層格（前景）、招牌位置、背景音樂、怪物遊走目標、寵物站位、燈光位置
+ * 純計算，可以在 node 測試。
+ */
+(function () {
+  'use strict';
+  var isNode = typeof module !== 'undefined' && typeof require === 'function';
+  var World = isNode ? require('./world.js') : window.JQ.World;
+
+  // ---------------------------------------------------------------- 上層格（DQ6 式前景）
+  /**
+   * tilesets.js 裡 upper:true 的字元（目前是 'U'）：可以走，但背景圖這一格要畫在角色上方。
+   * 回傳 { cells:[{x,y}], set:{ "x,y": true } }
+   */
+  function upperCells(map, tilesets) {
+    var set = {}, cells = [];
+    var ts = tilesets[map.tileset] || {};
+    (map.grid || []).forEach(function (row, y) {
+      for (var x = 0; x < row.length; x++) {
+        var d = ts[row.charAt(x)];
+        if (d && d.upper) { set[x + ',' + y] = true; cells.push({ x: x, y: y }); }
+      }
+    });
+    return { cells: cells, set: set };
+  }
+
+  /** 一個矩形（像素）有沒有碰到前景格。tile＝每格幾像素 */
+  function rectHitsCells(rect, set, tile) {
+    var x0 = Math.floor(rect.x / tile), x1 = Math.floor((rect.x + rect.w - 1) / tile);
+    var y0 = Math.floor(rect.y / tile), y1 = Math.floor((rect.y + rect.h - 1) / tile);
+    for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) if (set[x + ',' + y]) return true;
+    return false;
+  }
+
+  // ---------------------------------------------------------------- 招牌
+  var SIGN_KIND = { general: 'general', item: 'item', weapon: 'weapon', armor: 'armor', inn: 'inn' };
+  var SIGN_TEXT = { general: '雜貨', item: '道具', weapon: '武器', armor: '防具', inn: '旅店' };
+
+  /**
+   * 每間店、旅店的招牌位置：找店主人附近（2 格內）最近的門 'D'，招牌掛在門的上一格；
+   * 找不到門就掛在店主人頭上一格。回傳 [{kind, text, x, y, npcX, npcY}]
+   */
+  function signSpots(map) {
+    var shops = [];
+    if (map.shop) shops.push({ kind: SIGN_KIND[map.shop.shop_id] || 'general', x: map.shop.x, y: map.shop.y });
+    (map.extra_shops || []).forEach(function (s) { shops.push({ kind: SIGN_KIND[s.shop_id] || 'general', x: s.x, y: s.y }); });
+    if (map.inn) shops.push({ kind: 'inn', x: map.inn.x, y: map.inn.y });
+    return shops.map(function (s) {
+      var best = null, bestD = 99;
+      for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
+        if (World.charAt(map, s.x + dx, s.y + dy) !== 'D') continue;
+        var d = Math.abs(dx) * 1.5 + Math.abs(dy);   // 同一直行的門優先
+        if (d < bestD) { bestD = d; best = { x: s.x + dx, y: s.y + dy }; }
+      }
+      var at = best || { x: s.x, y: s.y };
+      return { kind: s.kind, text: SIGN_TEXT[s.kind], x: at.x, y: Math.max(0, at.y - 1), npcX: s.x, npcY: s.y, onDoor: !!best };
+    });
+  }
+
+  // ---------------------------------------------------------------- 背景音樂
+  var MAP_BGM = ['village', 'field', 'forest', 'cave', 'town', 'castle'];
+  var TILESET_BGM = { village: 'village', field: 'field', forest: 'forest', swamp: 'field', cave: 'cave', town: 'town', castle: 'castle' };
+
+  /** 地圖的 BGM：maps.js 的 bgm 是這六種之一就用它，否則依圖塊組 */
+  function bgmFor(map) {
+    if (map && MAP_BGM.indexOf(map.bgm) >= 0) return map.bgm;
+    return TILESET_BGM[map && map.tileset] || 'field';
+  }
+
+  /** 戰鬥 BGM：最終頭目 final（五科輪流或最高等級地圖的頭目）、頭目 boss、其他 battle */
+  function battleBgm(mon, map) {
+    if (!mon || !mon.boss) return 'battle';
+    if ((mon.subjects && mon.subjects.length > 1) || (map && map.level >= 5)) return 'final';
+    return 'boss';
+  }
+
+  // ---------------------------------------------------------------- 怪物遊走、寵物站位
+  /** 在遊走範圍內挑一個目標格（盡量離目前位置 2 格以上，讓怪物走遍整個範圍） */
+  function wanderTarget(tiles, from, rng) {
+    rng = rng || Math.random;
+    if (!tiles || !tiles.length) return null;
+    var far = tiles.filter(function (t) { return Math.abs(t.x - from.x) + Math.abs(t.y - from.y) >= 2; });
+    var pool = far.length ? far : tiles;
+    return pool[Math.floor(rng() * pool.length)];
+  }
+
+  /** 寵物要停的格子：目標格能站就站，不能（障礙、NPC）就找最近的可站格 */
+  function petSpot(walkable, cols, rows, target, from) {
+    if (walkable(target.x, target.y)) return { x: target.x, y: target.y };
+    var best = null, bestD = Infinity;
+    for (var r = 1; r <= 3 && !best; r++) {
+      for (var dy = -r; dy <= r; dy++) for (var dx = -r; dx <= r; dx++) {
+        var x = target.x + dx, y = target.y + dy;
+        if (x < 0 || y < 0 || x >= cols || y >= rows || !walkable(x, y)) continue;
+        var d = Math.abs(dx) + Math.abs(dy) + (from ? 0.01 * (Math.abs(x - from.x) + Math.abs(y - from.y)) : 0);
+        if (d < bestD) { bestD = d; best = { x: x, y: y }; }
+      }
+    }
+    return best;
+  }
+
+  // ---------------------------------------------------------------- 燈光
+  /**
+   * 柔和圓形暖光的位置：maps.js 的 lights:[{x,y,r?}] 優先；
+   * 沒寫時，洞窟裡的部落（type 'tribe'、tileset 'cave'，例如哥布林部落）在大型擺設 'K'（篝火、燈台）上加光。
+   * 知識燈點亮後的光由程式另外加（lamps）。
+   */
+  function lightSpots(map) {
+    if (Array.isArray(map.lights)) return map.lights.map(function (l) { return { x: l.x, y: l.y, r: l.r || 1 }; });
+    var out = [];
+    if (map.type === 'tribe' && map.tileset === 'cave') {
+      (map.grid || []).forEach(function (row, y) { for (var x = 0; x < row.length; x++) if (row.charAt(x) === 'K') out.push({ x: x, y: y, r: 1.2 }); });
+    }
+    return out;
+  }
+
+  var MapInfo = { upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+    wanderTarget: wanderTarget, petSpot: petSpot, lightSpots: lightSpots };
+  if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.MapInfo = MapInfo; }
+  if (typeof module !== 'undefined') module.exports = MapInfo;
+})();

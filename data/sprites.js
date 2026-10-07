@@ -282,6 +282,54 @@ window.SPRITES = {
   "frameW": 25,
   "frameH": 50
  },
+ "chest_closed": {
+  "file": "assets/ui/chest_closed.png",
+  "type": "single",
+  "frameW": 45,
+  "frameH": 44
+ },
+ "chest_open": {
+  "file": "assets/ui/chest_open.png",
+  "type": "single",
+  "frameW": 38,
+  "frameH": 44
+ },
+ "sign_weapon": {
+  "file": "assets/ui/sign_weapon.png",
+  "type": "single",
+  "frameW": 39,
+  "frameH": 44
+ },
+ "sign_armor": {
+  "file": "assets/ui/sign_armor.png",
+  "type": "single",
+  "frameW": 39,
+  "frameH": 44
+ },
+ "sign_item": {
+  "file": "assets/ui/sign_item.png",
+  "type": "single",
+  "frameW": 40,
+  "frameH": 44
+ },
+ "sign_inn": {
+  "file": "assets/ui/sign_inn.png",
+  "type": "single",
+  "frameW": 40,
+  "frameH": 44
+ },
+ "sign_general": {
+  "file": "assets/ui/sign_general.png",
+  "type": "single",
+  "frameW": 40,
+  "frameH": 44
+ },
+ "light_glow": {
+  "file": "assets/ui/light_glow.png",
+  "type": "single",
+  "frameW": 55,
+  "frameH": 44
+ },
  "mon_dango": {
   "file": "assets/monsters/mon_dango.png",
   "type": "single",

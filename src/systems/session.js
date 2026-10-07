@@ -58,18 +58,25 @@
     }
     if (o.forceLevel) pool = nearestLevel(pool, o.forceLevel);
 
+    if (!st.qhist) st.qhist = {};
+    var hist = st.qhist[subject] || [];
+    var lastId = hist[hist.length - 1];
+    var lastQ = lastId ? sess.questions.filter(function (x) { return x.id === lastId; })[0] : null;
     var pv = st.pendingVariant;
     if (pv && pv.subject === subject && !o.forceLevel) {
-      var picked = J.Rewards.pickVariant(pool, pv, { recent: st.adaptive.recent, answered: st.answered, rng: sess.rng });
+      // 變化題（ADR-005）刻意出「同概念」：同 variant_group 優先，其中挑最近沒出過的
+      var picked = J.Rewards.pickVariant(pool, pv, { recent: hist, answered: st.answered, rng: sess.rng });
       if (picked) { q = picked.question; isVariant = true; } else { st.pendingVariant = null; }
     }
     if (!q) {
       q = J.Adaptive.pickQuestion(pool, subject, st.adaptive, {
-        rng: sess.rng, answered: st.answered, exclude: sess.q ? [sess.q.id] : []
+        rng: sess.rng, answered: st.answered, exclude: sess.q ? [sess.q.id] : [],
+        history: hist, avoidGroup: lastQ && lastQ.variant_group
       });
     }
     if (!q) return null;
     J.Adaptive.pushRecent(st.adaptive, q.id);
+    J.Adaptive.pushHistory(st.qhist, subject, q.id);
     sess.asked.push(q.id);
     sess.q = q; sess.isVariant = isVariant;
     sess.wrongCount = 0; sess.hintsOpened = 0; sess.hintsUsed = false; sess.erased = []; sess.submitted = false; sess.solved = false;

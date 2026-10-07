@@ -232,3 +232,21 @@ table.report th, table.report td { border-bottom: 1px solid rgba(255, 255, 255, 
   .hud-card { font-size: 20px; padding: 4px 8px; }
   .bar { width: 80px; }
 }
+
+/* ---------- v0.4：任務按鈕數字、小地圖、名冊、旅店休息 ---------- */
+.badge { display: inline-block; min-width: 24px; margin-left: 4px; padding: 0 6px; border-radius: 999px; background: #e0603a; color: #fff; font-size: 18px; line-height: 24px; text-align: center; }
+.minimap { position: absolute; right: max(8px, env(safe-area-inset-right)); top: 60px; padding: 3px; min-width: 0; min-height: 0; border-radius: 8px; background: rgba(11, 18, 54, .75); line-height: 0; pointer-events: auto; }
+.minimap canvas { display: block; border-radius: 4px; image-rendering: auto; }
+.minimap-panel { width: min(1000px, 97vw); }
+.mm-body { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+.mm-body > .mm-map { flex: 0 1 auto; max-width: 100%; }   /* 寬度由 minimap.js 設成地圖寬，圖例跟著換行，名單排在右邊 */
+.mm-body canvas { display: block; border: 3px solid #fff; border-radius: 8px; max-width: 100%; }
+.mm-side { flex: 1; min-width: 200px; max-height: 62vh; overflow: auto; }
+.list.compact li { padding: 4px 8px; }
+.book-icon.unknown img, .book-icon.unknown span { filter: brightness(0) opacity(.55); }
+.done-quests summary { cursor: pointer; font-size: 22px; color: var(--accent); margin: 10px 0; min-height: 44px; display: flex; align-items: center; }
+.inn-veil { position: absolute; inset: 0; background: rgba(5, 8, 25, 0); transition: background .45s; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 50; }
+.inn-veil.on { background: rgba(5, 8, 25, .82); }
+.inn-veil div { color: #fffbe8; font-size: 30px; opacity: 0; transition: opacity .45s; }
+.inn-veil.on div { opacity: 1; }
+@media (max-height: 460px) { .minimap { top: 52px; } .minimap canvas { max-height: 70px; width: auto; } }
