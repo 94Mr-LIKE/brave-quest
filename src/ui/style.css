@@ -218,6 +218,7 @@ table.report th, table.report td { border-bottom: 1px solid rgba(255, 255, 255, 
 
 /* ---------- 提示訊息 ---------- */
 #toasts { position: absolute; right: 10px; top: 70px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; }
+body.panel-open #toasts { top: auto; right: auto; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%); align-items: center; }   /* 視窗開著時不蓋住右上角的「關閉」 */
 .toast { padding: 8px 16px; font-size: 21px; animation: toastin .25s ease-out; max-width: 70vw; }
 @keyframes toastin { from { transform: translateX(30px); opacity: 0; } }
 .big-banner { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%); font-size: 34px; padding: 16px 32px; text-align: center; pointer-events: none; animation: fadeout 2.4s forwards; }
@@ -250,3 +251,9 @@ table.report th, table.report td { border-bottom: 1px solid rgba(255, 255, 255, 
 .inn-veil div { color: #fffbe8; font-size: 30px; opacity: 0; transition: opacity .45s; }
 .inn-veil.on div { opacity: 1; }
 @media (max-height: 460px) { .minimap { top: 52px; } .minimap canvas { max-height: 70px; width: auto; } }
+
+/* v0.5 大地圖載入進度條 */
+.load-bar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(420px, 80vw); padding: 14px 18px; z-index: 45; pointer-events: none; }
+.load-bar .label { font-size: 20px; margin-bottom: 8px; text-align: center; }
+.load-bar .track { height: 16px; border-radius: 8px; background: rgba(255, 255, 255, .18); overflow: hidden; }
+.load-bar .fill { height: 100%; width: 0; background: linear-gradient(90deg, #ffd34d, #ffb02e); transition: width .15s; }

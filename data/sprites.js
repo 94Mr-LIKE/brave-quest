@@ -324,12 +324,6 @@ window.SPRITES = {
   "frameW": 40,
   "frameH": 44
  },
- "light_glow": {
-  "file": "assets/ui/light_glow.png",
-  "type": "single",
-  "frameW": 55,
-  "frameH": 44
- },
  "mon_dango": {
   "file": "assets/monsters/mon_dango.png",
   "type": "single",
@@ -576,24 +570,6 @@ window.SPRITES = {
   "frameW": 177,
   "frameH": 176
  },
- "bg_M01": {
-  "file": "assets/maps/bg_M01.png",
-  "type": "map",
-  "frameW": 1024,
-  "frameH": 640
- },
- "bg_M02": {
-  "file": "assets/maps/bg_M02.png",
-  "type": "map",
-  "frameW": 960,
-  "frameH": 576
- },
- "bg_M03": {
-  "file": "assets/maps/bg_M03.png",
-  "type": "map",
-  "frameW": 896,
-  "frameH": 512
- },
  "bg_M04": {
   "file": "assets/maps/bg_M04.png",
   "type": "map",
@@ -606,12 +582,6 @@ window.SPRITES = {
   "frameW": 960,
   "frameH": 608
  },
- "bg_M06": {
-  "file": "assets/maps/bg_M06.png",
-  "type": "map",
-  "frameW": 896,
-  "frameH": 512
- },
  "bg_M07": {
   "file": "assets/maps/bg_M07.png",
   "type": "map",
@@ -623,12 +593,6 @@ window.SPRITES = {
   "type": "map",
   "frameW": 960,
   "frameH": 576
- },
- "bg_M09": {
-  "file": "assets/maps/bg_M09.png",
-  "type": "map",
-  "frameW": 1024,
-  "frameH": 608
  },
  "bg_M10": {
   "file": "assets/maps/bg_M10.png",

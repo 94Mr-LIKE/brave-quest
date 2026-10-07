@@ -2,13 +2,13 @@
 window.ART = {
  "maps": {
   "M01": {
-   "bg": "bg_M01.png"
+   "bg": "bg_M01.webp"
   },
   "M02": {
-   "bg": "bg_M02.png"
+   "bg": "bg_M02.webp"
   },
   "M03": {
-   "bg": "bg_M03.png"
+   "bg": "bg_M03.webp"
   },
   "M04": {
    "bg": "bg_M04.png"
@@ -17,7 +17,7 @@ window.ART = {
    "bg": "bg_M05.png"
   },
   "M06": {
-   "bg": "bg_M06.png"
+   "bg": "bg_M06.webp"
   },
   "M07": {
    "bg": "bg_M07.png"
@@ -26,7 +26,7 @@ window.ART = {
    "bg": "bg_M08.png"
   },
   "M09": {
-   "bg": "bg_M09.png"
+   "bg": "bg_M09.webp"
   },
   "M10": {
    "bg": "bg_M10.png"

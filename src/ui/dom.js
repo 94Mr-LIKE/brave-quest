@@ -77,7 +77,11 @@
   }
 
   /** body.modal-open：讓觸控 B 鍵移到遮罩上方（見 style.css） */
-  function syncBodyClass() { document.body.classList.toggle('modal-open', stack.some(function (e) { return e.modal; })); }
+  function syncBodyClass() {
+    document.body.classList.toggle('modal-open', stack.some(function (e) { return e.modal; }));
+    // v0.5：有「有關閉鈕的視窗」（.panel）開著時，右上角的提示泡泡移到畫面下方中央，不蓋住「關閉」按鈕
+    document.body.classList.toggle('panel-open', stack.some(function (e) { return e.modal && e.content.classList && e.content.classList.contains('panel'); }));
+  }
 
   function closeAll() { while (stack.length) stack[stack.length - 1].handle.close(true); }
   function isOpen() { return stack.length > 0; }
@@ -108,6 +112,23 @@
     document.getElementById('ui').appendChild(n);
     setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 2700);
     announce(text);
+  }
+
+  /** 載入進度條（v0.5 大地圖背景）：回傳 { set(0–1), close() } */
+  function progress(label) {
+    var fill = h('div.fill');
+    var pct = h('span.pct', { text: '0%' });
+    var n = h('div.win.load-bar', { role: 'progressbar', 'aria-label': label, 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': '0' },
+      [h('div.label', {}, [label + ' ', pct]), h('div.track', {}, [fill])]);
+    document.getElementById('ui').appendChild(n);
+    return {
+      node: n,
+      set: function (v) {
+        var p = Math.max(0, Math.min(100, Math.round((v || 0) * 100)));
+        fill.style.width = p + '%'; pct.textContent = p + '%'; n.setAttribute('aria-valuenow', String(p));
+      },
+      close: function () { if (n.parentNode) n.parentNode.removeChild(n); }
+    };
   }
 
   function announce(text) { if (live) { live.textContent = ''; setTimeout(function () { live.textContent = text; }, 30); } }
@@ -176,5 +197,5 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.UI = { init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, toast: toast, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
+  window.JQ.UI = { init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, toast: toast, progress: progress, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
 })();

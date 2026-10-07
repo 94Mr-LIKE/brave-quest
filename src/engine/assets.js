@@ -99,6 +99,7 @@
     if (scene.textures.exists(k)) return;
     var url = resolveUrl(mapImagePath(file));
     if (url) scene.load.image(k, url);
+    else if ((window.JQ_PACKED_SKIPPED || []).indexOf(mapImagePath(file)) >= 0) console.info('[素材] 大地圖背景沒有打包進 file:// 模式，改用格子備援圖塊：' + file);
     else console.warn('[素材] 找不到地圖圖檔（file:// 需要先執行 tools/pack_assets.py）：' + file);
   }
 

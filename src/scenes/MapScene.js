@@ -7,6 +7,8 @@
  * - 點擊／觸控地面用 A* 走過去；方向鍵／WASD／螢幕方向鍵也能走
  * - 看得見的怪物在 spawns 範圍遊走，碰到就進入戰鬥；戰鬥後跑走、30 秒後重生
  * - 只載入這張地圖用到的圖塊與角色圖
+ * - v0.5 大地圖（邊長 3 倍）：背景可為 .webp；超過裝置最大貼圖尺寸時自動切塊；載入時顯示進度條；
+ *   鏡頭外的怪物不播動畫、遊走降頻，NPC 動畫暫停，備援圖塊分區隱藏；深度只在改變時才設定（避免每格重新排序）
  */
 (function () {
   'use strict';
@@ -18,6 +20,7 @@
   var ROW = { down: 0, left: 1, right: 2, up: 3 };
   var STEP_MS = C.STEP_MS;
   var RESPAWN_MS = C.MONSTER_RESPAWN_MS;
+  var BUCKET = 8;          // 大地圖備援圖塊的分區大小（格）：鏡頭外的分區隱藏
 
   function G() { return J.Game; }
 
@@ -37,10 +40,22 @@
       A.queueTileset(this, map.tileset);      // 寶箱、燈、傳送光圈與備援地面用
       // 背景／前景圖：maps.js 的 bg、fg 優先；沒寫時看 art_manifest.js 有沒有 bg_<地圖>.png、fg_<地圖>.png
       var artMap = A.art().maps[this.mapId] || {};
-      this.bgFile = map.bg || artMap.bg || null;
+      this.bgFile = map.noBg ? null : (map.bg || artMap.bg || null);   // noBg：試做大地圖只用格子（備援圖塊）
       this.fgFile = map.fg || artMap.fg || null;
+      if (map.noFg) this.fgFile = null;   // 試做大地圖（?debug=bigpilot）不用原本小地圖的前景
       if (this.bgFile) A.queueMapImage(this, this.bgFile);
       if (this.fgFile) A.queueMapImage(this, this.fgFile);
+      // v0.5：大地圖背景（1–2MB）第一次載入時顯示進度條，並記錄載入時間（debug.mapLoadLog()）
+      this.loadT0 = performance.now();
+      var bigFiles = [this.bgFile, this.fgFile].filter(function (f) { return f && !self.textures.exists('map:' + f); });
+      if (bigFiles.length) {
+        var bar = J.UI.progress('地圖載入中……');
+        this.load.on('progress', function (v) { bar.set(v); });
+        this.load.once('complete', function () {
+          bar.close();
+          g.mapLoadLog.push({ map: self.mapId, files: bigFiles, ms: Math.round(performance.now() - self.loadT0) });
+        });
+      }
       // 寶箱與招牌（GPT 圖，sprites.js；沒有圖時用程式畫的暫代圖）
       if ((map.chests || []).length) { if (A.has('chest_closed')) A.queue(this, 'chest_closed'); if (A.has('chest_open')) A.queue(this, 'chest_open'); }
       J.MapInfo.signSpots(map).forEach(function (sg) { if (A.has('sign_' + sg.kind)) A.queue(self, 'sign_' + sg.kind); });
@@ -68,6 +83,12 @@
       J.Assets.finalize(this);
       this.makeUiTextures();
       this.size = J.World.size(map);
+      // 大地圖：比畫面大兩倍以上（v0.5 的 3 倍地圖）→ 啟用分區隱藏與平滑鏡頭
+      this.bigMap = this.size.w * T > C.VIEW_W * 2 || this.size.h * T > C.VIEW_H * 2;
+      this.areaCache = new Map();
+      this.cullAt = 0;
+      // 場景重新開始（換地圖）時同一個物件會被重用：上一張地圖的分塊、分區資料要清掉
+      this.bgChunks = null; this.buckets = null; this.groundLayer = null; this.bucketKey = null;
       this.tileset = g.data.tilesets[map.tileset] || g.data.tilesets.village;
       this.frames = {};
       (window.TILE_FRAMES ? window.TILE_FRAMES.names : []).forEach(function (n, i) { self.frames[n] = i; });
@@ -85,6 +106,11 @@
       (map.lamps || []).forEach(function (l) { self.blocked[l.x + ',' + l.y] = true; });
 
       this.hasBg = !!(this.bgFile && this.textures.exists('map:' + this.bgFile));
+      // file:// 模式（雙擊 index.html）沒有打包大地圖背景：改用格子備援圖塊，並提示用網址開啟（每次開遊戲只提示一次）
+      if (this.bgFile && !this.hasBg && J.Assets.FILE_MODE && !g.fileBgNoticeShown) {
+        g.fileBgNoticeShown = true;
+        J.UI.toast('這張地圖的背景圖很大，直接開檔案時看不到；請用網址開啟遊戲，就能看到完整的地圖畫面。', 7000);
+      }
       if (this.hasBg) this.buildBackground(); else this.buildTiles();
       this.buildExits();
       this.buildObjects();
@@ -96,8 +122,11 @@
       if (g.DEBUG) this.buildDebugOverlay();
 
       var cam = this.cameras.main;
+      // 鏡頭：限制在地圖範圍內（地圖至少和畫面一樣大，邊界不會露出黑邊）；大地圖跟得柔和一點，主角在中間一小塊範圍內走動時鏡頭不動
       cam.setBounds(0, 0, this.size.w * T, this.size.h * T);
-      cam.startFollow(this.player, true, 0.2, 0.2);
+      var lerp = this.bigMap ? 0.12 : 0.2;
+      cam.startFollow(this.player, true, lerp, lerp);
+      if (this.bigMap) cam.setDeadzone(T * 2, T * 1.5);
       cam.setRoundPixels(true);
       cam.fadeIn(250, 0, 0, 0);
 
@@ -135,7 +164,7 @@
     }
 
     buildTiles() {
-      var self = this, w = this.size.w, h = this.size.h;
+      var self = this, w = this.size.w, h = this.size.h, first = this.children.list.length;
       var EDGE_GROUND = { path: 1, sand: 1, mud: 1 }, GRASS = { grass: 1, flowers: 1 };
       for (var y = 0; y < h; y++) {
         for (var x = 0; x < w; x++) {
@@ -177,16 +206,78 @@
           }
         }
       }
+      if (this.bigMap) this.organizeTiles(first);
+    }
+
+    /**
+     * 大地圖的備援圖塊（幾千張）：地面放進一個圖層（不參與角色的深度排序），
+     * 全部圖塊依 BUCKET×BUCKET 格分區，鏡頭附近以外的區塊隱藏（cull）
+     */
+    organizeTiles(first) {
+      var self = this, list = this.children.list.slice(first), B = BUCKET * T;
+      this.groundLayer = this.add.layer().setDepth(0);
+      this.buckets = {};
+      list.forEach(function (o) {
+        var k = Math.floor(o.x / B) + ',' + Math.floor(o.y / B);
+        (self.buckets[k] || (self.buckets[k] = [])).push(o);
+        if (o.depth < 1) { o.__ground = true; self.groundLayer.add(o); }
+      });
+      this.bucketKey = null;
+      // 鏡頭外被拿出畫面清單的圖塊，換地圖時不會被 Phaser 自動清掉，要自己清
+      var buckets = this.buckets;
+      this.events.once('shutdown', function () {
+        Object.keys(buckets).forEach(function (k) { buckets[k].forEach(function (o) { if (!o.displayList && o.scene) o.destroy(); }); });
+      });
     }
 
     /** 整張背景圖（GPT 繪製）；尺寸應為 欄數×32 × 列數×32，不合時拉伸並提醒 */
     buildBackground() {
       var key = 'map:' + this.bgFile, W = this.size.w * T, H = this.size.h * T;
-      var img = this.add.image(0, 0, key).setOrigin(0, 0).setDepth(0);
-      if (img.width !== W || img.height !== H) {
-        console.warn('[地圖] ' + this.mapId + ' 背景圖是 ' + img.width + '×' + img.height + '，應該是 ' + W + '×' + H + '（欄數×32 × 列數×32），已自動拉伸');
-        img.setDisplaySize(W, H);
+      var src = this.textures.get(key).getSourceImage();
+      if (src.width !== W || src.height !== H) {
+        console.warn('[地圖] ' + this.mapId + ' 背景圖是 ' + src.width + '×' + src.height + '，應該是 ' + W + '×' + H + '（欄數×32 × 列數×32），已自動拉伸');
       }
+      this.bgChunks = this.addBigImage(key, 0, W, H);
+    }
+
+    /** 裝置的最大貼圖尺寸（gl.MAX_TEXTURE_SIZE；網址 ?maxtex=N 可在測試時調小，模擬 iPad／Chromebook） */
+    maxTex() {
+      var r = this.sys.renderer, m = (r && r.getMaxTextureSize && r.getMaxTextureSize()) || 4096;
+      var o = G().MAX_TEX_OVERRIDE;
+      return o && o < m ? o : m;
+    }
+
+    /**
+     * 貼一張「整張地圖大小」的圖（背景或前景）。圖比最大貼圖尺寸大時，切成 2×2 或更多塊（每塊對齊格子）分別貼上。
+     * 回傳分塊清單 [{ key, sx, sy, sw, sh, kx, ky }]：sx/sy/sw/sh＝這塊在原圖的範圍，kx/ky＝原圖 1 像素等於世界幾像素
+     */
+    addBigImage(key, depth, W, H) {
+      var src = this.textures.get(key).getSourceImage();
+      var iw = src.width, ih = src.height, kx = W / iw, ky = H / ih, max = this.maxTex();
+      if (iw <= max && ih <= max) {
+        this.add.image(0, 0, key).setOrigin(0, 0).setScale(kx, ky).setDepth(depth);
+        return [{ key: key, sx: 0, sy: 0, sw: iw, sh: ih, kx: kx, ky: ky }];
+      }
+      var cellW = T / kx, cellH = T / ky;                         // 一格在原圖是幾像素
+      var cw = Math.max(1, Math.floor(max / cellW)) * cellW, ch = Math.max(1, Math.floor(max / cellH)) * cellH;
+      var nx = Math.ceil(iw / cw), ny = Math.ceil(ih / ch), out = [];
+      for (var j = 0; j < ny; j++) {
+        for (var i = 0; i < nx; i++) {
+          var sx = Math.round(i * cw), sy = Math.round(j * ch);
+          var sw = Math.min(Math.round((i + 1) * cw), iw) - sx, sh = Math.min(Math.round((j + 1) * ch), ih) - sy;
+          var k = key + '#' + i + ',' + j;
+          if (!this.textures.exists(k)) {
+            var c = document.createElement('canvas');
+            c.width = sw; c.height = sh;
+            c.getContext('2d').drawImage(src, sx, sy, sw, sh, 0, 0, sw, sh);
+            this.textures.addCanvas(k, c);
+          }
+          this.add.image(sx * kx, sy * ky, k).setOrigin(0, 0).setScale(kx, ky).setDepth(depth);
+          out.push({ key: k, sx: sx, sy: sy, sw: sw, sh: sh, kx: kx, ky: ky });
+        }
+      }
+      console.info('[地圖] ' + key + ' ' + iw + '×' + ih + ' 超過最大貼圖尺寸 ' + max + '，切成 ' + nx + '×' + ny + ' 塊');
+      return out;
     }
 
     /** 出口的傳送光圈 */
@@ -385,20 +476,21 @@
       var up = J.MapInfo.upperCells(this.map, G().data.tilesets);
       this.fgSet = {};
       Object.keys(up.set).forEach(function (k) { self.fgSet[k] = true; });
-      var bgKey = this.hasBg ? 'map:' + this.bgFile : null;
+      var chunks = this.hasBg ? this.bgChunks : null;
       up.cells.forEach(function (c) {
-        if (bgKey) {
-          // 從背景圖切出這一格，畫在角色上方
-          var img = self.add.image(0, 0, bgKey).setOrigin(0, 0);
-          var sx = img.width / W, sy = img.height / H;
-          img.setScale(1 / sx, 1 / sy).setCrop(c.x * T * sx, c.y * T * sy, T * sx, T * sy).setDepth(40000);
+        if (chunks) {
+          // 從背景圖（或它的分塊）切出這一格，畫在角色上方
+          var k0 = chunks[0], cx = c.x * T / k0.kx, cy = c.y * T / k0.ky, cw = T / k0.kx, chh = T / k0.ky;
+          var ck = chunks.filter(function (k) { return cx >= k.sx - 0.5 && cx < k.sx + k.sw - 0.5 && cy >= k.sy - 0.5 && cy < k.sy + k.sh - 0.5; })[0] || k0;
+          self.add.image(ck.sx * ck.kx, ck.sy * ck.ky, ck.key).setOrigin(0, 0).setScale(ck.kx, ck.ky)
+            .setCrop(Math.max(0, cx - ck.sx), Math.max(0, cy - ck.sy), Math.min(cw, ck.sx + ck.sw - cx), Math.min(chh, ck.sy + ck.sh - cy)).setDepth(40000);
         } else {
           var d = self.defAt(c.x, c.y);
           self.add.image(c.x * T, c.y * T, self.tex, self.frameOf(d.tile)).setOrigin(0, 0).setScale(S).setDepth(40000);
         }
       });
       if (this.fgFile && this.textures.exists('map:' + this.fgFile)) {
-        this.add.image(0, 0, 'map:' + this.fgFile).setOrigin(0, 0).setDisplaySize(W, H).setDepth(50000);
+        this.addBigImage('map:' + this.fgFile, 50000, W, H);
         this.maskFromFg('map:' + this.fgFile);
       }
       this.hasFg = Object.keys(this.fgSet).length > 0;
@@ -491,10 +583,10 @@
       this.npcList().forEach(function (n) {
         var tk = J.Assets.texKey(n.sprite || 'npc_unknown');
         var img = self.add.image(n.x * T + T / 2, n.y * T + T, tk, self.textures.get(tk).has(1) ? 1 : undefined).setOrigin(0.5, 1).setDepth((n.y + 1) * T);
-        self.tweens.add({ targets: img, y: img.y - 2, duration: 700 + (n.x * 37) % 400, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+        var t1 = self.tweens.add({ targets: img, y: img.y - 2, duration: 700 + (n.x * 37) % 400, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
         var mark = self.add.image(img.x, img.y - img.displayHeight - 4, 'ui:bang').setOrigin(0.5, 1).setScale(2).setDepth(9000).setVisible(false);
-        self.tweens.add({ targets: mark, y: mark.y - 4, duration: 500, yoyo: true, repeat: -1 });
-        self.npcs.push({ data: n, img: img, mark: mark });
+        var t2 = self.tweens.add({ targets: mark, y: mark.y - 4, duration: 500, yoyo: true, repeat: -1 });
+        self.npcs.push({ data: n, img: img, mark: mark, tw: [t1, t2] });
       });
       this.refreshMarkers();
       this.syncDepths();
@@ -504,7 +596,8 @@
       var g = G();
       this.npcs.forEach(function (n) {
         var m = g.npcMarker(n.data);
-        n.mark.setVisible(!!m);
+        n.markOn = !!m;
+        n.mark.setVisible(!!m && n.inView !== false);
         if (m) n.mark.setTexture(m === 'ready' ? 'ui:ready' : 'ui:bang');
       });
     }
@@ -533,8 +626,10 @@
     }
 
     areaTiles(s) {
+      if (this.areaCache && this.areaCache.has(s)) return this.areaCache.get(s);
       var a = s.area || [0, 0, this.size.w, this.size.h], out = [];
       for (var y = a[1]; y < a[1] + a[3]; y++) for (var x = a[0]; x < a[0] + a[2]; x++) if (this.walkable(x, y) && !J.World.exitAt(this.map, x, y)) out.push({ x: x, y: y });
+      if (this.areaCache) this.areaCache.set(s, out);
       return out;
     }
 
@@ -557,7 +652,7 @@
         var target = inf.mapH || (mob.boss ? C.MAP_BOSS_H : C.MAP_MONSTER_H);
         mob.sprite.setScale(target / Math.max(mob.sprite.height, 1));
       }
-      mob.sprite.setPosition(mob.tx * T + T / 2, mob.ty * T + T).setAlpha(first ? 1 : 0).setVisible(true);
+      mob.sprite.setPosition(mob.tx * T + T / 2, mob.ty * T + T).setAlpha(first ? 1 : 0).setVisible(mob.inView !== false);
       if (!first) this.tweens.add({ targets: mob.sprite, alpha: 1, duration: 600 });
       if (!mob.bob) mob.bob = this.tweens.add({ targets: mob.sprite, scaleY: mob.sprite.scaleY * 1.08, duration: 420 + (mob.idx * 53) % 300, yoyo: true, repeat: -1 });
       mob.active = true;
@@ -575,7 +670,9 @@
         if (mob.boss || mob.moving || now < mob.nextMove) return;
         // v0.4：spawns 的 area 是遊走範圍。在範圍內隨機挑目標格，用 A* 一格一格慢慢走過去，走到後休息一下再挑下一個
         var a = mob.spawn.area || [0, 0, self.size.w, self.size.h];
-        var occupied = function (x, y) { return self.monsters.some(function (o) { return o !== mob && o.active && o.tx === x && o.ty === y; }); };
+        var occ = {};
+        self.monsters.forEach(function (o) { if (o !== mob && o.active) occ[o.tx + ',' + o.ty] = true; });
+        var occupied = function (x, y) { return !!occ[x + ',' + y]; };
         var inArea = function (x, y) { return x >= a[0] && y >= a[1] && x < a[0] + a[2] && y < a[1] + a[3] && self.walkable(x, y) && !J.World.exitAt(self.map, x, y); };
         if (!mob.path || !mob.path.length) {
           var goal = J.MapInfo.wanderTarget(self.areaTiles(mob.spawn), { x: mob.tx, y: mob.ty });
@@ -585,8 +682,15 @@
         }
         var t = mob.path.shift();
         if (!inArea(t.c, t.r) || occupied(t.c, t.r)) { mob.path = []; mob.nextMove = now + 400; return; }
-        mob.moving = true; mob.tx = t.c; mob.ty = t.r;
+        mob.tx = t.c; mob.ty = t.r;
         mob.visited = (mob.visited || 0) + 1;
+        if (mob.inView === false) {
+          // 鏡頭外：不播補間動畫，直接移到下一格，而且走得比較慢（降頻），省下手機與平板的效能
+          mob.sprite.setPosition(t.c * T + T / 2, t.r * T + T);
+          mob.nextMove = now + (mob.path.length ? 900 : 2500 + Math.random() * 3000);
+          return;
+        }
+        mob.moving = true;
         if (t.c * T + T / 2 < mob.sprite.x) mob.sprite.setFlipX(false); else if (t.c * T + T / 2 > mob.sprite.x) mob.sprite.setFlipX(true);
         self.tweens.add({ targets: mob.sprite, x: t.c * T + T / 2, y: t.r * T + T, duration: 520, onComplete: function () {
           mob.moving = false;
@@ -798,6 +902,7 @@
       this.pet.setAlpha(this.walkable(ptx, pty) ? 1 : 0.5);
       this.updateGhost();
 
+      if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); }
       this.wanderMonsters(time);
       this.syncDepths();
       if (!blocked && time > this.encounterCooldown) this.checkEncounter();
@@ -810,9 +915,67 @@
     }
 
     syncDepths() {
-      this.player.setDepth(this.player.y);
-      this.pet.setDepth(this.pet.y - 0.1);
-      this.monsters.forEach(function (m) { if (m.sprite) m.sprite.setDepth(m.sprite.y); });
+      // Phaser 每次 setDepth 都會讓整個畫面重新排序，所以只有深度真的改變、而且在鏡頭附近的才設定
+      function setD(o, d) { if (o.depth !== d) o.setDepth(d); }
+      setD(this.player, this.player.y);
+      setD(this.pet, this.pet.y - 0.1);
+      this.monsters.forEach(function (m) { if (m.sprite && m.inView !== false) setD(m.sprite, m.sprite.y); });
+    }
+
+    /**
+     * 鏡頭外的東西不更新（每 150ms 檢查一次）：
+     * 怪物隱藏並暫停晃動動畫（遊走改成降頻、不播補間）、NPC 隱藏並暫停動畫、備援圖塊依分區隱藏
+     */
+    cull() {
+      var wv = this.cameras.main.worldView, m = T * 3;
+      if (!wv.width) return;
+      var x0 = wv.x - m, y0 = wv.y - m, x1 = wv.x + wv.width + m, y1 = wv.y + wv.height + m * 2;   // 角色圖從腳底往上長，下方多留一點
+      var inView = function (x, y) { return x >= x0 && x <= x1 && y >= y0 && y <= y1; };
+      this.monsters.forEach(function (mob) {
+        if (!mob.sprite) return;
+        var v = inView(mob.sprite.x, mob.sprite.y);
+        if (v === mob.inView) return;
+        mob.inView = v;
+        if (mob.active) mob.sprite.setVisible(v);
+        if (mob.bob) { if (v) mob.bob.resume(); else mob.bob.pause(); }
+      });
+      this.npcs.forEach(function (n) {
+        var v = inView(n.img.x, n.img.y);
+        if (v === n.inView) return;
+        n.inView = v;
+        n.img.setVisible(v);
+        n.mark.setVisible(v && !!n.markOn);
+        (n.tw || []).forEach(function (t) { if (v) t.resume(); else t.pause(); });
+      });
+      if (this.buckets) {
+        var B = BUCKET * T, on = {}, keys = [];
+        for (var by = Math.floor(y0 / B); by <= Math.floor(y1 / B); by++) for (var bx = Math.floor(x0 / B); bx <= Math.floor(x1 / B); bx++) { on[bx + ',' + by] = true; keys.push(bx + ',' + by); }
+        var key = keys.join(';');
+        if (key !== this.bucketKey) {
+          this.bucketKey = key;
+          var self = this;
+          Object.keys(this.buckets).forEach(function (k) {
+            var v = !!on[k];
+            self.buckets[k].forEach(function (o) {
+              // 地面（在圖層裡）只切換顯示；樹冠、屋頂等要和角色排序的，直接拿出／放回畫面清單，排序時就不用排它們
+              if (o.__ground) { if (o.visible !== v) o.setVisible(v); }
+              else if (v && !o.displayList) o.addToDisplayList();
+              else if (!v && o.displayList) o.removeFromDisplayList();
+            });
+          });
+        }
+      }
+    }
+
+    /** 效能數據（測試用）：畫面上的物件數、看得見的怪物數 */
+    perfInfo() {
+      var shown = 0;
+      this.children.list.forEach(function (o) { if (o.visible) shown++; });
+      return {
+        objects: this.children.list.length, visibleObjects: shown,
+        monsters: this.monsters.length, monstersInView: this.monsters.filter(function (m) { return m.inView !== false && m.active; }).length,
+        bigMap: this.bigMap, chunks: this.bgChunks ? this.bgChunks.length : 0, maxTex: this.maxTex(), size: [this.size.w, this.size.h]
+      };
     }
 
     checkEncounter() {
@@ -850,6 +1013,7 @@
         exits: (this.map.exits || []).map(function (e) { return { x: e.x, y: e.y, to: e.to, name: (g.data.maps[e.to] || {}).name || e.to }; }),
         shops: (this.signs || []).map(function (s) { return { kind: s.spot.kind, text: s.spot.text, x: s.spot.npcX, y: s.spot.npcY }; }),
         station: this.station ? { x: this.station.x, y: this.station.y, name: this.station.name } : null,
+        chests: this.chests.map(function (c) { return { x: c.data.x, y: c.data.y, open: !!g.state.chests[c.data.id] }; }),
         monsters: this.monsters.filter(function (m) { return m.active; }).map(function (m) { return { id: m.id, x: m.tx, y: m.ty, boss: m.boss }; })
       };
     }

@@ -53,6 +53,7 @@
       bosses: {},                 // 已淨化的頭目 {monsterId:true}
       location: null,             // {map, x, y}
       lastInn: null,              // 最近去過的旅店 {map, x, y}
+      mapDims: {},                // v0.5：存檔時每張地圖的尺寸 {地圖id:[欄,列]}；地圖放大後讀檔用來換算 location、lastInn
       visited: {},
       qhist: {},                  // 每科最近 80 題的出題紀錄（最近最少出現優先）
       bestiary: {},               // 怪物名冊 { 怪物id: {seen, defeated} }
@@ -75,7 +76,7 @@
    * 根因（審查 F-06）：inventory 的預設是 {herb:2, eraser:1, guide:1, snack:1}，而 removeItem 用完時會刪掉該鍵，
    * 以前逐鍵補預設值會讓用完的道具在讀檔後「長回來」。
    */
-  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered', 'qhist', 'bestiary', 'bestiaryClaims'];
+  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered', 'qhist', 'bestiary', 'bestiaryClaims', 'mapDims'];
 
   /** 以預設值補齊缺漏欄位（舊存檔、匯入存檔用），不覆蓋已有的值；字典型欄位只在整個不存在時才補 */
   function fillDefaults(target, defaults, path) {

@@ -12,12 +12,17 @@
     state: null, data: null, questions: [], provider: null, phaser: null, mapScene: null, busy: false,
     held: {}, heldOrder: [], tickTimer: 0, lastSave: 0, npcIndex: {}, battleCtx: null,
     joy: { dir: null, force: 0 },
-    DEBUG: /[?&]debug=1\b/.test(location.search)   // 開發者模式：碰撞格子疊圖
+    DEBUG: /[?&]debug=1\b/.test(location.search),   // 開發者模式：碰撞格子疊圖
+    BIGPILOT: /[?&]debug=bigpilot\b/.test(location.search),   // v0.5：試做大地圖（art_src/bigpilot）暫時取代 M02
+    // 測試用：把最大貼圖尺寸調小（例如 ?maxtex=1024），檢查大背景自動切塊
+    MAX_TEX_OVERRIDE: (function () { var m = /[?&]maxtex=(\d+)/.exec(location.search); return m ? Math.max(256, Number(m[1])) : 0; })(),
+    mapLoadLog: []   // 地圖背景載入時間紀錄（debug.mapLoadLog()）
   };
 
   // ---------------------------------------------------------------- 啟動
   G.boot = function () {
     G.data = J.World.fromWindow(window);
+    if (G.BIGPILOT && J.BigPilot) J.BigPilot.load(G);
     var norm = J.Answer.normalizeQuestions(window.QUESTIONS || []);
     G.questions = norm.valid;
     if (norm.invalid.length) console.warn('[題庫] 有 ' + norm.invalid.length + ' 題格式不對，已略過：', norm.invalid.slice(0, 5));
@@ -84,6 +89,8 @@
         }
       });
       G.titleHandle = titleHandle;
+      // 標題曲（還沒點畫面解鎖聲音時，music.js 會記住、解鎖後自動開始）；存檔裡關掉音樂就不播
+      if (!(s && s.settings && s.settings.music === false)) G.bgm('title');
       G.checkLoadLink(s);
     });
   };
@@ -122,6 +129,7 @@
     var m1 = G.data.maps.M01 ? 'M01' : Object.keys(G.data.maps)[0];
     var map = G.data.maps[m1];
     var start = map.start || { x: 2, y: 2 };
+    st.mapDims = J.MapInfo.currentDims(G.data.maps);   // 新遊戲的座標就是目前地圖的座標
     st.location = { map: m1, x: start.x, y: start.y };
     if (map.inn) st.lastInn = { map: m1, x: map.inn.x, y: map.inn.y + 1 };
     else st.lastInn = { map: m1, x: start.x, y: start.y };
@@ -133,6 +141,9 @@
     var st = G.state;
     J.Daily.ensure(st.daily, Date.now());
     J.Character.clampVitals(st, G.data);
+    // v0.5：地圖放大後，舊存檔的位置（location、lastInn）換算到新地圖最近能站的格子
+    var moved = J.MapInfo.migrateCoords(st, G.data.maps, G.data.tilesets);
+    if (moved.length) console.info('[存檔] 地圖尺寸改變，位置已換算：', moved);
     G.applySettings(true);
     G.save(true);
     J.HUD.show(true);
@@ -788,7 +799,7 @@
     st.stats.battles.won = (st.stats.battles.won || 0) + 1;
     J.Bestiary.defeated(st, mon.id);   // 怪物名冊：打倒
     G.stopBgm(200);
-    G.jingle(mon.boss && drops.length ? 'rare_item' : 'victory', null, null, 6000);
+    G.jingle(mon.boss && drops.length ? 'rare_item' : 'victory', null, null, 7000);
     var lines = [mon.wake, '經驗值 +' + vr.exp + '　金幣 +' + vr.gold];
     if (drops.length) lines.push('得到：' + drops.map(function (d) { return (G.data.items[d] || {}).name || d; }).join('、'));
     G.bmsg(lines.join('　'));
@@ -817,7 +828,7 @@
     var ctx = G.battleCtx;
     G.bmsg('累倒了……');
     G.stopBgm(200);
-    G.jingle('faint', null, 'hurt', 4000);
+    G.jingle('faint', null, 'hurt', 7000);
     G.say('D_FAINT', [{ who: 'pet', text: '我們累倒了……先回旅店休息一下吧。' }, { who: 'pet', text: '沒關係！金幣和道具都還在喔。' }]).then(function () { G.bend('ko'); });
   };
 
@@ -849,14 +860,13 @@
       G.busy = true;
       var veil = J.UI.h('div.inn-veil', { 'aria-hidden': 'true' }, [J.UI.h('div', { text: '💤 休息中……' })]);
       document.getElementById('ui').appendChild(veil);
-      G.resting = true;
       setTimeout(function () { veil.classList.add('on'); }, 20);
       G.stopBgm(400);
       G.jingle('inn_rest', function () {
         veil.classList.remove('on');
         setTimeout(function () {
           if (veil.parentNode) veil.parentNode.removeChild(veil);
-          G.resting = false; G.busy = false;
+          G.busy = false;
           if (G.mapScene) G.bgm(J.MapInfo.bgmFor(G.mapScene.map));
           resolve();
         }, 450);
@@ -970,6 +980,11 @@
       G.save();
     },
     musicLog: function () { return G.musicLog.slice(); },
+    mapLoadLog: function () { return G.mapLoadLog.slice(); },
+    /** 效能：目前 FPS（Phaser 量測）、畫面物件數、鏡頭附近的怪物數、背景分塊數 */
+    perf: function () { var p = G.mapScene ? G.mapScene.perfInfo() : {}; p.fps = G.phaser ? Math.round(G.phaser.loop.actualFps * 10) / 10 : 0; return p; },
+    camera: function () { var c = G.mapScene.cameras.main, v = c.worldView; return { x: v.x, y: v.y, w: v.width, h: v.height, mapW: G.mapScene.size.w * C.TILE, mapH: G.mapScene.size.h * C.TILE }; },
+    bigPilot: function () { return G.bigPilot || null; },
     gateAsks: function () { return G.gateAsks || 0; },
     monsterTiles: function () { return G.mapScene.monsters.filter(function (m) { return m.active; }).map(function (m) { return { id: m.id, idx: m.idx, x: m.tx, y: m.ty, visited: m.visited || 0, area: m.spawn.area }; }); },
     setLevel: function (lv) { G.state.player.level = lv; J.Character.restoreFull(G.state, G.data); G.refreshHud(); }
