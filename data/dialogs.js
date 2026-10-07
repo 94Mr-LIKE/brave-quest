@@ -140,7 +140,7 @@ window.DIALOGS = {
   ],
   D_ELF_1B: [
     { who: "elf_elder", text: "對了！植物需要陽光、空氣和水。" },
-    { who: "elf_elder", text: "村子中間的葉葉，指北針好像壞了。" }
+    { who: "elf_elder", text: "南邊小路旁的葉葉，指北針好像壞了。" }
   ],
   D_ELF_2A: [
     { who: "elf_kid", text: "我的指北針一直亂轉，找不到北邊！" },
@@ -339,7 +339,7 @@ window.DIALOGS = {
   ],
   D_ORC_1B: [
     { who: "orc_chief", text: "一起討論、一起遵守，真好！" },
-    { who: "orc_chief", text: "營地裡的獵人也需要幫忙。" }
+    { who: "orc_chief", text: "大門外的獵人也需要幫忙。" }
   ],
   D_ORC_2A: [
     { who: "orc", text: "營地裡每天都吵吵鬧鬧的。" },

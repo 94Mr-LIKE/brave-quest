@@ -51,7 +51,7 @@ window.QUESTS = {
   Q_ELF_1: {
     title: "葉子為什麼黃了", giver: "elf_elder", map: "M04", kind: "help",
     goal: "在金包里客運站搭車到神木森林，幫精靈長老想起植物和風的知識：答對 3 題自然。",
-    log_next: "去找村子中間的精靈小孩葉葉。",
+    log_next: "去找村子南邊、森林小路旁的精靈小孩葉葉。",
     subject: "自然", units: ["一、植物大發現", "三、風與空氣"], count: 3, level_range: [1, 2],
     hunt: null, requires: ["Q_TUT_3"], reward: { exp: 0, gold: 60, item: null, light: null },
     dialog_start: "D_ELF_1A", dialog_end: "D_ELF_1B", dialog_locked: "D_ELF_LOCK"
@@ -195,7 +195,7 @@ window.QUESTS = {
   Q_ORC_1: {
     title: "獵場要怎麼分", giver: "orc_chief", map: "M08", kind: "help",
     goal: "搭車到月世界，幫獸人族長想出公平的規則和分配方法：答對 4 題社會。",
-    log_next: "去找營地裡的獸人獵人。",
+    log_next: "去找營地大門外的獸人獵人。",
     subject: "社會", units: ["第一單元 升上三年級的新學習", "第二單元 校園規範和班級自治", "第五單元 打造更美好的班級"], count: 4, level_range: [2, 4],
     hunt: null, requires: ["Q_GNO_4", "Q_GOB_4"], reward: { exp: 0, gold: 150, item: null, light: null },
     dialog_start: "D_ORC_1A", dialog_end: "D_ORC_1B", dialog_locked: "D_ORC_LOCK"
