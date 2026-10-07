@@ -11,19 +11,19 @@ window.ART = {
    "bg": "bg_M03.webp"
   },
   "M04": {
-   "bg": "bg_M04.png"
+   "bg": "bg_M04.webp"
   },
   "M05": {
-   "bg": "bg_M05.png"
+   "bg": "bg_M05.webp"
   },
   "M06": {
    "bg": "bg_M06.webp"
   },
   "M07": {
-   "bg": "bg_M07.png"
+   "bg": "bg_M07.webp"
   },
   "M08": {
-   "bg": "bg_M08.png"
+   "bg": "bg_M08.webp"
   },
   "M09": {
    "bg": "bg_M09.webp"

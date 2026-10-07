@@ -570,30 +570,6 @@ window.SPRITES = {
   "frameW": 177,
   "frameH": 176
  },
- "bg_M04": {
-  "file": "assets/maps/bg_M04.png",
-  "type": "map",
-  "frameW": 960,
-  "frameH": 640
- },
- "bg_M05": {
-  "file": "assets/maps/bg_M05.png",
-  "type": "map",
-  "frameW": 960,
-  "frameH": 608
- },
- "bg_M07": {
-  "file": "assets/maps/bg_M07.png",
-  "type": "map",
-  "frameW": 896,
-  "frameH": 512
- },
- "bg_M08": {
-  "file": "assets/maps/bg_M08.png",
-  "type": "map",
-  "frameW": 960,
-  "frameH": 576
- },
  "bg_M10": {
   "file": "assets/maps/bg_M10.png",
   "type": "map",
