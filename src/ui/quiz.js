@@ -42,7 +42,8 @@
       timerBar = h('div.timer.crit-zone', { role: 'progressbar', 'aria-label': '答題時間', 'aria-valuemin': '0', 'aria-valuemax': '100' }, [timerFill, timerLabel]);
     }
     var speakBtn = h('button', { onclick: speak, 'aria-label': '朗讀題目' }, ['🔊 朗讀']);
-    var sceneEl = q.scene ? h('div.scene', { text: J.UI.fill(q.scene, st.player.name) }) : null;
+    var sceneText = q.scene ? (o.speaker ? J.DialogText.questScene(q.scene, o.speaker) : q.scene) : '';
+    var sceneEl = sceneText ? h('div.scene', { text: J.UI.fill(sceneText, st.player.name) }) : null;
     var stemEl = h('div.stem', { id: 'quiz-stem', text: J.UI.fill(q.stem, st.player.name) });
     var tipEl = h('p.small', { text: TYPE_TIP[q.type] || '' });
     var answerArea = h('div', { 'aria-labelledby': 'quiz-stem' });
@@ -173,7 +174,7 @@
 
     // ---------- 動作
     function speak() {
-      var parts = [q.scene || '', q.stem];
+      var parts = [sceneText || '', q.stem];
       if (q.options && q.type !== 'number') parts.push(q.options.map(function (op, i) { return '第' + (i + 1) + '個，' + op; }).join('。'));
       J.TTS.speak(J.UI.fill(parts.join('。'), st.player.name), q.tts_lang || 'zh-TW', null, function () { sess.shownAt = Date.now() - 3000; });
     }

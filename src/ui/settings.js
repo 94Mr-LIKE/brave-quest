@@ -146,7 +146,7 @@
       body.appendChild(h('div.row', {}, [h('button', { onclick: function () {
         qrBox.hidden = false; qrBox.innerHTML = '';
         qrBox.appendChild(h('p.small', { text: '產生中……' }));
-        J.SaveCode.exportCompact(st).then(function (code) {
+        J.SaveCode.exportSlim(st).then(function (code) {
           var url = J.SaveCode.loadUrl(location.href, code);
           var r = J.QR.render(url, { size: 360 });
           qrBox.innerHTML = '';

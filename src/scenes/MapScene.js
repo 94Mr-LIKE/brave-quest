@@ -49,11 +49,14 @@
       // v0.5：大地圖背景（1–2MB）第一次載入時顯示進度條，並記錄載入時間（debug.mapLoadLog()）
       this.loadT0 = performance.now();
       var bigFiles = [this.bgFile, this.fgFile].filter(function (f) { return f && !self.textures.exists('map:' + f); });
+      // 上一次的進度條（例如載入到一半就換地圖）先關掉，避免「地圖載入中 0%」一直留在畫面上
+      this.closeLoadBar();
       if (bigFiles.length) {
-        var bar = J.UI.progress('地圖載入中……');
-        this.load.on('progress', function (v) { bar.set(v); });
+        var bar = this.loadBar = J.UI.progress('地圖載入中……');
+        this.loadProgress = function (v) { bar.set(v); };
+        this.load.on('progress', this.loadProgress);
         this.load.once('complete', function () {
-          bar.close();
+          self.closeLoadBar();
           g.mapLoadLog.push({ map: self.mapId, files: bigFiles, ms: Math.round(performance.now() - self.loadT0) });
         });
       }
@@ -71,6 +74,12 @@
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
+    /** 關掉地圖載入進度條（載入完成、場景重新開始或結束時都會呼叫） */
+    closeLoadBar() {
+      if (this.loadProgress) { this.load.off('progress', this.loadProgress); this.loadProgress = null; }
+      if (this.loadBar) { this.loadBar.close(); this.loadBar = null; }
+    }
+
     npcList() {
       var map = this.map, list = (map.npcs || []).slice();
       if (map.inn && !map.inn.npc && !list.some(function (n) { return n.x === map.inn.x && n.y === map.inn.y; })) {
@@ -81,6 +90,8 @@
 
     create() {
       var g = G(), self = this, map = this.map;
+      this.closeLoadBar();   // 保險：地圖已經建好，進度條一定要關
+      this.events.once('shutdown', function () { self.closeLoadBar(); });
       J.Assets.finalize(this);
       this.makeUiTextures();
       this.size = J.World.size(map);
@@ -89,7 +100,8 @@
       this.areaCache = new Map();
       this.cullAt = 0;
       // 場景重新開始（換地圖）時同一個物件會被重用：上一張地圖的分塊、分區資料要清掉
-      this.bgChunks = null; this.buckets = null; this.groundLayer = null; this.bucketKey = null;
+      this.safePts = null;
+      this.bgChunks = null; this.buckets = null; this.groundLayer = null; this.bucketKey = null; this.fgBuckets = null; this.glows = [];
       this.tileset = g.data.tilesets[map.tileset] || g.data.tilesets.village;
       this.frames = {};
       (window.TILE_FRAMES ? window.TILE_FRAMES.names : []).forEach(function (n, i) { self.frames[n] = i; });
@@ -471,7 +483,8 @@
       var img = this.add.image(x, y, this.glowTexture()).setBlendMode(Phaser.BlendModes.ADD).setDepth(GLOW_DEPTH);
       var sc = (T * 3 * (r || 1)) / 128;
       img.setScale(sc).setAlpha(0.7);
-      this.tweens.add({ targets: img, alpha: 0.5, scale: sc * 0.93, duration: 1100 + Math.random() * 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      img.__tw = this.tweens.add({ targets: img, alpha: 0.5, scale: sc * 0.93, duration: 1100 + Math.random() * 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      (this.glows || (this.glows = [])).push(img);
       return img;
     }
 
@@ -488,17 +501,23 @@
       this.fgSet = {};
       Object.keys(up.set).forEach(function (k) { self.fgSet[k] = true; });
       var chunks = this.hasBg ? this.bgChunks : null;
+      // v0.8：前景格依 BUCKET×BUCKET 分區，鏡頭外的分區隱藏（大地圖的上層格有好幾百格）
+      this.fgBuckets = {};
+      this.fgBucketKey = null;
       up.cells.forEach(function (c) {
+        var img;
         if (chunks) {
           // 從背景圖（或它的分塊）切出這一格，畫在角色上方
           var k0 = chunks[0], cx = c.x * T / k0.kx, cy = c.y * T / k0.ky, cw = T / k0.kx, chh = T / k0.ky;
           var ck = chunks.filter(function (k) { return cx >= k.sx - 0.5 && cx < k.sx + k.sw - 0.5 && cy >= k.sy - 0.5 && cy < k.sy + k.sh - 0.5; })[0] || k0;
-          self.add.image(ck.sx * ck.kx, ck.sy * ck.ky, ck.key).setOrigin(0, 0).setScale(ck.kx, ck.ky)
+          img = self.add.image(ck.sx * ck.kx, ck.sy * ck.ky, ck.key).setOrigin(0, 0).setScale(ck.kx, ck.ky)
             .setCrop(Math.max(0, cx - ck.sx), Math.max(0, cy - ck.sy), Math.min(cw, ck.sx + ck.sw - cx), Math.min(chh, ck.sy + ck.sh - cy)).setDepth(40000);
         } else {
           var d = self.defAt(c.x, c.y);
-          self.add.image(c.x * T, c.y * T, self.tex, self.frameOf(d.tile)).setOrigin(0, 0).setScale(S).setDepth(40000);
+          img = self.add.image(c.x * T, c.y * T, self.tex, self.frameOf(d.tile)).setOrigin(0, 0).setScale(S).setDepth(40000);
         }
+        var bk = Math.floor(c.x / BUCKET) + ',' + Math.floor(c.y / BUCKET);
+        (self.fgBuckets[bk] || (self.fgBuckets[bk] = [])).push(img);
       });
       if (this.fgFile && this.textures.exists('map:' + this.fgFile)) {
         this.addBigImage('map:' + this.fgFile, 50000, W, H);
@@ -658,10 +677,17 @@
       });
     }
 
+    /** v0.9 下車點（車站、搭車落點）周圍 5 格：一般怪物不會出現、也不會走進來 */
+    safeAt(x, y) {
+      if (!this.safePts) this.safePts = J.MapInfo.safePoints(this.map, this.mapId, (window.WORLD && window.WORLD.regions) || []);
+      return J.MapInfo.inSafeZone(this.safePts, x, y);
+    }
+
     areaTiles(s) {
       if (this.areaCache && this.areaCache.has(s)) return this.areaCache.get(s);
       var a = s.area || [0, 0, this.size.w, this.size.h], out = [];
-      for (var y = a[1]; y < a[1] + a[3]; y++) for (var x = a[0]; x < a[0] + a[2]; x++) if (this.walkable(x, y) && !J.World.exitAt(this.map, x, y)) out.push({ x: x, y: y });
+      var boss = !!(s.boss || (G().data.monsters[s.monster] || {}).boss);
+      for (var y = a[1]; y < a[1] + a[3]; y++) for (var x = a[0]; x < a[0] + a[2]; x++) if (this.walkable(x, y) && !J.World.exitAt(this.map, x, y) && (boss || !this.safeAt(x, y))) out.push({ x: x, y: y });
       if (this.areaCache) this.areaCache.set(s, out);
       return out;
     }
@@ -706,7 +732,7 @@
         var occ = {};
         self.monsters.forEach(function (o) { if (o !== mob && o.active) occ[o.tx + ',' + o.ty] = true; });
         var occupied = function (x, y) { return !!occ[x + ',' + y]; };
-        var inArea = function (x, y) { return x >= a[0] && y >= a[1] && x < a[0] + a[2] && y < a[1] + a[3] && self.walkable(x, y) && !J.World.exitAt(self.map, x, y); };
+        var inArea = function (x, y) { return x >= a[0] && y >= a[1] && x < a[0] + a[2] && y < a[1] + a[3] && self.walkable(x, y) && !J.World.exitAt(self.map, x, y) && !self.safeAt(x, y); };
         if (!mob.path || !mob.path.length) {
           var goal = J.MapInfo.wanderTarget(self.areaTiles(mob.spawn), { x: mob.tx, y: mob.ty });
           mob.path = goal ? (J.Pathfind.findPath(function (x, y) { return inArea(x, y) && !occupied(x, y); }, self.size.w, self.size.h, { c: mob.tx, r: mob.ty }, { c: goal.x, r: goal.y }, 800) || []) : [];
@@ -754,6 +780,15 @@
         return;
       }
       this.walkTo(x, y, null);
+    }
+
+    /** 螢幕座標（clientX、clientY）→ 地圖上的點，當作點了那裡（v0.9：搖桿上的輕點） */
+    tapAtClient(cx, cy) {
+      var canvas = this.sys.game.canvas, r = canvas.getBoundingClientRect();
+      if (cx < r.left || cy < r.top || cx > r.right || cy > r.bottom) return;
+      var gx = (cx - r.left) * (this.scale.width / r.width), gy = (cy - r.top) * (this.scale.height / r.height);
+      var wp = this.cameras.main.getWorldPoint(gx, gy);
+      this.onPointer({ worldX: wp.x, worldY: wp.y });
     }
 
     isAdjacent(x, y) { return Math.abs(x - this.p.tx) + Math.abs(y - this.p.ty) === 1; }
@@ -969,6 +1004,24 @@
         n.mark.setVisible(v && !!n.markOn);
         (n.tw || []).forEach(function (t) { if (v) t.resume(); else t.pause(); });
       });
+      // v0.8：鏡頭外的燈光隱藏、暫停呼吸動畫
+      (this.glows || []).forEach(function (g) {
+        var r = g.displayWidth / 2, v = g.x + r >= x0 && g.x - r <= x1 && g.y + r >= y0 && g.y - r <= y1;
+        if (v === g.__inView) return;
+        g.__inView = v;
+        g.setVisible(v);
+        if (g.__tw) { if (v) g.__tw.resume(); else g.__tw.pause(); }
+      });
+      if (this.fgBuckets) {
+        var FB = BUCKET * T, fon = {}, fkeys = [];
+        for (var fy = Math.floor(y0 / FB); fy <= Math.floor(y1 / FB); fy++) for (var fx = Math.floor(x0 / FB); fx <= Math.floor(x1 / FB); fx++) { fon[fx + ',' + fy] = true; fkeys.push(fx + ',' + fy); }
+        var fkey = fkeys.join(';');
+        if (fkey !== this.fgBucketKey) {
+          this.fgBucketKey = fkey;
+          var fb = this.fgBuckets;
+          Object.keys(fb).forEach(function (k) { var v = !!fon[k]; fb[k].forEach(function (o) { if (o.visible !== v) o.setVisible(v); }); });
+        }
+      }
       if (this.buckets) {
         var B = BUCKET * T, on = {}, keys = [];
         for (var by = Math.floor(y0 / B); by <= Math.floor(y1 / B); by++) for (var bx = Math.floor(x0 / B); bx <= Math.floor(x1 / B); bx++) { on[bx + ',' + by] = true; keys.push(bx + ',' + by); }

@@ -111,9 +111,33 @@
       if (!r.ok) { J.UI.toast(r.reason === 'coins' ? '金幣不夠喔。' : '買不到。'); return; }
       var it = D.items[id];
       if (it.job && it.type === 'weapon') G.rareItem(); else J.Audio.play('chest');   // 職業武器＝珍貴道具
-      if ((it.type === 'weapon' || it.type === 'armor') && !st.equipment[it.type]) {
-        var e = J.Character.equip(st, id, D);
-        J.UI.toast('買了' + it.name + (e.ok ? '，已經裝備上了！' : '！'));
+      var cmp = J.Character.compareEquip(st, id, D);
+      var change = function (c) {
+        var parts = [];
+        if (c.before.atk !== c.after.atk) parts.push('攻擊力 ' + c.before.atk + '→' + c.after.atk);
+        if (c.before.def !== c.after.def) parts.push('防禦力 ' + c.before.def + '→' + c.after.def);
+        if (c.before.maxMp !== c.after.maxMp) parts.push('魔力上限 ' + c.before.maxMp + '→' + c.after.maxMp);
+        return parts.join('、');
+      };
+      if (cmp.slot && cmp.canEquip && !cmp.current) {
+        // 裝備欄是空的：直接換上
+        J.Character.equip(st, id, D);
+        J.UI.toast('買了' + it.name + '，已經裝備上了！' + (change(cmp) ? '（' + change(cmp) + '）' : ''), 4000);
+      } else if (cmp.slot && cmp.canEquip && cmp.better) {
+        // v0.9：比身上的更好 → 問要不要換上（大按鈕），並比較攻擊力、防禦力
+        var cur = D.items[cmp.current] || { name: '身上的裝備' };
+        G.save(); G.refreshHud(); render();
+        J.UI.confirm('買了' + it.name + '！要換上嗎？（' + cur.name + ' → ' + it.name + '：' + change(cmp) + '）', '換上', '先不要').then(function (yes) {
+          if (yes) {
+            J.Character.equip(st, id, D);
+            J.Audio.play('select');
+            J.UI.toast('已經換上' + it.name + '！' + change(cmp), 4000);
+          }
+          G.save(); G.refreshHud(); render();
+        });
+        return;
+      } else if (cmp.slot && !cmp.canEquip && cmp.reason === 'job') {
+        J.UI.toast('買了' + it.name + '！（這是轉職後的職業專用裝備，轉職後到背包裝備）', 4500);
       } else J.UI.toast('買了' + it.name + '！');
       G.save(); G.refreshHud(); render();
     }

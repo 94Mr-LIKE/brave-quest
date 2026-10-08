@@ -22,6 +22,14 @@
       screen.appendChild(h('h1', { text: J.CONFIG.GAME_TITLE }));
       screen.appendChild(h('div.sub', { text: '國小三年級・學習冒險' }));
       screen.appendChild(heroes);
+      // v0.8 電腦版瀏覽器被縮放（同網域的其他網站縮小過）：提示一次 Ctrl＋0；關掉後這次開啟不再出現；平板不提示
+      var z = J.Zoom ? J.Zoom.current() : { show: false };
+      if (z.show && !window.__jqZoomHintClosed) {
+        var hint = h('div.win.zoom-hint', { role: 'status' }, [h('span', { text: J.Zoom.MESSAGE }),
+          h('button.ghost.zoom-close', { 'aria-label': '關閉縮放提示', onclick: function () { window.__jqZoomHintClosed = true; if (hint.parentNode) hint.parentNode.removeChild(hint); } }, ['✕'])]);
+        hint.dataset.ratio = String(z.ratio);
+        screen.appendChild(hint);
+      }
       children.forEach(function (c) { if (c) screen.appendChild(c); });
       // v0.7.2 底部小字：聯絡作者（排在內容之後、推到最下面，不會蓋住按鈕）
       screen.appendChild(h('p.title-author', {}, ['聯絡作者：', h('a.author-mail', { href: 'mailto:' + J.Feedback.EMAIL, text: J.Feedback.EMAIL })]));

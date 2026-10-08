@@ -34,7 +34,25 @@
     return { isTaigi: false, main: text, tailo: '', huayu: '', speak: text };
   }
 
-  var DialogText = { MODES: MODES, view: view, fill: fill };
+  /**
+   * v0.9 委託題目：題庫情境的說話者（例如「書店阿姨：」「漁市阿伯看著時鐘：」）換成委託人的名字，
+   * 讓小朋友知道是在幫誰。只換句首的人物；番薯仔（一直跟著主角）、外國小朋友、告示牌、寶箱等不換。不改題庫本身。
+   */
+  var QUEST_SPEAKERS = ['賣地瓜的阿姨', '溫泉旅館老闆娘', '溫泉旅館阿姨', '溫泉研究員', '書店阿姨', '圖書館員', '老街阿伯', '漁市阿伯', '漁夫阿伯',
+    '地精族長', '地精木匠', '地精工匠', '外國商人', '導護志工', '湯博士', '里長伯', '里長', '布丁', '露露', '岩岩', '嘟嘟', '商人', '地精'];
+  function questScene(scene, npcName) {
+    var s = String(scene || '');
+    if (!npcName) return s;
+    var colon = s.search(/[：:]/);
+    if (colon < 0 || colon > 30) return s;   // 沒有說話者的敘述不換
+    for (var i = 0; i < QUEST_SPEAKERS.length; i++) {
+      var n = QUEST_SPEAKERS[i];
+      if (s.indexOf(n) === 0) return n === npcName ? s : npcName + s.slice(n.length);
+    }
+    return s;
+  }
+
+  var DialogText = { MODES: MODES, view: view, fill: fill, questScene: questScene, QUEST_SPEAKERS: QUEST_SPEAKERS };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.DialogText = DialogText; }
   if (typeof module !== 'undefined') module.exports = DialogText;
 })();

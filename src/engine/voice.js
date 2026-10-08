@@ -388,18 +388,40 @@
     });
   }
 
-  function playElement(url, rate, end) {
-    var a = new Audio(url);
+  /**
+   * <audio> 播放（file:// 或 Web Audio 不能用時）。
+   * done(ok)：只會觸發一次（ended、error、play() 被拒絕可能同時發生）。ok＝false 表示檔案播不了（要退回語音合成）。
+   * 保險：拿到長度後，長度÷速度＋1 秒還沒結束就強制結束（系統暫停播放時 ended 不會來）。
+   */
+  function playElement(url, rate, done) {
+    var a = new Audio(url), fired = false, guard = 0;
+    var finish = function (ok) {
+      if (fired) return;
+      fired = true;
+      if (guard) clearTimeout(guard);
+      try { a.pause(); } catch (e) { /* 忽略 */ }
+      done(ok);
+    };
     a.volume = clamp(settings.volume, 0, 1);
     a.playbackRate = rate;
     try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (e) { /* 忽略 */ }
-    audioEl = a;
-    a.onended = end; a.onerror = end;
+    audioEl = { pause: function () { finish(true); } };
+    a.onended = function () { finish(true); };
+    a.onerror = function () { finish(false); };
+    a.onloadedmetadata = function () {
+      if (isFinite(a.duration) && a.duration > 0) guard = later(function () { stats.guarded = (stats.guarded || 0) + 1; finish(true); }, (a.duration / rate + 1) * 1000);
+    };
     var pr = a.play();
-    if (pr && pr.catch) pr.catch(end);
+    if (pr && pr.catch) pr.catch(function () { finish(false); });
+    return a;
   }
 
-  function playFile(url, profile, onEnd) {
+  /**
+   * 播預錄音檔。onEnd()：播完；onFail()：檔案讀不到、解碼失敗、播不了 → 呼叫的人改用「提示音＋語音合成念華語」。
+   * 兩個只會呼叫其中一個、而且只呼叫一次。
+   * Web Audio 播放加保險計時：音檔長度÷速度＋1 秒還沒收到 ended（例如 iPad 把 AudioContext 暫停了）就強制結束。
+   */
+  function playFile(url, profile, onEnd, onFail) {
     stop();
     var my = token;
     var src = String(url || '').replace(/^\.\//, '').replace(/^docs\//, '');
@@ -410,25 +432,37 @@
     var rate = clamp(1 + (p.pitch - 1) * 0.15, 0.9, 1.1) * clamp(settings.rateMult, 0.8, 1.2);
     speaking = true;
     stats.files++;
-    var end = function () { if (my !== token) return; speaking = false; audioEl = null; if (onEnd) onEnd(); };
+    var settled = false;
+    var end = function () { if (settled || my !== token) return; settled = true; speaking = false; audioEl = null; if (onEnd) onEnd(); };
+    var fail = function () {
+      if (settled || my !== token) return;
+      settled = true; speaking = false; audioEl = null;
+      stats.fileFailed = (stats.fileFailed || 0) + 1;
+      if (onFail) onFail(); else if (onEnd) onEnd();
+    };
+    var viaElement = function () { playElement(full, rate, function (ok) { if (ok) end(); else fail(); }); };
     try {
       var A = window.JQ && window.JQ.Audio && window.JQ.Audio.context ? window.JQ.Audio.context() : null;
       if (A && typeof fetch === 'function' && location.protocol !== 'file:') {
         getBuffer(A.ctx, full).then(function (buf) {
-          if (my !== token) return;
+          if (my !== token || settled) return;
           var s = A.ctx.createBufferSource(), g = A.ctx.createGain();
           s.buffer = buf;
           s.playbackRate.value = rate;
           g.gain.value = clamp(settings.volume, 0, 1) * 1.3;   // 主音量是 0.7，語音補回一點
           s.connect(g); g.connect(A.out);
-          s.onended = end;
-          audioEl = { pause: function () { try { s.stop(); } catch (e) { /* 忽略 */ } } };
+          var guard = 0;
+          var finish = function () { if (guard) clearTimeout(guard); try { s.stop(); } catch (e) { /* 忽略 */ } end(); };
+          s.onended = finish;
+          audioEl = { pause: function () { if (guard) clearTimeout(guard); try { s.stop(); } catch (e) { /* 忽略 */ } } };
           s.start();
+          var dur = buf.duration || (buf.length && buf.sampleRate ? buf.length / buf.sampleRate : 0);
+          guard = later(function () { stats.guarded = (stats.guarded || 0) + 1; finish(); }, ((dur || 5) / rate + 1) * 1000);
           stats.webAudio = (stats.webAudio || 0) + 1;
-        }).catch(function () { if (my === token) playElement(full, rate, end); });
+        }).catch(function () { fail(); });   // 讀不到或解碼失敗 → 提示音＋念華語（不是直接沒有聲音）
         return true;
       }
-      playElement(full, rate, end);
+      viaElement();
       return true;
     } catch (e) { speaking = false; return false; }
   }
@@ -442,8 +476,15 @@
     var line = o.line || {};
     var profile = profileFor(o.who || line.who, typeof window !== 'undefined' ? window.VOICES : null, { name: o.name, playerGender: o.playerGender });
     var file = voiceFile(typeof window !== 'undefined' ? window.VOICE_MANIFEST : null, o.dialogId, o.index, line, settings.pref);
-    if (file && playFile(file, profile, onEnd)) return true;
     var view = window.JQ.DialogText.view(line, 'both', o.playerName);
+    // 預錄音檔讀不到、解碼失敗時的退路：台語句「提示音＋念華語翻譯」、一般句子用語音合成
+    var fallback = function () { synthLine(view, profile, line, onEnd); };
+    if (file && playFile(file, profile, onEnd, fallback)) return true;
+    return synthLine(view, profile, line, onEnd);
+  }
+
+  /** 語音合成念一句：台語句先響提示音再念華語翻譯 */
+  function synthLine(view, profile, line, onEnd) {
     if (view.isTaigi) {
       stop();
       if (window.JQ.Audio) { window.JQ.Audio.play('taigi'); stats.cues++; }

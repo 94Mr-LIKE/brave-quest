@@ -135,7 +135,28 @@
   /** 升級時補滿 體力／魔力（給孩子正向回饋） */
   function onLevelUp(state, data) { return restoreFull(state, data); }
 
-  var Character = { BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
+  /**
+   * v0.9 買裝備時比較：換上這件之後攻擊力、防禦力、魔力上限會變多少。
+   * 回傳 { slot, canEquip, reason, current（身上那件的 id）, before:{atk,def,maxMp}, after:{...}, better（攻擊＋防禦合計變多） }
+   */
+  function compareEquip(state, id, data) {
+    var it = data.items[id];
+    var slot = it && (it.type === 'weapon' ? 'weapon' : (it.type === 'armor' ? 'armor' : null));
+    if (!slot) return { slot: null, canEquip: false, reason: 'not-equipment' };
+    if (it.job) {
+      var jobs = Array.isArray(it.job) ? it.job : [it.job];
+      if (jobs.indexOf(state.player.job) < 0) return { slot: slot, canEquip: false, reason: 'job', jobs: jobs };
+    }
+    var b = stats(state, data);
+    var trial = { player: state.player, equipment: Object.assign({}, state.equipment) };
+    trial.equipment[slot] = id;
+    var a = stats(trial, data);
+    var before = { atk: b.atk, def: b.def, maxMp: b.maxMp }, after = { atk: a.atk, def: a.def, maxMp: a.maxMp };
+    return { slot: slot, canEquip: true, current: state.equipment[slot] || null, before: before, after: after,
+      better: (after.atk + after.def) > (before.atk + before.def) || ((after.atk + after.def) === (before.atk + before.def) && after.maxMp > before.maxMp) };
+  }
+
+  var Character = { compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Character = Character; }
   if (typeof module !== 'undefined') module.exports = Character;
 })();

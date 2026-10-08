@@ -135,7 +135,7 @@
       [h('div.label', {}, [label + ' ', pct]), h('div.track', {}, [fill])]);
     document.getElementById('ui').appendChild(n);
     return {
-      node: n,
+      node: n,   // 關閉：close()；全部關掉：J.UI.closeLoadBars()
       set: function (v) {
         var p = Math.max(0, Math.min(100, Math.round((v || 0) * 100)));
         fill.style.width = p + '%'; pct.textContent = p + '%'; n.setAttribute('aria-valuenow', String(p));
@@ -143,6 +143,9 @@
       close: function () { if (n.parentNode) n.parentNode.removeChild(n); }
     };
   }
+
+  /** 關掉畫面上所有的載入進度條（例如要顯示「今天冒險到這裡」時） */
+  function closeLoadBars() { Array.prototype.forEach.call(document.querySelectorAll('.load-bar'), function (n) { if (n.parentNode) n.parentNode.removeChild(n); }); }
 
   function announce(text) { if (live) { live.textContent = ''; setTimeout(function () { live.textContent = text; }, 30); } }
 
@@ -210,5 +213,5 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.UI = { init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, toast: toast, progress: progress, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
+  window.JQ.UI = { init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
 })();

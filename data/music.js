@@ -24,6 +24,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 標題
     title: {
       name: '標題：勇者的早晨', key: 'D 大調', tempo: 92, meter: 4, loop: true,
+      audio: { file: 'assets/music/title.m4a', seconds: 73.64, loopStart: 10.28, loopEnd: 73.64, gainDb: 0, lufs: -15.9 },
       mood: '充滿希望、展開冒險的期待',
       origin: '以「Re 起音、下到 La 再跳回」的原創動機開頭，第二樂句升到 C#6 做開闊感；伴奏為搖擺分解和弦。',
       tracks: [
@@ -50,6 +51,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 海邊小鎮（金包里）
     village: {
       name: '海邊小鎮：金包里的風', key: 'F 大調（宮調五聲音階）', tempo: 96, meter: 4, loop: true,
+      audio: { file: 'assets/music/village.m4a', seconds: 85.0, loopStart: 5.0, loopEnd: 85.0, gainDb: 0, lufs: -16.0 },
       mood: '溫暖、悠閒、帶台灣民謠五聲音階的鄉土味',
       origin: '主旋律只用 Fa Sol La Do Re 五個音（台灣民謠常見的五聲音階），切分節奏像海風輕拂；木魚打出輕巧節拍。',
       tracks: [
@@ -73,6 +75,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 原野（陽明山草原）
     field: {
       name: '原野：擎天草原向前走', key: 'G 大調', tempo: 112, meter: 4, loop: true,
+      audio: { file: 'assets/music/field.m4a', seconds: 73.48, loopStart: 5.0, loopEnd: 73.48, gainDb: 0, lufs: -16.0 },
       mood: '明亮、輕快、想往前跑的冒險感',
       origin: '以「Sol-Si-Re 上行附點＋短音回落」的原創動機開頭，後半段一路爬到 D6 再回主音；中音域八分音符分解和弦推進。',
       tracks: [
@@ -98,6 +101,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 神木森林（阿里山）
     forest: {
       name: '森林：神木的低語', key: 'E 多利安調式', tempo: 66, meter: 3, loop: true,
+      audio: { file: 'assets/music/forest.m4a', seconds: 91.4, loopStart: 5.0, loopEnd: 91.4, gainDb: 0, lufs: -16.0 },
       mood: '神祕、安靜、古老森林的呼吸',
       origin: '三拍子慢板，用多利安調式（升 C 的小調色彩）營造神祕感；八音盒般的高音「露珠」點綴，低音通鼓像心跳。',
       tracks: [
@@ -121,6 +125,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 洞窟（海蝕洞／哥布林部落）
     cave: {
       name: '洞窟：滴答滴答的岩洞', key: 'A 小調', tempo: 84, meter: 4, loop: true,
+      audio: { file: 'assets/music/cave.m4a', seconds: 74.12, loopStart: 5.0, loopEnd: 74.12, gainDb: 0, lufs: -15.9 },
       mood: '有點緊張、好奇地探索，但不可怕',
       origin: '低音「彈跳」頑固音型＋稀疏的三角波旋律；高音鐘聲像洞頂滴水。結尾用 E-F-E-D# 半音繞回主音。',
       tracks: [
@@ -143,6 +148,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 山城市集（九份）
     town: {
       name: '市集：山城好熱鬧', key: 'C 大調', tempo: 132, meter: 4, loop: true,
+      audio: { file: 'assets/music/town.m4a', seconds: 77.96, loopStart: 5.0, loopEnd: 77.96, gainDb: 0, lufs: -16.0 },
       mood: '熱鬧、活潑、逛市集的開心',
       origin: '跳躍的「短音＋空拍」旋律配上反拍和弦與「碰恰」低音；第 17–20 小節轉到 D 大和弦（借屬和弦）製造期待再回頭。',
       tracks: [
@@ -171,6 +177,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 府城古城
     castle: {
       name: '古城：府城的城門', key: '降 E 大調', tempo: 72, meter: 4, loop: true,
+      audio: { file: 'assets/music/castle.m4a', seconds: 85.64, loopStart: 5.0, loopEnd: 85.64, gainDb: 0, lufs: -16.0 },
       mood: '莊嚴、穩重、歷史悠久的城牆',
       origin: '慢速銅管主旋律，第 7 小節借用 F 大和弦（升高的 La）帶出光亮感；每四小節一聲廟鐘，定音鼓式的通鼓收尾。',
       tracks: [
@@ -192,6 +199,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 一般戰鬥
     battle: {
       name: '戰鬥：知識對決！', key: 'D 小調', tempo: 148, meter: 4, loop: true,
+      audio: { file: 'assets/music/battle.m4a', seconds: 49.8, loopStart: 5.0, loopEnd: 49.8, gainDb: 0, lufs: -16.0 },
       mood: '緊張、有幹勁，但不嚇人（像一起解題的挑戰）',
       origin: '八分音符八度跳躍低音推動；主旋律以「Re-Fa-La 上行後級進下行」的原創動機開頭，中段用 F→C→Bb 三段模進；第 7 小節借用 G 大和弦（多利安色彩）讓聲音明亮。',
       tracks: [
@@ -218,6 +226,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 頭目戰
     boss: {
       name: '頭目戰：迷霧中的大傢伙', key: 'E 小調', tempo: 144, meter: 4, loop: true,
+      audio: { file: 'assets/music/boss.m4a', seconds: 71.56, loopStart: 5.0, loopEnd: 71.56, gainDb: 0, lufs: -16.0 },
       mood: '氣勢強、心跳加速，但仍然明亮有希望',
       origin: '低音用 3+3+2 切分頑固音型；第 7 小節的 F 大和弦（降二級）帶來壓迫感，再由 B 大和弦（屬和弦）拉回；結尾 F#-D# 導音回到 E。',
       tracks: [
@@ -244,6 +253,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 最終戰
     final: {
       name: '最終戰：照亮遺忘之霧', key: 'C 小調', tempo: 160, meter: 4, loop: true,
+      audio: { file: 'assets/music/final.m4a', seconds: 76.04, loopStart: 5.0, loopEnd: 76.04, gainDb: 0, lufs: -16.0 },
       mood: '最高潮、壯闊、全力以赴，最後轉為光明',
       origin: '開頭四小節是原創的「主音反覆＋跳進」快速音型（C-C-G-C-Ab），接著寬廣的長音主題；中段轉到關係大調降 E 大調象徵希望，最後衝上 G6 再回到開頭。',
       tracks: [
@@ -277,6 +287,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 戰鬥勝利號角
     victory: {
       name: '勝利號角', key: 'C 大調', tempo: 132, meter: 4, loop: false, bgm: 'pause',
+      audio: { file: 'assets/music/victory.m4a', seconds: 8.0054, gainDb: 1.0, lufs: -14.6 },
       mood: '開心、驕傲、「我們做到了！」',
       origin: '以 Sol-Do-Mi-Sol 分解和弦一路上行、經 IV 和弦停在高音 Do 的原創號角；沒有使用同音反覆三連音等既有勝利曲的特徵句。',
       tracks: [
@@ -289,6 +300,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 升級
     levelup: {
       name: '升級了！', key: 'F 大調', tempo: 150, meter: 4, loop: false, bgm: 'pause',
+      audio: { file: 'assets/music/levelup.m4a', seconds: 6.1383, gainDb: 0, lufs: -13.2 },
       mood: '閃亮、雀躍、變強了',
       origin: '兩小節快速分解和弦向上衝到 F6，配高音鐘聲閃光；旋律輪廓為原創。',
       tracks: [
@@ -302,6 +314,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 委託完成
     quest_clear: {
       name: '委託完成', key: 'G 大調', tempo: 120, meter: 4, loop: false, bgm: 'pause',
+      audio: { file: 'assets/music/quest_clear.m4a', seconds: 9.1809, gainDb: 0, lufs: -14.0 },
       mood: '溫暖的成就感、被感謝的開心',
       origin: '兩句「上行跳進＋級進回落」的原創問答句，第二句移高四度，最後停在明亮的 Si 上，鐘聲收尾。',
       tracks: [
@@ -315,6 +328,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 旅店休息
     inn_rest: {
       name: '旅店的晚安曲', key: 'F 大調', tempo: 96, meter: 3, loop: false, bgm: 'pause',
+      audio: { file: 'assets/music/inn_rest.m4a', seconds: 9.9608, gainDb: 2.0, lufs: -16.5 },
       mood: '溫柔、安心、像搖籃曲一樣睡著再醒來',
       origin: '三拍子八音盒搖籃曲，從高音 Do 緩緩下行再回到主音，原創旋律。',
       tracks: [
@@ -326,6 +340,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 取得珍貴道具
     rare_item: {
       name: '得到珍貴的寶物', key: 'E 大調', tempo: 100, meter: 4, loop: false, bgm: 'pause',
+      audio: { file: 'assets/music/rare_item.m4a', seconds: 8.3312, gainDb: 0, lufs: -13.9 },
       mood: '驚喜、閃閃發光、「哇！」',
       origin: '分解和弦上行後在 C#6、F#6 停留（vi 和弦的驚喜色彩），高音鐘聲持續閃爍，最後回到 E 大和弦，原創。',
       tracks: [
@@ -338,6 +353,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 點亮知識燈
     lamp_lit: {
       name: '知識燈亮了', key: 'A 大調', tempo: 108, meter: 3, loop: false, bgm: 'duck',
+      audio: { file: 'assets/music/lamp_lit.m4a', seconds: 6.2237, gainDb: 1.5, lufs: -15.4 },
       mood: '「叮！」想通了、心裡亮起來',
       origin: '鐘聲五聲音階上行到 A6 的短句，像燈一盞盞亮起，原創。',
       tracks: [
@@ -349,6 +365,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 累倒
     faint: {
       name: '累倒了……', key: 'F 大調', tempo: 80, meter: 4, loop: false, bgm: 'pause',
+      audio: { file: 'assets/music/faint.m4a', seconds: 9.1934, gainDb: 0, lufs: -14.0 },
       mood: '有點可惜但溫和，像「沒關係，休息一下」',
       origin: '長笛緩慢下行，用大調和弦收在主音（不用陰森的小調或不協和音），原創。',
       tracks: [
@@ -360,6 +377,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 開寶箱
     chest: {
       name: '開寶箱小號角', key: 'C 大調', tempo: 150, meter: 4, loop: false, bgm: 'duck',
+      audio: { file: 'assets/music/chest.m4a', seconds: 6.4695, gainDb: 0, lufs: -13.9 },
       mood: '輕快、俏皮的「登登！」',
       origin: '先級進 Mi-Fa-Sol、空一拍後跳上高音 Do 並做 Do-Si-Do 的小迴音，最後衝到 E6，原創小號角。',
       tracks: [
@@ -372,6 +390,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 結局
     ending: {
       name: '結局：知識之光', key: 'D 大調', tempo: 66, meter: 4, loop: false, bgm: 'pause',
+      audio: { file: 'assets/music/ending.m4a', seconds: 10.9573, gainDb: 0, lufs: -14.0 },
       mood: '感動、圓滿、溫暖的光',
       origin: '慢板長笛從 Re 分解和弦上行、在 Si 稍停，再經 IV-V 走到高音 Re，和聲 I-IV-V-I 圓滿收尾；與標題曲同調性呼應，但旋律為另寫的原創句子。',
       tracks: [

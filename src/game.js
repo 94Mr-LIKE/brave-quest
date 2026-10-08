@@ -49,6 +49,8 @@
       bag: function () { if (!G.blocked()) J.Menus.bag(G); },
       settings: function () { if (!G.blocked()) J.Settings.open(G); },
       joystick: function (dir, force) { G.joy = { dir: dir, force: force }; },
+      // 在搖桿上「輕點一下」（沒有拖曳）：當作點了搖桿底下的地圖（例如搖桿蓋住的寶箱）
+      mapTap: function (cx, cy) { G.lastMapTap = { x: cx, y: cy }; if (G.mapScene && !G.blocked() && !J.UI.isOpen()) G.mapScene.tapAtClient(cx, cy); },
       action: function () { if (G.mapScene && !J.UI.isOpen()) G.mapScene.actionKey(); },
       cancel: function () {
         // B 鍵：有視窗就關掉（同 Esc），沒有就打開背包選單
@@ -90,7 +92,9 @@
       });
       G.titleHandle = titleHandle;
       // 標題曲（還沒點畫面解鎖聲音時，music.js 會記住、解鎖後自動開始）；存檔裡關掉音樂就不播
-      if (!(s && s.settings && s.settings.music === false)) G.bgm('title');
+      // 存檔裡關掉音樂：標題畫面就先關（music.js 不會下載任何音樂檔）
+      if (s && s.settings && s.settings.music === false) { if (G.musicReady()) { try { window.JQ.Music.setEnabled(false); } catch (e) { /* 忽略 */ } } }
+      else G.bgm('title');
       G.checkLoadLink(s);
     });
   };
@@ -107,6 +111,7 @@
   G.checkLoadLink = function (local) {
     var code = J.SaveCode.parseHash(location.hash);
     if (!code) return;
+    G.clearLoadHash();   // 先清掉網址上的存檔碼：就算存檔碼有問題讓頁面卡住，重新整理也不會再讀一次
     J.SaveCode.importAny(code).then(function (res) {
       if (!res.ok) { G.clearLoadHash(); J.UI.toast('QR Code 存檔讀不出來：' + res.error + '（原本的存檔沒有變動）', 6000); return; }
       var p = res.state.player;
@@ -150,6 +155,7 @@
     G.save(true);
     J.HUD.show(true);
     G.refreshHud();
+    setTimeout(G.onResize, 50);   // HUD 出現後量它的高度（直向時畫面貼在 HUD 下面）
     var loc = st.location && G.data.maps[st.location.map] ? st.location : { map: 'M01', x: undefined, y: undefined };
     G.ensurePhaser(function () {
       G.phaser.scene.start('Map', { mapId: loc.map, x: loc.x, y: loc.y });
@@ -162,12 +168,15 @@
 
   G.ensurePhaser = function (cb) {
     if (G.phaser) { cb(); return; }
+    var portrait = G.layoutMode();
     var z = G.zoomPlan();
     G.phaser = new Phaser.Game({
       type: Phaser.AUTO, parent: 'game', width: C.VIEW_W, height: C.VIEW_H, pixelArt: true, roundPixels: true,
       backgroundColor: '#0e1430', banner: false, audio: { noAudio: true },
       input: { keyboard: false },
-      scale: z.integer ? { mode: Phaser.Scale.NONE, zoom: z.zoom, autoCenter: Phaser.Scale.CENTER_BOTH } : { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      // v0.9 直向：畫面放大到滿寬、貼在 HUD 下面（以前置中，上面空了一大塊）
+      scale: z.integer ? { mode: Phaser.Scale.NONE, zoom: z.zoom, autoCenter: Phaser.Scale.CENTER_BOTH }
+        : { mode: Phaser.Scale.FIT, autoCenter: portrait ? Phaser.Scale.CENTER_HORIZONTALLY : Phaser.Scale.CENTER_BOTH },
       scene: []
     });
     G.phaser.scene.add('Map', J.MapScene, false);
@@ -183,19 +192,42 @@
   G.zoomPlan = function () {
     var f = Math.min(window.innerWidth / C.VIEW_W, window.innerHeight / C.VIEW_H);
     var n = Math.floor(f);
+    if (G.isPortrait()) return { integer: false, zoom: 1 };   // 直向一律等比例放大到滿寬
     return { integer: n >= 1 && f - n < 0.2, zoom: Math.max(1, n) };
   };
+  G.isPortrait = function () { return window.innerHeight > window.innerWidth * 1.05; };
+  /** 直向（平板直拿）：body.portrait，畫面貼在 HUD 下面；記下 HUD 高度給 CSS 用 */
+  G.layoutMode = function () {
+    var portrait = G.isPortrait();
+    document.body.classList.toggle('portrait', portrait);
+    var hud = document.getElementById('hud');
+    if (hud && !hud.hidden && hud.offsetHeight) document.documentElement.style.setProperty('--hud-h', hud.offsetHeight + 'px');
+    return portrait;
+  };
   G.onResize = function () {
+    var portrait = G.layoutMode();
     if (!G.phaser || !G.phaser.scale) return;
-    var z = G.zoomPlan();
-    if (G.phaser.scale.scaleMode === Phaser.Scale.NONE && z.integer) G.phaser.scale.setZoom(z.zoom);
+    var sc = G.phaser.scale, z = G.zoomPlan();
+    if (sc.scaleMode === Phaser.Scale.NONE && z.integer) sc.setZoom(z.zoom);
+    if (sc.scaleMode === Phaser.Scale.FIT) {
+      var want = portrait ? Phaser.Scale.CENTER_HORIZONTALLY : Phaser.Scale.CENTER_BOTH;
+      if (sc.autoCenter !== want) { sc.autoCenter = want; }
+      sc.refresh();
+    }
   };
 
   // ---------------------------------------------------------------- 共用
   G.stats = function () { return J.Character.stats(G.state, G.data); };
   G.refreshHud = function () { if (G.state) J.HUD.update(G.state, G.stats()); };
+  /** 戰鬥進行中（還沒結束）？ */
+  G.inBattle = function () { return !!(G.battleCtx && !G.battleCtx.over && !G.battleCtx.won); };   // 打贏（won）之後就可以存檔
+  /**
+   * 存檔。v0.9 老闆指示「非戰鬥時間才可存檔」：戰鬥中（自動存檔、答題、怪物攻擊、離開頁面…）一律不寫入，
+   * 戰鬥結束（G.bend）才寫。戰鬥中途重新整理 → 回到戰鬥前的狀態（這場答題的金幣、經驗值都還沒寫入，不會重複拿）。
+   */
   G.save = function (force) {
     if (!G.state) return Promise.resolve();
+    if (G.inBattle()) { G.saveSkipped = (G.saveSkipped || 0) + 1; return Promise.resolve(false); }
     G.lastSave = Date.now();
     return G.provider.save(SLOT, G.state).catch(function (e) { J.UI.toast('存檔失敗：' + e.message); });
   };
@@ -297,6 +329,8 @@
   // ---------------------------------------------------------------- 地圖
   G.onMapReady = function (scene) {
     G.mapScene = scene;
+    G.mapChanging = 0;
+    if (G.pendingChange) { var pc = G.pendingChange; G.pendingChange = null; setTimeout(function () { G.changeMap(pc[0], pc[1], pc[2], pc[3]); }, 0); }
     if (G.pendingLevelUp > 0) { var plv = G.pendingLevelUp; G.pendingLevelUp = 0; setTimeout(function () { G.afterReward(plv); }, 800); }
     var st = G.state, map = scene.map;
     st.location = { map: scene.mapId, x: scene.p.tx, y: scene.p.ty };
@@ -321,7 +355,12 @@
     if (!G.data.maps[to]) { console.warn('[地圖] 不存在：' + to); return; }
     G.state.location = { map: to, x: x, y: y };
     G.save();
-    G.mapScene.scene.restart({ mapId: to, x: x, y: y, facing: facing });
+    var sc = G.mapScene;
+    // 上一次換地圖還沒完成（場景重新開始、圖檔還在載入）：等它好了（onMapReady）再換，避免同一張圖被兩個載入器同時載入
+    if (G.mapChanging && Date.now() - G.mapChanging < 20000) { G.pendingChange = [to, x, y, facing]; return; }
+    if (sc && sc.load && sc.load.isLoading && sc.load.isLoading()) { G.pendingChange = [to, x, y, facing]; return; }
+    G.mapChanging = Date.now();
+    sc.scene.restart({ mapId: to, x: x, y: y, facing: facing });
   };
 
   // ---------------------------------------------------------------- 鍵盤與方向
@@ -505,6 +544,7 @@
       if (!qq) { J.UI.toast('「' + subj + '」的題目還在準備中。'); return; }
       J.Quiz.ask({
         session: sess, mode: 'help', state: st, title: q.title, subtitle: '幫忙 ' + (prog + 1) + '/' + J.QuestLog.helpCount(q) + '・' + G.speaker(npc.id).name,
+        speaker: G.speaker(npc.id).name,   // 題目情境的說話者換成委託人（不改題庫）
         onSave: function () { G.save(); },
         onRewards: function (res) { G.refreshHud(); if (res) G.afterReward(res.levelsGained); },
         onDone: function (r) {
@@ -813,6 +853,9 @@
     G.refreshHud();
     var done = [];
     if (mon.boss) done = J.QuestLog.onBossDefeated(st, G.data.quests, mon.id, G.data);
+    // 打贏了：獎勵、頭目委託馬上寫入存檔（頭目戰後的對話很長，這段時間關掉分頁也不會白打）。
+    // ctx.won 之後不會再有答題或攻擊，所以不會重複領獎；按「繼續」時 G.bend 再存一次。
+    ctx.won = true;
     G.save();
     var levels = st.player.level - lvl;
     var after = mon.boss && mon.dialog_after ? function () { return G.say(mon.dialog_after, []); } : function () { return Promise.resolve(); };
@@ -941,7 +984,13 @@
     var now = Date.now();
     if (J.Daily.ensure(st.daily, now)) J.UI.toast('新的一天！每日小任務換新了。');
     var ev = J.Playtime.tick(st.playtime, st.settings, now);
-    if (ev.indexOf('limit') >= 0 && !G.limitHandle) { G.save(); J.Settings.limitScreen(G); return; }
+    // 今日上限：不在冒險途中硬擋——戰鬥、對話、題目或其他視窗開著時先記著，結束後才顯示（上限本身不變）
+    if ((ev.indexOf('limit') >= 0 || G.limitPending) && !G.limitHandle) {
+      // 打贏後（勝利畫面、戰後對話）inBattle() 已是 false，但戰鬥還沒結束：一樣等到按「繼續」之後
+      if (G.inBattle() || (G.battleCtx && !G.battleCtx.over) || G.busy || J.UI.isOpen() || (G.mapScene && G.mapScene.transitioning)) { G.limitPending = true; }
+      else if (J.Playtime.isOverLimit(st.playtime, st.settings, now)) { G.limitPending = false; G.save(); J.UI.closeLoadBars && J.UI.closeLoadBars(); J.Settings.limitScreen(G); return; }
+      else G.limitPending = false;
+    }
     if (ev.indexOf('rest') >= 0) J.Settings.restReminder();
     if (now - G.lastSave > 30000) G.save();
   };

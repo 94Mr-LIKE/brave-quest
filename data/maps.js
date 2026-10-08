@@ -498,8 +498,8 @@ window.MAPS = {
       "TTTTTTTTTT~TTTT~TT~TTTT~TTTTTTTTT~~TTTTTTTFBBFTFBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBFT",
       "TTTTTT~~~~~TTT~~TT~TTT~~T~~TTTTTT~~TTTTTTTFBBFTFFFFFFFFFFFFFFFFFFFFFFFBBFFFFFFFFFFFFFFFFFT",
       "TTTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBFFFF%T%%T%T%%%%T%%T%%T%TFBBF%%%%T%%T%%%%T%%TT",
-      "TTTFBBBBBBBBBBUUUUUUUUUUUUUUUUBBBBBBBBBBBBBBBBBBF%%%%%%%%%%%%%%%%%%%%FBBF%%%%%%%%%%%%%%%%T",
-      "TT%FFFFFFFFFFFFBBFFFFFFFFFFFFFFFFFFFFFFFFFFBBFFFF%%%%%%%%%U%%%%%%%%%%FBBF%%%%UU%%%%%%%%%%T",
+      "TTT%BBBBBBBBBBUUUUUUUUUUUUUUUUBBBBBBBBBBBBBBBBBB%%%%%%%%%%%%%%%%%%%%%FBBF%%%%%%%%%%%%%%%%T",
+      "TT%%FFFFFFFFFFFBBFFFFFFFFFFFFFFFFFFFFFFFFFFBBFFFF%%%%%%%%%U%%%%%%%%%%FBBF%%%%UU%%%%%%%%%%T",
       "TT%%%%%%%%%%%%FBBFT%U%%%%%%TTT%%%%T%%%%%%%FBBF%%TT%%%%%%UUU%%%%%%%%%%%BB%%%%%UUU%%%%%%%%%T",
       "TTU%%%TT%%%%%UFBBF%%T%%%%%%%%UU%%UTU%%%%%%FBBF%UUUU%%%%%UTTT%%%%%%%%%%BB%%%%%TTT%%%%%%%%%T",
       "TTT%%~~~~%%%%UFBBB%%~~~~~%%%TTU%%TTT%%%%%%FBBF%UUUU%%%%%TTT%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%T",
@@ -535,7 +535,10 @@ window.MAPS = {
       { id: "C_M05_2", x: 85, y: 47, subject: "數學", level: 3, reward: { gold: 60, item: null } },
       { id: "C_M05_3", x: 22, y: 8, subject: "數學", level: 3, reward: { gold: 45, item: "herb" } },
       { id: "C_M05_4", x: 13, y: 43, subject: "數學", level: 3, reward: { gold: 55, item: null } },
-      { id: "C_M05_5", x: 85, y: 9, subject: "數學", level: 3, reward: { gold: 50, item: "guide" } }
+      { id: "C_M05_5", x: 85, y: 9, subject: "數學", level: 3, reward: { gold: 50, item: "guide" } },
+      { id: "C_M05_6", x: 84, y: 13, subject: "數學", level: 3, reward: { gold: 40, item: "herb" } },
+      { id: "C_M05_7", x: 48, y: 31, subject: "數學", level: 3, reward: { gold: 30, item: "snack" } },
+      { id: "C_M05_8", x: 87, y: 31, subject: "數學", level: 3, reward: { gold: 35, item: null } }
     ],
     spawns: [
       { monster: "mudslime", count: 3, area: [31, 1, 12, 11] },

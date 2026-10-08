@@ -234,7 +234,34 @@
     return log;
   }
 
-  var MapInfo = { upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+  // ---------------------------------------------------------------- 下車點安全範圍（v0.9）
+  var SAFE_RADIUS = 5;
+  /**
+   * 下車點：這張地圖的車站，以及世界地圖搭車到這張地圖的落點（world.js 的 map_entry＋tx,ty；沒寫 tx,ty 時用地圖 start）。
+   * 回傳 [{x,y}]
+   */
+  function safePoints(map, mapId, regions) {
+    var pts = [];
+    if (map.station && typeof map.station.x === 'number') pts.push({ x: map.station.x, y: map.station.y });
+    (regions || []).forEach(function (r) {
+      var e = r && r.map_entry;
+      if (!e) return;
+      var id = typeof e === 'string' ? e : e.map;
+      if (id !== mapId) return;
+      var x = typeof e === 'string' ? r.tx : e.x, y = typeof e === 'string' ? r.ty : e.y;
+      if (typeof x !== 'number' && map.start) { x = map.start.x; y = map.start.y; }
+      if (typeof x === 'number' && typeof y === 'number') pts.push({ x: x, y: y });
+    });
+    return pts;
+  }
+  /** 這一格在不在下車點周圍 SAFE_RADIUS 格內（方形範圍）——怪物不會出現在這裡，也不會走進來 */
+  function inSafeZone(pts, x, y, radius) {
+    var r = radius === undefined ? SAFE_RADIUS : radius;
+    for (var i = 0; i < pts.length; i++) if (Math.abs(pts[i].x - x) <= r && Math.abs(pts[i].y - y) <= r) return true;
+    return false;
+  }
+
+  var MapInfo = { SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
     wanderTarget: wanderTarget, petSpot: petSpot, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
     LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.MapInfo = MapInfo; }

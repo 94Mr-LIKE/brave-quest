@@ -58,15 +58,55 @@
       if (force >= C.JOYSTICK_DEADZONE) dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
       handlers.joystick(dir, force);
     }
+    var holdUntil = 0;   // 外圈輕點：保持方向一小段時間讓主角走一步（期間忽略 lostpointercapture 的放開）
     function release(e) {
+      if (holdUntil > Date.now()) return;
       if (active === null || (e && e.pointerId !== active)) return;
       active = null;
       knob.style.transform = '';
       handlers.joystick(null, 0);
     }
-    joy.addEventListener('pointerdown', function (e) { e.preventDefault(); active = e.pointerId; try { joy.setPointerCapture(e.pointerId); } catch (x) { /* 忽略 */ } moveKnob(e); });
-    joy.addEventListener('pointermove', function (e) { if (active === e.pointerId) { e.preventDefault(); moveKnob(e); } });
-    joy.addEventListener('pointerup', release);
+    // v0.9：按下後先等一下（拖超過 10px 或按住 150ms 才算在用搖桿）；很快放開＝「輕點」→ 當作點了搖桿底下的地圖
+    var start = null, engaged = false, armT = 0, lastE = null;
+    var pressSeq = 0;   // 每次按下 +1：外圈輕點的放開計時器只放開「自己那一次」按壓（快速連點、滑鼠同一個 pointerId 都不會誤放開新的按壓）
+    joy.addEventListener('pointerdown', function (e) {
+      holdUntil = 0; pressSeq++;
+      e.preventDefault(); active = e.pointerId; try { joy.setPointerCapture(e.pointerId); } catch (x) { /* 忽略 */ }
+      start = { x: e.clientX, y: e.clientY, t: Date.now() }; engaged = false; lastE = e;
+      clearTimeout(armT);
+      armT = setTimeout(function () { if (active !== null && !engaged) { engaged = true; moveKnob(lastE); } }, 150);
+    });
+    joy.addEventListener('pointermove', function (e) {
+      if (active !== e.pointerId) return;
+      e.preventDefault(); lastE = e;
+      if (!engaged && start && Math.abs(e.clientX - start.x) + Math.abs(e.clientY - start.y) > 10) engaged = true;
+      if (engaged) moveKnob(e);
+    });
+    joy.addEventListener('pointerup', function (e) {
+      if (active === e.pointerId && !engaged && start && Date.now() - start.t < 300) {
+        clearTimeout(armT);
+        var s0 = start, r0 = joy.getBoundingClientRect();
+        var dx = s0.x - (r0.left + r0.width / 2), dy = s0.y - (r0.top + r0.height / 2);
+        if (Math.sqrt(dx * dx + dy * dy) <= r0.width / 2 * 0.25 && handlers.mapTap) {
+          // 點在搖桿中心附近：當作點了搖桿底下的地圖（例如被搖桿蓋住的寶箱）
+          release(e);
+          handlers.mapTap(s0.x, s0.y);
+        } else {
+          // 點在外圈：照搖桿的方向走一步
+          moveKnob({ clientX: s0.x, clientY: s0.y });
+          holdUntil = Date.now() + 140;
+          var mySeq = pressSeq;
+          setTimeout(function () {
+            if (pressSeq !== mySeq) return;   // 這 150ms 內又按下了：新的按壓自己管，不動它
+            holdUntil = 0;
+            if (active === e.pointerId) release(e);
+          }, 150);
+        }
+        return;
+      }
+      clearTimeout(armT);
+      release(e);
+    });
     joy.addEventListener('pointercancel', release);
     joy.addEventListener('lostpointercapture', release);
     var size = C.TOUCH_BUTTON_SIZE + 'px';

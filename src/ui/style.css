@@ -281,3 +281,27 @@ body.panel-open #toasts { top: auto; right: auto; left: 50%; bottom: max(14px, e
 
 /* v0.7.2 視窗開著時，視窗打開前的提示泡泡先藏起來（關掉視窗後再出現），不會蓋住視窗內容 */
 body.modal-open #toasts .toast.bg { display: none; }
+
+/* v0.8 瀏覽器縮放提示（只在電腦版、縮放不是 100% 左右時出現） */
+.title-screen .zoom-hint { display: flex; align-items: center; gap: 10px; font-size: 18px; padding: 8px 10px 8px 16px; margin: 0 12px 12px; max-width: min(640px, 94vw); flex: none; }
+.title-screen .zoom-hint .zoom-close { min-height: 36px; min-width: 36px; padding: 2px 8px; font-size: 18px; flex: none; }
+
+/* ---------------- v0.9 試玩稽核：版面修正 ---------------- */
+/* 直向：遊戲畫面貼在 HUD 下面、滿寬（以前置中，上面空了一大塊） */
+body.portrait #game { align-items: flex-start; padding-top: var(--hud-h, 96px); box-sizing: border-box; }
+body.portrait .worldmap .stage img { height: auto; max-height: 46vh; max-width: 94vw; }
+/* 地名框放到 HUD 下面，不蓋住魔力數字 */
+.map-banner { top: calc(var(--hud-h, 88px) + 10px); }
+/* 提示泡泡放在小地圖下面，不疊在小地圖上 */
+#toasts { top: calc(var(--hud-h, 60px) + 130px); }
+/* B 鍵：對話、題目（不是面板）時藏起來；面板開著時放左下角（面板下方留空間），不再蓋住左上角的名字或關閉鈕 */
+body.modal-open:not(.panel-open) #pad .bbtn { display: none; }
+body.modal-open.panel-open #pad .bbtn { position: fixed; top: auto; right: auto; left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); width: 60px !important; height: 60px !important; }
+#pad:not([hidden]) ~ #layer .panel { padding-bottom: 76px; }
+/* 標題畫面的說明文字加半透明底，壓在插畫上也看得清楚 */
+.title-screen .note { background: rgba(11, 18, 54, .62); padding: 6px 14px; border-radius: 10px; }
+/* 小連結的點擊區至少 44px */
+.author-mail { display: inline-block; line-height: 44px; min-height: 44px; vertical-align: middle; }
+.voice-tips summary { min-height: 44px; line-height: 44px; }
+/* 地圖載入框不蓋在其他視窗上 */
+body.modal-open .load-bar { display: none; }

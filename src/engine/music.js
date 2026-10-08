@@ -20,6 +20,17 @@
  * 排程：用 AudioContext 的時間軸做 lookahead 排程（每 40 毫秒檢查一次，預先排 0.2 秒內的音符），
  *       音符時間 = 起點 + 拍數 × 每拍秒數，不會因 setInterval 不準而漂移。
  * 分頁隱藏時暫停（記住位置），回來時從原位置淡入。沒有 AudioContext（node 測試）時安全地什麼都不做。
+ *
+ * 預錄音樂（做法 C，2026-10-09）：樂譜有 audio 欄位（{ file, seconds, loopStart, loopEnd, gainDb, lufs }）時，
+ *   優先播放 docs/assets/music/<id>.m4a（管弦樂取樣錄音，-16 LUFS）：fetch → decodeAudioData → AudioBufferSourceNode。
+ *   - BGM：loop＋loopStart／loopEnd 無縫循環，[0, loopStart) 只在第一次播；暫停／短曲／分頁隱藏後從原位置（秒）接續。
+ *   - 短曲：只播一次；沒有解碼好的就這次先用合成版，同時在背景下載，下次就是預錄版。
+ *   - 載入：只預先下載標題曲；其他曲子第一次用到（playBgm／jingle／preload）才下載。已解碼的資料最多保留
+ *     BGM 2 首（地圖＋戰鬥來回切換都在快取）、短曲 3 首（最久沒用的先丟；正在播、暫停中、想播的不丟），避免舊款 iPad 記憶體不夠。
+ *   - BGM 還沒載入好：安靜等最多 REC_WAIT 秒，等不到就先用合成版播這一次。下載或解碼失敗也用合成版（30 秒後可重試）。
+ *   - file://、沒有 fetch 或 Web Audio 時，一律用原本的合成器。網址用 JQ.Assets.versioned 加版本號。
+ *   - 輸出：預錄聲部走「音樂主音量（×REC_TRIM）→ audio.js 主音量」，不經過 6.5kHz 低通（那是給合成音色用的）；
+ *     音量、淡入淡出、短曲壓低（duck）都和合成版共用同一套控制。
  */
 (function () {
   'use strict';
@@ -269,7 +280,7 @@
 
   // ================================================================ 播放器（一首曲子的排程狀態）
   function Player(song, ctx, bus, startTime, startBeat, fadeIn) {
-    this.song = song; this.ctx = ctx;
+    this.kind = 'synth'; this.song = song; this.ctx = ctx;
     this.gain = ctx.createGain();
     this.gain.connect(bus);
     var now = ctx.currentTime;
@@ -327,11 +338,161 @@
   var S = {
     enabled: true, volume: 0.55, hidden: false,
     want: null,        // 想要播的 BGM（短曲結束、重新解鎖、分頁回來時會接續它）
-    bgm: null, bgmId: null, held: null,   // held = { id, pos }：暫停時記住位置
+    bgm: null, bgmId: null, held: null,   // held = { id, pos, kind }：暫停時記住位置（kind 'synth' 時 pos 是拍數，'rec' 時是秒）
     jingle: null,      // { id, player, cb, mode, end }
+    wait: null,        // { id, since }：BGM 正在等預錄音檔
     bus: null, timer: null, cache: {}
   };
-  var stats = { bgm: null, jingle: null, notes: 0, loops: 0, ticks: 0, jingles: 0, bgmStarts: 0, enabled: true, volume: S.volume, supported: false, lastError: null };
+  var stats = { bgm: null, jingle: null, notes: 0, loops: 0, ticks: 0, jingles: 0, bgmStarts: 0, enabled: true, volume: S.volume, supported: false, lastError: null,
+    source: null, jingleSource: null, recFetches: 0, recBytes: 0, recDecoded: 0, recEvicted: 0, recErrors: 0, recPlays: 0, recJingles: 0, recFallbacks: 0,
+    recCached: [], recLastError: null };
+
+  // ================================================================ 預錄音樂（做法 C）
+  var REC_WAIT = 1.5,        // BGM 等預錄音檔最多幾秒（音訊時間），等不到就這次先用合成版
+      REC_TRIM = 2.0,        // 預錄音檔（-16 LUFS）和合成版的音量對齊（約 +6 dB）；實機試聽後可以微調
+      REC_MAX_BGM = 2, REC_MAX_JINGLE = 3, REC_RETRY_MS = 30000;
+  /** 播這首 BGM 時，順便預先載入接下來很可能用到的短曲 */
+  var REC_HINTS = { battle: ['victory', 'levelup'], boss: ['victory', 'levelup'], final: ['victory', 'levelup'] };
+  var R = { enabled: true, items: {}, clock: 0 };
+
+  function recMeta(id) {
+    var d = data(), s = (d.bgm || {})[id] || (d.jingle || {})[id];
+    return s && s.audio && s.audio.file ? s.audio : null;
+  }
+  function recSupported() {
+    if (!R.enabled || !supported()) return false;
+    var loc = root.location;
+    return !!loc && loc.protocol !== 'file:' && typeof root.fetch === 'function';
+  }
+  function recUrl(file) {
+    try { var A = root.JQ && root.JQ.Assets; if (A && typeof A.versioned === 'function') return A.versioned(file); } catch (e) { /* 改用下面的寫法 */ }
+    var v = root.JQ_VERSION;
+    return v ? file + (file.indexOf('?') >= 0 ? '&' : '?') + 'v=' + encodeURIComponent(v) : file;
+  }
+  function recItem(id) {
+    return R.items[id] || (R.items[id] = { id: id, kind: (data().bgm || {})[id] ? 'bgm' : 'jingle', state: 'idle', bytes: null, buffer: null, ctx: null, used: 0, failedAt: 0 });
+  }
+  function recFail(it, e) {
+    it.state = 'failed'; it.failedAt = Date.now(); it.bytes = null; it.buffer = null; it.ctx = null;
+    stats.recErrors++; stats.recLastError = it.id + '：' + String(e && e.message || e);
+  }
+  /** 開始下載（還沒解鎖聲音也可以先下載，解鎖後再解碼）。回傳項目；不能用預錄音樂時回傳 null */
+  function recLoad(id) {
+    if (!recSupported() || !recMeta(id)) return null;
+    var it = recItem(id);
+    if (it.state === 'failed' && Date.now() - it.failedAt > REC_RETRY_MS) it.state = 'idle';
+    if (it.state === 'idle') {
+      it.state = 'fetching'; stats.recFetches++;
+      var p;
+      try { p = root.fetch(recUrl(recMeta(id).file)); } catch (e) { recFail(it, e); return it; }
+      Promise.resolve(p).then(function (res) {
+        if (!res || !res.ok) throw new Error('下載失敗 HTTP ' + (res && res.status));
+        return res.arrayBuffer();
+      }).then(function (buf) {
+        if (it.state !== 'fetching') return;
+        it.bytes = buf; it.state = 'fetched'; stats.recBytes += (buf && buf.byteLength) || 0;
+        recPump();
+      }).catch(function (e) { recFail(it, e); });
+    } else if (it.state === 'fetched') recPump();
+    return it;
+  }
+  /** 有 AudioContext 時，把下載好的檔案解碼（同時支援 Promise 與舊版 Safari 的 callback 寫法） */
+  function recPump() {
+    var A = audioOut();
+    if (!A || typeof A.ctx.decodeAudioData !== 'function') return;
+    Object.keys(R.items).forEach(function (id) {
+      var it = R.items[id];
+      if (it.state !== 'fetched') return;
+      it.state = 'decoding';
+      var bytes = it.bytes, done = false;
+      it.bytes = null;
+      function ok(buffer) {
+        if (done) return; done = true;
+        if (it.state !== 'decoding') return;
+        if (!buffer || !(buffer.duration > 0)) { recFail(it, '解碼結果是空的'); return; }
+        it.buffer = buffer; it.ctx = A.ctx; it.state = 'ready'; it.used = ++R.clock; stats.recDecoded++;
+        recEvict();
+      }
+      function bad(e) { if (done) return; done = true; recFail(it, e || '解碼失敗'); }
+      try {
+        var pr = A.ctx.decodeAudioData(bytes, ok, bad);
+        if (pr && typeof pr.then === 'function') pr.then(ok, bad);
+      } catch (e) { bad(e); }
+    });
+  }
+  /** 已解碼、可以馬上播的項目；沒有就回傳 null */
+  function recReady(id, ctx) {
+    var it = R.items[id];
+    if (!it || it.state !== 'ready') return null;
+    if (it.ctx !== ctx) { it.state = 'idle'; it.buffer = null; it.ctx = null; recLoad(id); return null; }   // AudioContext 換了：重新載入
+    it.used = ++R.clock;
+    return it;
+  }
+  /** 只保留最近用過的幾首已解碼音樂；正在播、暫停中、想播的不會被丟掉 */
+  function recEvict() {
+    var keep = {};
+    [S.want, S.bgmId, S.held && S.held.id, S.jingle && S.jingle.id].forEach(function (x) { if (x) keep[x] = 1; });
+    ['bgm', 'jingle'].forEach(function (kind) {
+      var max = kind === 'bgm' ? REC_MAX_BGM : REC_MAX_JINGLE;
+      var ready = Object.keys(R.items).map(function (k) { return R.items[k]; })
+        .filter(function (it) { return it.kind === kind && it.state === 'ready'; })
+        .sort(function (a, b) { return a.used - b.used; });
+      var n = ready.length;
+      for (var i = 0; i < ready.length && n > max; i++) {
+        if (keep[ready[i].id]) continue;
+        ready[i].state = 'idle'; ready[i].buffer = null; ready[i].ctx = null; n--; stats.recEvicted++;
+      }
+    });
+    stats.recCached = Object.keys(R.items).filter(function (k) { return R.items[k].state === 'ready'; });
+  }
+  /** BGM 還沒載入好：要不要先用合成版（true＝不等了） */
+  function recGiveUp(id, now) {
+    var it = R.items[id];
+    if (!it || it.state === 'failed') return true;
+    if (!S.wait || S.wait.id !== id) S.wait = { id: id, since: now };
+    return now - S.wait.since >= REC_WAIT;
+  }
+
+  /** 播放一段預錄音樂（介面和合成版的 Player 相同：position、stop、schedule、endTime） */
+  function RecPlayer(id, it, ctx, bus, startTime, offset, fadeIn, loop) {
+    var meta = recMeta(id) || {}, buf = it.buffer, dur = buf.duration;
+    this.kind = 'rec'; this.id = id; this.ctx = ctx; this.loop = !!loop; this.dur = dur;
+    this.ls = loop ? Math.max(0, Math.min(Number(meta.loopStart) || 0, dur)) : 0;
+    this.le = loop ? Math.min(dur, Number(meta.loopEnd) || dur) : dur;
+    if (loop && !(this.le - this.ls >= 0.5)) { this.ls = 0; this.le = dur; }
+    offset = this.wrap(offset || 0);
+    this.gain = ctx.createGain();
+    this.gain.connect(bus);
+    var now = ctx.currentTime;
+    if (fadeIn > 0) { this.gain.gain.setValueAtTime(0, now); this.gain.gain.linearRampToValueAtTime(1, startTime + fadeIn); }
+    else this.gain.gain.value = 1;
+    var trim = ctx.createGain();
+    trim.gain.value = Math.pow(10, (Number(meta.gainDb) || 0) / 20);
+    trim.connect(this.gain);
+    var src = ctx.createBufferSource();
+    src.buffer = buf;
+    if (loop) { src.loop = true; src.loopStart = this.ls; src.loopEnd = this.le; }
+    src.connect(trim);
+    src.start(startTime, offset);
+    this.src = src; this.t0 = startTime; this.off = offset; this.stopped = false;
+  }
+  /** 把「從頭算起的秒數」換成檔案裡的位置（循環區段內繞回） */
+  RecPlayer.prototype.wrap = function (p) {
+    if (!(p > 0)) return 0;
+    if (this.loop && p >= this.le) return this.ls + (p - this.ls) % (this.le - this.ls);
+    return Math.min(p, this.dur);
+  };
+  RecPlayer.prototype.position = function (t) { return this.wrap(Math.max(0, t - this.t0) + this.off); };
+  RecPlayer.prototype.endTime = function () { return this.t0 + Math.max(0, this.dur - this.off); };
+  RecPlayer.prototype.schedule = function () { return 0; };
+  RecPlayer.prototype.stop = function (fadeSec) {
+    if (this.stopped) return;
+    this.stopped = true;
+    var g = this.gain.gain, now = this.ctx.currentTime, f = Math.max(0.02, fadeSec || 0), src = this.src, gain = this.gain;
+    try { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(0, now + f); } catch (e) { /* 忽略 */ }
+    try { src.stop(now + f + 0.05); } catch (e) { /* 忽略 */ }
+    setTimeout(function () { try { gain.disconnect(); } catch (e) { /* 忽略 */ } }, f * 1000 + 800);
+  };
 
   function data() { return root.MUSIC || { bgm: {}, jingle: {} }; }
   function song(kind, id) {
@@ -353,8 +514,20 @@
     main.gain.value = S.volume * MUSIC_BASE;
     lp.type = 'lowpass'; lp.frequency.value = LOWPASS_HZ; lp.Q.value = 0.5;
     bgm.connect(main); jin.connect(main); main.connect(lp); lp.connect(A.out);
-    S.bus = { ctx: ctx, main: main, bgm: bgm, jingle: jin };
+    // 預錄音樂：不經過低通，音量另乘 REC_TRIM（和合成版聽起來一樣大聲）
+    var mainRec = ctx.createGain(), bgmRec = ctx.createGain(), jinRec = ctx.createGain();
+    mainRec.gain.value = S.volume * MUSIC_BASE * REC_TRIM;
+    bgmRec.connect(mainRec); jinRec.connect(mainRec); mainRec.connect(A.out);
+    S.bus = { ctx: ctx, main: main, bgm: bgm, jingle: jin, mainRec: mainRec, bgmRec: bgmRec, jingleRec: jinRec };
     return S.bus;
+  }
+  /** BGM 匯流排（合成版與預錄版一起）漸變到 level：短曲壓低／恢復用 */
+  function rampBgmBus(level, sec) {
+    if (!S.bus) return;
+    var now = S.bus.ctx.currentTime;
+    [S.bus.bgm.gain, S.bus.bgmRec.gain].forEach(function (g) {
+      try { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(level, now + sec); } catch (e) { g.value = level; }
+    });
   }
   function later(fn) { if (typeof fn === 'function') setTimeout(function () { try { fn(); } catch (e) { stats.lastError = String(e); } }, 0); }
 
@@ -365,15 +538,32 @@
   }
   function stopTimer() { if (S.timer) { clearInterval(S.timer); S.timer = null; } }
 
-  function startBgm(id, pos, fadeIn) {
+  /**
+   * 開始播 BGM。pos／posKind：接續的位置（posKind 'synth' 時是拍數、'rec' 時是秒；種類不同就從頭播）。
+   * 預錄音檔還在載入時回傳 false（下一次 tick 再試；等太久就改用合成版）。
+   */
+  function startBgm(id, pos, fadeIn, posKind) {
     var A = audioOut(), sg = song('bgm', id);
     if (!A || !sg) return false;
-    var bus = ensureBus(A), t0 = A.ctx.currentTime + 0.06;
+    var now = A.ctx.currentTime, it = recReady(id, A.ctx);
+    if (!it && recLoad(id) && !recGiveUp(id, now)) {   // 安靜等預錄音檔（原本那首先淡出）
+      if (S.bgm) { S.bgm.stop(0.7); S.bgm = null; S.bgmId = null; stats.bgm = null; stats.source = null; }
+      recPump();
+      return false;
+    }
+    var bus = ensureBus(A), t0 = now + 0.06;
     if (S.bgm) S.bgm.stop(0.7);
-    S.bgm = new Player(sg, A.ctx, bus.bgm, t0, pos || 0, fadeIn);
-    S.bgmId = id; S.held = null;
-    stats.bgm = id; stats.bgmStarts++;
-    S.bgm.schedule(A.ctx.currentTime + LOOKAHEAD);
+    if (it) {
+      S.bgm = new RecPlayer(id, it, A.ctx, bus.bgmRec, t0, posKind === 'rec' ? pos : 0, fadeIn, true);
+      stats.recPlays++;
+    } else {
+      S.bgm = new Player(sg, A.ctx, bus.bgm, t0, posKind === 'rec' ? 0 : (pos || 0), fadeIn);
+      if (recMeta(id) && recSupported()) stats.recFallbacks++;
+    }
+    S.bgmId = id; S.held = null; S.wait = null;
+    stats.bgm = id; stats.bgmStarts++; stats.source = S.bgm.kind === 'rec' ? 'recorded' : 'synth';
+    S.bgm.schedule(now + LOOKAHEAD);
+    (REC_HINTS[id] || []).forEach(function (j) { recLoad(j); });
     return true;
   }
   /** 暫停 BGM 並記住位置 */
@@ -381,19 +571,16 @@
     if (!S.bgm) return;
     var A = audioOut();
     var pos = A && S.bgm.ctx === A.ctx ? S.bgm.position(A.ctx.currentTime) : 0;
-    S.held = { id: S.bgmId, pos: pos };
+    S.held = { id: S.bgmId, pos: pos, kind: S.bgm.kind };
     S.bgm.stop(fade || 0.12);
-    S.bgm = null; S.bgmId = null; stats.bgm = null;
+    S.bgm = null; S.bgmId = null; stats.bgm = null; stats.source = null;
   }
   function finishJingle(cut) {
     var j = S.jingle;
     if (!j) return;
-    S.jingle = null; stats.jingle = null;
+    S.jingle = null; stats.jingle = null; stats.jingleSource = null;
     j.player.stop(cut ? 0.06 : 0.3);
-    if (j.mode === 'duck' && S.bus) {
-      var g = S.bus.bgm.gain, now = S.bus.ctx.currentTime;
-      g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(1, now + 0.5);
-    }
+    if (j.mode === 'duck') rampBgmBus(1, 0.5);
     later(j.cb);
     // pause 模式：在下一次 tick 從記住的位置淡入接續 S.want
   }
@@ -412,6 +599,7 @@
       return;
     }
     ensureBus(A);
+    recPump();   // 解鎖前就下載好的檔案（例如標題曲），在這裡解碼
     var now = A.ctx.currentTime, until = now + LOOKAHEAD;
     if (S.jingle) {
       S.jingle.player.schedule(until);
@@ -419,7 +607,7 @@
     }
     if (!S.jingle && S.want && !S.bgm) {
       var resume = S.held && S.held.id === S.want;
-      startBgm(S.want, resume ? S.held.pos : 0, resume ? 0.9 : 0.25);
+      startBgm(S.want, resume ? S.held.pos : 0, resume ? 0.9 : 0.25, resume ? S.held.kind : null);
     }
     if (S.bgm) S.bgm.schedule(until);
     if (!S.bgm && !S.jingle && !S.want) stopTimer();
@@ -429,21 +617,23 @@
     if (!song('bgm', id)) { stats.lastError = '找不到 BGM：' + id; return false; }
     if (S.want === id && (S.bgm || S.jingle)) return true;   // 同一首：繼續播
     S.want = id;
+    if (S.wait && S.wait.id !== id) S.wait = null;
     if (!supported()) return false;
+    recLoad(id);                                             // 預錄音檔：第一次用到才下載
     if (S.jingle) { ensureTimer(); return true; }            // 短曲結束後才播
     var A = audioOut();
     if (A && S.enabled && !S.hidden) {
       var resume = S.held && S.held.id === id;
-      startBgm(id, resume ? S.held.pos : 0, resume ? 0.9 : 0.3);
+      startBgm(id, resume ? S.held.pos : 0, resume ? 0.9 : 0.3, resume ? S.held.kind : null);
     }
-    ensureTimer();   // 還沒解鎖聲音時，計時器會等到可以播再開始
+    ensureTimer();   // 還沒解鎖聲音、或預錄音檔還在載入時，計時器會等到可以播再開始
     return true;
   }
 
   function stopBgm(fadeMs) {
-    S.want = null; S.held = null;
+    S.want = null; S.held = null; S.wait = null;
     if (S.bgm) { S.bgm.stop((typeof fadeMs === 'number' ? fadeMs : 600) / 1000); S.bgm = null; }
-    S.bgmId = null; stats.bgm = null;
+    S.bgmId = null; stats.bgm = null; stats.source = null;
   }
 
   function jingle(id, onEnd, opts) {
@@ -452,12 +642,19 @@
     var bus = ensureBus(A);
     if (S.jingle) finishJingle(true);   // 前一首短曲還沒播完：切掉（它的 onEnd 也會被呼叫）
     var mode = (opts && opts.bgm) || sg.bgmMode || 'pause', now = A.ctx.currentTime, delay = 0.05;
-    if (mode === 'duck') {
-      var g = bus.bgm.gain; g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(DUCK_LEVEL, now + 0.08);
-    } else if (S.bgm) { holdBgm(0.12); delay = 0.12; }
-    var p = new Player(sg, A.ctx, bus.jingle, now + delay, 0, 0);
-    S.jingle = { id: id, player: p, cb: onEnd, mode: mode, end: now + delay + sg.duration + JINGLE_TAIL };
-    stats.jingle = id; stats.jingles++;
+    if (mode === 'duck') rampBgmBus(DUCK_LEVEL, 0.08);
+    else if (S.bgm) { holdBgm(0.12); delay = 0.12; }
+    var it = recReady(id, A.ctx), p, dur;
+    if (it) {                            // 預錄短曲：只播一次，檔案本身已含殘響尾巴
+      p = new RecPlayer(id, it, A.ctx, bus.jingleRec, now + delay, 0, 0, false);
+      dur = p.dur + 0.05; stats.recJingles++;
+    } else {                             // 還沒有解碼好的預錄檔：這次用合成版，同時在背景下載，下次就是預錄版
+      recLoad(id);
+      p = new Player(sg, A.ctx, bus.jingle, now + delay, 0, 0);
+      dur = sg.duration + JINGLE_TAIL;
+    }
+    S.jingle = { id: id, player: p, cb: onEnd, mode: mode, end: now + delay + dur };
+    stats.jingle = id; stats.jingles++; stats.jingleSource = it ? 'recorded' : 'synth';
     p.schedule(now + LOOKAHEAD);
     ensureTimer();
     return true;
@@ -466,7 +663,13 @@
   function setVolume(v) {
     v = Number(v); if (!isFinite(v)) return;
     S.volume = Math.max(0, Math.min(1, v)); stats.volume = S.volume;
-    if (S.bus) { var g = S.bus.main.gain, now = S.bus.ctx.currentTime; try { g.cancelScheduledValues(now); g.setTargetAtTime(S.volume * MUSIC_BASE, now, 0.05); } catch (e) { g.value = S.volume * MUSIC_BASE; } }
+    if (S.bus) {
+      var now = S.bus.ctx.currentTime;
+      [[S.bus.main.gain, 1], [S.bus.mainRec.gain, REC_TRIM]].forEach(function (x) {
+        var g = x[0], v2 = S.volume * MUSIC_BASE * x[1];
+        try { g.cancelScheduledValues(now); g.setTargetAtTime(v2, now, 0.05); } catch (e) { g.value = v2; }
+      });
+    }
   }
 
   function setEnabled(on) {
@@ -504,16 +707,39 @@
     playBgm: playBgm, stopBgm: stopBgm, jingle: jingle, setVolume: setVolume, setEnabled: setEnabled, stats: stats,
     current: function () {
       var A = audioOut(), pos = S.bgm && A ? S.bgm.position(A.ctx.currentTime) : (S.held ? S.held.pos : 0);
+      var kind = S.bgm ? S.bgm.kind : (S.held ? S.held.kind : null), sg = song('bgm', S.bgmId || (S.held && S.held.id) || '');
+      var beat = kind === 'rec' ? (sg ? pos / sg.spb : 0) : pos, sec = kind === 'rec' ? pos : (sg ? pos * sg.spb : 0);
       return { bgm: S.bgmId, want: S.want, jingle: S.jingle ? S.jingle.id : null, held: S.held ? S.held.id : null,
-        beat: Math.round(pos * 100) / 100, enabled: S.enabled, volume: S.volume, running: !!S.timer };
+        beat: Math.round(beat * 100) / 100, seconds: Math.round(sec * 100) / 100,
+        source: kind === 'rec' ? 'recorded' : kind ? 'synth' : null, waiting: S.wait ? S.wait.id : null,
+        jingleSource: S.jingle ? stats.jingleSource : null,
+        enabled: S.enabled, volume: S.volume, running: !!S.timer };
     },
     isEnabled: function () { return S.enabled; },
     list: list, info: info,
+    /** 預先下載＋解碼一首預錄音樂（例如快到下一張地圖時）；不能用預錄時什麼都不做 */
+    preload: function (id) { return !!recLoad(id); },
+    /** 預錄音樂狀態（除錯、測試用） */
+    recorded: function () {
+      var items = {};
+      Object.keys(R.items).forEach(function (k) { items[k] = R.items[k].state; });
+      return { supported: recSupported(), enabled: R.enabled, items: items, cached: Object.keys(items).filter(function (k) { return items[k] === 'ready'; }),
+        maxBgm: REC_MAX_BGM, maxJingle: REC_MAX_JINGLE, waitSec: REC_WAIT, trim: REC_TRIM };
+    },
+    /** 開關預錄音樂（關掉＝全部用合成版；已在播的不受影響） */
+    setRecorded: function (on) { R.enabled = !!on; },
+    /** 測試用：清掉預錄音樂的下載與快取 */
+    _recReset: function () { R.items = {}; R.clock = 0; S.wait = null; stats.recCached = []; },
     // 純計算工具（測試與試聽頁用）
     parse: parseNotes, compile: compile, expand: expand, noteToMidi: noteToMidi, midiToName: midiToName,
     INSTRUMENTS: Object.keys(INSTRUMENTS), INSTRUMENT_INFO: INSTRUMENTS, DRUMS: DRUM_NAMES
   };
   stats.supported = supported();
+  // 只先下載標題曲（解鎖聲音後再解碼）；其他曲子第一次用到才下載。
+  // 稍等一下再下載：讓遊戲先套用設定，玩家把音樂關掉時就不浪費流量。
+  if (recSupported()) {
+    setTimeout(function () { try { if (S.enabled) recLoad('title'); } catch (e) { stats.recLastError = String(e); } }, 800);
+  }
 
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Music = Music; }
   if (typeof module !== 'undefined' && module.exports) module.exports = Music;
