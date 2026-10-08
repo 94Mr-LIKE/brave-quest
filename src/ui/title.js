@@ -23,6 +23,8 @@
       screen.appendChild(h('div.sub', { text: '國小三年級・學習冒險' }));
       screen.appendChild(heroes);
       children.forEach(function (c) { if (c) screen.appendChild(c); });
+      // v0.7.2 底部小字：聯絡作者（排在內容之後、推到最下面，不會蓋住按鈕）
+      screen.appendChild(h('p.title-author', {}, ['聯絡作者：', h('a.author-mail', { href: 'mailto:' + J.Feedback.EMAIL, text: J.Feedback.EMAIL })]));
     }
 
     function tapScreen() {

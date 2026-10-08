@@ -267,3 +267,17 @@ body.panel-open #toasts { top: auto; right: auto; left: 50%; bottom: max(14px, e
 .voice-now { align-items: center; gap: 10px; flex-wrap: wrap; }
 .voice-tips summary { cursor: pointer; font-weight: bold; margin: 6px 0; }
 .voice-tips li { margin: 4px 0; line-height: 1.5; }
+
+/* v0.7.2 標題畫面的聯絡作者、回饋視窗 */
+.title-screen { overflow-y: auto; }
+.title-screen .title-author { margin: auto 0 0; padding: 14px 12px max(10px, env(safe-area-inset-bottom)); font-size: 15px; color: #e6eeff; text-shadow: 0 1px 3px #0b1236, 0 0 6px #0b1236; text-align: center; flex: none; }
+.author-mail { color: #ffe08a; text-decoration: underline; word-break: break-all; }
+.feedback-panel { width: min(760px, 96vw); }
+.feedback-panel .fb-text, .feedback-panel .fb-copy { width: 100%; box-sizing: border-box; font-size: 18px; }
+.feedback-panel .fb-check { align-items: flex-start; gap: 8px; margin: 10px 0; flex-wrap: nowrap; }
+.feedback-panel .fb-check input { width: 22px; height: 22px; flex: none; }
+.feedback-panel a.btn { display: inline-flex; align-items: center; text-decoration: none; background: #e0782e; border-color: #fff3d6; color: #fff; }
+.feedback-panel .fb-preview { white-space: pre-wrap; font-size: 14px; max-height: 30vh; overflow: auto; background: rgba(0, 0, 0, .2); padding: 8px; border-radius: 6px; }
+
+/* v0.7.2 視窗開著時，視窗打開前的提示泡泡先藏起來（關掉視窗後再出現），不會蓋住視窗內容 */
+body.modal-open #toasts .toast.bg { display: none; }

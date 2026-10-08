@@ -106,6 +106,10 @@
     var adaptiveChange = 0;
     if (!sess.submitted) {
       sess.submitted = true;
+      // v0.7.2 最近答過的題目（最多 10 題；回饋「題目有錯」時帶入最近 3 題的 ID）
+      st.recentQ = (st.recentQ || []).filter(function (x) { return x !== q.id; });
+      st.recentQ.push(q.id);
+      while (st.recentQ.length > 10) st.recentQ.shift();
       var res = correct ? (sess.hintsUsed ? 'neutral' : 'correct') : 'wrong';
       adaptiveChange = J.Adaptive.recordResult(st.adaptive, q, res).change;
     }

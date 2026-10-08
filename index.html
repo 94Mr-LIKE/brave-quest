@@ -10,16 +10,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="勇者大冒險：給國小三年級的學習冒險遊戲">
 <title>勇者大冒險</title>
-<link rel="icon" href="assets/ui/icon-192.png?v=16bee26f7b" type="image/png">
+<link rel="icon" href="assets/ui/icon-192.png?v=8130d8f62a" type="image/png">
 <!-- 加入主畫面：Android／Chrome 用 manifest；iPad／iPhone Safari 用下面的 apple-* 設定 -->
-<link rel="manifest" href="manifest.webmanifest?v=16bee26f7b">
+<link rel="manifest" href="manifest.webmanifest?v=8130d8f62a">
 <meta name="theme-color" content="#1d2b5e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="勇者大冒險">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="assets/ui/icon-180.png?v=16bee26f7b">
-<link rel="stylesheet" href="src/ui/style.css?v=16bee26f7b">
+<link rel="apple-touch-icon" href="assets/ui/icon-180.png?v=8130d8f62a">
+<link rel="stylesheet" href="src/ui/style.css?v=8130d8f62a">
 </head>
 <body>
 <!-- 遊戲畫面（Phaser 畫布會放在這裡） -->
@@ -37,87 +37,88 @@
 <noscript><p class="noscript">這個遊戲需要開啟 JavaScript 才能玩。</p></noscript>
 
 <!-- 遊戲引擎：Phaser 4.2.1（MIT，本機保存一份，不連 CDN） -->
-<script src="data/version.js?v=16bee26f7b"></script>
-<script src="lib/phaser.min.js?v=16bee26f7b"></script>
+<script src="data/version.js?v=8130d8f62a"></script>
+<script src="lib/phaser.min.js?v=8130d8f62a"></script>
 <!-- QR Code：qrcode-generator 2.0.4（MIT，本機保存一份） -->
-<script src="lib/qrcode.js?v=16bee26f7b"></script>
+<script src="lib/qrcode.js?v=8130d8f62a"></script>
 
 <!-- 題庫：正式題庫 → 範例題庫（只在正式題庫沒載入時生效） -->
-<script src="data/questions.js?v=16bee26f7b"></script>
-<script src="data/sample_questions.js?v=16bee26f7b"></script>
+<script src="data/questions.js?v=8130d8f62a"></script>
+<script src="data/sample_questions.js?v=8130d8f62a"></script>
 
 <!-- 世界資料（劇情設計師、CTO 撰寫） -->
-<script src="data/tilesets.js?v=16bee26f7b"></script>
-<script src="data/tile_frames.js?v=16bee26f7b"></script>
-<script src="data/maps.js?v=16bee26f7b"></script>
-<script src="data/quests.js?v=16bee26f7b"></script>
-<script src="data/dialogs.js?v=16bee26f7b"></script>
-<script src="data/monsters.js?v=16bee26f7b"></script>
-<script src="data/items.js?v=16bee26f7b"></script>
-<script src="data/jobs.js?v=16bee26f7b"></script>
-<script src="data/world.js?v=16bee26f7b"></script>
-<script src="data/sprites.js?v=16bee26f7b"></script>
-<script src="data/dev_world.js?v=16bee26f7b"></script>
-<script src="data/art_manifest.js?v=16bee26f7b"></script>
+<script src="data/tilesets.js?v=8130d8f62a"></script>
+<script src="data/tile_frames.js?v=8130d8f62a"></script>
+<script src="data/maps.js?v=8130d8f62a"></script>
+<script src="data/quests.js?v=8130d8f62a"></script>
+<script src="data/dialogs.js?v=8130d8f62a"></script>
+<script src="data/monsters.js?v=8130d8f62a"></script>
+<script src="data/items.js?v=8130d8f62a"></script>
+<script src="data/jobs.js?v=8130d8f62a"></script>
+<script src="data/world.js?v=8130d8f62a"></script>
+<script src="data/sprites.js?v=8130d8f62a"></script>
+<script src="data/dev_world.js?v=8130d8f62a"></script>
+<script src="data/art_manifest.js?v=8130d8f62a"></script>
 <!-- 語音：說話者音色設定（劇情設計師）、預錄音檔清單（tools/pack_assets.py 產生） -->
-<script src="data/voices.js?v=16bee26f7b"></script>
-<script src="data/voice_manifest.js?v=16bee26f7b"></script>
-<script src="data/dev_sprites.js?v=16bee26f7b"></script>
+<script src="data/voices.js?v=8130d8f62a"></script>
+<script src="data/voice_manifest.js?v=8130d8f62a"></script>
+<script src="data/dev_sprites.js?v=8130d8f62a"></script>
 
 <!-- 可調參數 -->
-<script src="src/config.js?v=16bee26f7b"></script>
+<script src="src/config.js?v=8130d8f62a"></script>
 
 <!-- 系統邏輯（可在 node 測試） -->
-<script src="src/systems/exp.js?v=16bee26f7b"></script>
-<script src="src/systems/answer.js?v=16bee26f7b"></script>
-<script src="src/systems/rewards.js?v=16bee26f7b"></script>
-<script src="src/systems/adaptive.js?v=16bee26f7b"></script>
-<script src="src/systems/hints.js?v=16bee26f7b"></script>
-<script src="src/systems/guard.js?v=16bee26f7b"></script>
-<script src="src/systems/daily.js?v=16bee26f7b"></script>
-<script src="src/systems/playtime.js?v=16bee26f7b"></script>
-<script src="src/systems/state.js?v=16bee26f7b"></script>
-<script src="src/systems/bestiary.js?v=16bee26f7b"></script>
-<script src="src/systems/parentgate.js?v=16bee26f7b"></script>
-<script src="src/systems/save.js?v=16bee26f7b"></script>
-<script src="src/systems/savecode.js?v=16bee26f7b"></script>
-<script src="src/systems/saveprovider.js?v=16bee26f7b"></script>
-<script src="src/systems/quest.js?v=16bee26f7b"></script>
-<script src="src/systems/report.js?v=16bee26f7b"></script>
-<script src="src/systems/session.js?v=16bee26f7b"></script>
-<script src="src/systems/shop.js?v=16bee26f7b"></script>
-<script src="src/systems/world.js?v=16bee26f7b"></script>
-<script src="src/systems/character.js?v=16bee26f7b"></script>
-<script src="src/systems/battle.js?v=16bee26f7b"></script>
-<script src="src/systems/questlog.js?v=16bee26f7b"></script>
-<script src="src/systems/chests.js?v=16bee26f7b"></script>
-<script src="src/systems/pathfind.js?v=16bee26f7b"></script>
-<script src="src/systems/worldmap.js?v=16bee26f7b"></script>
-<script src="src/systems/dialogtext.js?v=16bee26f7b"></script>
-<script src="src/systems/mapinfo.js?v=16bee26f7b"></script>
-<script src="src/systems/petfollow.js?v=16bee26f7b"></script>
+<script src="src/systems/exp.js?v=8130d8f62a"></script>
+<script src="src/systems/answer.js?v=8130d8f62a"></script>
+<script src="src/systems/rewards.js?v=8130d8f62a"></script>
+<script src="src/systems/adaptive.js?v=8130d8f62a"></script>
+<script src="src/systems/hints.js?v=8130d8f62a"></script>
+<script src="src/systems/guard.js?v=8130d8f62a"></script>
+<script src="src/systems/daily.js?v=8130d8f62a"></script>
+<script src="src/systems/playtime.js?v=8130d8f62a"></script>
+<script src="src/systems/state.js?v=8130d8f62a"></script>
+<script src="src/systems/bestiary.js?v=8130d8f62a"></script>
+<script src="src/systems/parentgate.js?v=8130d8f62a"></script>
+<script src="src/systems/save.js?v=8130d8f62a"></script>
+<script src="src/systems/savecode.js?v=8130d8f62a"></script>
+<script src="src/systems/saveprovider.js?v=8130d8f62a"></script>
+<script src="src/systems/quest.js?v=8130d8f62a"></script>
+<script src="src/systems/report.js?v=8130d8f62a"></script>
+<script src="src/systems/session.js?v=8130d8f62a"></script>
+<script src="src/systems/shop.js?v=8130d8f62a"></script>
+<script src="src/systems/world.js?v=8130d8f62a"></script>
+<script src="src/systems/character.js?v=8130d8f62a"></script>
+<script src="src/systems/battle.js?v=8130d8f62a"></script>
+<script src="src/systems/questlog.js?v=8130d8f62a"></script>
+<script src="src/systems/chests.js?v=8130d8f62a"></script>
+<script src="src/systems/pathfind.js?v=8130d8f62a"></script>
+<script src="src/systems/worldmap.js?v=8130d8f62a"></script>
+<script src="src/systems/dialogtext.js?v=8130d8f62a"></script>
+<script src="src/systems/feedback.js?v=8130d8f62a"></script>
+<script src="src/systems/mapinfo.js?v=8130d8f62a"></script>
+<script src="src/systems/petfollow.js?v=8130d8f62a"></script>
 
 <!-- 引擎與畫面 -->
-<script src="src/engine/audio.js?v=16bee26f7b"></script>
-<script src="src/engine/sfx.js?v=16bee26f7b"></script>
-<script src="src/engine/voice.js?v=16bee26f7b"></script>
+<script src="src/engine/audio.js?v=8130d8f62a"></script>
+<script src="src/engine/sfx.js?v=8130d8f62a"></script>
+<script src="src/engine/voice.js?v=8130d8f62a"></script>
 <!-- 音樂（作曲家）：music.js 還沒完成時，遊戲用 typeof JQ.Music 檢查後略過 -->
-<script src="data/music.js?v=16bee26f7b"></script>
-<script src="src/engine/music.js?v=16bee26f7b"></script>
-<script src="src/engine/assets.js?v=16bee26f7b"></script>
-<script src="src/engine/bigpilot.js?v=16bee26f7b"></script>
-<script src="src/ui/dom.js?v=16bee26f7b"></script>
-<script src="src/ui/quiz.js?v=16bee26f7b"></script>
-<script src="src/ui/hud.js?v=16bee26f7b"></script>
-<script src="src/ui/menus.js?v=16bee26f7b"></script>
-<script src="src/ui/settings.js?v=16bee26f7b"></script>
-<script src="src/ui/title.js?v=16bee26f7b"></script>
-<script src="src/ui/qr.js?v=16bee26f7b"></script>
-<script src="src/ui/worldmap.js?v=16bee26f7b"></script>
-<script src="src/ui/minimap.js?v=16bee26f7b"></script>
-<script src="src/scenes/MapScene.js?v=16bee26f7b"></script>
-<script src="src/scenes/BattleScene.js?v=16bee26f7b"></script>
-<script src="src/game.js?v=16bee26f7b"></script>
-<script src="src/main.js?v=16bee26f7b"></script>
+<script src="data/music.js?v=8130d8f62a"></script>
+<script src="src/engine/music.js?v=8130d8f62a"></script>
+<script src="src/engine/assets.js?v=8130d8f62a"></script>
+<script src="src/engine/bigpilot.js?v=8130d8f62a"></script>
+<script src="src/ui/dom.js?v=8130d8f62a"></script>
+<script src="src/ui/quiz.js?v=8130d8f62a"></script>
+<script src="src/ui/hud.js?v=8130d8f62a"></script>
+<script src="src/ui/menus.js?v=8130d8f62a"></script>
+<script src="src/ui/settings.js?v=8130d8f62a"></script>
+<script src="src/ui/title.js?v=8130d8f62a"></script>
+<script src="src/ui/qr.js?v=8130d8f62a"></script>
+<script src="src/ui/worldmap.js?v=8130d8f62a"></script>
+<script src="src/ui/minimap.js?v=8130d8f62a"></script>
+<script src="src/scenes/MapScene.js?v=8130d8f62a"></script>
+<script src="src/scenes/BattleScene.js?v=8130d8f62a"></script>
+<script src="src/game.js?v=8130d8f62a"></script>
+<script src="src/main.js?v=8130d8f62a"></script>
 </body>
 </html>

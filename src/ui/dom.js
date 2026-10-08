@@ -101,10 +101,23 @@
     }
   }
 
+  /**
+   * 提示泡泡。v0.7.2：視窗開著時，「視窗打開前」出現的提示（例如「找頭上有！的人說話吧！」）先隱藏（.bg，見 style.css），
+   * 關掉視窗後再顯示，至少再停 2 秒；視窗裡的操作產生的提示（例如「已複製」「金幣不夠」）照常顯示。
+   */
   function toast(text, ms) {
-    var n = h('div.win.toast', { text: text });
+    var bg = !stack.some(function (e) { return e.modal; });
+    var n = h('div.win.toast' + (bg ? '.bg' : ''), { text: text });
     toasts.appendChild(n);
-    setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, ms || 2600);
+    var remove = function () { if (n.parentNode) n.parentNode.removeChild(n); };
+    var waited = false;
+    var tick = function () {
+      if (!n.parentNode) return;
+      if (bg && document.body.classList.contains('modal-open')) { waited = true; setTimeout(tick, 400); return; }
+      if (waited) { waited = false; setTimeout(remove, 2000); return; }
+      remove();
+    };
+    setTimeout(tick, ms || 2600);
   }
 
   function banner(text, cls) {

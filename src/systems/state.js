@@ -62,6 +62,7 @@
       titles: [],                 // 拿到的稱號
       pendingVariant: null,       // 待補回的一半 經驗值（ADR-005）
       answered: {},               // {questionId: true} 曾經答對過
+      recentQ: [],                // v0.7.2 最近答過的題目 ID（最多 10 題，回饋「題目有錯」用）
       stats: { subjects: emptyBySubject(function () { return { done: 0, firstTry: 0, submissions: 0 }; }), units: {}, battles: { won: 0, fled: 0, ko: 0 } },
       adaptive: Adaptive.createState(),
       daily: Daily.create(),

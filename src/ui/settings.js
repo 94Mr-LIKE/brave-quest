@@ -165,8 +165,88 @@
       } }, ['刪除存檔'])]));
       body.appendChild(h('p.small', { text: '雲端存檔：目前不提供（Google 登入不適用以兒童為對象的應用程式）。請用「存檔碼」備份或換裝置。' }));
       body.appendChild(h('p.small', { text: 'iPad 請用 Safari「分享→加入主畫面」後，從主畫面圖示開啟，存檔比較不會被清除；也請定期用存檔碼／QR Code 備份。' }));
+
+      // v0.7.2 使用者回饋（在家長確認之後才看得到）
+      body.appendChild(h('h3', { text: '✉️ 使用者回饋' }));
+      body.appendChild(h('p.small', { text: '請家長協助填寫：遊戲有問題、題目有錯或有建議，都歡迎告訴作者。' }));
+      body.appendChild(h('div.row', {}, [h('button', { onclick: function () { feedback(G); } }, ['填寫回饋'])]));
+
+      // v0.7.2 關於本遊戲
+      body.appendChild(h('h3', { text: 'ℹ️ 關於本遊戲' }));
+      body.appendChild(h('p.small', { text: J.CONFIG.GAME_TITLE + '　版本：' + (window.JQ_VERSION || '開發版') }));
+      body.appendChild(h('p.small.author-line', {}, ['聯絡作者：', h('a.author-mail', { href: 'mailto:' + J.Feedback.EMAIL, text: J.Feedback.EMAIL })]));
     }
     render();
+  }
+
+  /** 回饋內容附上的資訊：只有版本號、地圖 ID、等級、userAgent、螢幕尺寸、語音設定（不含名字、存檔碼） */
+  function deviceInfo(G) {
+    var st = G.state || { settings: {}, player: {} }, s = st.settings || {};
+    var voice = (s.tts === false ? '朗讀關' : '朗讀開') + '・' + (s.voiceAuto === false ? '按鍵才念' : '自動念') + '・台語台詞：' + (s.voiceLang === 'huayu' ? '華語' : '台語語音') +
+      '・雲端語音：' + (s.voiceCloud === false ? '不允許' : '允許') + '・語速 ' + (s.voiceRate || 1);
+    return {
+      version: window.JQ_VERSION || '開發版',
+      map: G.mapScene ? G.mapScene.mapId : (st.location && st.location.map) || '',
+      level: st.player && typeof st.player.level === 'number' ? st.player.level : '',
+      userAgent: navigator.userAgent || '',
+      screen: (screen && screen.width ? screen.width + '×' + screen.height : '') + '（視窗 ' + window.innerWidth + '×' + window.innerHeight + '）',
+      voice: voice
+    };
+  }
+
+  /** 使用者回饋視窗：類別、文字、附上資訊 → 「用 Email 寄出」（mailto）／「複製內容」 */
+  function feedback(G) {
+    var st = G.state || {}, cat = '遊戲有問題';
+    var text = h('textarea.fb-text', { maxlength: String(J.Feedback.MAX_TEXT), rows: '5', 'aria-label': '回饋內容', placeholder: '請描述發生了什麼事、在哪裡、怎麼重現（最多 ' + J.Feedback.MAX_TEXT + ' 字）' });
+    var count = h('span.small.fb-count', { text: '0／' + J.Feedback.MAX_TEXT });
+    var info = h('input', { type: 'checkbox', id: 'fb-info', checked: true });
+    var mail = h('a.btn.fb-mail', { href: '#', role: 'button' }, ['用 Email 寄出']);
+    var preview = h('pre.fb-preview', { 'aria-label': '將寄出的內容' });
+    var copyBox = h('textarea.fb-copy', { readonly: true, hidden: true, 'aria-label': '回饋內容（請複製）' });
+    var cats = h('div.row', { role: 'radiogroup', 'aria-label': '回饋類別' });
+    var result = null;
+    function build() {
+      result = J.Feedback.build({ category: cat, text: text.value, includeInfo: info.checked, info: deviceInfo(G),
+        recentQuestionIds: (st.recentQ || []).slice(), playerName: st.player && st.player.name });
+      mail.setAttribute('href', result.url);
+      preview.textContent = J.Feedback.plainText(result);
+      count.textContent = text.value.length + '／' + J.Feedback.MAX_TEXT + (result.truncated ? '（太長，寄出時會截斷）' : '');
+    }
+    function renderCats() {
+      cats.innerHTML = '';
+      J.Feedback.CATEGORIES.forEach(function (c) {
+        cats.appendChild(h('button', { role: 'radio', 'aria-checked': String(c === cat), 'aria-pressed': String(c === cat), onclick: function () { cat = c; renderCats(); build(); } }, [c]));
+      });
+    }
+    text.addEventListener('input', build);
+    info.addEventListener('change', build);
+    var copyBtn = h('button', { onclick: function () {
+      build();
+      var plain = J.Feedback.plainText(result);
+      var done = function () { J.UI.toast('已複製，請貼到 Email 寄給 ' + J.Feedback.EMAIL, 5000); };
+      var fallback = function () { copyBox.hidden = false; copyBox.value = plain; copyBox.focus(); copyBox.select(); J.UI.toast('請按「拷貝」或 Ctrl＋C 複製選取的文字，再貼到 Email 寄給 ' + J.Feedback.EMAIL, 6000); };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(plain).then(done, fallback);
+        else fallback();
+      } catch (e) { fallback(); }
+    } }, ['複製內容']);
+    var handle;
+    var panel = h('div.win.panel.feedback-panel', {}, [
+      h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']),
+      h('h2', { text: '✉️ 使用者回饋' }),
+      h('p.small', { text: '請家長協助填寫。內容會用這台裝置的郵件 App 寄給作者（' + J.Feedback.EMAIL + '）；遊戲本身不會傳送任何資料。' }),
+      h('h3', { text: '類別' }), cats,
+      h('h3', { text: '內容' }), text, count,
+      h('div.row.fb-check', {}, [info, h('label', { for: 'fb-info', text: '附上遊戲版本與裝置資訊（版本、地圖、等級、瀏覽器、螢幕尺寸、語音設定；不含名字和存檔）' })]),
+      h('div.row', {}, [mail, copyBtn]),
+      copyBox,
+      h('details', {}, [h('summary', { text: '看看將寄出的內容' }), preview])
+    ]);
+    renderCats();
+    build();
+    handle = J.UI.open(panel, { label: '使用者回饋' });
+    setTimeout(function () { text.focus(); }, 50);
+    return handle;
   }
 
   /** 連續玩 20 分鐘的休息提醒 */
@@ -194,5 +274,5 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.Settings = { gate: gate, open: open, restReminder: restReminder, limitScreen: limitScreen };
+  window.JQ.Settings = { feedback: feedback, deviceInfo: deviceInfo, gate: gate, open: open, restReminder: restReminder, limitScreen: limitScreen };
 })();
