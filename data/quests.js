@@ -3,7 +3,7 @@
  * 撰寫：遊戲劇情設計師＋關卡設計
  *
  * units 全部取自 docs/data/questions.js 實際存在的 unit 字串（validate_world.js 會逐一比對）。
- * 版本：國數自社＝翰林三上、英語＝何嘉仁 Super Fun 1（依 questions.js 檔頭與 01_課本版本調查.md）。
+ * 版本：國數自社＝翰林三上／三下、英語＝何嘉仁 Super Fun 1／2（依 questions.js 檔頭與 01_課本版本調查.md）。v0.8 起五科頭目任務的單元清單加入三下單元。
  *
  * 委託鏈（requires）與地區解鎖（world.js 的 unlock_quest）：
  *   Q_TUT_1 → Q_TUT_2 → Q_TUT_3（解鎖：神木森林、府城古城）
@@ -77,7 +77,7 @@ window.QUESTS = {
     title: "淨化枯萎樹王", giver: "elf_elder", map: "M04", kind: "boss",
     goal: "到神木森林最北邊的千年神木前，讓枯萎樹王清醒，拿回自然之光。",
     log_next: "拿到自然之光！紅樹林濕地解鎖了，搭車去幫地精族。",
-    subject: "自然", units: ["一、植物大發現", "二、磁鐵好好玩", "三、風與空氣", "四、奇妙的溶解"], count: null, level_range: [2, 4],
+    subject: "自然", units: ["一、植物大發現", "二、磁鐵好好玩", "三、風與空氣", "四、奇妙的溶解", "一、快樂小農夫", "二、千變萬化的水", "三、天氣停看聽", "四、動物王國"], count: null, level_range: [2, 4],
     boss: "tree_king", boss_map: "M04",
     hunt: null, requires: ["Q_ELF_3"], reward: { exp: 0, gold: 100, item: null, light: "自然" },
     dialog_start: "D_ELF_4A", dialog_end: "D_ELF_4B"
@@ -113,7 +113,7 @@ window.QUESTS = {
     title: "漁港的迷霧章魚", giver: "merchant", map: "M09", kind: "boss",
     goal: "回金包里的磺火漁港，沿著碼頭木橋走到底，讓迷霧章魚清醒，拿回英語之光。",
     log_next: "拿到英語之光！金包里東北邊海岸的海蝕洞窟深處，有哥布林部落需要幫忙。",
-    subject: "英語", units: ["Lesson 1 What's your name?（名字）", "Lesson 2 How old are you?（數字）", "Lesson 3 I'm short.（身材外貌）", "Lesson 4 Are you tired?（感覺）"], count: null, level_range: [2, 4],
+    subject: "英語", units: ["Lesson 1 What's your name?（名字）", "Lesson 2 How old are you?（數字）", "Lesson 3 I'm short.（身材外貌）", "Lesson 4 Are you tired?（感覺）", "Lesson 1 Stationery（文具用品）", "Lesson 2 Colors（顏色）", "Review 1 Fun Things（有趣的事物）", "Lesson 3 Animal（動物）", "Lesson 4 Things you can do（能力）"], count: null, level_range: [2, 4],
     boss: "fog_octopus", boss_map: "M01",
     hunt: null, requires: ["Q_MER_3"], reward: { exp: 0, gold: 100, item: null, light: "英語" },
     dialog_start: "D_MER_4A", dialog_end: "D_MER_4B"
@@ -149,7 +149,7 @@ window.QUESTS = {
     title: "泥巴大蛙", giver: "gnome_chief", map: "M05", kind: "boss",
     goal: "沿著木棧道走到濕地西南邊的泥灘，讓泥巴大蛙清醒，拿回數學之光。",
     log_next: "拿到數學之光！國語之光也拿到的話，月世界就會解鎖。",
-    subject: "數學", units: ["1 10000以內的數", "2 10000以內的加減", "3 毫米與數線", "4 乘法", "5 角與形狀", "6 除法", "7 公斤與公克", "8 分數", "9 列表與規律"], count: null, level_range: [2, 4],
+    subject: "數學", units: ["1 10000以內的數", "2 10000以內的加減", "3 毫米與數線", "4 乘法", "5 角與形狀", "6 除法", "7 公斤與公克", "8 分數", "9 列表與規律", "1 除法", "2 公升與毫升", "3 分數與加減", "4 圓", "5 兩步驟應用問題", "6 一位小數", "7 時間", "8 乘與除", "9 面積"], count: null, level_range: [2, 4],
     boss: "mud_frog", boss_map: "M05",
     hunt: null, requires: ["Q_GNO_3"], reward: { exp: 0, gold: 150, item: null, light: "數學" },
     dialog_start: "D_GNO_4A", dialog_end: "D_GNO_4B"
@@ -185,7 +185,7 @@ window.QUESTS = {
     title: "噪音蝙蝠王", giver: "goblin_chief", map: "M07", kind: "boss",
     goal: "到哥布林部落東邊的小洞，讓噪音蝙蝠王清醒，拿回國語之光。",
     log_next: "拿到國語之光！數學之光也拿到的話，月世界就會解鎖。",
-    subject: "國語", units: ["第壹單元 運用時間", "第貳單元 解決問題", "第參單元 走進大自然", "第肆單元 美好的祝福"], count: null, level_range: [2, 4],
+    subject: "國語", units: ["第壹單元 運用時間", "第貳單元 解決問題", "第參單元 走進大自然", "第肆單元 美好的祝福", "第壹單元 人物組曲", "第貳單元 臺灣風景畫", "第參單元 生活小智慧", "第肆單元 奇幻故事屋"], count: null, level_range: [2, 4],
     boss: "noise_bat", boss_map: "M07",
     hunt: null, requires: ["Q_GOB_3"], reward: { exp: 0, gold: 150, item: null, light: "國語" },
     dialog_start: "D_GOB_4A", dialog_end: "D_GOB_4B"
@@ -221,7 +221,7 @@ window.QUESTS = {
     title: "暴躁石像", giver: "orc_chief", map: "M08", kind: "boss",
     goal: "到月世界南邊的泥岩溝，讓暴躁石像清醒，拿回社會之光。",
     log_next: "五道光都拿回來了嗎？搭車回金包里找里長伯點燈！",
-    subject: "社會", units: ["第一單元 升上三年級的新學習", "第二單元 校園規範和班級自治", "第三單元 我的校園和家庭生活", "第四單元 健康成長的快樂童年", "第五單元 打造更美好的班級"], count: null, level_range: [3, 4],
+    subject: "社會", units: ["第一單元 升上三年級的新學習", "第二單元 校園規範和班級自治", "第三單元 我的校園和家庭生活", "第四單元 健康成長的快樂童年", "第五單元 打造更美好的班級", "第一單元 我居住的地方", "第二單元 多元的生活空間", "第三單元 生活中的各行各業", "第四單元 生活與工作的轉變", "第五單元 儲蓄與消費", "第六單元 小小街道觀察家"], count: null, level_range: [3, 4],
     boss: "angry_golem", boss_map: "M08",
     hunt: null, requires: ["Q_ORC_3"], reward: { exp: 0, gold: 200, item: null, light: "社會" },
     dialog_start: "D_ORC_4A", dialog_end: "D_ORC_4B"
