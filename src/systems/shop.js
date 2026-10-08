@@ -45,7 +45,61 @@
     return { ok: true, hearts: state.pet.hearts };
   }
 
-  var Shop = { SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet };
+  // ---------------------------------------------------------------- v0.9.1 賣東西（老闆 2026-10-09：舊裝備可以賣，原價 50%）
+  var SELL_RATE = 0.5;
+  /** 珍貴道具：職業專用裝備（轉職的獎勵、珍貴道具短曲）、或資料標了 precious／rare／not_for_sale */
+  function isPrecious(it) { return !!(it && (it.precious || it.rare || it.not_for_sale || it.job)); }
+  /** 進行中的打獵委託要收集的東西（任務道具），這時候不能賣 */
+  function questNeeds(state, quests) {
+    var need = {};
+    Object.keys((state && state.quests) || {}).forEach(function (qid) {
+      var s = state.quests[qid], q = quests && quests[qid];
+      if (!q || !s || s.status === 'done') return;
+      var h = q.hunt;
+      if ((q.kind || q.type) === 'hunt' && h && h.item) need[String(h.item).replace(/^item_/, '')] = true;
+    });
+    return need;
+  }
+  /** 賣價：裝備和道具＝原價的 50%（無條件捨去）；素材照原本的收購價 */
+  function sellPrice(it) {
+    if (!it) return 0;
+    if (it.type === 'material') return Math.floor(Number(it.sell) || 0);
+    return Math.floor((Number(it.price) || 0) * SELL_RATE);
+  }
+  /**
+   * 背包裡可以賣的清單：[{ id, item, have, equipped, count（能賣幾個）, price, ok, reason }]
+   * reason：'equipped'（身上這件要先卸下）、'precious'（珍貴道具）、'quest'（委託要用）、'free'（不值錢）
+   */
+  function sellList(state, items, quests) {
+    var need = questNeeds(state, quests), out = [];
+    Object.keys(state.inventory || {}).forEach(function (id) {
+      var it = items[id], have = state.inventory[id] || 0;
+      if (!it || have <= 0) return;
+      var equipped = state.equipment && (state.equipment.weapon === id || state.equipment.armor === id);
+      var count = have - (equipped ? 1 : 0), price = sellPrice(it), reason = '';
+      if (isPrecious(it)) reason = 'precious';
+      else if (need[id]) reason = 'quest';
+      else if (price <= 0) reason = 'free';
+      else if (count <= 0) reason = 'equipped';
+      out.push({ id: id, item: it, have: have, equipped: !!equipped, count: Math.max(0, count), price: price, ok: !reason, reason: reason });
+    });
+    var order = { weapon: 0, armor: 1, consumable: 2, card: 3, material: 4 };
+    out.sort(function (a, b) { return (order[a.item.type] === undefined ? 9 : order[a.item.type]) - (order[b.item.type] === undefined ? 9 : order[b.item.type]) || (a.id < b.id ? -1 : 1); });
+    return out;
+  }
+  /** 賣 1 個。回傳 { ok, price } 或 { ok:false, reason } */
+  function sell(state, id, items, quests) {
+    var e = sellList(state, items, quests).filter(function (x) { return x.id === id; })[0];
+    if (!e) return { ok: false, reason: 'none' };
+    if (!e.ok) return { ok: false, reason: e.reason };
+    state.inventory[id] -= 1;
+    if (state.inventory[id] <= 0) delete state.inventory[id];
+    state.player.coins += e.price;
+    return { ok: true, price: e.price, item: e.item };
+  }
+
+  var Shop = { SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet,
+    SELL_RATE: SELL_RATE, isPrecious: isPrecious, questNeeds: questNeeds, sellPrice: sellPrice, sellList: sellList, sell: sell };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Shop = Shop; }
   if (typeof module !== 'undefined') module.exports = Shop;
 })();

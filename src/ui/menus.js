@@ -72,7 +72,7 @@
     var shopInfo = (D.shops && D.shops[shopId]) || { name: { general: '雜貨店', item: '道具店', weapon: '武器店', armor: '防具店' }[shopId] || '商店', items: null };
     var body = h('div');
     var tabBuy = h('button', { role: 'tab', 'aria-selected': 'true', onclick: function () { mode = 'buy'; render(); } }, ['買東西']);
-    var tabSell = h('button', { role: 'tab', 'aria-selected': 'false', onclick: function () { mode = 'sell'; render(); } }, ['賣素材']);
+    var tabSell = h('button', { role: 'tab', 'aria-selected': 'false', onclick: function () { mode = 'sell'; render(); } }, ['賣東西']);
     var mode = 'buy';
     var handle;
     var panel = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']),
@@ -96,12 +96,17 @@
           list.appendChild(h('li', {}, [icon(it, it.id), h('div.what', {}, [h('b', { text: it.name }), h('span.small', { text: '　已有 ' + have }), h('div.small', { text: it.desc + (info.length ? '（' + info.join('、') + '）' : '') })]), b]));
         });
       } else {
-        var mats = Object.keys(st.inventory).filter(function (id) { var it = D.items[id]; return it && it.type === 'material' && it.sell > 0 && st.inventory[id] > 0; });
-        if (!mats.length) list.appendChild(h('li', { text: '沒有可以賣的素材。打獵委託需要的素材，記得先留著喔！' }));
-        mats.forEach(function (id) {
-          var it = D.items[id];
-          list.appendChild(h('li', {}, [icon(it, id), h('div.what', {}, [h('b', { text: it.name + ' ×' + st.inventory[id] }), h('div.small', { text: it.desc })]),
-            h('button', { onclick: function () { sell(id); } }, ['賣 1 個（' + it.sell + ' 金幣）'])]));
+        // v0.9.1：裝備和道具可以賣（原價 50%，無條件捨去）；素材照收購價。身上正在用的、珍貴道具、委託要用的不能賣
+        body.appendChild(h('p.small', { text: '裝備和道具用原價的一半收購；身上正在用的要先卸下，珍貴道具和委託要用的東西不能賣。' }));
+        var rows = J.Shop.sellList(st, D.items, D.quests);
+        if (!rows.length) list.appendChild(h('li', { text: '背包裡沒有可以賣的東西。' }));
+        var WHY = { equipped: '正在裝備中，先到背包卸下才能賣', precious: '珍貴道具，不能賣', quest: '委託要用，先留著喔', free: '這個不能賣' };
+        rows.forEach(function (r) {
+          var it = r.item;
+          var note = r.ok ? (r.equipped ? '（身上正在用 1 個，其他的可以賣）' : '') : WHY[r.reason];
+          list.appendChild(h('li.sell-row', { 'data-id': r.id }, [icon(it, r.id), h('div.what', {}, [h('b', { text: it.name + ' ×' + r.have + (r.equipped ? '（裝備中）' : '') }),
+            h('div.small', { text: note || it.desc })]),
+            h('button', { disabled: !r.ok, onclick: function () { sell(r.id); } }, [r.ok ? '賣 1 個（' + r.price + ' 金幣）' : '不能賣'])]));
         });
       }
       body.appendChild(list);
@@ -142,10 +147,15 @@
       G.save(); G.refreshHud(); render();
     }
     function sell(id) {
-      var it = D.items[id];
-      if (!J.Character.removeItem(st, id, 1)) return;
-      st.player.coins += it.sell;
-      J.Audio.play('select'); G.save(); G.refreshHud(); render();
+      var it = D.items[id], price = J.Shop.sellPrice(it);
+      J.UI.confirm('要把「' + it.name + '」賣掉 1 個嗎？可以拿到 ' + price + ' 金幣。', '賣掉', '不要').then(function (yes) {
+        if (!yes) return;
+        var r = J.Shop.sell(st, id, D.items, D.quests);
+        if (!r.ok) { J.UI.toast(r.reason === 'equipped' ? '正在裝備中，先卸下才能賣。' : '這個不能賣。'); render(); return; }
+        J.Audio.play('select');
+        J.UI.toast('賣掉了「' + it.name + '」，拿到 ' + r.price + ' 金幣！');
+        G.save(); G.refreshHud(); render();
+      });
     }
     render();
   }

@@ -11,7 +11,13 @@
   var SHOP_COLOR = { weapon: '#e0603a', armor: '#3b8fd6', item: '#2f8f4a', general: '#d0a020', inn: '#a15ad8' };
   var SHOP_SHORT = { weapon: '武', armor: '防', item: '道', general: '雜', inn: '旅' };
   var LOCAL_W = 40, LOCAL_H = 25;   // 大地圖時小地圖顯示的範圍（格）
-  var box = null, canvas = null, timer = 0, gridCache = {};
+  var box = null, canvas = null, caption = null, timer = 0, gridCache = {};
+  /** 「寶箱：還剩 N 個」（這張地圖還沒打開的寶箱數；沒有寶箱的地圖不顯示） */
+  function chestText(info) {
+    var cs = info.chests || [];
+    if (!cs.length) return '';
+    return '寶箱：還剩 ' + cs.filter(function (c) { return !c.open; }).length + ' 個';
+  }
 
   /** 沒有背景圖時的底圖：可走／不可走上色（每格 4 像素，整張只畫一次） */
   function gridImage(info) {
@@ -61,14 +67,7 @@
     }
     info.exits.forEach(function (e) { if (inside(e.x, e.y)) { g.fillStyle = '#6ae0f0'; g.fillRect((e.x - view.x) * cw, (e.y - view.y) * ch, Math.max(2, cw), Math.max(2, ch)); } });
     if (info.station && inside(info.station.x, info.station.y)) { g.fillStyle = '#ffffff'; g.fillRect((info.station.x - view.x) * cw, (info.station.y - view.y) * ch, Math.max(3, cw), Math.max(3, ch)); }
-    // 寶箱：沒開的是咖啡色、開過的是灰色
-    (info.chests || []).forEach(function (c) {
-      if (!inside(c.x, c.y)) return;
-      var s = Math.max(4, Math.min(cw, ch) * (big ? 0.9 : 1.1));
-      g.fillStyle = c.open ? '#9a9a9a' : '#c8873a';
-      g.fillRect(px(c.x) - s / 2, py(c.y) - s * 0.4, s, s * 0.8);
-      g.lineWidth = 1.5; g.strokeStyle = '#1d2b5e'; g.strokeRect(px(c.x) - s / 2, py(c.y) - s * 0.4, s, s * 0.8);
-    });
+    // v0.9.1 老闆指示：寶箱不標位置（讓小朋友自己找），只在旁邊顯示「寶箱：還剩 N 個」
     info.npcs.forEach(function (n) { dot(n.x, n.y, '#4aa3ff', r); });
     // 商店、旅店畫在店主人上面（比較大的彩色圓圈＋字），才看得出是店
     info.shops.forEach(function (s) {
@@ -92,7 +91,8 @@
     var hud = document.getElementById('hud');
     if (!box) {
       canvas = h('canvas', { 'aria-hidden': 'true' });
-      box = h('button.minimap', { onclick: function () { if (!G.blocked()) openBig(G); }, 'aria-label': '小地圖（點一下放大）' }, [canvas]);
+      caption = h('span.mm-caption');
+      box = h('button.minimap', { onclick: function () { if (!G.blocked()) openBig(G); }, 'aria-label': '小地圖（點一下放大）' }, [canvas, caption]);
       hud.appendChild(box);
     }
     var info = scene.minimapInfo();
@@ -100,11 +100,13 @@
     var sz = size({ w: v0.w, h: v0.h }, 170, 110);
     canvas.width = sz.w; canvas.height = sz.h;
     box.dataset.local = String(v0.w < info.w || v0.h < info.h);   // 測試用：是不是局部顯示
-    box.setAttribute('aria-label', '小地圖：' + (info.name || '') + '（點一下放大）');
+    box.setAttribute('aria-label', '小地圖：' + (info.name || '') + '（點一下放大）' + (chestText(info) ? '，' + chestText(info) : ''));
+    caption.textContent = chestText(info);
+    caption.hidden = !caption.textContent;
     clearInterval(timer);
     timer = setInterval(function () {
       if (!G.mapScene || G.mapScene !== scene || !scene.p || !scene.sys.isActive()) return;
-      try { var inf = scene.minimapInfo(); draw(canvas, inf, false, null, viewFor(inf, true)); } catch (e) { /* 換圖中 */ }
+      try { var inf = scene.minimapInfo(); draw(canvas, inf, false, null, viewFor(inf, true)); caption.textContent = chestText(inf); caption.hidden = !caption.textContent; } catch (e) { /* 換圖中 */ }
     }, 300);
     draw(canvas, info, false, null, v0);
   }
@@ -123,11 +125,7 @@
     });
     info.shops.forEach(function (s) { npcList.appendChild(h('li', {}, [h('span', { text: '🏠 ' + s.text + '（' + (SHOP_SHORT[s.kind] || '') + '）' })])); });
     if (!info.npcs.length) npcList.appendChild(h('li', { text: '這裡沒有人。' }));
-    var chests = info.chests || [];
-    if (chests.length) {
-      var opened = chests.filter(function (c) { return c.open; }).length;
-      npcList.appendChild(h('li', {}, [h('span', { text: '🧰 寶箱 ' + chests.length + ' 個（已打開 ' + opened + ' 個）' })]));
-    }
+    if (chestText(info)) npcList.appendChild(h('li.mm-chests', {}, [h('span', { text: '🧰 ' + chestText(info) + '（位置要自己找喔）' })]));
     var monList = h('ul.list.compact', { 'aria-label': '本地圖的怪物' });
     var ids = [];
     (sc.map.spawns || []).forEach(function (s) { if (D.monsters[s.monster] && ids.indexOf(s.monster) < 0) ids.push(s.monster); });
@@ -138,7 +136,7 @@
           h('div.small', { text: known ? ('已遇見 ' + r.seen + ' 次・已打倒 ' + r.defeated + ' 次') : '還沒遇見' })])]));
     });
     if (!ids.length) monList.appendChild(h('li', { text: '這裡沒有怪物。' }));
-    var legend = h('p.small', { text: '🟡 你　🔵 人　🟠 怪物　🔷 出口　⬜ 車站　🟫 寶箱（灰色＝已打開）　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' });
+    var legend = h('p.small', { text: '🟡 你　🔵 人　🟠 怪物　🔷 出口　⬜ 車站　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' });
     var handle;
     var mapBox = h('div.mm-map', {}, [big, legend]);
     mapBox.style.width = sz.w + 6 + 'px';   // 圖例跟著地圖寬度換行
@@ -151,5 +149,5 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.Minimap = { attach: attach, openBig: openBig, draw: draw, viewFor: viewFor, LOCAL_W: LOCAL_W, LOCAL_H: LOCAL_H };
+  window.JQ.Minimap = { chestText: chestText, attach: attach, openBig: openBig, draw: draw, viewFor: viewFor, LOCAL_W: LOCAL_W, LOCAL_H: LOCAL_H };
 })();

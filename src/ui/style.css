@@ -305,3 +305,8 @@ body.modal-open.panel-open #pad .bbtn { position: fixed; top: auto; right: auto;
 .voice-tips summary { min-height: 44px; line-height: 44px; }
 /* 地圖載入框不蓋在其他視窗上 */
 body.modal-open .load-bar { display: none; }
+
+/* v0.9.1 小地圖下方的「寶箱：還剩 N 個」 */
+.minimap { display: flex; flex-direction: column; align-items: center; }
+.minimap .mm-caption { display: block; font-size: 14px; line-height: 1.3; color: #fff3c8; padding: 3px 4px 1px; white-space: nowrap; }
+.minimap .mm-caption[hidden] { display: none; }
