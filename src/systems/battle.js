@@ -12,6 +12,8 @@
  * - 怪物攻擊：max(1, 怪物 攻擊力 + 0~2 − 防禦力)
  * - 逃跑成功率 70%，頭目戰不能逃
  * - 頭目：3 個階段（體力 剩 2/3、1/3、0 換階段），每階段至少答對 2 題；最後一題是 L4
+ *   v0.9.3：頭目每進入下一個階段，攻擊傷害 +20%（×1、×1.2、×1.4）；還沒答夠題數時體力停在門檻上方一小段（看得見），畫面寫「再答對 N 題」
+ * - v0.9.3 親密度（番薯仔的愛心，最多 10 顆，隱藏屬性）：掉寶率、打倒怪物的經驗值都 ×（1＋N%）（不加金幣）
  * - 打倒＝怪物「清醒了，開心跑走」
  */
 (function () {
@@ -43,10 +45,34 @@
     return { damage: Math.max(1, Math.round(dmg)), crit: crit, speed: speed };
   }
 
-  function monsterAttack(monster, def, rng) {
+  /**
+   * 怪物攻擊：max(1, 攻擊力 + 0~2 − 防禦力) × mult（v0.9.3 頭目階段倍率，見 phaseMult），四捨五入、至少 1
+   */
+  function monsterAttack(monster, def, rng, mult) {
     rng = rng || Math.random;
-    return Math.max(1, (monster.atk || 1) + Math.floor(rng() * 3) - (def || 0));
+    var base = Math.max(1, (monster.atk || 1) + Math.floor(rng() * 3) - (def || 0));
+    return Math.max(1, Math.round(base * (mult || 1)));
   }
+
+  /** v0.9.3（老闆 2026-10-10）頭目每進入下一個階段，攻擊傷害 +20%：第 1 階段 ×1、第 2 階段 ×1.2、第 3 階段 ×1.4 */
+  var PHASE_DMG_STEP = 0.2;
+  function phaseMult(b) {
+    if (!b || !b.boss) return 1;
+    var ph = Math.max(1, Math.min(b.phase, b.phases));
+    return Math.round((1 + PHASE_DMG_STEP * (ph - 1)) * 100) / 100;
+  }
+
+  /**
+   * v0.9.3 親密度（番薯仔的愛心，老闆 2026-10-10 裁示的隱藏屬性，畫面上不說明、不顯示百分比）：
+   * 1 顆愛心 = 1%，最多 10 顆；加在掉寶率和戰鬥經驗值上，不加金幣。
+   */
+  var BOND_MAX = 10;
+  function bond(state) {
+    var n = Math.floor(Number(state && state.pet && state.pet.hearts) || 0);
+    return Math.max(0, Math.min(BOND_MAX, n));
+  }
+  /** 經驗值套用親密度：exp ×（1＋bondPct%），四捨五入 */
+  function bondExp(exp, bondPct) { return Math.round((exp || 0) * (1 + Math.max(0, bondPct || 0) / 100)); }
 
   function tryFlee(isBoss, rng) {
     if (isBoss) return false;
@@ -67,8 +93,24 @@
   function threshold(b, k) { return Math.round(b.maxHp * (1 - k / b.phases)); }
 
   /**
-   * 主角打中。回傳 {defeated, phaseUp, dealt}
-   * 頭目：階段＝體力 門檻；每階段至少要答對 perPhase 題（還沒答夠時 體力 停在門檻上方 1 點），
+   * 這一階段還沒答夠題數時，體力停在門檻上方多少：這一段體力的 10%（至少 1 點）。
+   * v0.9.3 修正（老闆問「BOSS 會鎖血嗎？」）：原本停在門檻上方 1 點，最後一階段就是「剩 1 點」，
+   * 體力條看起來已經空了卻打不倒。改成留下看得見的一小段，並由畫面寫出「再答對 N 題」。
+   */
+  function holdMargin(b) {
+    var seg = b.maxHp / b.phases;
+    return Math.max(1, Math.round(seg * 0.1));
+  }
+
+  /** 這一階段還要答對幾題（不管傷害）才能換階段／打倒；不是頭目回傳 0 */
+  function needCorrect(b) {
+    if (!b.boss || b.over) return 0;
+    return Math.max(0, b.perPhase - b.phaseCorrect);
+  }
+
+  /**
+   * 主角打中。回傳 {defeated, phaseUp, dealt, held}
+   * 頭目：階段＝體力 門檻；每階段至少要答對 perPhase 題（還沒答夠時 體力 停在門檻上方一小段，held＝true），
    *       答夠且 體力 到門檻才換下一階段 → 最少 3×2 = 6 題（07 第 3 節），傷害不夠時會多幾題。
    */
   function hit(b, dmg) {
@@ -77,8 +119,10 @@
     if (b.boss) {
       b.phaseCorrect += 1;
       var th = threshold(b, b.phase);
-      var hp = b.hp - dmg;
-      if (b.phaseCorrect < b.perPhase) hp = Math.max(hp, th + 1);
+      var hp = b.hp - dmg, held = false;
+      // 上一擊是被「撐住」的（體力是刻意留下的那一段）：這一擊答夠題數就一定過門檻，不會因為傷害小又卡住
+      if (b.held && b.phaseCorrect >= b.perPhase) hp = Math.min(hp, th);
+      if (b.phaseCorrect < b.perPhase && hp <= th) { hp = Math.max(hp, Math.min(before, th + holdMargin(b))); held = true; }
       var phaseUp = false, defeated = false;
       if (hp <= th) {
         hp = th;
@@ -86,8 +130,9 @@
         if (b.phase > b.phases) { defeated = true; hp = 0; } else phaseUp = true;
       }
       b.hp = Math.max(0, hp);
+      b.held = held;   // 體力停在門檻上方、等答夠題數（畫面顯示「再答對 N 題」）
       if (defeated) { b.over = true; b.result = 'win'; }
-      return { defeated: defeated, phaseUp: phaseUp, dealt: before - b.hp };
+      return { defeated: defeated, phaseUp: phaseUp, dealt: before - b.hp, held: held };
     }
     var d = Math.min(b.hp, dmg);
     b.hp -= d;
@@ -110,18 +155,25 @@
     return { damage: dmg, ko: state.player.hp <= 0 };
   }
 
-  function rollDrops(monster, rng) {
+  /** 掉寶。bondPct（親密度，0～10）：每一樣的掉落率 ×（1＋bondPct%）（例：30% → 33%；37 號設計），最多 100% */
+  function dropRate(d, bondPct) {
+    var base = d.rate === undefined ? 1 : Number(d.rate) || 0;
+    return Math.min(1, base * (1 + Math.max(0, bondPct || 0) / 100));
+  }
+  function rollDrops(monster, rng, bondPct) {
     rng = rng || Math.random;
     var got = [];
     (monster.drops || []).forEach(function (d) {
-      if (d && d.item && rng() < (d.rate === undefined ? 1 : d.rate)) got.push(d.item.replace(/^item_/, ''));
+      if (d && d.item && rng() < dropRate(d, bondPct)) got.push(d.item.replace(/^item_/, ''));
     });
     return got;
   }
 
-  /** 打倒怪物的獎勵（不含答題本身的 經驗值）：經驗值 × 地圖係數、金幣 */
-  function victoryReward(monster, coef) {
-    return { exp: Math.round((monster.exp || 0) * (coef || 1)), gold: Math.round(monster.gold || 0) };
+  /**
+   * 打倒怪物的獎勵（不含答題本身的 經驗值）：經驗值 × 地圖係數 ×（1＋親密度%）、金幣（親密度不加金幣）。四捨五入
+   */
+  function victoryReward(monster, coef, bondPct) {
+    return { exp: bondExp(Math.round((monster.exp || 0) * (coef || 1)), bondPct), gold: Math.round(monster.gold || 0) };
   }
 
   // ---------------------------------------------------------------- 時間條
@@ -135,9 +187,10 @@
 
   var Battle = {
     DIFF: DIFF, TIME_SEC: TIME_SEC, MODE_MULT: MODE_MULT, CRIT_MULT: CRIT_MULT, FAVORED_MULT: FAVORED_MULT, FLEE_RATE: FLEE_RATE,
-    BOSS_PHASES: BOSS_PHASES, PER_PHASE: PER_PHASE,
-    timeLimitMs: timeLimitMs, damage: damage, monsterAttack: monsterAttack, tryFlee: tryFlee,
-    create: create, hit: hit, needsFinalL4: needsFinalL4, heroHurt: heroHurt, rollDrops: rollDrops, victoryReward: victoryReward,
+    BOSS_PHASES: BOSS_PHASES, PER_PHASE: PER_PHASE, PHASE_DMG_STEP: PHASE_DMG_STEP, BOND_MAX: BOND_MAX,
+    timeLimitMs: timeLimitMs, damage: damage, monsterAttack: monsterAttack, phaseMult: phaseMult, bond: bond, bondExp: bondExp, tryFlee: tryFlee,
+    create: create, hit: hit, holdMargin: holdMargin, needCorrect: needCorrect, needsFinalL4: needsFinalL4, heroHurt: heroHurt,
+    dropRate: dropRate, rollDrops: rollDrops, victoryReward: victoryReward,
     createTimer: createTimer, tick: tick, tickFree: tickFree, expired: expired, remainingFrac: remainingFrac, pause: pause, resume: resume
   };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Battle = Battle; }

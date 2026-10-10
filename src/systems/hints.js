@@ -36,6 +36,7 @@
     if (method === 'card') {
       if ((state.inventory.guide || 0) < 1) return { ok: false, reason: 'no-card' };
       state.inventory.guide -= 1;
+      var st = state; if (st.startItems && (st.startItems['guide'] || 0) > (st.inventory['guide'] || 0)) { if (st.inventory['guide'] > 0) st.startItems['guide'] = st.inventory['guide']; else delete st.startItems['guide']; }   // v0.9.2 先用掉一開始給的
       return { ok: true, method: 'card' };
     }
     if (state.player.coins < HINT_COIN_COST) return { ok: false, reason: 'no-coins' };

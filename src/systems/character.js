@@ -52,6 +52,7 @@
     n = n || 1;
     if (count(state, id) < n) return false;
     state.inventory[id] -= n;
+    var st = state; if (st.startItems && (st.startItems[id] || 0) > (st.inventory[id] || 0)) { if (st.inventory[id] > 0) st.startItems[id] = st.inventory[id]; else delete st.startItems[id]; }   // v0.9.2 先用掉一開始給的
     if (state.inventory[id] === 0 && state.equipment.weapon !== id && state.equipment.armor !== id) delete state.inventory[id];
     return true;
   }

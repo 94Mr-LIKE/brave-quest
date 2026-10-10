@@ -49,11 +49,13 @@
    */
   function open(content, opts) {
     opts = opts || {};
-    var modal = opts.modal !== false;
-    var wrap = modal ? h('div.modal-back', {}, [content]) : content;
+    // v0.9.3 passMove：開著時主角仍然可以走（放大地圖）。遮罩變淡而且點得穿，搖桿照常顯示
+    var passMove = !!opts.passMove;
+    var modal = opts.modal !== false && !passMove;
+    var wrap = modal ? h('div.modal-back', {}, [content]) : (passMove ? h('div.modal-back.pass', {}, [content]) : content);
     if (opts.label) { content.setAttribute('role', 'dialog'); content.setAttribute('aria-modal', modal ? 'true' : 'false'); content.setAttribute('aria-label', opts.label); }
     layer.appendChild(wrap);
-    var entry = { node: wrap, content: content, onClose: opts.onClose, prevFocus: document.activeElement, escClose: opts.escClose !== false, modal: modal };
+    var entry = { node: wrap, content: content, onClose: opts.onClose, prevFocus: document.activeElement, escClose: opts.escClose !== false, modal: modal, passMove: passMove };
     stack.push(entry);
     setTimeout(function () {
       var f = opts.focus || focusables(content)[0];
@@ -80,11 +82,16 @@
   function syncBodyClass() {
     document.body.classList.toggle('modal-open', stack.some(function (e) { return e.modal; }));
     // v0.5：有「有關閉鈕的視窗」（.panel）開著時，右上角的提示泡泡移到畫面下方中央，不蓋住「關閉」按鈕
-    document.body.classList.toggle('panel-open', stack.some(function (e) { return e.modal && e.content.classList && e.content.classList.contains('panel'); }));
+    document.body.classList.toggle('panel-open', stack.some(function (e) { return (e.modal || e.passMove) && e.content.classList && e.content.classList.contains('panel'); }));
+    document.body.classList.toggle('pass-open', stack.some(function (e) { return e.passMove; }));
   }
 
   function closeAll() { while (stack.length) stack[stack.length - 1].handle.close(true); }
   function isOpen() { return stack.length > 0; }
+  /** v0.9.3 有沒有「擋住走路」的視窗（放大地圖這類 passMove 視窗不算） */
+  function blocksMove() { return stack.some(function (e) { return !e.passMove; }); }
+  /** v0.9.3 關掉所有 passMove 視窗（遇到怪物、換地圖時） */
+  function closePassMove() { stack.filter(function (e) { return e.passMove; }).forEach(function (e) { e.handle.close(); }); }
   function top() { return stack[stack.length - 1] || null; }
 
   function onKey(e) {
@@ -213,5 +220,5 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.UI = { init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
+  window.JQ.UI = { init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, blocksMove: blocksMove, closePassMove: closePassMove, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
 })();

@@ -108,6 +108,7 @@
     var defaults = State.createNewState(s.player.name, s.player.gender, 0);
     repairTypes(s, defaults);
     dropBadEntries(s.inventory, function (v) { return typeof v === 'number' && isFinite(v) && v >= 0; });
+    dropBadEntries(s.startItems, function (v) { return typeof v === 'number' && isFinite(v) && v >= 0; });
     dropBadEntries(s.quests, function (v) { return isObj(v) && typeof v.status === 'string'; });
     dropBadEntries(s.stats.subjects, isObj);
     dropBadEntries(s.adaptive.units, isObj);
@@ -121,10 +122,12 @@
   /** 舊版本存檔升級＋補預設值 */
   function migrate(s) {
     if (s.version === 1) migrateV1toV2(s);
+    State.migrateAudio(s.settings);   // v0.9.3 語速：舊的預設 1 倍 → 新的預設「稍快」（要在補預設值之前）
     var defaults = State.createNewState(s.player && s.player.name, s.player && s.player.gender, s.createdAt || 0);
     State.fillDefaults(s, defaults);
     repairState(s);
     Bestiary.backfill(s);   // v0.4 怪物名冊：舊存檔把已淨化的頭目補記為遇見、打倒各 1 次
+    State.trimStart(s);     // v0.9.2 舊存檔沒有 startItems：以建立角色時的初始配置推定，但不超過現在背包裡的數量
     s.player.name = State.cleanName(s.player.name);
     s.player.gender = State.cleanGender(s.player.gender);
     s.version = State.SCHEMA_VERSION;

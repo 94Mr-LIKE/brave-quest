@@ -39,6 +39,8 @@ window.WORLD = {
     { id: "R_SHENMU",   name: "神木森林",   real_ref: "嘉義阿里山",                           map_entry: "M04", tx: 34, ty: 53, x: 0.40, y: 0.53, unlock_quest: "Q_TUT_3" },
     { id: "R_FUCHENG",  name: "府城古城",   real_ref: "台南府城",                             map_entry: "M10", tx: 17,  ty: 51, x: 0.10, y: 0.68, unlock_quest: "Q_TUT_3" },
     { id: "R_MANGROVE", name: "紅樹林濕地", real_ref: "台北關渡自然公園（也參考台南四草）",   map_entry: "M05", tx: 55, ty: 49, x: 0.74, y: 0.05, unlock_quest: "Q_ELF_4" },
-    { id: "R_MOON",     name: "月世界",     real_ref: "高雄田寮月世界",                       map_entry: "M08", tx: 12,  ty: 46, x: 0.20, y: 0.71, unlock_quest: ["Q_GNO_4", "Q_GOB_4"] }
+    { id: "R_MOON",     name: "月世界",     real_ref: "高雄田寮月世界",                       map_entry: "M08", tx: 12,  ty: 46, x: 0.20, y: 0.71, unlock_quest: ["Q_GNO_4", "Q_GOB_4"] },
+    { id: "R_YEHLIU",   name: "野柳海蝕洞", real_ref: "新北市萬里區野柳地質公園（海蝕洞、蕈狀岩）", map_entry: "M06", tx: 2,  ty: 16, x: 0.87, y: 0.01, unlock_quest: null },
+    { id: "R_GOBLIN",   name: "哥布林村莊", real_ref: "（奇幻地點，接在野柳海蝕洞深處）",           map_entry: "M07", tx: 11, ty: 16, x: 0.88, y: 0.035, unlock_quest: null }
   ]
 };

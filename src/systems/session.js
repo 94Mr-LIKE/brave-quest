@@ -26,7 +26,10 @@
     return {
       state: state, questions: questions, subject: subject, rng: opts.rng || Math.random,
       mode: mode, expMult: opts.expMult || 1, filter: opts.filter || null, noRepeat: !!opts.noRepeat,
-      deferExp: !!opts.deferExp, pendingExp: 0,   // v0.7 戰鬥：答對的經驗值先記在存檔 player.pendingExp，戰鬥結束才一起加（pendingExp＝這場累積多少，顯示用）
+      // v0.9.3（老闆 2026-10-10 C1）戰鬥：答對、攻擊都不給經驗值和金幣，打倒怪物時才給（怪物的經驗值、金幣，見 game.js bvictory）；
+      // 逃跑、累倒都不給。forgone＝這場答對「本來會拿到」的數字（只給測試看）。
+      // 每日小任務的金幣等戰鬥結束才給：記在存檔 player.pendingDaily，由 settleBattle（戰鬥結束）或 settlePlayerExp（讀檔時）結算
+      deferExp: !!opts.deferExp, forgoneExp: 0, forgoneCoins: 0,
       asked: [], guard: J.Guard.create(), q: null, isVariant: false,
       wrongCount: 0, hintsOpened: 0, hintsUsed: false, erased: [], submitted: false, solved: false,
       shownAt: 0, finished: false
@@ -129,12 +132,14 @@
     if (reward.needVariant) st.pendingVariant = J.Rewards.makePending(q, reward.variantBonus);
     var levels = 0;
     if (sess.deferExp) {
-      // 記在存檔裡（不是只在記憶體）：戰鬥中重新整理，下次讀檔時一樣會結算，不會不見
-      st.player.pendingExp = (st.player.pendingExp || 0) + reward.exp;
-      sess.pendingExp += reward.exp;
+      // v0.9.3 戰鬥：答對不給經驗值和金幣（獎勵只來自打倒怪物，見 Battle.victoryReward；數值依 37 號設計重訂）。
+      // 只記下「本來會拿到多少」給測試看，不會加到主角身上
+      sess.forgoneExp += reward.exp;
+      sess.forgoneCoins += reward.coins;
+    } else {
+      levels = J.Exp.addExp(st.player, reward.exp);
+      st.player.coins += reward.coins;
     }
-    else levels = J.Exp.addExp(st.player, reward.exp);
-    st.player.coins += reward.coins;
     st.answered[q.id] = true;
     J.Report.recordDone(st, q, reward.firstTry);
 
@@ -147,7 +152,9 @@
       quest = J.Quest.recordCorrect(st);
       if (quest.questDone) { dailyDone = dailyDone.concat(J.Daily.record(st.daily, 'quest')); sess.finished = true; }
     }
-    dailyDone.forEach(function (t) { st.player.coins += t.reward; });
+    // 每日小任務的金幣：戰鬥中也等戰鬥結束才給（任務已經記成完成，所以逃跑、累倒時一樣會給，見 settleBattle）
+    // 記在存檔 player.pendingDaily（和完成狀態一起存），戰鬥中關掉分頁時，下次讀檔一樣拿得到
+    dailyDone.forEach(function (t) { if (sess.deferExp) st.player.pendingDaily = (Number(st.player.pendingDaily) || 0) + t.reward; else st.player.coins += t.reward; });
 
     return {
       status: 'correct', reward: reward, levelsGained: levels, dailyDone: dailyDone, quest: quest,
@@ -179,27 +186,44 @@
     var idx = J.Hints.pickEraseOption(sess.q, sess.erased, sess.rng);
     if (idx < 0) return { ok: false, reason: 'no-more' };
     st.inventory.eraser -= 1;
+    if (st.startItems && (st.startItems['eraser'] || 0) > (st.inventory['eraser'] || 0)) { if (st.inventory['eraser'] > 0) st.startItems['eraser'] = st.inventory['eraser']; else delete st.startItems['eraser']; }   // v0.9.2 先用掉一開始給的
     sess.erased.push(idx);
     sess.hintsUsed = true;
     return { ok: true, index: idx };
   }
 
-  /** 戰鬥結束：把戰鬥中答對累積的經驗值加到主角身上，回傳升了幾級 */
+  /** 舊介面（v0.7～v0.9.2）：只結算存檔裡留下的 player.pendingExp／pendingDaily；戰鬥結束請用 settleBattle */
   function settleExp(sess) {
     if (!sess) return 0;
-    sess.pendingExp = 0;
     return settlePlayerExp(sess.state);
   }
 
-  /** 存檔裡還沒結算的戰鬥經驗值（player.pendingExp）加到主角身上並歸零，回傳升了幾級。讀檔時也會呼叫 */
+  /**
+   * v0.9.3 戰鬥結束（打倒、逃跑、累倒都一樣）：答對不給經驗值和金幣；
+   * 只把這場完成的每日小任務金幣（player.pendingDaily）給出去（任務已經記成完成，不然就白做了），以及舊存檔留下的 player.pendingExp。
+   * 回傳 { daily（給了多少金幣）, levels }（只會給一次：給完歸零）
+   */
+  function settleBattle(sess) {
+    if (!sess) return { daily: 0, levels: 0 };
+    var p = sess.state.player, daily = Number(p.pendingDaily) || 0;
+    var levels = settlePlayerExp(sess.state);
+    return { daily: daily, levels: levels };
+  }
+
+  /**
+   * 存檔裡還沒結算的：戰鬥經驗值（player.pendingExp，v0.7～v0.9.2 的舊存檔）加到主角身上、
+   * 戰鬥中完成的每日小任務金幣（player.pendingDaily，v0.9.3）加到金幣，然後歸零。回傳升了幾級。讀檔時也會呼叫
+   */
   function settlePlayerExp(state) {
     var p = state && state.player;
-    var exp = p ? Number(p.pendingExp) || 0 : 0;
-    if (p) p.pendingExp = 0;
+    if (!p) return 0;
+    var exp = Number(p.pendingExp) || 0, daily = Number(p.pendingDaily) || 0;
+    p.pendingExp = 0; p.pendingDaily = 0;
+    if (daily > 0) p.coins += daily;
     return exp > 0 ? J.Exp.addExp(p, exp) : 0;
   }
 
-  var Session = { settleExp: settleExp, settlePlayerExp: settlePlayerExp, create: create, next: next, markShown: markShown, abandon: abandon, submit: submit, openHint: openHint, useEraser: useEraser };
+  var Session = { settleExp: settleExp, settleBattle: settleBattle, settlePlayerExp: settlePlayerExp, create: create, next: next, markShown: markShown, abandon: abandon, submit: submit, openHint: openHint, useEraser: useEraser };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Session = Session; }
   if (typeof module !== 'undefined') module.exports = Session;
 })();

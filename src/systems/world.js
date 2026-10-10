@@ -65,17 +65,18 @@
       var isEquip = it.kind === 'weapon' || it.kind === 'armor' || it.type === 'weapon' || it.type === 'armor';
       out[key] = {
         name: it.name || key, type: normType(it.type || it.kind || it.category, it),
-        price: Number(it.price || 0), sell: Number(it.sell || 0), atk: Number(it.atk || 0), def: Number(it.def || 0),
+        price: Number(it.price || 0), atk: Number(it.atk || 0), def: Number(it.def || 0),
         heal: Number(it.heal || eff.hp || (isEquip ? 0 : it.hp) || 0),
         mp: isEquip ? 0 : Number(eff.mp || 0),           // 消耗品回復的魔力
         mpBonus: isEquip ? Number(it.mp || 0) : 0,       // 裝備增加的魔力上限
         pet: Number(eff.pet || it.pet || 0),
         desc: it.desc || it.description || '', sprite: it.sprite || it.icon || ('item_' + key),
-        job: it.jobs || it.job || null, not_for_sale: !!it.not_for_sale
+        job: it.jobs || it.job || null, not_for_sale: !!it.not_for_sale,
+        precious: !!it.precious, rare: !!it.rare, quest: !!it.quest   // 重要任務道具、劇情關鍵道具（不能賣）
       };
     });
     Object.keys(CORE_ITEMS).forEach(function (id) {
-      if (!out[id]) out[id] = Object.assign({ atk: 0, def: 0, heal: 0, mp: 0, mpBonus: 0, pet: 0, sell: 0, job: null }, CORE_ITEMS[id]);
+      if (!out[id]) out[id] = Object.assign({ atk: 0, def: 0, heal: 0, mp: 0, mpBonus: 0, pet: 0, job: null }, CORE_ITEMS[id]);
     });
     return out;
   }

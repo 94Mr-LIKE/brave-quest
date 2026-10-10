@@ -5,6 +5,50 @@
   function h() { return J.UI.h.apply(null, arguments); }
   var LIMIT_LABEL = { 0: '不限' };
   var TIME_LABEL = { relaxed: '寬鬆（時間 1.5 倍）', standard: '標準', off: '關閉（不計時）' };
+  var VOL_OPTIONS = [{ value: 'small', label: '小' }, { value: 'mid', label: '中' }, { value: 'large', label: '大' }];
+  var SAMPLE_LINE = '你好！我是勇者大冒險的說書人，歡迎來到金包里。';
+
+  /**
+   * v0.9.3 語音模型：列出這台裝置可用的中文語音（下拉選單），選好就存起來並試聽一次。
+   * 「自動」＝依角色男女老少挑（原本的做法）。台語預錄音檔不受影響。
+   * 有些瀏覽器的語音清單要等一下才會出現：清單變了就重新整理這一塊。
+   */
+  function voicePicker(G, apply) {
+    var st = G.state, box = h('div.voice-pick');
+    function build() {
+      box.innerHTML = '';
+      var list = J.Voice.chineseVoices();
+      var cur = st.settings.voiceName || '';
+      var sel = h('select.voice-select', { 'aria-label': '選擇語音' });
+      sel.appendChild(h('option', { value: '', text: '自動（依角色挑選男女老少的聲音）' }));
+      list.forEach(function (v) {
+        sel.appendChild(h('option', { value: v.name, text: v.name + '（' + v.lang + (v.cloud ? '・雲端' : '・本機') + (v.quality ? '・高品質' : '') + '）' }));
+      });
+      // 存的語音不在這台裝置上（例如換了裝置）：照樣顯示，但標示找不到，實際念的時候會改用自動
+      if (cur && !list.some(function (v) { return v.name === cur; })) sel.appendChild(h('option', { value: cur, text: cur + '（這台裝置找不到，會改用自動）' }));
+      sel.value = cur;
+      sel.addEventListener('change', function () {
+        st.settings.voiceName = sel.value;
+        apply();
+        J.Voice.sayLine({ line: { who: 'narrator', text: SAMPLE_LINE }, who: 'narrator' });
+      });
+      var now = J.Voice.currentVoice('narrator');
+      box.appendChild(h('h3', { text: '語音（電腦合成的聲音）' }));
+      box.appendChild(h('div.row', {}, [sel,
+        h('button', { onclick: function () { J.Voice.sayLine({ line: { who: 'narrator', text: SAMPLE_LINE }, who: 'narrator' }); }, 'aria-label': '試聽目前的語音' }, ['🔊 試聽'])]));
+      box.appendChild(h('p.small.voice-now', { text: (now ? '目前的語音：' + now.name + (now.cloud ? '（雲端）' : '（本機）') + (now.quality ? '・高品質' : '')
+        : '目前的語音：這台裝置沒有中文語音（會用瀏覽器預設的聲音）') + (list.length ? '　這台裝置有 ' + list.length + ' 個中文語音。' : '') }));
+      box.appendChild(h('p.small', { text: '選了語音之後，所有角色的華語台詞都用這個聲音（音高、快慢仍依角色調整）。台語台詞的預錄語音不受影響。' }));
+    }
+    build();
+    try {
+      if (window.speechSynthesis && window.speechSynthesis.addEventListener) {
+        var onChange = function () { if (document.body.contains(box)) build(); else window.speechSynthesis.removeEventListener('voiceschanged', onChange); };
+        window.speechSynthesis.addEventListener('voiceschanged', onChange);
+      }
+    } catch (e) { /* 忽略 */ }
+    return box;
+  }
 
   /**
    * 家長確認：兩位數 × 兩位數。回傳 Promise<boolean>
@@ -86,19 +130,15 @@
       body.appendChild(radioRow('語音（對話、題目朗讀）', 'tts', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.tts, function (v) { st.settings.tts = v; apply(); }));
       if (st.settings.tts !== false) {
         body.appendChild(radioRow('對話自動念出來', 'vauto', [{ value: true, label: '自動' }, { value: false, label: '按 🔊 才念' }], st.settings.voiceAuto !== false, function (v) { st.settings.voiceAuto = v; apply(); }));
-        body.appendChild(radioRow('語音音量', 'vvol', [{ value: 0.4, label: '小' }, { value: 0.7, label: '中' }, { value: 0.9, label: '大' }],
-          [0.4, 0.7, 0.9].reduce(function (a, b) { return Math.abs(b - st.settings.voiceVolume) < Math.abs(a - st.settings.voiceVolume) ? b : a; }), function (v) { st.settings.voiceVolume = v; apply(); }));
-        body.appendChild(radioRow('語速', 'vrate', [{ value: 0.8, label: '慢' }, { value: 0.9, label: '稍慢' }, { value: 1, label: '標準' }, { value: 1.15, label: '稍快' }],
-          st.settings.voiceRate || 1, function (v) { st.settings.voiceRate = v; apply(); }));
+        // v0.9.3（老闆 2026-10-10）：音量「小／中／大」預設「中」（語音的「中」比以前大）；語速預設「稍快」
+        body.appendChild(radioRow('語音音量', 'vvol', VOL_OPTIONS, st.settings.voiceVol || 'mid', function (v) { st.settings.voiceVol = v; apply(); }));
+        body.appendChild(radioRow('語速', 'vrate', J.State.AUDIO.SPEEDS, J.State.AUDIO.nearestSpeed(J.State.AUDIO.voiceSpeed(st.settings)),
+          function (v) { st.settings.voiceSpeed = v; st.settings.voiceRate = v; apply(); }));
+        body.appendChild(voicePicker(G, apply));
         body.appendChild(radioRow('台語台詞', 'vlang', [{ value: 'taigi', label: '台語語音（電腦合成）' }, { value: 'huayu', label: '華語（提示音＋念華語翻譯）' }],
           st.settings.voiceLang || 'taigi', function (v) { st.settings.voiceLang = v; apply(); }));
         body.appendChild(radioRow('允許使用雲端高品質語音（不會傳送名字）', 'vcloud', [{ value: true, label: '允許' }, { value: false, label: '只用本機語音' }],
           st.settings.voiceCloud !== false, function (v) { st.settings.voiceCloud = v; apply(); }));
-        // 目前用的語音＋試聽
-        var cur = J.Voice.currentVoice('narrator');
-        var curText = cur ? '目前的語音：' + cur.name + (cur.cloud ? '（雲端）' : '（本機）') + (cur.quality ? '・高品質' : '') : '目前的語音：這台裝置沒有中文語音（會用瀏覽器預設的聲音）';
-        body.appendChild(h('div.row.voice-now', {}, [h('span', { text: curText }),
-          h('button', { onclick: function () { J.Voice.sayLine({ line: { who: 'narrator', text: '你好！我是勇者大冒險的說書人，歡迎來到金包里。' }, who: 'narrator' }); }, 'aria-label': '試聽目前的語音' }, ['🔊 試聽'])]));
         body.appendChild(h('p.small', { text: '朗讀是裝置內建的電腦合成語音（不是真人錄音）。選「華語」時，台語台詞會先響一聲提示音，再念華語翻譯；對話框照常顯示台語漢字和台羅。' }));
         body.appendChild(h('p.small.voice-credit', { text: '台語語音：以 Meta MMS-TTS 閩南語模型（facebook/mms-tts-nan，CC BY-NC 4.0）依教育部台羅合成，非真人錄音' }));
         body.appendChild(h('details.voice-tips', {}, [h('summary', { text: '🎧 讓聲音更自然' }),
@@ -110,8 +150,8 @@
       body.appendChild(radioRow('音效', 'sound', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.sound, function (v) { st.settings.sound = v; G.save(); G.applySettings(); }));
       body.appendChild(radioRow('音樂', 'music', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.music !== false, function (v) { st.settings.music = v; G.save(); G.applySettings(); }));
       if (st.settings.music !== false) {
-        body.appendChild(radioRow('音樂音量', 'mvol', [{ value: 0.3, label: '小' }, { value: 0.55, label: '中' }, { value: 0.8, label: '大' }],
-          [0.3, 0.55, 0.8].reduce(function (a, b) { return Math.abs(b - st.settings.musicVolume) < Math.abs(a - st.settings.musicVolume) ? b : a; }), function (v) { st.settings.musicVolume = v; G.save(); G.applySettings(); }));
+        // v0.9.3：「中」比以前小，避免音樂蓋過語音
+        body.appendChild(radioRow('音樂音量', 'mvol', VOL_OPTIONS, st.settings.musicVol || 'mid', function (v) { st.settings.musicVol = v; G.save(); G.applySettings(); }));
       }
       body.appendChild(radioRow('螢幕搖桿與 A／B 鍵', 'touch', [{ value: 'auto', label: '自動（觸控裝置才顯示）' }, { value: 'on', label: '一直顯示' }, { value: 'off', label: '不顯示' }],
         st.settings.touchControls || 'auto', function (v) { st.settings.touchControls = v; G.save(); G.applySettings(); }));
@@ -183,7 +223,8 @@
   function deviceInfo(G) {
     var st = G.state || { settings: {}, player: {} }, s = st.settings || {};
     var voice = (s.tts === false ? '朗讀關' : '朗讀開') + '・' + (s.voiceAuto === false ? '按鍵才念' : '自動念') + '・台語台詞：' + (s.voiceLang === 'huayu' ? '華語' : '台語語音') +
-      '・雲端語音：' + (s.voiceCloud === false ? '不允許' : '允許') + '・語速 ' + (s.voiceRate || 1);
+      '・雲端語音：' + (s.voiceCloud === false ? '不允許' : '允許') + '・語速 ' + J.State.AUDIO.voiceSpeed(s) +
+      '・語音 ' + (s.voiceName || '自動') + '・音量 語音' + ({ small: '小', mid: '中', large: '大' }[s.voiceVol] || '中') + '／音樂' + ({ small: '小', mid: '中', large: '大' }[s.musicVol] || '中');
     return {
       version: window.JQ_VERSION || '開發版',
       map: G.mapScene ? G.mapScene.mapId : (st.location && st.location.map) || '',

@@ -66,6 +66,9 @@ button[aria-pressed="true"], button.selected { background: #f2c14e; color: #2a1e
 
 /* ---------- 遮罩與面板 ---------- */
 .modal-back { position: absolute; inset: 0; background: rgba(6, 10, 30, .55); display: flex; align-items: center; justify-content: center; padding: 10px; }
+/* v0.9.3 放大地圖開著時也能走：遮罩變淡、點得穿（搖桿在遮罩上方照常可用） */
+.modal-back.pass { background: rgba(6, 10, 30, .18); pointer-events: none; }
+.modal-back.pass > * { pointer-events: auto; }
 .panel { width: min(920px, 96vw); max-height: 94vh; overflow: auto; }
 .panel.narrow { width: min(620px, 96vw); }
 .panel .close { float: right; }
@@ -109,6 +112,8 @@ textarea { font-size: 20px; min-height: 120px; }
 .bar.mp > i { background: #6ab8ff; }
 .bar.exp > i { background: var(--accent); }
 .bar.boss > i { background: #ff8a6a; }
+.bar.boss > b.phase-mark { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #fff3c8; opacity: .85; }   /* v0.9.3 頭目階段分隔線 */
+.boss-need { color: #ffd34d; margin-top: 2px; }
 .hud-buttons { display: flex; gap: 6px; }
 .hud-buttons button { padding: 4px 10px; font-size: 20px; white-space: nowrap; }
 .map-banner { position: absolute; left: 50%; top: 64px; transform: translateX(-50%); font-size: 26px; padding: 8px 24px; pointer-events: none; animation: fadeout 2.6s forwards; }
@@ -310,3 +315,5 @@ body.modal-open .load-bar { display: none; }
 .minimap { display: flex; flex-direction: column; align-items: center; }
 .minimap .mm-caption { display: block; font-size: 14px; line-height: 1.3; color: #fff3c8; padding: 3px 4px 1px; white-space: nowrap; }
 .minimap .mm-caption[hidden] { display: none; }
+.minimap .mm-level { display: block; font-size: 14px; line-height: 1.3; color: #9fe0ff; padding: 1px 4px 3px; white-space: nowrap; }   /* v0.9.3 建議等級 */
+.minimap .mm-level[hidden] { display: none; }

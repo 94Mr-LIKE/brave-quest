@@ -44,7 +44,7 @@
     var shops = [];
     if (map.shop) shops.push({ kind: SIGN_KIND[map.shop.shop_id] || 'general', x: map.shop.x, y: map.shop.y });
     (map.extra_shops || []).forEach(function (s) { shops.push({ kind: SIGN_KIND[s.shop_id] || 'general', x: s.x, y: s.y }); });
-    if (map.inn) shops.push({ kind: 'inn', x: map.inn.x, y: map.inn.y });
+    if (map.inn) shops.push({ kind: 'inn', x: map.inn.x, y: map.inn.y, text: map.inn.sign || null });   // v0.9.3 B14 各地旅店的招牌字
     return shops.map(function (s) {
       var best = null, bestD = 99;
       for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
@@ -53,8 +53,81 @@
         if (d < bestD) { bestD = d; best = { x: s.x + dx, y: s.y + dy }; }
       }
       var at = best || { x: s.x, y: s.y };
-      return { kind: s.kind, text: SIGN_TEXT[s.kind], x: at.x, y: Math.max(0, at.y - 1), npcX: s.x, npcY: s.y, onDoor: !!best };
+      return { kind: s.kind, text: s.text || SIGN_TEXT[s.kind], custom: !!s.text, x: at.x, y: Math.max(0, at.y - 1), npcX: s.x, npcY: s.y, onDoor: !!best };
     });
+  }
+
+  // ---------------------------------------------------------------- 建議等級（v0.9.3，37_現行版等級與怪物數值調整.md 第 3 節）
+  /** maps.js 有 rec_level: [低, 高] 就用它；沒有時用這張表（金包里沒有野怪，不標） */
+  var REC_LEVEL = { M02: [1, 4], M03: [3, 6], M04: [5, 8], M09: [6, 9], M05: [9, 12], M06: [11, 14], M07: [12, 14], M08: [14, 17], M10: [16, 19], M11: [18, 20] };
+  function recLevel(map, mapId) {
+    var r = map && Array.isArray(map.rec_level) && map.rec_level.length === 2 ? map.rec_level : REC_LEVEL[mapId || (map && map.id)];
+    return r ? [Number(r[0]), Number(r[1])] : null;
+  }
+  /** 「Lv1–4」；沒有建議等級時 '' */
+  function levelText(map, mapId) {
+    var r = recLevel(map, mapId);
+    return r ? 'Lv' + r[0] + (r[1] !== r[0] ? '–' + r[1] : '') : '';
+  }
+  /** 地圖名稱＋建議等級：「擎天草原 Lv1–4」 */
+  function nameWithLevel(map, mapId) {
+    var lt = levelText(map, mapId), name = (map && map.name) || mapId || '';
+    return lt ? name + ' ' + lt : name;
+  }
+
+  // ---------------------------------------------------------------- 會走動的動物 NPC（v0.9.3 B11 擎天崗的黃牛）
+  /**
+   * maps.js 的 animals: [{ id, sprite, area: [x, y, w, h], count, name（預設「黃牛」）, say（預設「哞～」）}]
+   * 不能戰鬥；在 area 裡「可走、不是出口、不是上層格 U」的格子上慢慢走。
+   */
+  function animalSpecs(map) {
+    return ((map && map.animals) || []).filter(function (a) { return a && Array.isArray(a.area) && a.area.length === 4; }).map(function (a, i) {
+      return { id: a.id || ('animal_' + i), sprite: a.sprite || 'npc_cow', area: a.area, count: Math.max(1, Math.min(6, a.count | 0 || 1)),
+        name: a.name || '黃牛', say: a.say || '哞～' };
+    });
+  }
+  /** 動物可以站的格子。walk(x,y)：地圖可走；不含出口、上層格 U */
+  function animalTiles(map, area, walk) {
+    var out = [];
+    for (var y = area[1]; y < area[1] + area[3]; y++) for (var x = area[0]; x < area[0] + area[2]; x++) {
+      if (walk(x, y) && !World.exitAt(map, x, y) && World.charAt(map, x, y) !== 'U') out.push({ x: x, y: y });
+    }
+    return out;
+  }
+  /** 被主角碰到時要走開：挑離主角最遠的幾格之一（rng 0～1） */
+  function awayTarget(tiles, from, player, rng) {
+    if (!tiles.length) return null;
+    var d = function (t) { return Math.abs(t.x - player.x) + Math.abs(t.y - player.y); };
+    var sorted = tiles.filter(function (t) { return t.x !== from.x || t.y !== from.y; }).sort(function (a, b) { return d(b) - d(a); });
+    var top = sorted.slice(0, Math.max(1, Math.ceil(sorted.length / 4)));
+    return top[Math.floor((rng || Math.random)() * top.length)] || null;
+  }
+
+  // ---------------------------------------------------------------- 旅店（v0.9.3 B14 各地旅店不一樣）
+  /**
+   * 旅店老闆說的台詞 ID：maps.js 的 inn.dialog；沒有設定時，站櫃 NPC 用自己的台詞，沒有 NPC 的旅店用 D_INN_IDLE
+   */
+  function innDialog(map, npc) {
+    var inn = map && map.inn;
+    if (inn && inn.dialog) return inn.dialog;
+    if (npc && !npc.virtual && npc.dialog) return npc.dialog;
+    return 'D_INN_IDLE';
+  }
+  /** 旅店老闆台詞的說話者（例：inn_shenmu）；找不到時 null */
+  function innSpeaker(map, dialogs) {
+    var lines = (dialogs || {})[innDialog(map, null)] || [];
+    var who = lines.length && lines[0].who;
+    return who && who !== 'narrator' && who !== 'pet' ? who : null;
+  }
+  /**
+   * 旅店老闆的稱呼：一律以 SPEAKERS 為準（例：「樹屋旅店老闆娘」，性別和聲音一致）；
+   * 台詞的說話者不在 SPEAKERS 時才用「inn.name＋老闆」，再沒有就「旅店老闆」
+   */
+  function innKeeperName(map, dialogs, speakers) {
+    var who = innSpeaker(map, dialogs);
+    if (who && speakers && typeof speakers[who] === 'string' && speakers[who]) return speakers[who];
+    var inn = map && map.inn;
+    return (inn && inn.name ? inn.name : '旅店') + '老闆';
   }
 
   // ---------------------------------------------------------------- 背景音樂
@@ -105,8 +178,16 @@
    * 沒寫時，洞窟裡的部落（type 'tribe'、tileset 'cave'，例如哥布林部落）在大型擺設 'K'（篝火、燈台）上加光。
    * 知識燈點亮後的光由程式另外加（lamps）。
    */
+  /** 光暈顏色 '#rrggbb' → [r, g, b]；格式不對或沒給 → null（用原本的暖色） */
+  function glowRgb(color) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(color || ''));
+    if (!m) return null;
+    var n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
   function lightSpots(map) {
-    if (Array.isArray(map.lights)) return map.lights.map(function (l) { return { x: l.x, y: l.y, r: l.r || 1 }; });
+    // v0.9.3：color（例：藍水晶 #a8dcff、紫水晶與祭壇 #a98bff）；沒寫 color 的維持暖色
+    if (Array.isArray(map.lights)) return map.lights.map(function (l) { var o = { x: l.x, y: l.y, r: l.r || 1 }; if (glowRgb(l.color)) o.color = l.color; return o; });
     var out = [];
     if (map.type === 'tribe' && map.tileset === 'cave') {
       (map.grid || []).forEach(function (row, y) { for (var x = 0; x < row.length; x++) if (row.charAt(x) === 'K') out.push({ x: x, y: y, r: 1.2 }); });
@@ -261,8 +342,8 @@
     return false;
   }
 
-  var MapInfo = { SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
-    wanderTarget: wanderTarget, petSpot: petSpot, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
+  var MapInfo = { animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+    wanderTarget: wanderTarget, petSpot: petSpot, glowRgb: glowRgb, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
     LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.MapInfo = MapInfo; }
   if (typeof module !== 'undefined') module.exports = MapInfo;

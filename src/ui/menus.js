@@ -96,14 +96,14 @@
           list.appendChild(h('li', {}, [icon(it, it.id), h('div.what', {}, [h('b', { text: it.name }), h('span.small', { text: '　已有 ' + have }), h('div.small', { text: it.desc + (info.length ? '（' + info.join('、') + '）' : '') })]), b]));
         });
       } else {
-        // v0.9.1：裝備和道具可以賣（原價 50%，無條件捨去）；素材照收購價。身上正在用的、珍貴道具、委託要用的不能賣
-        body.appendChild(h('p.small', { text: '裝備和道具用原價的一半收購；身上正在用的要先卸下，珍貴道具和委託要用的東西不能賣。' }));
+        // v0.9.2：裝備原價 50%、道具 25%（無條件捨去）；任務素材、重要任務道具、一開始拿到的不能賣；身上正在用的要先卸下
+        body.appendChild(h('p.small', { text: '裝備用原價的一半收購，道具用原價的四分之一。任務素材、重要任務道具和一開始拿到的東西不能賣；身上正在用的要先卸下。' }));
         var rows = J.Shop.sellList(st, D.items, D.quests);
         if (!rows.length) list.appendChild(h('li', { text: '背包裡沒有可以賣的東西。' }));
-        var WHY = { equipped: '正在裝備中，先到背包卸下才能賣', precious: '珍貴道具，不能賣', quest: '委託要用，先留著喔', free: '這個不能賣' };
+        var WHY = { material: '任務素材，不能賣', equipped: '正在裝備中，先到背包卸下才能賣', quest: '重要任務道具', start: '一開始拿到的，不能賣', free: '這個不能賣' };
         rows.forEach(function (r) {
           var it = r.item;
-          var note = r.ok ? (r.equipped ? '（身上正在用 1 個，其他的可以賣）' : '') : WHY[r.reason];
+          var note = r.ok ? (r.count < r.have ? '（可以賣 ' + r.count + ' 個' + (r.start ? '；一開始拿到的 ' + r.start + ' 個不能賣' : '') + (r.equipped ? '；身上正在用 1 個' : '') + '）' : '') : WHY[r.reason];
           list.appendChild(h('li.sell-row', { 'data-id': r.id }, [icon(it, r.id), h('div.what', {}, [h('b', { text: it.name + ' ×' + r.have + (r.equipped ? '（裝備中）' : '') }),
             h('div.small', { text: note || it.desc })]),
             h('button', { disabled: !r.ok, onclick: function () { sell(r.id); } }, [r.ok ? '賣 1 個（' + r.price + ' 金幣）' : '不能賣'])]));
@@ -151,7 +151,7 @@
       J.UI.confirm('要把「' + it.name + '」賣掉 1 個嗎？可以拿到 ' + price + ' 金幣。', '賣掉', '不要').then(function (yes) {
         if (!yes) return;
         var r = J.Shop.sell(st, id, D.items, D.quests);
-        if (!r.ok) { J.UI.toast(r.reason === 'equipped' ? '正在裝備中，先卸下才能賣。' : '這個不能賣。'); render(); return; }
+        if (!r.ok) { J.UI.toast({ equipped: '正在裝備中，先卸下才能賣。', quest: '這是重要任務道具，不能賣。', material: '這是任務素材，不能賣。', start: '這是一開始拿到的，不能賣。' }[r.reason] || '這個不能賣。'); render(); return; }
         J.Audio.play('select');
         J.UI.toast('賣掉了「' + it.name + '」，拿到 ' + r.price + ' 金幣！');
         G.save(); G.refreshHud(); render();
@@ -174,10 +174,10 @@
     handle = J.UI.open(panel, { label: '冒險手帳' });
     // ---------- 怪物名冊：遇見過的顯示圖、名稱、出沒地區、叫聲、打倒次數；沒遇見顯示剪影「？？？」
     function renderBook() {
-      var c = J.Bestiary.counts(st, D.monsters);
+      var c = J.Bestiary.counts(st, D.monsters, D.maps);   // v0.9.3 只算至少出現在一張地圖的怪物
       body.appendChild(h('p', { text: '遇見 ' + c.seen + '／' + c.total + ' 種・小怪各打倒 3 次：' + c.mobsDefeated3 + '／' + c.mobs + '・頭目：' + c.bossesDefeated + '／' + c.bosses }));
       var rw = h('ul.list.book-rewards', { 'aria-label': '收集獎勵' });
-      J.Bestiary.rewards(st, D.monsters).forEach(function (r) {
+      J.Bestiary.rewards(st, D.monsters, D.maps).forEach(function (r) {
         var label = [];
         if (r.reward.gold) label.push('金幣 ' + r.reward.gold);
         if (r.reward.item) label.push((D.items[r.reward.item] || {}).name + ' ×' + (r.reward.n || 1));
@@ -191,7 +191,7 @@
       body.appendChild(rw);
       var V = (window.VOICES && window.VOICES.monsters) || {};
       var grid = h('ul.list.book', { 'aria-label': '怪物名冊' });
-      J.Bestiary.split(D.monsters).all.forEach(function (id) {
+      J.Bestiary.split(D.monsters, D.maps).all.forEach(function (id) {
         var m = D.monsters[id], r = (st.bestiary || {})[id] || { seen: 0, defeated: 0 };
         var known = r.seen > 0;
         var icon = h('span.icon.book-icon' + (known ? '' : '.unknown'), { html: J.Assets.domIcon(m.sprite, { size: 56, label: known ? m.name : '?', alt: '' }) });
@@ -215,7 +215,7 @@
       }
     }
     function claim(id) {
-      var r = J.Bestiary.claim(st, D.monsters, id);
+      var r = J.Bestiary.claim(st, D.monsters, id, D.maps);
       if (!r.ok) return;
       G.rareItem();   // 名冊獎勵＝珍貴道具短曲 rare_item
       var rw = r.reward, msg = [];
@@ -286,7 +286,7 @@
   // ---------------------------------------------------------------- 旅店
   function inn(G, mapId, innInfo) {
     var price = innInfo && innInfo.price ? innInfo.price : 0;
-    return J.UI.confirm('要在旅店休息嗎？體力和魔力會全部回滿。' + (price ? '（' + price + ' 金幣）' : '（免費）'), '休息', '先不用').then(function (yes) {
+    return J.UI.confirm('要在' + ((innInfo && innInfo.name) || '旅店') + '休息嗎？體力和魔力會全部回滿。' + (price ? '（' + price + ' 金幣）' : '（免費）'), '休息', '先不用').then(function (yes) {
       if (!yes) return false;
       if (price && G.state.player.coins < price) { J.UI.toast('金幣不夠喔。'); return false; }
       G.state.player.coins -= price;

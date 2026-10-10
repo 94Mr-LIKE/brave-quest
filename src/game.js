@@ -12,7 +12,8 @@
     state: null, data: null, questions: [], provider: null, phaser: null, mapScene: null, busy: false,
     held: {}, heldOrder: [], tickTimer: 0, lastSave: 0, npcIndex: {}, battleCtx: null,
     joy: { dir: null, force: 0 },
-    DEBUG: /[?&]debug=1\b/.test(location.search),   // 開發者模式：碰撞格子疊圖
+    // 開發者模式（碰撞格子疊圖，會看到寶箱位置）：只在本機開啟（localhost、127.0.0.1、file://）；正式網站帶了參數也不開
+    DEBUG: /[?&]debug=1\b/.test(location.search) && (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\]|::1)$/.test(location.hostname)),
     BIGPILOT: /[?&]debug=bigpilot\b/.test(location.search),   // v0.5：試做大地圖（art_src/bigpilot）暫時取代 M02
     // 測試用：把最大貼圖尺寸調小（例如 ?maxtex=1024），檢查大背景自動切塊
     MAX_TEX_OVERRIDE: (function () { var m = /[?&]maxtex=(\d+)/.exec(location.search); return m ? Math.max(256, Number(m[1])) : 0; })(),
@@ -235,11 +236,13 @@
     var s = G.state.settings;
     J.Audio.setEnabled(s.sound !== false);
     J.TTS.setEnabled(s.tts !== false);
-    J.Voice.configure({ volume: typeof s.voiceVolume === 'number' ? s.voiceVolume : 0.9, rateMult: s.voiceRate || 1, pref: s.voiceLang || 'taigi',
+    // v0.9.3：音量「小／中／大」、語速預設「稍快」、家長選的語音（數值見 state.js 的 AUDIO）
+    var A = J.State.AUDIO;
+    J.Voice.configure({ volume: A.voiceVolume(s), rateMult: A.voiceSpeed(s), pref: s.voiceLang || 'taigi', voiceName: s.voiceName || '',
       allowCloud: s.voiceCloud !== false, playerName: G.state.player.name || '' });   // 雲端語音念的文字會把這個名字換成「勇者」
     J.HUD.setTouchMode(s.touchControls || 'auto');
     if (G.musicReady()) {
-      try { window.JQ.Music.setEnabled(s.music !== false); window.JQ.Music.setVolume(typeof s.musicVolume === 'number' ? s.musicVolume : 0.55); } catch (e) { /* 忽略 */ }
+      try { window.JQ.Music.setEnabled(s.music !== false); window.JQ.Music.setVolume(A.musicVolume(s)); } catch (e) { /* 忽略 */ }
     }
     if (G.limitHandle && !J.Playtime.isOverLimit(G.state.playtime, s, Date.now())) { G.limitHandle.close(true); G.limitHandle = null; }
   };
@@ -253,6 +256,8 @@
     G.musicLog.push('bgm:' + id);
     G.currentBgm = id;
     if (!G.musicReady() || (G.state && G.state.settings.music === false)) return;
+    // v0.9.3 還沒讀存檔（標題畫面）時也用新的預設音量「中」
+    if (!G.state) { try { window.JQ.Music.setVolume(J.State.AUDIO.MUSIC_VOL.mid); } catch (e) { /* 忽略 */ } }
     try { window.JQ.Music.playBgm(id); } catch (e) { /* 音樂出錯不影響遊戲 */ }
   };
   G.stopBgm = function (ms) { if (G.musicReady()) { try { window.JQ.Music.stopBgm(ms || 300); } catch (e) { /* 忽略 */ } } };
@@ -281,7 +286,10 @@
     if (who === 'hero' || who === 'player') { name = G.state.player.name; sprite = G.heroKey(); }
     else if (who === 'pet') { name = name || '番薯仔'; sprite = 'pet_imo'; }
     else if (who === 'narrator') { name = ''; }
-    else if (who === '__inn') { name = '旅店老闆'; sprite = 'npc_innkeeper'; }
+    else if (/^animal:/.test(who)) { name = who.slice(7); sprite = G.animalSprite || null; }   // v0.9.3 會走動的動物（黃牛）
+    // v0.9.3 B14：旅店老闆的稱呼以 SPEAKERS 為準（例：「樹屋旅店老闆娘」）
+    else if (who === '__inn') { name = J.MapInfo.innKeeperName(G.mapScene && G.mapScene.map, G.data.dialogs, SP); sprite = 'npc_innkeeper'; }
+    else if (/^inn_/.test(who) && !G.npcIndex[who]) { sprite = 'npc_innkeeper'; }
     else if (G.npcIndex[who]) { sprite = G.npcIndex[who].npc.sprite; name = name || G.npcIndex[who].npc.name || who; }
     else if (G.data.monsters[who]) { sprite = G.data.monsters[who].sprite; name = name || G.data.monsters[who].name; }
     if (name === null) name = who;
@@ -340,7 +348,7 @@
       var spot = w(map.inn.x, map.inn.y + 1) ? { c: map.inn.x, r: map.inn.y + 1 } : J.Pathfind.nearestWalkable(w, scene.size.w, scene.size.h, { c: map.inn.x, r: map.inn.y }, null);
       if (spot) J.Character.setInn(st, scene.mapId, spot.c, spot.r);
     }
-    J.HUD.mapBanner(map.name || scene.mapId);
+    J.HUD.mapBanner(J.MapInfo.nameWithLevel(map, scene.mapId));   // v0.9.3 地名＋建議等級「擎天草原 Lv1–4」
     G.bgm(J.MapInfo.bgmFor(map));
     if (J.Minimap) J.Minimap.attach(G, scene);
     G.refreshHud();
@@ -353,6 +361,7 @@
 
   G.changeMap = function (to, x, y, facing) {
     if (!G.data.maps[to]) { console.warn('[地圖] 不存在：' + to); return; }
+    J.UI.closePassMove();   // v0.9.3 開著放大地圖走到出口：換地圖前把舊地圖關掉
     G.state.location = { map: to, x: x, y: y };
     G.save();
     var sc = G.mapScene;
@@ -368,9 +377,11 @@
     var MAP = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', w: 'up', s: 'down', a: 'left', d: 'right', W: 'up', S: 'down', A: 'left', D: 'right' };
     window.addEventListener('keydown', function (e) {
       var tag = e.target && e.target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (J.UI.isOpen()) return;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      // v0.9.3 放大地圖（passMove 視窗）開著時方向鍵照樣能走；其他視窗開著時不動
+      if (J.UI.blocksMove()) return;
       if (MAP[e.key]) { G.setHeld(MAP[e.key], true); e.preventDefault(); }
+      else if (J.UI.isOpen()) return;
       else if ((e.key === 'z' || e.key === 'Z' || e.key === ' ' || e.key === 'Enter') && (tag !== 'BUTTON')) {
         if (G.mapScene && G.state) { e.preventDefault(); G.mapScene.actionKey(); }
       }
@@ -427,7 +438,7 @@
     var f = ids.length ? J.QuestLog.forNpc(st, Q, npc.id, ids) : null;
     // 旅店、商店老闆如果也有委託，先處理委託
     if (f && r.role !== 'quest') r = { role: 'quest' };
-    if (r.role === 'inn') { G.say(npc.dialog, [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
+    if (r.role === 'inn') { G.say(J.MapInfo.innDialog(map, npc), [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
     if (r.role === 'shop') { G.say(npc.dialog, []).then(function () { J.Menus.shop(G, r.info.shop_id || 'general'); }); return; }
     if (r.role === 'travel') { G.say(npc.dialog, [{ who: npc.id, text: '要搭車去哪裡呢？' }]).then(function () { G.openWorldMap(); }); return; }
     if (r.role === 'guild') {
@@ -469,7 +480,7 @@
   /** 接到頭目委託後，讓頭目出現在地圖上（同一張圖時立刻出現） */
   G.respawnBosses = function () {
     var sc = G.mapScene;
-    if (!sc) return;
+    if (!sc || !sc.p) return;   // 地圖還在載入（create 之前）：建好時 buildMonsters 會自己放頭目
     (sc.map.spawns || []).forEach(function (s) {
       if (!(s.boss && s.quest)) return;
       if (sc.monsters.some(function (m) { return m.spawn === s; })) return;
@@ -606,6 +617,13 @@
     G.openWorldMap();
   };
 
+  /** v0.9.3 面對動物按 A：「哞～」跳出一句話（不能戰鬥） */
+  G.animalTalk = function (spec) {
+    G.animalSprite = spec.sprite;
+    J.Audio.play('select');
+    return G.say(null, [{ who: 'animal:' + spec.name, text: spec.say }]);
+  };
+
   G.inspectLamp = function (lamp, scene) {
     var st = G.state;
     if (st.lamps[lamp.subject]) { G.say('D_LAMP_LIT', [{ who: 'pet', text: lamp.subject + '燈亮亮的，好溫暖！' }]); return; }
@@ -635,8 +653,31 @@
   };
 
   // ---------------------------------------------------------------- 戰鬥
+  /** 最終頭目：五科輪流出題、或在最高等級地圖的頭目（和最終頭目 BGM 同一個判斷） */
+  G.isFinalBoss = function (mon, map) { return !!(mon && mon.boss && J.MapInfo.battleBgm(mon, map) === 'final'); };
+
+  /**
+   * v0.9.3（老闆核准）最終頭目和每日時間上限：進場前看今天還剩多少時間。
+   * 剩 25 分鐘以上（或家長設定不限時）直接進場；剩 10～25 分鐘提醒可能打不完，讓孩子選；不到 10 分鐘不讓進場。
+   * 最終頭目重新挑戰時從頭開始（每次進場都是新的一場）。回傳 Promise<boolean>（true＝進場）
+   */
+  G.finalBossGate = function () {
+    var st = G.state, gate = J.Playtime.finalBossGate(st.playtime, st.settings, Date.now());
+    G.lastFinalGate = gate;   // 測試用
+    if (gate.action === 'go') return Promise.resolve(true);
+    if (gate.action === 'ask') {
+      return J.UI.confirm('今天剩 ' + gate.minutes + ' 分鐘，可能打不完，要現在挑戰還是明天再來？（沒打完的話，下次要從頭開始喔）', '現在挑戰', '明天再來')
+        .then(function (yes) {
+          if (!yes) return G.say(null, [{ who: 'pet', text: '好！明天精神飽滿再來挑戰！' }]).then(function () { return false; });
+          return true;
+        });
+    }
+    return G.say(null, [{ who: 'pet', text: '今天只剩 ' + gate.minutes + ' 分鐘，打不完的。明天再來挑戰吧！' }]).then(function () { return false; });
+  };
+
   G.startBattle = function (mob, scene) {
     var map = scene.map, mon = mob.mon;
+    J.UI.closePassMove();   // v0.9.3 開著放大地圖走路時遇到怪物：先把地圖關掉
     G.battleCtx = { mob: mob, mon: mon, mapId: scene.mapId, over: false };
     var bg = G.battleBgFor(mon, scene.mapId);
     J.Bestiary.seen(G.state, mon.id);   // 怪物名冊：遇見
@@ -691,8 +732,16 @@
     var ctx = G.battleCtx, st = G.state, s = G.stats(), b = ctx.b, mon = ctx.mon, h = J.UI.h;
     var pct = function (a, m) { return Math.max(0, Math.min(100, Math.round(a / m * 100))); };
     ctx.el.top.innerHTML = '';
-    ctx.el.top.appendChild(h('div', { text: mon.name + (b.boss ? '　第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段' : '') }));
-    ctx.el.top.appendChild(h('span.bar.boss', { role: 'progressbar', 'aria-label': mon.name + ' 的體力', 'aria-valuenow': String(pct(b.hp, b.maxHp)), style: { width: '220px' } }, [h('i', { style: { width: pct(b.hp, b.maxHp) + '%' } })]));
+    // v0.9.3 頭目：寫出第幾階段、還剩幾個階段、這一階段還要答對幾題；體力條上畫出階段的分隔線
+    var ph = Math.min(b.phase, b.phases), left = b.phases - ph;
+    var phaseText = b.boss ? '　第 ' + ph + '/' + b.phases + ' 階段' + (left ? '（還剩 ' + left + ' 個階段）' : '（最後階段）') : '';
+    ctx.el.top.appendChild(h('div.boss-phase', { text: mon.name + phaseText }));
+    var marks = [];
+    if (b.boss) for (var k = 1; k < b.phases; k++) marks.push(h('b.phase-mark', { style: { left: Math.round((1 - k / b.phases) * 100) + '%' } }));
+    var hpPct = b.hp > 0 ? Math.max(1, pct(b.hp, b.maxHp)) : 0;   // 還有體力時至少畫 1%，不會看起來是空的
+    ctx.el.top.appendChild(h('span.bar.boss', { role: 'progressbar', 'aria-label': mon.name + ' 的體力', 'aria-valuenow': String(hpPct), style: { width: '220px' } }, [h('i', { style: { width: hpPct + '%' } })].concat(marks)));
+    var need = J.Battle.needCorrect(b);
+    if (b.boss && !b.over && need > 0 && b.held) ctx.el.top.appendChild(h('div.small.boss-need', { text: '再答對 ' + need + ' 題' + (left ? '進入下一階段' : '就能打倒') }));
     ctx.el.status.innerHTML = '';
     ctx.el.status.appendChild(h('div', { html: '<b style="color:#ffd34d">' + J.UI.esc(st.player.name) + '</b>　等級 ' + st.player.level }));
     ctx.el.status.appendChild(h('div', {}, ['體力 ', h('span.bar.hp', { role: 'progressbar', 'aria-label': '體力' }, [h('i', { style: { width: pct(st.player.hp, s.maxHp) + '%' } })]), ' ' + st.player.hp + '/' + s.maxHp]));
@@ -777,8 +826,12 @@
       var h = J.Battle.hit(b, d.damage);
       sc.hitEffect(h.dealt, d.crit);
       if (h.phaseUp) sc.phaseEffect();
-      if (h.phaseUp) J.UI.banner(G.battleCtx.mon.name + '生氣了！', 'rage-banner');
-      msgs.push((d.crit ? '會心一擊！' : '') + (favored && i === 0 ? '拿手科目！' : '') + '打出 ' + h.dealt + ' 點傷害！' + (h.phaseUp ? G.battleCtx.mon.name + '生氣了！（第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段）' : ''));
+      // v0.9.3 生氣了 = 進入下一階段、攻擊 +20%
+      if (h.phaseUp) J.UI.banner(G.battleCtx.mon.name + '生氣了！攻擊變強了！', 'rage-banner');
+      var left = b.phases - Math.min(b.phase, b.phases);
+      msgs.push((d.crit ? '會心一擊！' : '') + (favored && i === 0 ? '拿手科目！' : '') + '打出 ' + h.dealt + ' 點傷害！' +
+        (h.phaseUp ? G.battleCtx.mon.name + '生氣了！攻擊變強了！（第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段' + (left ? '，還剩 ' + left + ' 個階段' : '，最後一個階段') + '）' : '') +
+        (h.held && !b.over ? G.battleCtx.mon.name + '撐住了！再答對 ' + J.Battle.needCorrect(b) + ' 題' + (b.phase >= b.phases ? '就能打倒它！' : '就會進入下一個階段！') : ''));
       G.brender();
       i++;
       setTimeout(next, 450);
@@ -787,11 +840,13 @@
 
   G.bmonsterTurn = function () {
     var ctx = G.battleCtx, mon = ctx.mon, s = G.stats(), st = G.state;
-    var dmg = J.Battle.monsterAttack(mon, s.def);
+    var pm = J.Battle.phaseMult(ctx.b);   // v0.9.3 頭目每進一個階段傷害 +20%
+    var dmg = J.Battle.monsterAttack(mon, s.def, null, pm);
     var h = J.Battle.heroHurt(st, dmg);
+    ctx.lastHit = { dmg: dmg, mult: pm };   // 測試用
     ctx.scene.hurtEffect();
     G.brender(); G.refreshHud();
-    G.bmsg(mon.name + '撞了過來！受到 ' + dmg + ' 點傷害。');
+    G.bmsg(mon.name + (pm > 1 ? '（生氣中）' : '') + '撞了過來！受到 ' + dmg + ' 點傷害。');
     G.save();
     if (h.ko) setTimeout(G.bko, 900);
     else setTimeout(function () { G.bcommands(true); }, 700);
@@ -836,18 +891,20 @@
     var ctx = G.battleCtx, st = G.state, mon = ctx.mon;
     ctx.scene.wakeEffect();
     var lvl = st.player.level;
-    var vr = J.Battle.victoryReward(mon, G.coef(ctx.mapId));
-    var answerExp = st.player.pendingExp || 0;
-    J.Session.settleExp(ctx.sess);            // 戰鬥中答對的經驗值，現在才一起加
+    var bond = J.Battle.bond(st);   // v0.9.3 親密度（番薯仔的愛心，隱藏屬性）：掉寶率、經驗值 +N%（不加金幣、畫面不說明）
+    var vr = J.Battle.victoryReward(mon, G.coef(ctx.mapId), bond);
+    // v0.9.3 C1：經驗值和金幣只在打倒怪物時給（怪物的 exp×地圖係數×親密度、gold）；戰鬥中答對不給
+    var ans = J.Session.settleBattle(ctx.sess);   // 只有這場完成的每日小任務金幣、舊存檔的暫存經驗值
     J.Exp.addExp(st.player, vr.exp);
     st.player.coins += vr.gold;
-    var drops = J.Battle.rollDrops(mon);
+    ctx.reward = { exp: vr.exp, coins: vr.gold + ans.daily, monsterGold: vr.gold, daily: ans.daily, bond: bond };   // 測試用
+    var drops = J.Battle.rollDrops(mon, null, bond);
     drops.forEach(function (it) { J.Character.addItem(st, it, 1); });
     st.stats.battles.won = (st.stats.battles.won || 0) + 1;
     J.Bestiary.defeated(st, mon.id);   // 怪物名冊：打倒
     G.stopBgm(200);
     G.jingle(mon.boss && drops.length ? 'rare_item' : 'victory', null, null, 7000);
-    var lines = [mon.wake, '經驗值 +' + (vr.exp + answerExp) + '　金幣 +' + vr.gold];
+    var lines = [mon.wake, '經驗值 +' + ctx.reward.exp + '　金幣 +' + ctx.reward.coins];
     if (drops.length) lines.push('得到：' + drops.map(function (d) { return (G.data.items[d] || {}).name || d; }).join('、'));
     G.bmsg(lines.join('　'));
     G.refreshHud();
@@ -886,9 +943,10 @@
     var ctx = G.battleCtx;
     if (!ctx || ctx.over) return;
     ctx.over = true;
-    // 逃跑、累倒：戰鬥中答對的經驗值照樣算，回到地圖後才結算（打贏時 bvictory 已經結算過）
-    var lateLevels = J.Session.settleExp(ctx.sess);
-    if (lateLevels > 0) setTimeout(function () { G.afterReward(lateLevels); }, 900);
+    // v0.9.3 逃跑、累倒：不給經驗值和金幣（只給這場完成的每日小任務金幣；打贏時 bvictory 已經給過，這裡是 0）
+    var late = J.Session.settleBattle(ctx.sess);
+    ctx.lateDaily = late.daily;   // 測試用
+    if (late.levels > 0) setTimeout(function () { G.afterReward(late.levels); }, 900);
     if (ctx.ui) ctx.ui.close(true);
     J.TTS.stop();
     G.phaser.scene.stop('Battle');
@@ -987,8 +1045,9 @@
     // 今日上限：不在冒險途中硬擋——戰鬥、對話、題目或其他視窗開著時先記著，結束後才顯示（上限本身不變）
     if ((ev.indexOf('limit') >= 0 || G.limitPending) && !G.limitHandle) {
       // 打贏後（勝利畫面、戰後對話）inBattle() 已是 false，但戰鬥還沒結束：一樣等到按「繼續」之後
-      if (G.inBattle() || (G.battleCtx && !G.battleCtx.over) || G.busy || J.UI.isOpen() || (G.mapScene && G.mapScene.transitioning)) { G.limitPending = true; }
-      else if (J.Playtime.isOverLimit(st.playtime, st.settings, now)) { G.limitPending = false; G.save(); J.UI.closeLoadBars && J.UI.closeLoadBars(); J.Settings.limitScreen(G); return; }
+      // v0.9.3：放大地圖（passMove 視窗）開著時還能走，不能拿來延後上限 → 用 blocksMove()，顯示上限前先關掉放大地圖
+      if (G.inBattle() || (G.battleCtx && !G.battleCtx.over) || G.busy || J.UI.blocksMove() || (G.mapScene && G.mapScene.transitioning)) { G.limitPending = true; }
+      else if (J.Playtime.isOverLimit(st.playtime, st.settings, now)) { G.limitPending = false; G.save(); J.UI.closeLoadBars && J.UI.closeLoadBars(); J.UI.closePassMove(); J.Settings.limitScreen(G); return; }
       else G.limitPending = false;
     }
     if (ev.indexOf('rest') >= 0) J.Settings.restReminder();
@@ -1005,6 +1064,7 @@
     exits: function () { return (G.mapScene.map.exits || []).slice(); },
     chests: function () { return (G.mapScene.map.chests || []).map(function (c) { return { id: c.id, x: c.x, y: c.y, opened: !!G.state.chests[c.id] }; }); },
     npcs: function () { return G.mapScene.npcs.map(function (n) { return { id: n.data.id, x: n.data.x, y: n.data.y }; }); },
+    animals: function () { return (G.mapScene.animals || []).map(function (a) { return { id: a.spec.id, x: a.tx, y: a.ty, area: a.spec.area, moving: a.moving }; }); },
     monsters: function () { return G.mapScene.monsters.filter(function (m) { return m.active; }).map(function (m) { return { id: m.id, x: m.tx, y: m.ty }; }); },
     /** 讓最近的怪物走到主角面前（觸發和真的碰到一樣的戰鬥流程） */
     encounter: function () {
@@ -1053,7 +1113,7 @@
     },
     ghostVisible: function () { return !!(G.mapScene && G.mapScene.ghost && G.mapScene.ghost.visible); },
     seeMonsters: function (n, defeatedTimes) {
-      Object.keys(G.data.monsters).slice(0, n).forEach(function (id) { var r = J.Bestiary.rec(G.state, id); r.seen = Math.max(r.seen, 1); if (defeatedTimes) r.defeated = Math.max(r.defeated, defeatedTimes); });
+      J.Bestiary.split(G.data.monsters, G.data.maps).all.slice(0, n).forEach(function (id) { var r = J.Bestiary.rec(G.state, id); r.seen = Math.max(r.seen, 1); if (defeatedTimes) r.defeated = Math.max(r.defeated, defeatedTimes); });
       G.save();
     },
     musicLog: function () { return G.musicLog.slice(); },

@@ -7,7 +7,7 @@
  * 裝備欄位：atk / def / mp；jobs＝建議職業（null＝誰都能裝）。數值依 07 第 5 節：木劍 ATK+3 50 金、皮衣 DEF+2 40 金。
  * 價格依據【推論】：地圖等級 1 結束時大約有 100–150 金（教學委託 100＋寶箱＋小怪），買得起木劍＋皮衣；
  *   地圖等級 3 前約有 400–600 金，買得起一把 180–220 的職業武器。
- * sell：素材可以賣給商店換一點金幣（v0.1 沒有賣出功能；前端若不做可忽略）。
+ * 素材是怪物掉落、交打獵委託用的任務素材：不賣、也不收購（老闆 2026-10-09 裁示，已拿掉原本的 sell 收購價）。
  * 本檔只賣道具與裝備，不賣真錢、沒有轉蛋。
  */
 window.ITEMS = {
@@ -30,14 +30,14 @@ window.ITEMS = {
   robe:    { name: "法袍", sprite: "item_robe",    kind: "armor", price: 150, atk: 0, def: 4, mp: 5, jobs: null, desc: "織了防霧花紋的長袍，誰都能穿。" },
 
   // ── 素材（打獵委託）──
-  sticky_ball:  { name: "黏黏球",     sprite: "item_sticky_ball",  kind: "material", price: 0, sell: 2,  desc: "迷糊團子身上掉下來的黏黏球，可以補洞。" },
-  mushroom_cap: { name: "毒菇帽",     sprite: "item_mushroom_cap", kind: "material", price: 0, sell: 3,  desc: "毒菇怪的帽子。精靈長老拿來研究霧。不能吃喔！" },
-  feather:      { name: "羽毛",       sprite: "item_feather",      kind: "material", price: 0, sell: 3,  desc: "白白的羽毛，可以做成羽毛筆。" },
-  bat_wing:     { name: "夜翼徽章",   sprite: "item_bat_wing",     kind: "material", price: 0, sell: 4,  desc: "蝙蝠翅膀形狀的小徽章，是蝙蝠們撿來的寶物。" },
-  crystal:      { name: "回音水晶",   sprite: "item_crystal",      kind: "material", price: 0, sell: 10, desc: "對它說話，會小小聲地回答你。" },
-  gear:         { name: "齒輪",       sprite: "item_gear",         kind: "material", price: 0, sell: 5,  desc: "地精做機關用的齒輪。" },
-  scroll:       { name: "告示卷軸",   sprite: "item_scroll",       kind: "material", price: 0, sell: 2,  desc: "哥布林部落的告示碎片，拼起來就能讀。" },
-  key:          { name: "柵欄鑰匙",   sprite: "item_key",          kind: "material", price: 0, sell: 2,  desc: "獸人營地柵欄的鑰匙。" }
+  sticky_ball:  { name: "黏黏球",     sprite: "item_sticky_ball",  kind: "material", price: 0, desc: "迷糊團子身上掉下來的黏黏球，可以補洞。" },
+  mushroom_cap: { name: "毒菇帽",     sprite: "item_mushroom_cap", kind: "material", price: 0, desc: "毒菇怪的帽子。精靈長老拿來研究霧。不能吃喔！" },
+  feather:      { name: "羽毛",       sprite: "item_feather",      kind: "material", price: 0, desc: "白白的羽毛，可以做成羽毛筆。" },
+  bat_wing:     { name: "夜翼徽章",   sprite: "item_bat_wing",     kind: "material", price: 0, desc: "蝙蝠翅膀形狀的小徽章，是蝙蝠們撿來的寶物。" },
+  crystal:      { name: "回音水晶",   sprite: "item_crystal",      kind: "material", price: 0, desc: "對它說話，會小小聲地回答你。" },
+  gear:         { name: "齒輪",       sprite: "item_gear",         kind: "material", price: 0, desc: "地精做機關用的齒輪。" },
+  scroll:       { name: "告示卷軸",   sprite: "item_scroll",       kind: "material", price: 0, desc: "哥布林部落的告示碎片，拼起來就能讀。" },
+  key:          { name: "柵欄鑰匙",   sprite: "item_key",          kind: "material", price: 0, desc: "獸人營地柵欄的鑰匙。" }
 };
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */

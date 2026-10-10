@@ -9,7 +9,7 @@
   class BattleScene extends Phaser.Scene {
     constructor() { super('Battle'); }
 
-    init(data) { this.data_ = data; }
+    init(data) { this.data_ = data; this.flashTw = null; this.shakeTw = null; this.raging = false; }
 
     preload() {
       J.Assets.watch(this);
@@ -69,11 +69,19 @@
       this.time.delayedCall(90, function () { self.cry('hurt'); });
       // v0.7：閃爍與晃動都從「原本的狀態」開始。以前連續打兩下（技能二連擊、會心一擊閃 4 次）時，
       // 第二個閃爍從半透明開始、結束時又回到半透明，怪物就一直半透明（看得到背後的背景）
-      if (this.flashTw) this.flashTw.stop();
+      // v0.9.3（老闆截圖 004110「頭目是半透明的」）：原因是這裡的受擊閃爍把怪物的 alpha 降到 0.25（每次 70ms、來回 2～4 次），
+      // 閃爍中的畫面就是半透明、看得到背後的戰鬥背景（圖檔本身全部不透明，已檢查 alpha）。
+      // 改成「顏色閃爍」：怪物一直保持不透明（alpha 1），只把顏色在淡紅色和原色之間切換
+      if (this.flashTw) { try { this.time.removeEvent(this.flashTw); } catch (e) { /* 忽略 */ } this.flashTw = null; }
       if (this.shakeTw) this.shakeTw.stop();
       m.setAlpha(1).setX(this.baseX);
-      var self1 = this;
-      this.flashTw = this.tweens.add({ targets: m, alpha: 0.25, duration: 70, yoyo: true, repeat: crit ? 3 : 1, onComplete: function () { m.setAlpha(1); }, onStop: function () { m.setAlpha(1); } });
+      var self1 = this, flashes = (crit ? 4 : 2) * 2, k = 0;
+      var restore = function () { if (self1.raging) m.setTint(0xff5a4a); else m.clearTint(); m.setAlpha(1); };
+      this.flashTw = this.time.addEvent({ delay: 70, repeat: flashes - 1, callback: function () {
+        k++;
+        if (k % 2) m.setTint(0xffb4a0); else restore();
+        if (k >= flashes) restore();
+      } });
       this.shakeTw = this.tweens.add({ targets: m, x: this.baseX + (crit ? 10 : 5), duration: 50, yoyo: true, repeat: 2, onComplete: function () { m.setX(self1.baseX); }, onStop: function () { m.setX(self1.baseX); } });
       if (crit) this.cameras.main.shake(180, 0.012);
       var t = this.add.text(m.x, m.y - m.displayHeight * 0.6, String(dmg), {

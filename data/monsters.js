@@ -51,151 +51,165 @@
  *   (b) 頭目戰時主角傷害另乘 1.3；(c) 下修等級 3、4 小怪 HP。請遊戲設計師以模擬結果拍板。
  * EXP／金幣：exp＝打倒後額外給的討伐獎勵（答題 EXP 由題目另算）；約等於該區一題 L1 題的 EXP；gold ≈ exp ÷ 2。
  */
+/*
+ * v0.9.3（2026-10-10）數值調整：hp／atk／exp／gold 依成品匣 37_現行版等級與怪物數值調整.md 第 4 節修改表套用（21 隻）；
+ * 招潮蟹（fiddler_crab）依同文件第 5 節用紅樹林沼澤蛙那一列。配合 C1（打倒怪物才給經驗值和金幣）、C5（頭目第 2、3 階段傷害 ×1.2、×1.4）。
+ * 頭目的 atk 是第 1 階段的值。上面舊的推導說明是 v0.2～v0.9.2 的數值，僅供參考。
+ */
 window.MONSTERS = {
 
   // ── 地圖等級 1（M02 擎天草原）──
   dango: {
-    name: "迷糊團子", sprite: "mon_dango", level: 1, hp: 12, atk: 4, subject: "數學", q_levels: [1, 1],
-    exp: 8, gold: 4, drops: [{ item: "sticky_ball", rate: 0.5 }], boss: false,
+    name: "迷糊團子", sprite: "mon_dango", level: 1, hp: 25, atk: 6, subject: "數學", q_levels: [1, 1],
+    exp: 30, gold: 3, drops: [{ item: "sticky_ball", rate: 0.5 }], boss: false,
     desc: "軟軟黏黏的小團子，被霧弄得數不清自己有幾顆。",
     wake: "迷糊團子清醒了，咕嚕咕嚕滾回草叢裡。"
   },
   rabbit: {
-    name: "跳跳兔", sprite: "mon_rabbit", level: 1, hp: 14, atk: 5, subject: "國語", q_levels: [1, 1],
-    exp: 9, gold: 4, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    name: "跳跳兔", sprite: "mon_rabbit", level: 1, hp: 30, atk: 7, subject: "國語", q_levels: [1, 1],
+    exp: 40, gold: 5, drops: [{ item: "herb", rate: 0.3 }], boss: false,
     desc: "跳得很高的兔子，被霧弄得忘了回家的路。",
     wake: "跳跳兔清醒了，一蹦一跳地回家了。"
   },
 
   // ── 地圖等級 2（M03 硫磺谷、M04 神木森林、M09 山城市集；港口螃蟹住在 M06 海邊岩岸）──
   mushroom: {
-    name: "毒菇怪", sprite: "mon_mushroom", level: 2, hp: 38, atk: 9, subject: "自然", q_levels: [1, 2],
-    exp: 16, gold: 8, drops: [{ item: "mushroom_cap", rate: 0.5 }], boss: false,
+    name: "毒菇怪", sprite: "mon_mushroom", level: 2, hp: 55, atk: 8, subject: "自然", q_levels: [1, 2],
+    exp: 50, gold: 6, drops: [{ item: "mushroom_cap", rate: 0.5 }], boss: false,
     desc: "頭上戴著大菇帽。霧讓牠忘了自己要曬太陽還是躲陰涼。",
     wake: "毒菇怪清醒了，摘下菇帽向你敬禮，跑回樹下。"
   },
   sprout: {
-    name: "樹精寶寶", sprite: "mon_sprout", level: 2, hp: 34, atk: 8, subject: "自然", q_levels: [1, 2],
-    exp: 15, gold: 7, drops: [{ item: "herb", rate: 0.4 }], boss: false,
+    name: "樹精寶寶", sprite: "mon_sprout", level: 2, hp: 120, atk: 10, subject: "自然", q_levels: [1, 2],
+    exp: 65, gold: 9, drops: [{ item: "herb", rate: 0.4 }], boss: false,
     desc: "剛發芽的小樹精，被霧弄得忘了要喝水。",
     wake: "樹精寶寶清醒了，開心地去找水喝。"
   },
   owl: {
-    name: "貓頭鷹", sprite: "mon_owl", level: 2, hp: 42, atk: 10, subject: "國語", q_levels: [1, 2],
-    exp: 18, gold: 9, drops: [{ item: "feather", rate: 0.3 }], boss: false,
+    name: "貓頭鷹", sprite: "mon_owl", level: 2, hp: 125, atk: 11, subject: "國語", q_levels: [1, 2],
+    exp: 75, gold: 10, drops: [{ item: "feather", rate: 0.3 }], boss: false,
     desc: "森林裡最愛讀書的鳥，霧讓牠把字都看反了。",
     wake: "貓頭鷹清醒了，咕咕叫著飛回樹洞。"
   },
   crab: {
-    name: "港口螃蟹", sprite: "mon_crab", level: 2, hp: 40, atk: 9, subject: "英語", q_levels: [1, 2],
-    exp: 16, gold: 8, drops: [{ item: "snack", rate: 0.3 }], boss: false,
+    name: "港口螃蟹", sprite: "mon_crab", level: 2, hp: 220, atk: 17, subject: "英語", q_levels: [1, 2],
+    exp: 125, gold: 18, drops: [{ item: "snack", rate: 0.3 }], boss: false,
     desc: "住在海邊岩岸的螃蟹，霧讓牠聽不懂外國船員的話。",
     wake: "港口螃蟹清醒了，橫著走回沙灘。"
   },
   seagull: {
-    name: "搶食海鷗", sprite: "mon_seagull", level: 2, hp: 34, atk: 10, subject: "英語", q_levels: [1, 2],
-    exp: 16, gold: 8, drops: [{ item: "feather", rate: 0.5 }], boss: false,
+    name: "搶食海鷗", sprite: "mon_seagull", level: 2, hp: 135, atk: 14, subject: "英語", q_levels: [1, 2],
+    exp: 80, gold: 11, drops: [{ item: "feather", rate: 0.5 }], boss: false,
     desc: "被霧弄得到處亂搶東西的海鷗。",
     wake: "搶食海鷗清醒了，把東西還給你，飛回海上。"
   },
 
   // ── 地圖等級 3（M05 紅樹林濕地、M06 海蝕洞窟、M07 哥布林部落）──
   mudslime: {
-    name: "泥泥怪", sprite: "mon_mudslime", level: 3, hp: 90, atk: 14, subject: "數學", q_levels: [2, 3],
-    exp: 28, gold: 14, drops: [{ item: "gear", rate: 0.5 }], boss: false,
+    name: "泥泥怪", sprite: "mon_mudslime", level: 3, hp: 200, atk: 16, subject: "數學", q_levels: [2, 3],
+    exp: 95, gold: 14, drops: [{ item: "gear", rate: 0.5 }], boss: false,
     desc: "濕地泥灘上的泥巴團，迷糊時會把亮亮的齒輪吞進肚子。",
     wake: "泥泥怪清醒了，吐出齒輪，慢慢滑回泥灘裡。"
   },
   frog: {
-    name: "沼澤蛙", sprite: "mon_frog", level: 3, hp: 100, atk: 15, subject: "自然", q_levels: [2, 3],
-    exp: 30, gold: 15, drops: [{ item: "gear", rate: 0.3 }], boss: false,
+    name: "沼澤蛙", sprite: "mon_frog", level: 3, hp: 210, atk: 17, subject: "自然", q_levels: [2, 3],
+    exp: 110, gold: 16, drops: [{ item: "gear", rate: 0.3 }], boss: false,
     desc: "呱呱叫的大青蛙，霧讓牠忘了天氣會怎麼變。",
     wake: "沼澤蛙清醒了，撲通一聲跳回河道裡。"
   },
+  // 2026-10-10 老闆 B13「紅樹林適合用招潮蟹當野怪」：取代 M05 的沼澤蛙出沒區（泥泥怪保留，委託 Q_GNO_3 要收集牠的齒輪）。
+  // 數值照 37 號「數值請用紅樹林那一列」＝與沼澤蛙同一列；之後套用 37 號修改表時，請和 frog 一起改（210／17／110／16）。
+  // 【美術需求｜佔位】還沒有招潮蟹的圖，先借用港口螃蟹的圖 mon_crab；招潮蟹圖完成後把 sprite 改成新圖的 id。
+  fiddler_crab: {
+    name: "招潮蟹", sprite: "mon_crab", level: 3, hp: 210, atk: 17, subject: "自然", q_levels: [2, 3],
+    exp: 110, gold: 16, drops: [{ item: "gear", rate: 0.3 }], boss: false,
+    desc: "紅樹林泥灘上揮著一隻大螯的小螃蟹，霧讓牠忘了潮水什麼時候會來。",
+    wake: "招潮蟹清醒了，揮揮大螯，鑽回泥灘的小洞裡。"
+  },
   bat: {
-    name: "洞窟蝙蝠", sprite: "mon_bat", level: 3, hp: 85, atk: 15, subject: "國語", q_levels: [2, 3],
-    exp: 28, gold: 14, drops: [{ item: "bat_wing", rate: 0.4 }], boss: false,
+    name: "洞窟蝙蝠", sprite: "mon_bat", level: 3, hp: 230, atk: 18, subject: "國語", q_levels: [2, 3],
+    exp: 140, gold: 20, drops: [{ item: "bat_wing", rate: 0.4 }], boss: false,
     desc: "倒掛在洞頂睡覺的蝙蝠，被霧吵醒後脾氣不太好。",
     wake: "洞窟蝙蝠清醒了，飛回洞頂繼續睡覺。"
   },
   rock: {
-    name: "石頭怪", sprite: "mon_rock", level: 3, hp: 110, atk: 14, subject: "數學", q_levels: [2, 3],
-    exp: 32, gold: 16, drops: [{ item: "crystal", rate: 0.4 }], boss: false,
+    name: "石頭怪", sprite: "mon_rock", level: 3, hp: 230, atk: 18, subject: "數學", q_levels: [2, 3],
+    exp: 125, gold: 18, drops: [{ item: "crystal", rate: 0.4 }], boss: false,
     desc: "會走路的石頭，身上常常黏著亮晶晶的水晶。",
     wake: "石頭怪清醒了，滾到角落安靜地休息。"
   },
   goblin: {
-    name: "頑皮哥布林", sprite: "mon_goblin", level: 3, hp: 95, atk: 15, subject: "國語", q_levels: [2, 3],
-    exp: 30, gold: 15, drops: [{ item: "scroll", rate: 0.5 }], boss: false,
+    name: "頑皮哥布林", sprite: "mon_goblin", level: 3, hp: 240, atk: 18, subject: "國語", q_levels: [2, 3],
+    exp: 140, gold: 20, drops: [{ item: "scroll", rate: 0.5 }], boss: false,
     desc: "被霧弄迷糊的哥布林，把部落的告示撕下來當玩具。",
     wake: "頑皮哥布林清醒了，不好意思地跑回部落。"
   },
 
   // ── 地圖等級 4（M08 月世界泥岩丘、M10 府城古城、M11 古城塔頂）──
   boar: {
-    name: "岩丘野豬", sprite: "mon_boar", level: 4, hp: 160, atk: 19, subject: "社會", q_levels: [3, 4],
-    exp: 45, gold: 22, drops: [{ item: "key", rate: 0.4 }], boss: false,
+    name: "岩丘野豬", sprite: "mon_boar", level: 4, hp: 320, atk: 20, subject: "社會", q_levels: [3, 4],
+    exp: 165, gold: 25, drops: [{ item: "key", rate: 0.4 }], boss: false,
     desc: "在泥岩溝谷裡亂跑的野豬，迷糊時把柵欄鑰匙叼走了。",
     wake: "岩丘野豬清醒了，放下鑰匙，跑回溝谷。"
   },
   wisp: {
-    name: "迷霧精", sprite: "mon_wisp", level: 4, hp: 150, atk: 20, subject: "英語", q_levels: [3, 4],
-    exp: 45, gold: 22, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    name: "迷霧精", sprite: "mon_wisp", level: 4, hp: 340, atk: 21, subject: "英語", q_levels: [3, 4],
+    exp: 180, gold: 30, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
     desc: "一小團會飄的霧。被光照到就會變回小水滴。",
     wake: "迷霧精被光照亮，變成小水滴飄走了。"
   },
   armor: {
-    name: "空盔甲", sprite: "mon_armor", level: 4, hp: 175, atk: 20, subject: "社會", q_levels: [3, 4],
-    exp: 48, gold: 24, drops: [{ item: "gear", rate: 0.3 }], boss: false,
+    name: "空盔甲", sprite: "mon_armor", level: 4, hp: 360, atk: 22, subject: "社會", q_levels: [3, 4],
+    exp: 210, gold: 35, drops: [{ item: "gear", rate: 0.3 }], boss: false,
     desc: "古城的舊盔甲，被霧吹得自己走來走去。",
     wake: "空盔甲清醒了，喀啦喀啦走回展示台站好。"
   },
 
   // ───────────────────────────── 頭目 ─────────────────────────────
   tree_king: {
-    name: "枯萎樹王", sprite: "boss_tree", level: 2, hp: 190, atk: 12, subject: "自然", q_levels: [2, 4],
-    exp: 120, gold: 60, drops: [{ item: "herb", rate: 1 }], boss: true,
+    name: "枯萎樹王", sprite: "boss_tree", level: 2, hp: 510, atk: 13, subject: "自然", q_levels: [2, 4],
+    exp: 660, gold: 60, drops: [{ item: "herb", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["mushroom", "sprout", "owl"],
     dialog_before: "D_BOSS_TREE_A", dialog_after: "D_BOSS_TREE_B",
     desc: "守護神木森林的千年神木，被霧附身後忘了怎麼長葉子。",
     wake: "神木清醒了，枝頭冒出新的綠芽。"
   },
   fog_octopus: {
-    name: "迷霧章魚", sprite: "boss_octopus", level: 2, hp: 185, atk: 12, subject: "英語", q_levels: [2, 4],
-    exp: 120, gold: 60, drops: [{ item: "snack", rate: 1 }], boss: true,
+    name: "迷霧章魚", sprite: "boss_octopus", level: 2, hp: 550, atk: 13, subject: "英語", q_levels: [2, 4],
+    exp: 790, gold: 60, drops: [{ item: "snack", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["crab", "seagull"],
     dialog_before: "D_BOSS_OCTO_A", dialog_after: "D_BOSS_OCTO_B",
     desc: "從遠海漂來的大章魚，擋在漁港碼頭。只聽得懂英文，一直打瞌睡。",
     wake: "迷霧章魚清醒了，揮揮觸手游回大海。"
   },
   mud_frog: {
-    name: "泥巴大蛙", sprite: "boss_frog", level: 3, hp: 475, atk: 19, subject: "數學", q_levels: [2, 4],
-    exp: 200, gold: 100, drops: [{ item: "gear", rate: 1 }], boss: true,
+    name: "泥巴大蛙", sprite: "boss_frog", level: 3, hp: 750, atk: 16, subject: "數學", q_levels: [2, 4],
+    exp: 1010, gold: 100, drops: [{ item: "gear", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["mudslime", "frog"],
     dialog_before: "D_BOSS_FROG_A", dialog_after: "D_BOSS_FROG_B",
     desc: "紅樹林濕地最大的青蛙，霧讓牠數字全亂掉，一直亂丟泥巴。",
     wake: "泥巴大蛙清醒了，呱呱笑著跳回池塘。"
   },
   noise_bat: {
-    name: "噪音蝙蝠王", sprite: "boss_bat", level: 3, hp: 485, atk: 19, subject: "國語", q_levels: [2, 4],
-    exp: 200, gold: 100, drops: [{ item: "bat_wing", rate: 1 }], boss: true,
+    name: "噪音蝙蝠王", sprite: "boss_bat", level: 3, hp: 840, atk: 17, subject: "國語", q_levels: [2, 4],
+    exp: 1270, gold: 100, drops: [{ item: "bat_wing", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["bat", "rock", "goblin"],
     dialog_before: "D_BOSS_BAT_A", dialog_after: "D_BOSS_BAT_B",
     desc: "蝙蝠們的老大，霧讓牠的叫聲變得好吵，大家都看不下書。",
     wake: "噪音蝙蝠王清醒了，安安靜靜地倒掛著睡著了。"
   },
   angry_golem: {
-    name: "暴躁石像", sprite: "boss_golem", level: 4, hp: 775, atk: 25, subject: "社會", q_levels: [3, 4],
-    exp: 300, gold: 150, drops: [{ item: "crystal", rate: 1 }], boss: true,
+    name: "暴躁石像", sprite: "boss_golem", level: 4, hp: 1200, atk: 21, subject: "社會", q_levels: [3, 4],
+    exp: 1570, gold: 150, drops: [{ item: "crystal", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["boar", "wisp"],
     dialog_before: "D_BOSS_GOLEM_A", dialog_after: "D_BOSS_GOLEM_B",
     desc: "守護月世界的石像，被霧弄得忘了大家一起訂的規則。",
     wake: "暴躁石像清醒了，慢慢坐下來守護泥岩丘。"
   },
   fog_demon: {
-    name: "遺忘霧魔", sprite: "boss_fog", level: 5, hp: 975, atk: 28, subject: "混合",
+    name: "遺忘霧魔", sprite: "boss_fog", level: 5, hp: 1510, atk: 24, subject: "混合",
     subjects: ["國語", "英語", "數學", "自然", "社會"], q_levels: [3, 4],
-    exp: 500, gold: 300, drops: [], boss: true,
+    exp: 1730, gold: 300, drops: [], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["armor", "wisp"],
     dialog_before: "D_BOSS_FOG_A", dialog_after: "D_BOSS_FOG_B",
     desc: "讓大家忘記知識的大霧。五道光一起照它，它就會散開。",

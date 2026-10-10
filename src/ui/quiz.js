@@ -221,12 +221,14 @@
       J.Audio.play('correct');
       var r = res.reward;
       var lines = [];
-      if (r.outcome === 'repeat') lines.push('這題以前答對過囉：金幣 +' + r.coins);
-      else if (o.session && o.session.deferExp) lines.push('經驗值 +' + r.exp + '（戰鬥結束時一起算）　金幣 +' + r.coins);
+      // v0.9.3 戰鬥中：答對不給經驗值和金幣，打倒怪物時才一次拿到（逃跑、累倒就沒有）
+      var deferred = !!(o.session && o.session.deferExp);
+      if (deferred) lines.push('打倒怪物時，才會拿到經驗值和金幣喔！');
+      else if (r.outcome === 'repeat') lines.push('這題以前答對過囉：金幣 +' + r.coins);
       else lines.push('經驗值 +' + r.exp + '　金幣 +' + r.coins);
-      if (r.bonusPaid) lines.push('（變化題一次答對，補回 ' + r.bonusPaid + ' 經驗值！）');
-      if (res.needVariant) lines.push('下一題是類似的題目，第一次就答對可以補回另一半獎勵！');
-      if (res.dailyDone && res.dailyDone.length) res.dailyDone.forEach(function (t) { lines.push('每日小任務完成：「' + t.text + '」金幣 +' + t.reward); });
+      if (r.bonusPaid && !deferred) lines.push('（變化題一次答對，補回 ' + r.bonusPaid + ' 經驗值！）');
+      if (res.needVariant && !deferred) lines.push('下一題是類似的題目，第一次就答對可以補回另一半獎勵！');
+      if (res.dailyDone && res.dailyDone.length) res.dailyDone.forEach(function (t) { lines.push('每日小任務完成：「' + t.text + '」金幣 +' + t.reward + (deferred ? '（戰鬥結束時拿到）' : '')); });
       end({ correct: true, res: res }, '答對了！' + (q.explanation ? ' ' + q.explanation : ''), 'good', lines);
     }
 

@@ -286,7 +286,7 @@ Q_TUT_1 → Q_TUT_2 → Q_TUT_3
 | `sprite` | 圖像 key（`item_*`） |
 | `kind` | `consumable`（消耗品）／`card`（答題輔助卡）／`weapon`／`armor`／`material`（素材） |
 | `price` | 買價；素材是 0（不賣） |
-| `sell` | （新增，只有素材有）賣給商店的價錢。前端不做賣出功能的話可以忽略 |
+| （素材） | 素材是任務素材，商店不收購，所以沒有 `sell` 欄位（2026-10-09 拿掉）。裝備、道具的賣價由遊戲依 `price` 計算（裝備 50%、道具 25%） |
 | `effect` | 消耗品與卡片的效果：`hp`（回復體力）、`pet`（番薯仔好感）、`remove_option`（刪掉幾個錯的選項）、`hint_level`（打開到第幾層提示） |
 | `atk`, `def`, `mp` | 裝備加成 |
 | `jobs` | 裝備限定的職業 ID 陣列；`null`＝誰都能裝 |

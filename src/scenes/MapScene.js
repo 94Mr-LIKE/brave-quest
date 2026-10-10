@@ -33,6 +33,12 @@
       this.startX = data.x; this.startY = data.y;
       this.startFacing = data.facing || 'down';
       this.map = G().data.maps[this.mapId];
+      // 場景重新開始時物件會留著上一張地圖的值：車站要先清掉（不然沒有車站的地圖會顯示上一張的「在○○站搭車」）
+      this.station = null; this.stationSign = null;
+      // 上一張地圖的 hasBg、主角狀態也不要留著（create 之前讀到舊值會誤判「新地圖已經好了」）
+      this.hasBg = false; this.p = null;
+      this.safePts = null;   // 同樣的原因：下車點安全範圍是每張地圖各自算的
+      this.animals = [];
     }
 
     preload() {
@@ -71,6 +77,8 @@
         var m = g.data.monsters[s.monster];
         if (m) A.queue(self, m.sprite, m.name);
       });
+      // v0.9.3 會走動的動物（黃牛）：美術還沒畫時用暫代圖（四方向走路格式）
+      J.MapInfo.animalSpecs(map).forEach(function (a) { A.queue(self, a.sprite, a.name); });
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
@@ -83,7 +91,8 @@
     npcList() {
       var map = this.map, list = (map.npcs || []).slice();
       if (map.inn && !map.inn.npc && !list.some(function (n) { return n.x === map.inn.x && n.y === map.inn.y; })) {
-        list.push({ id: '__inn', x: map.inn.x, y: map.inn.y, sprite: 'npc_innkeeper', dialog: 'D_INN_IDLE', virtual: true });
+        // v0.9.3 B14 各地旅店不一樣：台詞用 maps.js 的 inn.dialog（沒有設定才用 D_INN_IDLE）
+        list.push({ id: '__inn', x: map.inn.x, y: map.inn.y, sprite: 'npc_innkeeper', dialog: J.MapInfo.innDialog(map, null), virtual: true });
       }
       return list;
     }
@@ -125,19 +134,36 @@
         J.UI.toast('這張地圖的背景圖很大，直接開檔案時看不到；請用網址開啟遊戲，就能看到完整的地圖畫面。', 7000);
       }
       // v0.7 快取混版：背景圖讀不到，或背景尺寸不等於「格子數×32」→ 資料（maps.js）和圖檔不是同一版，請玩家重新整理（不默默改畫備援）
+      this.bgMissing = false;
       if (this.bgFile && !J.Assets.FILE_MODE) {
         var bgk = 'map:' + this.bgFile, need = [this.size.w * T, this.size.h * T];
-        if (!this.hasBg && J.Assets.failed[bgk]) g.versionMismatch({ map: this.mapId, file: this.bgFile, reason: 'missing', grid: need });
-        else if (this.hasBg) {
+        if (!this.hasBg) {
+          // v0.9.3（老闆截圖 003805）：背景沒讀到時不要退回備援方塊。先自動再讀一次（網路一時不穩）；
+          // 還是讀不到才蓋上「地圖讀不到」的畫面並請玩家重新整理（孩子不會看到方塊）
+          g.bgRetry = g.bgRetry || {};
+          if (!g.bgRetry[this.bgFile]) {
+            g.bgRetry[this.bgFile] = 1;
+            delete J.Assets.failed[bgk];
+            console.warn('[地圖] 背景圖沒讀到，再讀一次：' + this.bgFile);
+            this.p = null; this.transitioning = true;   // 重新開始之前 update() 不要動
+            this.scene.restart({ mapId: this.mapId, x: this.startX, y: this.startY, facing: this.startFacing });
+            return;
+          }
+          this.bgMissing = true;
+          g.versionMismatch({ map: this.mapId, file: this.bgFile, reason: 'missing', grid: need });
+        } else {
           var bsrc = this.textures.get(bgk).getSourceImage();
           if (Math.abs(bsrc.width - need[0]) > 2 || Math.abs(bsrc.height - need[1]) > 2) g.versionMismatch({ map: this.mapId, file: this.bgFile, reason: 'size', image: [bsrc.width, bsrc.height], grid: need });
         }
       }
-      if (this.hasBg) this.buildBackground(); else this.buildTiles();
+      if (this.hasBg) this.buildBackground();
+      else if (this.bgMissing) this.buildMissingCover();
+      else this.buildTiles();   // 本來就沒有背景圖的地圖（例如 ?debug=bigpilot 的格子試做）、file:// 模式
       this.buildExits();
       this.buildObjects();
       this.buildCharacters();
       this.buildMonsters();
+      this.buildAnimals();
       this.buildSigns();
       this.buildLights();
       this.buildForeground();
@@ -382,14 +408,27 @@
       }
     }
 
+    /** v0.9.3 背景圖讀不到（重試後）：不畫備援方塊，鏡頭前蓋一層深色畫面＋文字，等玩家按「重新整理」 */
+    buildMissingCover() {
+      var W = C.VIEW_W, H = C.VIEW_H;
+      this.cameras.main.setBackgroundColor('#0b1236');
+      var cover = this.add.rectangle(-W, -H, W * 4, H * 4, 0x0b1236, 1).setOrigin(0, 0).setScrollFactor(0).setDepth(70000);
+      var txt = this.add.text(W / 2, H / 2, '地圖圖片讀不到\n請按「重新整理」', { fontFamily: 'sans-serif', fontSize: '28px', color: '#fffbe8', align: 'center' })
+        .setOrigin(0.5).setScrollFactor(0).setDepth(70001);
+      this.missingCover = [cover, txt];
+      G().bgMissingShown = (G().bgMissingShown || 0) + 1;   // 測試用
+    }
+
     // ---------------------------------------------------------------- 物件
     buildObjects() {
       var self = this, g = G(), st = g.state;
       var stn = this.map.station;
-      if (stn) {
-        this.station = stn;
+      this.station = stn || null;
+      this.stationSign = null;
+      // v0.9.3（33 號稽核）：背景圖已經畫了站牌的地圖（maps.js station.drawSign:false）不再疊程式站牌；互動照常
+      if (stn && stn.drawSign !== false) {
         var key = J.Assets.has('obj_station') ? J.Assets.texKey('obj_station') : 'ui:station';
-        this.add.image(stn.x * T + T / 2, stn.y * T + T, key).setOrigin(0.5, 1).setDepth((stn.y + 1) * T - 1);
+        this.stationSign = this.add.image(stn.x * T + T / 2, stn.y * T + T, key).setOrigin(0.5, 1).setDepth((stn.y + 1) * T - 1);
       }
       this.chestArt = this.hasArt('chest_closed') && this.hasArt('chest_open');
       (this.map.chests || []).forEach(function (c) {
@@ -440,7 +479,7 @@
       this.signs = [];
       J.MapInfo.signSpots(this.map).forEach(function (sg) {
         var key = 'sign_' + sg.kind, img;
-        if (self.hasArt(key)) img = self.add.image(sg.x * T + T / 2, (sg.y + 1) * T, J.Assets.texKey(key)).setOrigin(0.5, 1).setScale(1.15);
+        if (self.hasArt(key) && !sg.custom) img = self.add.image(sg.x * T + T / 2, (sg.y + 1) * T, J.Assets.texKey(key)).setOrigin(0.5, 1).setScale(1.15);
         else img = self.add.image(sg.x * T + T / 2, (sg.y + 1) * T, self.textSign(sg.kind, sg.text)).setOrigin(0.5, 1);
         img.setDepth((sg.y + 1) * T + 2);
         self.signs.push({ spot: sg, img: img });
@@ -449,7 +488,7 @@
 
     /** 沒有招牌圖時：木頭招牌＋文字 */
     textSign(kind, text) {
-      var key = 'ui:signtext:' + kind;
+      var key = 'ui:signtext:' + kind + ':' + text;   // v0.9.3 各地旅店的招牌字不一樣，貼圖要分開
       if (this.textures.exists(key)) return key;
       var c = document.createElement('canvas'); c.width = 64; c.height = 34;
       var g = c.getContext('2d');
@@ -464,23 +503,35 @@
     }
 
     // ---------------------------------------------------------------- 燈光：程式繪製的圓形暖色放射漸層（加法混合、輕微呼吸）
-    glowTexture() {
-      if (this.textures.exists('ui:glow')) return 'ui:glow';
+    /** 光暈貼圖。color：'#rrggbb'（v0.9.3 藍水晶、紫水晶、祭壇）；沒有給＝原本的暖色 */
+    glowTexture(color) {
+      var rgb = J.MapInfo.glowRgb(color);
+      var key = rgb ? 'ui:glow:' + rgb.join(',') : 'ui:glow';
+      if (this.textures.exists(key)) return key;
       var c = document.createElement('canvas'); c.width = c.height = 128;
       var g = c.getContext('2d');
       var gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-      gr.addColorStop(0, 'rgba(255,228,150,0.9)');
-      gr.addColorStop(0.35, 'rgba(255,190,90,0.45)');
-      gr.addColorStop(0.7, 'rgba(255,150,60,0.12)');
-      gr.addColorStop(1, 'rgba(255,140,50,0)');
+      if (rgb) {
+        var mix = function (a, k) { return Math.round(a + (255 - a) * k); };   // 中心偏白、外圈是指定的顏色
+        gr.addColorStop(0, 'rgba(' + mix(rgb[0], 0.5) + ',' + mix(rgb[1], 0.5) + ',' + mix(rgb[2], 0.5) + ',0.9)');
+        gr.addColorStop(0.35, 'rgba(' + rgb.join(',') + ',0.45)');
+        gr.addColorStop(0.7, 'rgba(' + rgb.join(',') + ',0.12)');
+        gr.addColorStop(1, 'rgba(' + rgb.join(',') + ',0)');
+      } else {
+        gr.addColorStop(0, 'rgba(255,228,150,0.9)');
+        gr.addColorStop(0.35, 'rgba(255,190,90,0.45)');
+        gr.addColorStop(0.7, 'rgba(255,150,60,0.12)');
+        gr.addColorStop(1, 'rgba(255,140,50,0)');
+      }
       g.fillStyle = gr; g.beginPath(); g.arc(64, 64, 64, 0, Math.PI * 2); g.fill();
-      this.textures.addCanvas('ui:glow', c);
-      return 'ui:glow';
+      this.textures.addCanvas(key, c);
+      return key;
     }
 
-    addGlow(x, y, r) {
+    addGlow(x, y, r, color) {
       // v0.7：光暈畫在角色「下面」（地面上的一圈光）。以前畫在最上層（加法混合），洞窟裡暗色的蝙蝠走進光裡會被洗白、看起來像半透明
-      var img = this.add.image(x, y, this.glowTexture()).setBlendMode(Phaser.BlendModes.ADD).setDepth(GLOW_DEPTH);
+      var img = this.add.image(x, y, this.glowTexture(color)).setBlendMode(Phaser.BlendModes.ADD).setDepth(GLOW_DEPTH);
+      img.__color = color || null;   // 測試用
       var sc = (T * 3 * (r || 1)) / 128;
       img.setScale(sc).setAlpha(0.7);
       img.__tw = this.tweens.add({ targets: img, alpha: 0.5, scale: sc * 0.93, duration: 1100 + Math.random() * 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
@@ -490,7 +541,7 @@
 
     buildLights() {
       var self = this;
-      this.lights_ = J.MapInfo.lightSpots(this.map).map(function (l) { return self.addGlow(l.x * T + T / 2, l.y * T + T / 2, l.r); });
+      this.lights_ = J.MapInfo.lightSpots(this.map).map(function (l) { return self.addGlow(l.x * T + T / 2, l.y * T + T / 2, l.r, l.color); });
       this.updateLamps();
     }
 
@@ -758,6 +809,88 @@
       });
     }
 
+    // ---------------------------------------------------------------- 會走動的動物（v0.9.3 B11 擎天崗的黃牛）
+    /** 不能戰鬥；在範圍內的可走格慢慢隨機走動；碰到會「哞～」並走開，面對牠按 A 跳出一句話 */
+    buildAnimals() {
+      var self = this, g = G();
+      this.animals = [];
+      var taken = {};
+      J.MapInfo.animalSpecs(this.map).forEach(function (spec) {
+        var tiles = J.MapInfo.animalTiles(self.map, spec.area, function (x, y) { return self.walkable(x, y); });
+        if (!tiles.length) { console.warn('[動物] ' + self.mapId + ' ' + spec.id + ' 的範圍裡沒有可以站的格子'); return; }
+        var tk = J.Assets.texKey(spec.sprite);
+        // 美術交四方向走路圖（sprites.js type: "walk"，3×4 格）後就有走路動畫；暫代圖只有一張，左右用翻轉
+        var walk = self.textures.exists(tk) && self.textures.get(tk).has(11);
+        if (walk) self.ensureWalkAnims(tk, spec.sprite);
+        for (var i = 0; i < spec.count; i++) {
+          var free = tiles.filter(function (t) { return !taken[t.x + ',' + t.y] && !(t.x === self.p.tx && t.y === self.p.ty); });
+          var pick = (free.length ? free : tiles)[Math.floor(Math.random() * (free.length ? free.length : tiles.length))];
+          taken[pick.x + ',' + pick.y] = true;
+          var spr = self.add.sprite(pick.x * T + T / 2, pick.y * T + T, tk, walk ? self.idleFrame(spec.sprite, 'down') : undefined).setOrigin(0.5, 1);
+          if (!walk) spr.setScale(C.MAP_MONSTER_H / Math.max(spr.height, 1));
+          self.animals.push({ spec: spec, tiles: tiles, sprite: spr, walk: walk, tx: pick.x, ty: pick.y, facing: 'down', moving: false, path: [],
+            nextMove: self.time.now + 1500 + Math.random() * 3000, idx: i });
+        }
+      });
+      g.animalLog = this.animals.length;   // 測試用
+    }
+
+    animalAt(x, y) {
+      for (var i = 0; i < (this.animals || []).length; i++) { var a = this.animals[i]; if (a.tx === x && a.ty === y) return a; }
+      return null;
+    }
+
+    /** 主角碰到動物：頭上冒出「哞～」，動物馬上走開（不會擋住太久） */
+    bumpAnimal(a) {
+      var now = this.time.now;
+      if (!a.lastBump || now - a.lastBump > 1200) {
+        a.lastBump = now;
+        var t = this.add.text(a.sprite.x, a.sprite.y - a.sprite.displayHeight - 4, a.spec.say, { fontFamily: 'sans-serif', fontSize: '16px', color: '#2a1e22', backgroundColor: '#fffbe8', padding: { x: 6, y: 2 } })
+          .setOrigin(0.5, 1).setDepth(9000);
+        this.tweens.add({ targets: t, y: t.y - 14, alpha: 0, delay: 700, duration: 600, onComplete: function () { t.destroy(); } });
+        J.Audio.play('select');
+        G().animalBumps = (G().animalBumps || 0) + 1;   // 測試用
+      }
+      a.flee = true;
+      a.path = [];
+      if (!a.moving) a.nextMove = Math.min(a.nextMove, now + 250);
+    }
+
+    wanderAnimals(now) {
+      var self = this, p = this.p;
+      (this.animals || []).forEach(function (a) {
+        if (a.moving || now < a.nextMove) return;
+        var occupied = function (x, y) {
+          if (x === p.tx && y === p.ty) return true;
+          if (p.moving && p.prev && x === p.prev.x && y === p.prev.y) return true;
+          return self.animals.some(function (o) { return o !== a && o.tx === x && o.ty === y; });
+        };
+        var ok = {};
+        a.tiles.forEach(function (t) { ok[t.x + ',' + t.y] = true; });
+        var can = function (x, y) { return !!ok[x + ',' + y] && !occupied(x, y); };
+        if (!a.path.length) {
+          var goal = a.flee ? J.MapInfo.awayTarget(a.tiles, { x: a.tx, y: a.ty }, { x: p.tx, y: p.ty }) : J.MapInfo.wanderTarget(a.tiles, { x: a.tx, y: a.ty });
+          a.flee = false;
+          a.path = goal ? (J.Pathfind.findPath(can, self.size.w, self.size.h, { c: a.tx, r: a.ty }, { c: goal.x, r: goal.y }, 600) || []) : [];
+          if (!a.path.length) { a.nextMove = now + 1500 + Math.random() * 2000; return; }
+        }
+        var t = a.path.shift();
+        if (!can(t.c, t.r)) { a.path = []; a.nextMove = now + 600; return; }
+        var dir = t.c > a.tx ? 'right' : t.c < a.tx ? 'left' : t.r > a.ty ? 'down' : 'up';
+        a.tx = t.c; a.ty = t.r; a.facing = dir;
+        a.moving = true;
+        var key = a.sprite.texture.key + '-' + dir;
+        if (a.walk) { if (self.anims.exists(key) && (!a.sprite.anims.isPlaying || a.sprite.anims.currentAnim.key !== key)) a.sprite.anims.play(key); }
+        else if (dir === 'left' || dir === 'right') a.sprite.setFlipX(dir === 'right');
+        self.tweens.add({ targets: a.sprite, x: t.c * T + T / 2, y: t.r * T + T, duration: 650, onComplete: function () {
+          a.moving = false;
+          if (a.path.length) { a.nextMove = self.time.now; return; }
+          if (a.walk) { a.sprite.anims.stop(); a.sprite.setFrame(self.idleFrame(a.spec.sprite, a.facing)); }
+          a.nextMove = self.time.now + 2000 + Math.random() * 3500;   // 走到了就停下來吃草一下
+        } });
+      });
+    }
+
     /** 戰鬥結束：怪物清醒跑走，30 秒後在範圍內重生（頭目淨化後不再出現） */
     monsterRunAway(mob, defeated) {
       if (!mob || !mob.sprite) return;
@@ -833,7 +966,9 @@
       var p = this.p, d = DIRS[dir];
       p.facing = dir;
       var nx = p.tx + d[0], ny = p.ty + d[1];
-      if (!this.walkable(nx, ny)) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, dir)); return false; }
+      var an = this.animalAt(nx, ny);
+      if (an) this.bumpAnimal(an);   // v0.9.3 碰到黃牛：哞～，牠會走開
+      if (an || !this.walkable(nx, ny)) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, dir)); return false; }
       this.beginStep(nx, ny);
       return true;
     }
@@ -890,6 +1025,8 @@
       for (i = 0; i < this.chests.length; i++) if (this.chests[i].data.x === x && this.chests[i].data.y === y) return { kind: 'chest', chest: this.chests[i].data };
       for (i = 0; i < this.lamps.length; i++) if (this.lamps[i].data.x === x && this.lamps[i].data.y === y) return { kind: 'lamp', lamp: this.lamps[i].data };
       if (this.station && this.station.x === x && this.station.y === y) return { kind: 'station', station: this.station };
+      var an = this.animalAt(x, y);
+      if (an) return { kind: 'animal', animal: an };
       return null;
     }
 
@@ -910,7 +1047,7 @@
     }
 
     actionKey() {
-      if (J.UI.isOpen() || this.transitioning || this.p.moving || G().busy) return;
+      if (!this.p || J.UI.isOpen() || this.transitioning || this.p.moving || G().busy) return;   // 地圖背景還在載入時 p 是 null
       var n = this.nearbyInteractable();
       if (n) { this.face(n.x, n.y); this.interact(n.t); }
     }
@@ -923,10 +1060,12 @@
       else if (t.kind === 'chest') g.openChest(t.chest, this);
       else if (t.kind === 'lamp') g.inspectLamp(t.lamp, this);
       else if (t.kind === 'station') g.useStation(t.station, this);
+      else if (t.kind === 'animal') { t.animal.nextMove = Math.max(t.animal.nextMove, this.time.now + 2500); g.animalTalk(t.animal.spec); }   // 說話時先站著不動
     }
 
     promptText(t) {
       if (t.kind === 'npc') return '和' + G().speaker(t.npc.id).name + '說話';
+      if (t.kind === 'animal') return '摸摸' + t.animal.spec.name;
       if (t.kind === 'chest') return G().state.chests[t.chest.id] ? '看看寶箱' : '打開寶箱';
       if (t.kind === 'station') return '在' + (t.station.name || '車站') + '搭車';
       return '看看' + t.lamp.subject + '燈';
@@ -936,7 +1075,7 @@
     update(time, delta) {
       var g = G(), p = this.p;
       if (!p || this.transitioning) return;
-      var blocked = J.UI.isOpen() || g.busy;
+      var blocked = J.UI.blocksMove() || g.busy;   // v0.9.3 放大地圖開著時也能走（passMove 視窗不擋）
       if (p.moving) {
         p.t += delta;
         var k = Math.min(1, p.t / (p.stepMs || STEP_MS));
@@ -952,7 +1091,9 @@
         if (dir) { p.path = []; p.pending = null; this.tryStep(dir); }
         else if (p.path.length) {
           var n = p.path.shift();
-          if (this.walkable(n.c, n.r)) this.beginStep(n.c, n.r); else p.path = [];
+          var an2 = this.animalAt(n.c, n.r);
+          if (an2) { this.bumpAnimal(an2); p.path = []; }
+          else if (this.walkable(n.c, n.r)) this.beginStep(n.c, n.r); else p.path = [];
         } else if (this.player.anims.isPlaying) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, p.facing)); }
       }
       // 番薯仔跟在後面（防閃爍：方向有遲滯、短暫停頓不切站姿、站姿沿用目前方向、透明度平滑變化）
@@ -961,14 +1102,15 @@
 
       if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); }
       this.wanderMonsters(time);
+      if (!g.busy) this.wanderAnimals(time);
       this.syncDepths();
       if (!blocked && time > this.encounterCooldown) this.checkEncounter();
-      if (!blocked && !p.moving) {
+      if (!blocked && !p.moving && !J.UI.isOpen()) {
         var near = this.nearbyInteractable();
         var self = this;
         if (near) J.HUD.prompt(this.promptText(near.t), function () { self.face(near.x, near.y); self.interact(near.t); });
         else J.HUD.prompt(null);
-      } else if (p.moving) J.HUD.prompt(null);
+      } else if (p.moving || J.UI.isOpen()) J.HUD.prompt(null);
     }
 
     syncDepths() {
@@ -977,6 +1119,7 @@
       setD(this.player, this.player.y);
       setD(this.pet, this.pet.y - 0.1);
       this.monsters.forEach(function (m) { if (m.sprite && m.inView !== false) setD(m.sprite, m.sprite.y); });
+      (this.animals || []).forEach(function (a) { if (a.inView !== false) setD(a.sprite, a.sprite.y); });
     }
 
     /**
@@ -995,6 +1138,12 @@
         mob.inView = v;
         if (mob.active) mob.sprite.setVisible(v);
         if (mob.bob) { if (v) mob.bob.resume(); else mob.bob.pause(); }
+      });
+      (this.animals || []).forEach(function (a) {
+        var v = inView(a.sprite.x, a.sprite.y);
+        if (v === a.inView) return;
+        a.inView = v;
+        a.sprite.setVisible(v);
       });
       this.npcs.forEach(function (n) {
         var v = inView(n.img.x, n.img.y);
@@ -1059,17 +1208,31 @@
         var m = this.monsters[i];
         if (!m.active || !m.sprite) continue;
         var dx = m.sprite.x - px, dy = m.sprite.y - py;
-        if (Math.abs(dx) < T * 0.65 && Math.abs(dy) < T * 0.65) { this.startBattle(m); return; }
+        var near = Math.abs(dx) < T * 0.65 && Math.abs(dy) < T * 0.65;
+        // v0.9.3 最終頭目：孩子選了「明天再來」之後，要先離開一下才會再問
+        if (m.waitLeave) { if (Math.abs(dx) > T * 1.5 || Math.abs(dy) > T * 1.5) m.waitLeave = false; continue; }
+        if (near) { this.startBattle(m); return; }
       }
     }
 
     startBattle(mob) {
-      var self = this;
+      var self = this, g = G();
       this.p.path = []; this.p.pending = null;
       this.p.moving = false;
       this.player.setPosition(this.p.tx * T + T / 2, this.p.ty * T + T);
       this.player.anims.stop();
       this.encounterCooldown = Infinity;
+      // v0.9.3（老闆核准）最終頭目戰前先看今天還剩多少時間（剩 25 分鐘以上直接進場；10～25 分鐘讓孩子選；不到 10 分鐘明天再來）
+      if (mob.boss && g.isFinalBoss(mob.mon, this.map) && !mob.gateOk) {
+        J.HUD.prompt(null);
+        g.finalBossGate().then(function (ok) {
+          if (!self.sys || !self.sys.isActive()) return;
+          if (ok) { mob.gateOk = true; self.startBattle(mob); mob.gateOk = false; return; }
+          mob.waitLeave = true;
+          self.encounterCooldown = self.time.now + 800;
+        });
+        return;
+      }
       J.HUD.prompt(null);
       J.Audio.play('encounter');
       this.cameras.main.flash(250, 255, 255, 255);

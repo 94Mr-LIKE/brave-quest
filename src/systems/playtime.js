@@ -26,6 +26,25 @@
     return pt.todayMs >= limitMs(settings);
   }
 
+  /** 今天還剩幾分鐘（無條件捨去；不限時回傳 Infinity） */
+  function remainingMin(pt, settings, now) {
+    rollDay(pt, now);
+    var lim = limitMs(settings);
+    if (lim === Infinity) return Infinity;
+    return Math.max(0, Math.floor((lim - pt.todayMs) / 60000));
+  }
+
+  /**
+   * v0.9.3（老闆核准）進入最終頭目戰前看今天還剩多少時間：
+   * 剩 25 分鐘以上 → 'go'（直接進場）；10～25 分鐘 → 'ask'（提醒可能打不完，讓孩子自己選）；不到 10 分鐘 → 'tomorrow'（不讓進場）。
+   * 回傳 { action, minutes }
+   */
+  var FINAL_GO_MIN = 25, FINAL_MIN = 10;
+  function finalBossGate(pt, settings, now) {
+    var left = remainingMin(pt, settings, now);
+    return { action: left >= FINAL_GO_MIN ? 'go' : left >= FINAL_MIN ? 'ask' : 'tomorrow', minutes: left };
+  }
+
   /** 每秒呼叫一次。回傳事件陣列：'rest'（該休息）、'limit'（今日已達上限） */
   function tick(pt, settings, now) {
     rollDay(pt, now);
@@ -48,7 +67,7 @@
 
   function minutes(ms) { return Math.floor(ms / 60000); }
 
-  var Playtime = { LIMIT_OPTIONS: LIMIT_OPTIONS, DEFAULT_LIMIT: DEFAULT_LIMIT, REST_MS: REST_MS, create: create, tick: tick, pause: pause, isOverLimit: isOverLimit, limitMs: limitMs, minutes: minutes };
+  var Playtime = { remainingMin: remainingMin, finalBossGate: finalBossGate, FINAL_GO_MIN: FINAL_GO_MIN, FINAL_MIN: FINAL_MIN, LIMIT_OPTIONS: LIMIT_OPTIONS, DEFAULT_LIMIT: DEFAULT_LIMIT, REST_MS: REST_MS, create: create, tick: tick, pause: pause, isOverLimit: isOverLimit, limitMs: limitMs, minutes: minutes };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Playtime = Playtime; }
   if (typeof module !== 'undefined') module.exports = Playtime;
 })();

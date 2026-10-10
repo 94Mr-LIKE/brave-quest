@@ -21,18 +21,40 @@
 (function () {
   'use strict';
 
-  // ---------------------------------------------------------------- 音色辨識
+  // ================================================================ 【語音組 2026-10-10 區塊 A：挑語音（性別辨識、性別保護）開始】
+  // 這個區塊由語音組維護（老闆試玩回饋 A5–A9）。前端同事要改請先跟語音組說，避免互相蓋掉。
   // 依語音名稱判斷性別（名稱含這些字就算；不分大小寫、忽略「-」與空白）
-  var FEMALE = ['meijia', 'tingting', 'sinji', 'hanhan', 'yating', 'hsiaochen', 'hsiaoyu', 'huihui', 'yaoyao', 'xiaoxiao', 'xiaoyi', 'xiaohan', 'xiaomo', 'xiaorui', 'xiaoshuang', 'hiugaai', 'hiumaan', 'lili', 'female', '女'];
-  var MALE = ['zhiwei', 'yunjhe', 'kangkang', 'yunxi', 'yunyang', 'yunjian', 'yunfeng', 'yunhao', 'wanlung', 'male', '男'];
+  // 2026-10-10：Edge 在中文介面會把語音名稱顯示成中文（老闆截圖：「Microsoft 曉臻 Online (Natural)」「Microsoft 雲哲 Online (Natural)」
+  //   「Microsoft 曉雨 Online (Natural)」），原本只認英文拼音，中文名稱全被當成「不知道性別」，女性角色會隨機分到雲哲（男聲）。
+  //   Microsoft 中文語音的命名規則：女聲「曉／Xiao／Hsiao／Hiu」開頭，男聲「雲／Yun／Wan」開頭。
+  var FEMALE = ['meijia', 'tingting', 'sinji', 'hanhan', 'yating', 'hsiaochen', 'hsiaoyu', 'huihui', 'yaoyao', 'xiaoxiao', 'xiaoyi', 'xiaohan', 'xiaomo', 'xiaorui', 'xiaoshuang', 'hiugaai', 'hiumaan', 'lili', 'female', '女',
+    'xiaochen', 'xiaoyan', 'xiaoyou', 'xiaoqiu', 'xiaozhen', 'xiaomeng', 'xiaoxuan', 'xiaobei', 'xiaoni', 'yushu',
+    '曉', '漢漢', '雅婷', '慧慧', '瑤瑤', '美佳', '婷婷', '善怡'];
+  var MALE = ['zhiwei', 'yunjhe', 'kangkang', 'yunxi', 'yunyang', 'yunjian', 'yunfeng', 'yunhao', 'wanlung', 'male', '男',
+    'yunxia', 'yunze', 'yunye', 'limu',
+    '雲', '志偉', '康康'];
 
+  /** name 可以是語音名稱字串，也可以是語音物件（{ name }） */
   function voiceGender(name) {
+    if (name && typeof name === 'object') name = name.name;
     var n = String(name || '').toLowerCase().replace(/[\s\-_]/g, '');
     if (/female/.test(n)) return 'f';
     for (var i = 0; i < MALE.length; i++) if (n.indexOf(MALE[i]) >= 0) return 'm';
     for (var j = 0; j < FEMALE.length; j++) if (n.indexOf(FEMALE[j]) >= 0) return 'f';
     return 'n';   // 例如「Google 國語（臺灣）」：不知道性別，當中性
   }
+
+  /**
+   * 角色性別和實際用到的語音性別不合時的音高修正（給 speakChunks 用）：
+   * - 男性角色用到女聲或不知性別的聲音 → 壓低（lowerForMale，原本就有）
+   * - 女性角色只能用到男聲（裝置上完全沒有女聲或中性聲）→ 提高（raiseForFemale），盡量接近女聲
+   * 用「實際語音名稱」判斷，所以家長在設定頁指定的語音也算得到。
+   */
+  function genderFix(profile, pick) {
+    var vg = pick && pick.voice ? voiceGender(pick.voice.name) : 'n';
+    return { lowerForMale: profile.gender === 'm' && vg !== 'm', raiseForFemale: profile.gender === 'f' && vg === 'm' };
+  }
+  // ================================================================ 【語音組區塊 A 結束（pickVoice 在下面，也屬語音組）】
 
   /** 語音品質分：名稱含 Natural／Neural（例如 Edge 的「Microsoft HsiaoChen Online (Natural)」）40；Enhanced／Premium／增強／高品質（iPad 增強版「美佳」）35 */
   var QUALITY = [[/natural|neural/i, 40], [/enhanced|premium|增強|高品質|優化/i, 35]];
@@ -43,7 +65,11 @@
   }
 
   /**
-   * 從語音清單挑一個。分數：語言（zh-TW 100 ＞ zh-HK 50 ＞ 其他 zh 20）＞ 品質（35～40）＞ 性別（相符 30、中性 10）。
+   * 【語音組 2026-10-10 修改】從語音清單挑一個。
+   * 分數：語言（zh-TW 100 ＞ zh-HK 50 ＞ 其他 zh 20）＞ 性別（相符 50、中性 10）＞ 品質（35～40）。
+   *   2026-10-10 起性別分（50）高於品質分（40）：同一種語言裡，男性角色寧可用一般男聲，也不用高品質女聲（老闆 A9「男女聲音放反」）。
+   * 女性角色絕對不配男聲：只要清單裡有女聲或不知性別的聲音，男聲一律不列入候選（老闆 A8）；
+   *   整台裝置只有男聲時才用男聲，並由 genderFix 提高音高。
    * opts = { allowCloud（預設 true；false 時不用雲端語音）, key（角色 id：同分時依 id 固定挑其中一個，讓不同角色聲音不同） }
    * 回傳 { voice, gender, matched, score, cloud }；沒有符合的語音時 voice 為 null。
    */
@@ -60,9 +86,11 @@
       var score = 0;
       if (vl === lang) score += 100; else if (pre === 'zh' && vl === 'zh-hk') score += 50; else score += 20;
       score += voiceQuality(v);
-      if (want && want !== 'n') score += g === want ? 30 : (g === 'n' ? 10 : 0);
+      if (want && want !== 'n') score += g === want ? 50 : (g === 'n' ? 10 : 0);
       cands.push({ voice: v, gender: g, score: score });
     });
+    // 女性角色：有女聲或中性聲可用時，男聲完全不列入
+    if (want === 'f' && cands.some(function (c) { return c.gender !== 'm'; })) cands = cands.filter(function (c) { return c.gender !== 'm'; });
     if (!cands.length) return { voice: null, gender: 'n', matched: false, score: -1, cloud: false };
     var top = Math.max.apply(null, cands.map(function (c) { return c.score; }));
     var tier = cands.filter(function (c) { return c.score === top; });
@@ -211,13 +239,61 @@
     var e = EMOTION[opts.emotion] || EMOTION[String(opts.emotion || '').toLowerCase()];
     if (e) { p += e.pitch || 0; r += e.rate || 0; v += e.volume || 0; }
     if (opts.lowerForMale) p *= profile.abs ? 0.88 : 0.78;   // 男性角色卻沒有男聲：再壓低一點
+    if (opts.raiseForFemale) p *= 1.3;   // 【語音組 2026-10-10】女性角色只能用男聲（裝置上沒有女聲）：提高音高盡量接近女聲
     r *= opts.rateMult || 1;
     v *= opts.volume === undefined ? 1 : opts.volume;
     return { pitch: clamp(p, 0.3, 2), rate: clamp(r, 0.55, 1.6), volume: clamp(v, 0, 1) };
   }
 
+  // ================================================================ 【語音組 2026-10-10 區塊 B：讀音替換、題目括號、念完整】開始
+  // 這個區塊由語音組維護（老闆試玩回饋 A4、A8）。前端同事要改請先跟語音組說。
+  /**
+   * 讀音替換（只影響朗讀，不改畫面上的字）：瀏覽器的華語語音遇到破音字可能挑錯讀音，
+   * 把「整個詞」換成同音而且只有一個讀音的字，讓語音念出辭典的正確讀音。
+   * 讀音依教育部《重編國語辭典修訂本》（https://dict.revised.moe.edu.tw/ ，2026-10-10 查詢），每條都在 34 號報告附詞條。
+   * 只放「整個詞」，不放單字，避免換到別的詞（例如「數學」「力量」不受影響）。依陣列順序替換（長的詞放前面）。
+   */
+  var READINGS = [
+    ['數數看', '暑暑看'],   // 數 ㄕㄨˇ（動詞：計算）
+    ['數數', '暑數'],       // 數數 ㄕㄨˇ ㄕㄨˋ
+    ['數清楚', '暑清楚'], ['數不清', '暑不清'], ['數對', '暑對'],
+    ['量兩次', '良兩次'],   // 量 ㄌㄧㄤˊ（動詞：以工具計算長短）
+    ['量不準', '良不準'], ['量木板', '良木板'], ['量得剛', '良得剛'], ['量長度', '良長度'],
+    ['當成', '蕩成'],       // 當成：當 ㄉㄤˋ（視、認為；同「當作」ㄉㄤˋ ㄗㄨㄛˋ）
+    ['卷軸', '倦軸'],       // 卷軸 ㄐㄩㄢˋ ㄓㄡˊ
+    ['彈彈', '談談']        // 軟軟彈彈：彈 ㄊㄢˊ（同「彈性」ㄊㄢˊ ㄒㄧㄥˋ）
+  ];
+  function readingFix(text) {
+    var s = String(text || '');
+    for (var i = 0; i < READINGS.length; i++) if (s.indexOf(READINGS[i][0]) >= 0) s = s.split(READINGS[i][0]).join(READINGS[i][1]);
+    return s;
+  }
+
+  /**
+   * 題目朗讀不要丟掉括號裡的字（A8 語音要完整）：括號在題目裡是內容，不是舞台說明，
+   * 例如「（可以選不只一個）」「氵（水部）」「。（句號）」。原本 stripStage 會整段拿掉，選項可能變成沒聲音。
+   * 這裡把括號換成逗號（停頓），內容照念。對話台詞仍然拿掉括號（外國商人的「Hello!（你好！）」不重複念）。
+   */
+  function keepParens(text) {
+    return String(text || '').replace(/[（(【［\[]([^（）()【】［］\[\]]*)[）)】］\]]/g, function (m, inner) {
+      return inner.replace(/[\s　_＿]/g, '').length ? '，' + inner + '，' : '，';
+    });
+  }
+
+  /**
+   * 每一段的保險時間（A8）：原本固定「1.5 秒＋每字 0.32 秒」，沒算語速。
+   * 語速慢（老人 0.7、家長設「慢」0.6）時一個字要 0.4～0.5 秒，保險時間會比真正念完還早到，
+   * 後面的段落被提早排進去、整句提早算「念完」，接著換句或關掉時 cancel() 就把還沒念完的尾巴切掉。
+   * 改成依實際語速放大，雲端語音再多等 1.5 秒（要先連線）。保險時間到時如果瀏覽器還在念，再延長（最多 3 次）。
+   */
+  function guardMs(text, rate, cloud) {
+    var n = String(text || '').length;
+    return Math.round(1500 + (cloud ? 1500 : 0) + n * 320 / clamp(rate || 1, 0.5, 2));
+  }
+  // ================================================================ 【語音組區塊 B 結束】
+
   // ---------------------------------------------------------------- 分段
-  var PAUSE = { '，': 180, ',': 180, '、': 130, '；': 230, ';': 230, '：': 180, '。': 380, '.': 380, '！': 340, '!': 340, '？': 360, '?': 360, '…': 420 };
+  var PAUSE ={ '，': 180, ',': 180, '、': 130, '；': 230, ';': 230, '：': 180, '。': 380, '.': 380, '！': 340, '!': 340, '？': 360, '?': 360, '…': 420 };
 
   /** 去掉括號裡的舞台說明：（笑）、(小聲)、【動作】、［…］ */
   function stripStage(text) {
@@ -230,7 +306,7 @@
    * - 每一短句裡的英文單字串照原規則用 latinLang（英文語音）念
    */
   function chunks(text, latinLang) {
-    var s = stripStage(text);
+    var s = readingFix(stripStage(text));   // 【語音組 2026-10-10】readingFix：破音字讀音替換（只影響朗讀）
     var out = [];
     var re = /[^，,、；;：。！!？?…]+(?:[，,、；;：。！!？?]|…+)*/g, m;
     while ((m = re.exec(s))) {
@@ -287,7 +363,9 @@
   // ---------------------------------------------------------------- 播放（瀏覽器）
   var synth = typeof window !== 'undefined' ? (window.speechSynthesis || null) : null;
   var enabled = true, speaking = false, token = 0, audioEl = null, timers = [];
-  var settings = { volume: 0.9, rateMult: 1, pref: 'taigi', allowCloud: true, playerName: '' };
+  // v0.9.3：rateMult 預設 1.15（稍快）；voiceName＝家長在設定頁選的中文語音（'' = 依角色自動挑）
+  var RATE_BASE = 1.15;   // 預錄音檔（台語）錄的是正常速度：語速設定在「稍快」時照原速播，只依相對比例調整
+  var settings = { volume: 1, rateMult: RATE_BASE, pref: 'taigi', allowCloud: true, playerName: '', voiceName: '' };
   var voiceCache = {};   // 角色 id＋語言 → 語音名稱（同一個角色每次都用同一個語音）
   var stats = { utterances: 0, files: 0, cues: 0 };   // 給測試看
 
@@ -307,6 +385,13 @@
    * 記住的語音不在清單裡了（例如換了裝置設定）或雲端設定改了，才重新挑。
    */
   function voiceFor(profile, lang, list) {
+    // v0.9.3 家長選了語音：中文句子都用它（音高、語速仍依角色調整）；英文句子、台語預錄音檔不受影響
+    if (settings.voiceName && /^zh/i.test(lang)) {
+      var chosen = list.filter(function (v) { return v.name === settings.voiceName; })[0];
+      if (chosen && (settings.allowCloud || chosen.localService !== false)) {
+        return { voice: chosen, gender: profile.gender, matched: true, cloud: chosen.localService === false, chosen: true };
+      }
+    }
     var key = (profile.id || 'narrator') + '|' + lang + '|' + (settings.allowCloud ? 'c' : 'l');
     var cached = voiceCache[key];
     if (cached) {
@@ -334,7 +419,9 @@
       return true;
     }
     var pick = voiceFor(profile, 'zh-TW', voicesList());
-    var base = prosody(profile, { emotion: emotion, rateMult: settings.rateMult, volume: settings.volume, lowerForMale: profile.gender === 'm' && !pick.matched });
+    // 【語音組 2026-10-10】性別修正改看「實際用到的語音」的性別（genderFix）：男角配到女聲壓低、女角只能配男聲時提高
+    var gfix = genderFix(profile, pick);
+    var base = prosody(profile, { emotion: emotion, rateMult: settings.rateMult, volume: settings.volume, lowerForMale: gfix.lowerForMale, raiseForFemale: gfix.raiseForFemale });
     var i = 0;
     function finish() { if (my !== token) return; speaking = false; if (onEnd) onEnd(); }
     function next() {
@@ -356,7 +443,16 @@
       var done = false;
       var go = function () { if (done || my !== token) return; done = true; later(next, c.pauseAfter || 0); };
       u.onend = go; u.onerror = go;
-      later(go, 1500 + c.text.length * 320);   // 保險：有些瀏覽器不會觸發 onend
+      // 保險：有些瀏覽器不會觸發 onend。【語音組 2026-10-10】保險時間依語速放大；時間到但瀏覽器還在念就再等（最多 3 次），避免提早算念完
+      var tries = 0;
+      var guard = function () {
+        if (done || my !== token) return;
+        var busy = false;
+        try { busy = !!(synth.speaking || synth.pending); } catch (e) { /* 忽略 */ }
+        if (busy && tries++ < 3) { later(guard, 1200); return; }
+        go();
+      };
+      later(guard, guardMs(c.text, u.rate, vp.cloud));
       try { synth.speak(u); stats.utterances++; } catch (e) { go(); }
     }
     next();
@@ -366,7 +462,8 @@
   /** 題目朗讀（相容舊 tts.js）：lang＝題目的 tts_lang，英文段落用英文語音 */
   function speak(text, lang, onStart, onEnd) {
     var latin = lang && lang.indexOf('en') === 0 ? lang : 'en-US';
-    return speakChunks(chunks(premask(text), latin), { id: 'narrator', gender: 'n', age: 'adult', persona: 'calm', pitch: 1, rate: 1 }, null, onStart, onEnd);
+    // 【語音組 2026-10-10】keepParens：題目括號裡的字照念（A8 語音要完整）
+    return speakChunks(chunks(keepParens(premask(text)), latin), { id: 'narrator', gender: 'n', age: 'adult', persona: 'calm', pitch: 1, rate: 1 }, null, onStart, onEnd);
   }
 
   /**
@@ -402,7 +499,7 @@
       try { a.pause(); } catch (e) { /* 忽略 */ }
       done(ok);
     };
-    a.volume = clamp(settings.volume, 0, 1);
+    a.volume = clamp(settings.volume, 0, 1);   // <audio> 最大 1（音量「大」只在 Web Audio 播放時更大聲）
     a.playbackRate = rate;
     try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (e) { /* 忽略 */ }
     audioEl = { pause: function () { finish(true); } };
@@ -429,7 +526,7 @@
     var full = window.JQ && window.JQ.Assets && window.JQ.Assets.versioned ? window.JQ.Assets.versioned(src) : src;   // 網址加版本號，避免快取到舊錄音
     // 依說話者微調播放速度（±10%）：小孩稍高、老人稍低
     var p = prosody(profile, { rateMult: 1 });
-    var rate = clamp(1 + (p.pitch - 1) * 0.15, 0.9, 1.1) * clamp(settings.rateMult, 0.8, 1.2);
+    var rate = clamp(1 + (p.pitch - 1) * 0.15, 0.9, 1.1) * clamp(settings.rateMult / RATE_BASE, 0.8, 1.2);   // v0.9.3 預設「稍快」＝錄音原速
     speaking = true;
     stats.files++;
     var settled = false;
@@ -449,7 +546,7 @@
           var s = A.ctx.createBufferSource(), g = A.ctx.createGain();
           s.buffer = buf;
           s.playbackRate.value = rate;
-          g.gain.value = clamp(settings.volume, 0, 1) * 1.3;   // 主音量是 0.7，語音補回一點
+          g.gain.value = clamp(settings.volume, 0, 1.5) * 1.3;   // 主音量是 0.7，語音補回一點（v0.9.3 音量「大」1.3 倍）
           s.connect(g); g.connect(A.out);
           var guard = 0;
           var finish = function () { if (guard) clearTimeout(guard); try { s.stop(); } catch (e) { /* 忽略 */ } end(); };
@@ -502,11 +599,12 @@
     try { synth.getVoices(); } catch (e) { /* 忽略：有些瀏覽器要先呼叫一次才會載入語音清單 */ }
   }
 
-  /** s = { volume 0～1, rateMult 0.8～1.2, pref 'taigi'|'huayu' } */
+  /** s = { volume 0～1.5（小 0.6、中 1、大 1.3）, rateMult 0.6～1.5, pref 'taigi'|'huayu', allowCloud, playerName, voiceName } */
   function configure(s) {
     if (!s) return;
-    if (typeof s.volume === 'number') settings.volume = clamp(s.volume, 0, 1);
+    if (typeof s.volume === 'number') settings.volume = clamp(s.volume, 0, 1.5);
     if (typeof s.rateMult === 'number') settings.rateMult = clamp(s.rateMult, 0.6, 1.5);
+    if (typeof s.voiceName === 'string') settings.voiceName = s.voiceName;
     if (s.pref === 'taigi' || s.pref === 'huayu') settings.pref = s.pref;
     if (typeof s.allowCloud === 'boolean') settings.allowCloud = s.allowCloud;
     if (typeof s.playerName === 'string') settings.playerName = s.playerName;
@@ -519,7 +617,21 @@
     return p.voice ? { name: p.voice.name, lang: p.voice.lang, cloud: p.voice.localService === false, quality: voiceQuality(p.voice) } : null;
   }
 
+  /**
+   * v0.9.3 設定頁的「語音模型」清單：這台裝置可用的中文語音（台灣華語排前面、高品質排前面）。
+   * list 不給就用瀏覽器的清單。不允許雲端語音時，雲端的不列出。回傳 [{ name, lang, cloud, quality, gender }]
+   */
+  function chineseVoices(list, allowCloud) {
+    list = list || voicesList();
+    if (allowCloud === undefined) allowCloud = settings.allowCloud;
+    var rank = function (v) { return (/^zh[-_]TW/i.test(v.lang) ? 0 : /^zh[-_](HK|Hant)/i.test(v.lang) ? 1 : 2); };
+    return list.filter(function (v) { return v && /^(zh|cmn)/i.test(v.lang || '') && (allowCloud || v.localService !== false); })
+      .map(function (v) { return { name: v.name, lang: v.lang, cloud: v.localService === false, quality: voiceQuality(v), gender: voiceGender(v) }; })
+      .sort(function (a, b) { return rank(a) - rank(b) || (b.quality || 0) - (a.quality || 0) || (a.name < b.name ? -1 : 1); });
+  }
+
   var Voice = {
+    RATE_BASE: RATE_BASE, chineseVoices: chineseVoices,
     FEMALE: FEMALE, MALE: MALE, voiceGender: voiceGender, pickVoice: pickVoice, voiceQuality: voiceQuality, maskName: maskName, nameVariants: nameVariants, voiceFor: voiceFor, currentVoice: currentVoice,
     _settings: settings, _cache: voiceCache, inferProfile: inferProfile, profileFor: profileFor,
     prosody: prosody, stripStage: stripStage, chunks: chunks, splitLatin: splitLatin, voiceFile: voiceFile, hash: hash,
@@ -528,6 +640,8 @@
     available: function () { return !!(synth && typeof SpeechSynthesisUtterance !== 'undefined'); },
     setEnabled: function (v) { enabled = !!v; if (!v) stop(); }
   };
+  // 【語音組 2026-10-10】給測試用
+  Voice.READINGS = READINGS; Voice.readingFix = readingFix; Voice.keepParens = keepParens; Voice.guardMs = guardMs; Voice.genderFix = genderFix;
   if (typeof window !== 'undefined') {
     window.JQ = window.JQ || {};
     window.JQ.Voice = Voice;

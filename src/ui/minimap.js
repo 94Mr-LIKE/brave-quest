@@ -11,7 +11,7 @@
   var SHOP_COLOR = { weapon: '#e0603a', armor: '#3b8fd6', item: '#2f8f4a', general: '#d0a020', inn: '#a15ad8' };
   var SHOP_SHORT = { weapon: '武', armor: '防', item: '道', general: '雜', inn: '旅' };
   var LOCAL_W = 40, LOCAL_H = 25;   // 大地圖時小地圖顯示的範圍（格）
-  var box = null, canvas = null, caption = null, timer = 0, gridCache = {};
+  var box = null, canvas = null, caption = null, levelCap = null, timer = 0, gridCache = {};
   /** 「寶箱：還剩 N 個」（這張地圖還沒打開的寶箱數；沒有寶箱的地圖不顯示） */
   function chestText(info) {
     var cs = info.chests || [];
@@ -92,7 +92,8 @@
     if (!box) {
       canvas = h('canvas', { 'aria-hidden': 'true' });
       caption = h('span.mm-caption');
-      box = h('button.minimap', { onclick: function () { if (!G.blocked()) openBig(G); }, 'aria-label': '小地圖（點一下放大）' }, [canvas, caption]);
+      levelCap = h('span.mm-level');   // v0.9.3 建議等級「Lv1–4」
+      box = h('button.minimap', { onclick: function () { if (!G.blocked()) openBig(G); }, 'aria-label': '小地圖（點一下放大）' }, [levelCap, canvas, caption]);
       hud.appendChild(box);
     }
     var info = scene.minimapInfo();
@@ -103,6 +104,8 @@
     box.setAttribute('aria-label', '小地圖：' + (info.name || '') + '（點一下放大）' + (chestText(info) ? '，' + chestText(info) : ''));
     caption.textContent = chestText(info);
     caption.hidden = !caption.textContent;
+    levelCap.textContent = J.MapInfo.levelText(scene.map, scene.mapId) ? '建議 ' + J.MapInfo.levelText(scene.map, scene.mapId) : '';
+    levelCap.hidden = !levelCap.textContent;
     clearInterval(timer);
     timer = setInterval(function () {
       if (!G.mapScene || G.mapScene !== scene || !scene.p || !scene.sys.isActive()) return;
@@ -141,9 +144,10 @@
     var mapBox = h('div.mm-map', {}, [big, legend]);
     mapBox.style.width = sz.w + 6 + 'px';   // 圖例跟著地圖寬度換行
     var panel = h('div.win.panel.minimap-panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']),
-      h('h2', { text: '🗺️ ' + (info.name || '地圖') + '（' + info.w + '×' + info.h + ' 格）' }),
+      h('h2', { text: '🗺️ ' + J.MapInfo.nameWithLevel({ name: info.name || '地圖', rec_level: sc.map.rec_level }, sc.mapId) + '（' + info.w + '×' + info.h + ' 格）' }),
       h('div.mm-body', {}, [mapBox, h('div.mm-side', {}, [h('h3', { text: '這裡的人（點一下看位置）' }), npcList, h('h3', { text: '這裡的怪物' }), monList])])]);
-    handle = J.UI.open(panel, { label: (info.name || '') + '的地圖', onClose: function () { clearInterval(t); } });
+    // v0.9.3 放大地圖開著時主角仍然可以走（方向鍵、搖桿），地圖上的「你」會跟著動
+    handle = J.UI.open(panel, { label: (info.name || '') + '的地圖', passMove: true, onClose: function () { clearInterval(t); } });
     draw(big, info, true);
     return handle;
   }

@@ -20,14 +20,25 @@
   function seen(state, id) { rec(state, id).seen += 1; }
   function defeated(state, id) { var r = rec(state, id); if (!r.seen) r.seen = 1; r.defeated += 1; }
 
-  function split(monsters) {
-    var mobs = [], bosses = [];
-    Object.keys(monsters || {}).forEach(function (id) { (monsters[id].boss ? bosses : mobs).push(id); });
+  /** 至少出現在一張地圖（spawns，包含頭目）的怪物 id */
+  function onMaps(maps) {
+    var set = {};
+    Object.keys(maps || {}).forEach(function (mid) { (maps[mid].spawns || []).forEach(function (s) { if (s && s.monster) set[s.monster] = true; }); });
+    return set;
+  }
+
+  /**
+   * 小怪、頭目名單。maps 有給時只算至少出現在一張地圖的怪物（v0.9.3：沼澤蛙被招潮蟹取代後不再出現，
+   * 不能算進「遇見全部」「每種小怪都打倒 3 次」，不然永遠拿不到）。不寫死名單
+   */
+  function split(monsters, maps) {
+    var mobs = [], bosses = [], on = maps ? onMaps(maps) : null;
+    Object.keys(monsters || {}).forEach(function (id) { if (on && !on[id]) return; (monsters[id].boss ? bosses : mobs).push(id); });
     return { mobs: mobs, bosses: bosses, all: mobs.concat(bosses) };
   }
 
-  function counts(state, monsters) {
-    var s = split(monsters), b = state.bestiary || {};
+  function counts(state, monsters, maps) {
+    var s = split(monsters, maps), b = state.bestiary || {};
     return {
       total: s.all.length,
       seen: s.all.filter(function (id) { return b[id] && b[id].seen > 0; }).length,
@@ -37,8 +48,8 @@
   }
 
   /** 獎勵清單（含進度與是否可領） */
-  function rewards(state, monsters) {
-    var c = counts(state, monsters);
+  function rewards(state, monsters, maps) {
+    var c = counts(state, monsters, maps);
     var list = [
       { id: 'seen5', text: '遇見 5 種怪物', have: c.seen, need: Math.min(5, c.total), reward: { gold: 50 } },
       { id: 'seen10', text: '遇見 10 種怪物', have: c.seen, need: Math.min(10, c.total), reward: { item: 'herb', n: 3 } },
@@ -55,8 +66,8 @@
   var STICKER_NAME = { bk_doctor: '怪物博士貼紙', bk_brave: '勇敢徽章貼紙', bk_light: '五道光貼紙' };
 
   /** 領獎。回傳 {ok, reward} */
-  function claim(state, monsters, id) {
-    var r = rewards(state, monsters).filter(function (x) { return x.id === id; })[0];
+  function claim(state, monsters, id, maps) {
+    var r = rewards(state, monsters, maps).filter(function (x) { return x.id === id; })[0];
     if (!r || !r.ready) return { ok: false };
     var rw = r.reward;
     if (rw.gold) state.player.coins += rw.gold;
@@ -85,7 +96,7 @@
       .map(function (mid) { return maps[mid].name || mid; });
   }
 
-  var Bestiary = { rec: rec, seen: seen, defeated: defeated, split: split, counts: counts, rewards: rewards, claim: claim, backfill: backfill, habitats: habitats, STICKER_NAME: STICKER_NAME };
+  var Bestiary = { onMaps: onMaps, rec: rec, seen: seen, defeated: defeated, split: split, counts: counts, rewards: rewards, claim: claim, backfill: backfill, habitats: habitats, STICKER_NAME: STICKER_NAME };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Bestiary = Bestiary; }
   if (typeof module !== 'undefined') module.exports = Bestiary;
 })();
