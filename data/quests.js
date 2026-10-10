@@ -20,7 +20,7 @@ window.QUESTS = {
   // ═════════════════════ 金包里教學（M01）═════════════════════
   Q_TUT_1: {
     title: "燈座上的字", giver: "chief", map: "M01", kind: "help",
-    goal: "在慈海宮廟埕找里長伯，幫忙讀海風公園燈座上的字：答對 2 題國語。",
+    goal: "在金包里慈護宮廟埕找里長伯，幫忙讀海風公園燈座上的字：答對 2 題國語。",
     log_next: "去金包里東北邊的磺火漁港，找漁夫阿伯。",
     teaches: ["移動", "對話", "答題", "提示"],
     subject: "國語", units: ["第參單元 走進大自然"], count: 2, level_range: [1, 1],
@@ -30,7 +30,7 @@ window.QUESTS = {
   Q_TUT_2: {
     title: "漁夫阿伯算魚錢", giver: "fisher", map: "M01", kind: "help",
     goal: "幫漁夫阿伯算魚錢、找零錢：答對 3 題數學。",
-    log_next: "拿金幣去老街的雜貨店買木劍或皮衣。再去溫泉旁找旅館老闆娘。",
+    log_next: "拿金幣去老街的雜貨店買木劍或皮衣。再去溫泉旁找旅館老闆。",
     teaches: ["商店"],
     subject: "數學", units: ["1 10000以內的數", "2 10000以內的加減"], count: 3, level_range: [1, 2],
     hunt: null, requires: ["Q_TUT_1"], reward: { exp: 0, gold: 50, item: null, light: null },
@@ -251,16 +251,16 @@ window.QUESTS = {
   // ═════════════════════ 村民委託（支線，散佈各圖）═════════════════════
   Q_SIDE_BOOK: {
     title: "書架亂糟糟", giver: "bookstore", map: "M01", kind: "help",
-    goal: "幫海風圖書館的阿姨整理書架：答對 3 題國語。",
-    log_next: "圖書館阿姨說：不會的題目，提示會告訴你課本哪裡有教。",
+    goal: "幫海風圖書館的阿伯整理書架：答對 3 題國語。",
+    log_next: "圖書館阿伯說：不會的題目，提示會告訴你課本哪裡有教。",
     subject: "國語", units: ["第壹單元 運用時間", "第貳單元 解決問題"], count: 3, level_range: [1, 2],
     hunt: null, requires: ["Q_TUT_1"], reward: { exp: 0, gold: 30, item: "guide", light: null },
     dialog_start: "D_BOOK_A", dialog_end: "D_BOOK_B"
   },
   Q_SIDE_POTATO: {
     title: "烤地瓜秤一秤", giver: "potato_seller", map: "M02", kind: "help",
-    goal: "幫擎天草原步道口賣地瓜的阿姨秤重、數數：答對 3 題數學。",
-    log_next: "阿姨送你番薯仔點心。",
+    goal: "幫擎天草原步道口賣地瓜的阿伯秤重、數數：答對 3 題數學。",
+    log_next: "阿伯送你番薯仔點心。",
     subject: "數學", units: ["7 公斤與公克", "1 10000以內的數"], count: 3, level_range: [1, 2],
     hunt: null, requires: ["Q_TUT_2"], reward: { exp: 0, gold: 30, item: "snack", light: null },
     dialog_start: "D_POTATO_A", dialog_end: "D_POTATO_B"
@@ -315,8 +315,8 @@ window.QUESTS = {
   },
   Q_SIDE_TARO: {
     title: "芋圓平分", giver: "taro_seller", map: "M09", kind: "help",
-    goal: "幫山城的芋圓店阿姨把芋圓平分到每一碗：答對 3 題數學。",
-    log_next: "芋圓店阿姨說：你真聰明，有空再來吃芋圓。",
+    goal: "幫山城的芋圓店老闆把芋圓平分到每一碗：答對 3 題數學。",
+    log_next: "芋圓店老闆說：你真聰明，有空再來吃芋圓。",
     subject: "數學", units: ["4 乘法", "6 除法", "9 列表與規律"], count: 3, level_range: [3, 4],
     hunt: null, requires: ["Q_TUT_3"], reward: { exp: 0, gold: 100, item: "snack", light: null },
     dialog_start: "D_TARO_A", dialog_end: "D_TARO_B"

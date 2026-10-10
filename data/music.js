@@ -24,7 +24,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 標題
     title: {
       name: '標題：勇者的早晨', key: 'D 大調', tempo: 92, meter: 4, loop: true,
-      audio: { file: 'assets/music/title.m4a', seconds: 73.64, loopStart: 10.28, loopEnd: 73.64, gainDb: 0, lufs: -15.9 },
+      audio: { file: 'assets/music/title.m4a', seconds: 76.68, loopStart: 13.96, loopEnd: 76.68, gainDb: 0, lufs: -16.0 },   // v0.9.4 標題序曲 v2（銅管進行曲）
       mood: '充滿希望、展開冒險的期待',
       origin: '以「Re 起音、下到 La 再跳回」的原創動機開頭，第二樂句升到 C#6 做開闊感；伴奏為搖擺分解和弦。',
       tracks: [
@@ -226,7 +226,7 @@ window.MUSIC = {
     // ------------------------------------------------------------------ 頭目戰
     boss: {
       name: '頭目戰：迷霧中的大傢伙', key: 'E 小調', tempo: 144, meter: 4, loop: true,
-      audio: { file: 'assets/music/boss.m4a', seconds: 71.56, loopStart: 5.0, loopEnd: 71.56, gainDb: 0, lufs: -16.0 },
+      audio: { file: 'assets/music/boss.m4a', seconds: 65.8, loopStart: 8.2, loopEnd: 65.8, gainDb: 0, lufs: -16.0 },   // v0.9.4 頭目戰 v2「霧中的霸者」
       mood: '氣勢強、心跳加速，但仍然明亮有希望',
       origin: '低音用 3+3+2 切分頑固音型；第 7 小節的 F 大和弦（降二級）帶來壓迫感，再由 B 大和弦（屬和弦）拉回；結尾 F#-D# 導音回到 E。',
       tracks: [
@@ -402,3 +402,18 @@ window.MUSIC = {
     }
   }
 };
+
+/*
+ * v0.9.4 最終頭目「遺忘霧王」專屬曲（音樂試聽_C/說明.md 8.3；v1.0 才會用到）。
+ * 預錄音檔 assets/music/final_king.m4a；預錄不能用時（file://、下載失敗）退回合成器，樂譜借用「最終戰」final。
+ */
+(function (M) {
+  var f = M.bgm.final;
+  M.bgm.final_king = {
+    name: '最終頭目：遺忘霧王', key: 'C 小調', tempo: f.tempo, meter: f.meter, loop: true, fallbackOf: 'final',
+    audio: { file: 'assets/music/final_king.m4a', seconds: 107.4, loopStart: 15.24, loopEnd: 107.4, gainDb: 0, lufs: -16.0 },
+    mood: '最後的決戰：莊嚴、壯闊，合唱與管風琴帶出希望',
+    origin: '預錄版為原創新曲（管風琴、合唱、全銅管；C 小調約 94 拍）；合成器退回時使用「最終戰」的原創樂譜。',
+    tracks: f.tracks
+  };
+})(window.MUSIC);

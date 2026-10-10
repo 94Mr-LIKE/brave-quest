@@ -53,6 +53,8 @@ window.ART = {
   "icon-192": "assets/ui/icon-192.png",
   "icon-512": "assets/ui/icon-512.png",
   "light_glow": "assets/ui/light_glow.png",
+  "obj_bus_shelter": "assets/ui/obj_bus_shelter.png",
+  "obj_bus_sign": "assets/ui/obj_bus_sign.png",
   "sign_armor": "assets/ui/sign_armor.png",
   "sign_general": "assets/ui/sign_general.png",
   "sign_inn": "assets/ui/sign_inn.png",

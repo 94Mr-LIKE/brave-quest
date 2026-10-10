@@ -20,17 +20,18 @@
  */
 window.SPEAKERS = {
   hero: "{name}", pet: "番薯仔", narrator: "",
-  chief: "里長伯", temple_keeper: "廟公", bookstore: "圖書館阿姨", fisher: "漁夫阿伯", shopkeeper: "老街阿伯",
-  innkeeper: "溫泉旅館老闆娘", potato_seller: "賣地瓜的阿姨", hiker: "登山阿伯",
+  // v0.9.4 老闆 2026-10-11 裁示：台語語音只有一種男聲，講台語的角色一律男性（原女性角色改名，見 35_台語對白報告.md 第九節）
+  chief: "里長伯", temple_keeper: "廟公", bookstore: "圖書館阿伯", fisher: "漁夫阿伯", shopkeeper: "老街阿伯",
+  innkeeper: "溫泉旅館老闆", potato_seller: "賣地瓜的阿伯", hiker: "登山阿伯",
   elf_kid_lost: "迷路的精靈小孩", elf_elder: "精靈長老", elf_kid: "精靈小孩葉葉",
   gnome_chief: "地精族長", gnome: "地精工匠", gnome_measure: "地精木匠",
   goblin_kid_echo: "洞窟裡的哥布林小孩", goblin_chief: "哥布林酋長", goblin_kid: "哥布林小孩咕嚕",
   orc_chief: "獸人族長", orc: "獸人獵人", orc_bank: "獸人小班長",
-  merchant: "外國商人", blacksmith: "鐵匠師傅", armor_keeper: "防具店老闆", item_keeper: "市場阿姨",
-  innkeeper_port: "山城民宿老闆娘", taro_seller: "芋圓店阿姨",
+  merchant: "外國商人", blacksmith: "鐵匠師傅", armor_keeper: "防具店老闆", item_keeper: "市場阿叔",
+  innkeeper_port: "山城民宿老闆", taro_seller: "芋圓店老闆",
   king: "城主", guild: "公會導師", librarian: "圖書館員",
   // v0.9.3 B14 各地旅店老闆（還沒有精靈圖；性別、年齡暫定，待語音組確認）
-  inn_shenmu: "樹屋旅店老闆娘", inn_mangrove: "地精旅舍老闆", inn_goblin: "石屋客棧老闆娘",
+  inn_shenmu: "樹屋旅店老闆", inn_mangrove: "地精旅舍老闆", inn_goblin: "石屋客棧老闆娘",
   inn_moon: "帳篷營地老闆", inn_fucheng: "府城老客棧老闆",
   tree_king: "枯萎樹王", fog_octopus: "迷霧章魚", mud_frog: "泥巴大蛙", noise_bat: "噪音蝙蝠王",
   angry_golem: "暴躁石像", fog_demon: "遺忘霧魔"
@@ -48,7 +49,7 @@ window.DIALOGS = {
       taigi: { hanji: "拄著霧的人，學過的物件攏會袂記得。", tailo: "Tú-tio̍h bū ê lâng, o̍h--kuè ê mi̍h-kiānn lóng ē bē-kì-tit.", huayu: "被霧碰到的人，會把學過的東西忘掉。" } },
     { who: "pet", emotion: "開心", text: "我是番薯仔！我們一起把光找回來吧！" },
     { who: "pet", emotion: "平靜", text: "走到人旁邊按對話鍵，就能聊天喔。" },
-    { who: "pet", emotion: "開心", text: "有些阿伯阿姨會說台語，下面有華語喔。" }
+    { who: "pet", emotion: "開心", text: "有些阿伯、叔叔會說台語，下面有華語喔。" }
   ],
   D_FAINT: [
     { who: "pet", emotion: "擔心", text: "我們累倒了……先回旅店休息一下吧。" },
@@ -122,8 +123,8 @@ window.DIALOGS = {
       taigi: { hanji: "南爿草埔有圓圓的怪物，會落黏黐黐的球。", tailo: "Lâm-pîng tsháu-poo ū înn-înn ê kuài-bu̍t, ē lak liâm-thi-thi ê kiû.", huayu: "南邊擎天草原的迷糊團子會掉黏黏球。" } },
     { who: "innkeeper", emotion: "平靜", text: "幫我帶 2 顆回來補窗戶，好嗎？",
       taigi: { hanji: "共我紮兩粒轉來補窗仔，好無？", tailo: "Kā guá tsah nn̄g lia̍p tńg-lâi póo thang-á, hó--bô?", huayu: "幫我帶兩顆回來補窗戶，好嗎？" } },
-    { who: "innkeeper", emotion: "開心", text: "累了就回來泡溫泉，不用錢喔。",
-      taigi: { hanji: "忝矣就轉來浸溫泉，免錢喔。", tailo: "Thiám--ah tō tńg-lâi tsìm un-tsuânn, bián-tsînn--ooh.", huayu: "累了就回來泡溫泉，不用錢喔。" } },
+    { who: "innkeeper", emotion: "開心", text: "累了就回來泡溫泉，住一晚 5 個金幣喔。",
+      taigi: { hanji: "忝矣就轉來浸溫泉，蹛一暝五个金幣喔。", tailo: "Thiám--ah tō tńg-lâi tsìm un-tsuânn, tuà tsi̍t mê gōo ê kim-pè--ooh.", huayu: "累了就回來泡溫泉，住一晚 5 個金幣喔。" } },
     { who: "pet", emotion: "平靜", text: "碰到怪物就會開始戰鬥，答對就能攻擊！" },
     { who: "pet", emotion: "開心", text: "越快答對，打得越用力喔！" }
   ],
@@ -579,6 +580,11 @@ window.DIALOGS = {
     { who: "innkeeper", text: "歡迎！泡一下溫泉，就有精神了。",
       taigi: { hanji: "歡迎！浸一下溫泉，就有元氣矣。", tailo: "Huan-gîng! Tsìm tsi̍t-ē un-tsuânn, tō ū guân-khì--ah.", huayu: "歡迎！泡一下溫泉，就有精神了。" } }
   ],
+  // v0.9.4 D23（老闆裁示選 A）：住溫泉旅館要收費；金幣不夠時，只有金包里溫泉旅館可以免費住（每次都可以）
+  D_INN_FREE: [
+    { who: "innkeeper", emotion: "開心", text: "錢不夠也沒關係，阿伯讓你免費住一晚！",
+      taigi: { hanji: "錢無夠嘛無要緊，阿伯予你免錢蹛一暝！", tailo: "Tsînn bô-kàu mā bô iàu-kín, a-peh hōo lí bián-tsînn tuà tsi̍t mê!", huayu: "錢不夠也沒關係，阿伯讓你免費住一晚！" } }
+  ],
   D_POTATO_IDLE: [
     { who: "potato_seller", text: "烤地瓜香噴噴，吃一條再出發！",
       taigi: { hanji: "烘番薯芳貢貢，食一條才出發！", tailo: "Hang han-tsî phang-kòng-kòng, tsia̍h tsi̍t tiâu tsiah tshut-huat!", huayu: "烤地瓜香噴噴，吃一條再出發！" } }
@@ -661,5 +667,35 @@ window.DIALOGS = {
   D_INN_FUCHENG: [
     { who: "inn_fucheng", emotion: "開心", text: "歡迎光臨府城老客棧，讓你一夜好眠。",
       taigi: { hanji: "歡迎光臨府城的古早客棧，予你一暝睏甲真好勢。", tailo: "Huan-gîng kong-lîm Hú-siânn ê kóo-tsá kheh-tsàn, hōo lí tsi̍t mê khùn kah tsin hó-sè.", huayu: "歡迎光臨府城老客棧，讓你一夜好眠。" } }
+  ],
+
+  // ═════════════ 旅店：金幣不夠（v0.9.4 D23）═════════════
+  // 金包里溫泉旅館以外的旅店要付錢；金幣不夠時提示回金包里溫泉旅館免費住，或去打怪賺金幣。
+  D_INN_SHENMU_NOCOIN: [
+    { who: "inn_shenmu", emotion: "擔心", text: "金幣不夠喔！回金包里溫泉旅館免費住，或去打怪賺金幣吧。",
+      taigi: { hanji: "金幣無夠喔！轉去金包里溫泉旅館免錢蹛，抑是去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh! Tńg-khì Kim-pau-lí un-tsuânn lí-kuán bián-tsînn tuà, ia̍h-sī khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔！回金包里溫泉旅館免費住，或去打怪賺金幣吧。" } }
+  ],
+  D_INN_MANGROVE_NOCOIN: [
+    { who: "inn_mangrove", emotion: "擔心", text: "金幣不夠呢。金包里的溫泉旅館能免費住，或去打怪賺金幣吧。" }
+  ],
+  D_INN_GOBLIN_NOCOIN: [
+    { who: "inn_goblin", emotion: "擔心", text: "嘿嘿，金幣不夠啦！去金包里溫泉旅館免費住，或打怪賺金幣！" }
+  ],
+  D_INN_MOON_NOCOIN: [
+    { who: "inn_moon", emotion: "擔心", text: "金幣不夠啦！回金包里溫泉旅館免費住，不然就去打怪賺金幣。",
+      taigi: { hanji: "金幣無夠啦！轉去金包里溫泉旅館免錢蹛，若無就去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--lah! Tńg-khì Kim-pau-lí un-tsuânn lí-kuán bián-tsînn tuà, nā-bô tō khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠啦！回金包里溫泉旅館免費住，不然就去打怪賺金幣。" } }
+  ],
+  D_INN_FUCHENG_NOCOIN: [
+    { who: "inn_fucheng", emotion: "擔心", text: "抱歉，金幣不夠喔。金包里溫泉旅館能免費住，或去打怪賺金幣。",
+      taigi: { hanji: "歹勢，金幣無夠喔。金包里溫泉旅館免錢蹛，抑是去拍怪物趁金幣。", tailo: "Pháinn-sè, kim-pè bô-kàu--ooh. Kim-pau-lí un-tsuânn lí-kuán bián-tsînn tuà, ia̍h-sī khì phah kuài-bu̍t thàn kim-pè.", huayu: "抱歉，金幣不夠喔。金包里溫泉旅館能免費住，或去打怪賺金幣。" } }
+  ],
+  D_INN_PORT_NOCOIN: [
+    { who: "innkeeper_port", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。",
+      taigi: { hanji: "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" } }
+  ],
+  // v0.9.4 擎天崗的水牛（老闆 D2-a）：面對水牛按 A。只有華語，不需要台語語音
+  D_ANIMAL_BUFFALO: [
+    { who: "narrator", text: "水牛：「哞～」" },
+    { who: "pet", text: "野生的水牛要保持 20 公尺喔！" }
   ]
 };

@@ -75,15 +75,18 @@
     return lt ? name + ' ' + lt : name;
   }
 
-  // ---------------------------------------------------------------- 會走動的動物 NPC（v0.9.3 B11 擎天崗的黃牛）
+  // ---------------------------------------------------------------- 會走動的動物 NPC（v0.9.3 框架；v0.9.4 老闆選 D2-a：擎天崗的水牛）
   /**
-   * maps.js 的 animals: [{ id, sprite, area: [x, y, w, h], count, name（預設「黃牛」）, say（預設「哞～」）}]
+   * maps.js 的 animals: [{ id, sprite（預設 npc_buffalo）, area: [x, y, w, h], count, name（預設「水牛」）, say（預設見 ANIMAL_SAY）}]
    * 不能戰鬥；在 area 裡「可走、不是出口、不是上層格 U」的格子上慢慢走。
    */
+  var ANIMAL_SAY = '哞～（野生的水牛要保持 20 公尺喔！）';
   function animalSpecs(map) {
     return ((map && map.animals) || []).filter(function (a) { return a && Array.isArray(a.area) && a.area.length === 4; }).map(function (a, i) {
-      return { id: a.id || ('animal_' + i), sprite: a.sprite || 'npc_cow', area: a.area, count: Math.max(1, Math.min(6, a.count | 0 || 1)),
-        name: a.name || '黃牛', say: a.say || '哞～' };
+      var sprite = a.sprite || 'npc_buffalo';
+      // dialog：面對動物按 A 時播的台詞（dialogs.js）；水牛預設 D_ANIMAL_BUFFALO。沒有台詞時用 say 這一句
+      return { id: a.id || ('animal_' + i), sprite: sprite, area: a.area, count: Math.max(1, Math.min(6, a.count | 0 || 1)),
+        name: a.name || '水牛', say: a.say || ANIMAL_SAY, dialog: a.dialog || (sprite === 'npc_buffalo' ? 'D_ANIMAL_BUFFALO' : null) };
     });
   }
   /** 動物可以站的格子。walk(x,y)：地圖可走；不含出口、上層格 U */
@@ -120,7 +123,23 @@
     return who && who !== 'narrator' && who !== 'pet' ? who : null;
   }
   /**
-   * 旅店老闆的稱呼：一律以 SPEAKERS 為準（例：「樹屋旅店老闆娘」，性別和聲音一致）；
+   * v0.9.4（老闆 2026-10-11：講台語的角色一律男性）沒有站櫃 NPC 的旅店（__inn 虛擬老闆）依老闆的性別選圖：
+   *   女性（例：石屋客棧老闆娘）→ npc_innkeeper；男性 → npc_<說話者>_m（例：npc_inn_shenmu_m）→ npc_innkeeper_m → npc_innkeeper。
+   * voices：window.VOICES；has(key)：sprites.js 有沒有這張圖
+   */
+  function innKeeperSprite(map, dialogs, voices, has) {
+    return innSpeakerSprite(innSpeaker(map, dialogs), voices, has);
+  }
+  /** 旅店老闆說話者（inn_shenmu 等）的圖：女性用 npc_innkeeper；男性優先 npc_<說話者>_m，其次 npc_innkeeper_m（地圖上的老闆和對話框頭像共用這條規則） */
+  function innSpeakerSprite(who, voices, has) {
+    var v = who && voices && voices.speakers ? voices.speakers[who] : null;
+    has = has || function () { return true; };
+    var list = v && v.gender === 'f' ? ['npc_innkeeper'] : (who ? ['npc_' + who + '_m'] : []).concat(['npc_innkeeper_m', 'npc_innkeeper']);
+    for (var i = 0; i < list.length; i++) if (has(list[i])) return list[i];
+    return 'npc_innkeeper';
+  }
+  /**
+   * 旅店老闆的稱呼：一律以 SPEAKERS 為準（例：「樹屋旅店老闆」，性別和聲音一致）；
    * 台詞的說話者不在 SPEAKERS 時才用「inn.name＋老闆」，再沒有就「旅店老闆」
    */
   function innKeeperName(map, dialogs, speakers) {
@@ -342,7 +361,7 @@
     return false;
   }
 
-  var MapInfo = { animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+  var MapInfo = { ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
     wanderTarget: wanderTarget, petSpot: petSpot, glowRgb: glowRgb, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
     LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.MapInfo = MapInfo; }

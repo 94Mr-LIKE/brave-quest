@@ -121,7 +121,7 @@ window.MONSTERS = {
   // 數值照 37 號「數值請用紅樹林那一列」＝與沼澤蛙同一列；之後套用 37 號修改表時，請和 frog 一起改（210／17／110／16）。
   // 【美術需求｜佔位】還沒有招潮蟹的圖，先借用港口螃蟹的圖 mon_crab；招潮蟹圖完成後把 sprite 改成新圖的 id。
   fiddler_crab: {
-    name: "招潮蟹", sprite: "mon_crab", level: 3, hp: 210, atk: 17, subject: "自然", q_levels: [2, 3],
+    name: "招潮蟹", sprite: "mon_fiddler_crab", level: 3, hp: 210, atk: 17, subject: "自然", q_levels: [2, 3],
     exp: 110, gold: 16, drops: [{ item: "gear", rate: 0.3 }], boss: false,
     desc: "紅樹林泥灘上揮著一隻大螯的小螃蟹，霧讓牠忘了潮水什麼時候會來。",
     wake: "招潮蟹清醒了，揮揮大螯，鑽回泥灘的小洞裡。"

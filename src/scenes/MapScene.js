@@ -34,7 +34,7 @@
       this.startFacing = data.facing || 'down';
       this.map = G().data.maps[this.mapId];
       // 場景重新開始時物件會留著上一張地圖的值：車站要先清掉（不然沒有車站的地圖會顯示上一張的「在○○站搭車」）
-      this.station = null; this.stationSign = null;
+      this.station = null; this.stationSign = null; this.stationLabel = null; this.stationShelter = null;
       // 上一張地圖的 hasBg、主角狀態也不要留著（create 之前讀到舊值會誤判「新地圖已經好了」）
       this.hasBg = false; this.p = null;
       this.safePts = null;   // 同樣的原因：下車點安全範圍是每張地圖各自算的
@@ -79,6 +79,9 @@
       });
       // v0.9.3 會走動的動物（黃牛）：美術還沒畫時用暫代圖（四方向走路格式）
       J.MapInfo.animalSpecs(map).forEach(function (a) { A.queue(self, a.sprite, a.name); });
+      // v0.9.4 車站：新站牌、候車亭（sprites.js 有才載入；沒有時用程式畫的站牌）
+      if (map.station && map.station.drawSign !== false && A.has('obj_station')) A.queue(this, 'obj_station');
+      if (map.station && map.station.shelter && A.has('obj_bus_shelter')) A.queue(this, 'obj_bus_shelter');
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
@@ -92,7 +95,7 @@
       var map = this.map, list = (map.npcs || []).slice();
       if (map.inn && !map.inn.npc && !list.some(function (n) { return n.x === map.inn.x && n.y === map.inn.y; })) {
         // v0.9.3 B14 各地旅店不一樣：台詞用 maps.js 的 inn.dialog（沒有設定才用 D_INN_IDLE）
-        list.push({ id: '__inn', x: map.inn.x, y: map.inn.y, sprite: 'npc_innkeeper', dialog: J.MapInfo.innDialog(map, null), virtual: true });
+        list.push({ id: '__inn', x: map.inn.x, y: map.inn.y, sprite: J.MapInfo.innKeeperSprite(map, G().data.dialogs, window.VOICES, J.Assets.has), dialog: J.MapInfo.innDialog(map, null), virtual: true });
       }
       return list;
     }
@@ -427,8 +430,21 @@
       this.stationSign = null;
       // v0.9.3（33 號稽核）：背景圖已經畫了站牌的地圖（maps.js station.drawSign:false）不再疊程式站牌；互動照常
       if (stn && stn.drawSign !== false) {
-        var key = J.Assets.has('obj_station') ? J.Assets.texKey('obj_station') : 'ui:station';
+        // v0.9.4 B17：美術的新站牌（sprite obj_station，牌面空白），站名由程式寫在站牌上方的小牌子
+        var art = this.hasArt('obj_station');
+        var key = art ? J.Assets.texKey('obj_station') : 'ui:station';
         this.stationSign = this.add.image(stn.x * T + T / 2, stn.y * T + T, key).setOrigin(0.5, 1).setDepth((stn.y + 1) * T - 1);
+        if (art && stn.name) {
+          this.stationLabel = this.add.text(stn.x * T + T / 2, stn.y * T + T - this.stationSign.displayHeight - 2, stn.name, {
+            fontFamily: '"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif', fontSize: '12px', fontStyle: 'bold',
+            color: '#1e4a8a', backgroundColor: '#f4f4f0', padding: { x: 4, y: 1 } }).setOrigin(0.5, 1).setDepth((stn.y + 1) * T - 0.5);
+        }
+      }
+      // v0.9.4 B17（老闆 D17「每個車站都可以有」）：背景沒有畫站房的車站旁放候車亭（maps.js station.shelter = 左上角格子，3×3 格；只擋最下面一排）
+      this.stationShelter = null;
+      if (stn && stn.shelter && this.hasArt('obj_bus_shelter')) {
+        var sh = stn.shelter;
+        this.stationShelter = this.add.image((sh.x + 1.5) * T, (sh.y + 3) * T, J.Assets.texKey('obj_bus_shelter')).setOrigin(0.5, 1).setDepth((sh.y + 3) * T - 1);
       }
       this.chestArt = this.hasArt('chest_closed') && this.hasArt('chest_open');
       (this.map.chests || []).forEach(function (c) {
@@ -884,7 +900,8 @@
         else if (dir === 'left' || dir === 'right') a.sprite.setFlipX(dir === 'right');
         self.tweens.add({ targets: a.sprite, x: t.c * T + T / 2, y: t.r * T + T, duration: 650, onComplete: function () {
           a.moving = false;
-          if (a.path.length) { a.nextMove = self.time.now; return; }
+          // 走路途中被主角碰到（flee）：這一格走完就馬上走開，不要先停下來吃草
+          if (a.path.length || a.flee) { a.nextMove = self.time.now; return; }
           if (a.walk) { a.sprite.anims.stop(); a.sprite.setFrame(self.idleFrame(a.spec.sprite, a.facing)); }
           a.nextMove = self.time.now + 2000 + Math.random() * 3500;   // 走到了就停下來吃草一下
         } });

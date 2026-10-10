@@ -176,6 +176,9 @@
     var b = {};
     (map.npcs || []).forEach(function (n) { b[n.x + ',' + n.y] = true; });
     (map.chests || []).forEach(function (c) { b[c.x + ',' + c.y] = true; });
+    // v0.9.4 候車亭（station.shelter 左上角，3×3 格）：依 2.5D 規範只擋最下面一排（底座），上面兩排可以走到後面被遮住
+    var sh = map.station && map.station.shelter;
+    if (sh) for (var dx = 0; dx < 3; dx++) b[(sh.x + dx) + ',' + (sh.y + 2)] = true;
     return b;
   }
 

@@ -2,7 +2,7 @@
  * 勇者大冒險 — 地圖資料（11 張，M01–M11；舞台以台灣地形為藍本）
  * 撰寫：遊戲劇情設計師＋關卡設計
  * 格式依 07_設計改版v0.2 第 6.1 節；新增欄位說明見 docs/data/README_資料格式.md。
- * 座標 x＝欄、y＝列（0 起算）。地名都是「致敬版」虛構地名，不對應真實店家、人物或神明。
+ * 座標 x＝欄、y＝列（0 起算）。地名都是「致敬版」虛構地名，不對應真實店家、人物或神明；例外：金包里慈護宮用真實名稱（老闆 2026-10-11 裁示）。
  *
  * 格子是給 GPT 畫整張背景圖的「地形草圖」：大塊清楚；建築用 'R'（屋頂）＋'H'（牆）＋'D'（門）拼出輪廓。
  * 每張圖的 art_note 是給美術的文字說明，real_ref 是參考的真實地點。
@@ -21,12 +21,12 @@
 window.MAPS = {
 
   // ───────────────────────────── M01 金包里（起點）─────────────────────────────
-  // 方位依真實金山市區壓縮（見 world.js 檔頭）：北邊是海；老街在中間偏西；慈海宮在老街東南；
+  // 方位依真實金山市區壓縮（見 world.js 檔頭）：北邊是海；老街在中間偏西；金包里慈護宮在老街東南；
   // 溫泉在老街東邊；磺火漁港在東北；燭火雙岩在漁港外海。國小、圖書館、公園、客運站的位置是推論。
   M01: {
     name: "金包里", type: "village", level: 1, bgm: "village", battle_bg: "grass", tileset: "village",
     real_ref: "新北市金山區市區（金山老街、慈護宮、金山溫泉、磺港漁港、燭臺雙嶼）",
-    art_note: "北邊大海與沙灘；東北角碼頭木橋伸進海裡，外海兩根細長岩柱（燭火雙岩）；左上是海風國小（只畫柵欄、校門、操場）；中間是客運站與漁會；右邊冒白煙的溫泉池；中間兩排紅磚老街；下方左起圖書館、海風公園（五盞燈）、慈海宮（廟頂燕尾、前面廟埕廣場，不畫神像）。",
+    art_note: "北邊大海與沙灘；東北角碼頭木橋伸進海裡，外海兩根細長岩柱（燭火雙岩）；左上是海風國小（只畫柵欄、校門、操場）；中間是客運站與漁會；右邊冒白煙的溫泉池；中間兩排紅磚老街；下方左起圖書館、海風公園（五盞燈）、金包里慈護宮（廟頂燕尾、前面廟埕廣場，不畫神像）。",
     grid: [
       "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
       "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
@@ -90,7 +90,7 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     start: { x: 36, y: 34 },
-    station: { x: 46, y: 15, name: "金包里客運站" },
+    station: { x: 46, y: 15, name: "金包里客運站", drawSign: false },
     places: [
       { name: "海風國小（校門與操場）", x: 2, y: 8, w: 22, h: 11 },
       { name: "金包里客運站", x: 31, y: 11, w: 13, h: 5 },
@@ -101,7 +101,7 @@ window.MAPS = {
       { name: "金包里老街", x: 3, y: 19, w: 90, h: 17 },
       { name: "海風圖書館", x: 3, y: 36, w: 14, h: 10 },
       { name: "海風公園", x: 18, y: 36, w: 27, h: 18 },
-      { name: "慈海宮與廟埕", x: 46, y: 35, w: 25, h: 18 },
+      { name: "金包里慈護宮與廟埕", x: 46, y: 35, w: 25, h: 18 },
       { name: "地瓜田", x: 70, y: 39, w: 25, h: 16 },
       { name: "燭火雙岩", x: 86, y: 0, w: 6, h: 4 }
     ],
@@ -116,9 +116,9 @@ window.MAPS = {
     npcs: [
       { id: "chief", x: 57, y: 47, sprite: "npc_chief", dialog: "D_CHIEF_IDLE", quest: "Q_TUT_1", quests: ["Q_TUT_1", "Q_LAMPS"] },
       { id: "temple_keeper", x: 63, y: 47, sprite: "npc_chief", dialog: "D_TEMPLE_IDLE", quest: null, quests: [] },
-      { id: "bookstore", x: 12, y: 43, sprite: "npc_bookstore", dialog: "D_BOOK_IDLE", quest: "Q_SIDE_BOOK", quests: ["Q_SIDE_BOOK"] },
+      { id: "bookstore", x: 12, y: 43, sprite: "npc_bookstore_m", dialog: "D_BOOK_IDLE", quest: "Q_SIDE_BOOK", quests: ["Q_SIDE_BOOK"] },
       { id: "shopkeeper", x: 31, y: 33, sprite: "npc_shopkeeper", dialog: "D_SHOP_IDLE", quest: null, quests: [] },
-      { id: "innkeeper", x: 84, y: 16, sprite: "npc_innkeeper", dialog: "D_INN_IDLE", quest: "Q_TUT_3", quests: ["Q_TUT_3"] },
+      { id: "innkeeper", x: 84, y: 16, sprite: "npc_innkeeper_m", dialog: "D_INN_IDLE", quest: "Q_TUT_3", quests: ["Q_TUT_3"] },
       { id: "fisher", x: 62, y: 9, sprite: "npc_fisher", dialog: "D_FISHER_IDLE", quest: "Q_TUT_2", quests: ["Q_TUT_2"] }
     ],
     lamps: [
@@ -139,7 +139,7 @@ window.MAPS = {
     spawns: [
       { monster: "fog_octopus", count: 1, area: [64, 2, 1, 1], boss: true, quest: "Q_MER_4" }
     ],
-    inn: { npc: "innkeeper", price: 0, x: 84, y: 16, name: "金包里溫泉旅館", sign: "溫泉" },
+    inn: { npc: "innkeeper", price: 5, x: 84, y: 16, name: "金包里溫泉旅館", sign: "溫泉", freeIfBroke: true, dialog_nocoin: "D_INN_FREE" },
     shop: { shop_id: "general", npc: "shopkeeper", x: 31, y: 33 },
     lights: [
       { x: 34, y: 50, r: 1 },
@@ -241,7 +241,7 @@ window.MAPS = {
       { x: 0, y: 21, to: "M03", tx: 82, ty: 19 }
     ],
     npcs: [
-      { id: "potato_seller", x: 48, y: 3, sprite: "npc_auntie_yam", dialog: "D_POTATO_IDLE", quest: "Q_SIDE_POTATO", quests: ["Q_SIDE_POTATO"] }
+      { id: "potato_seller", x: 48, y: 3, sprite: "npc_uncle_yam", dialog: "D_POTATO_IDLE", quest: "Q_SIDE_POTATO", quests: ["Q_SIDE_POTATO"] }
     ],
     chests: [
       { id: "C_M02_1", x: 8, y: 46, subject: "數學", level: 1, reward: { gold: 30, item: null } },
@@ -258,7 +258,11 @@ window.MAPS = {
       { monster: "dango", count: 2, area: [44, 37, 15, 11] }
     ],
     inn: null,
-    shop: null
+    shop: null,
+    animals: [
+      { id: "buffalo_1", sprite: "npc_buffalo", area: [53, 14, 16, 10], count: 3, name: "水牛" },
+      { id: "buffalo_2", sprite: "npc_buffalo", area: [69, 15, 15, 9], count: 2, name: "水牛" }
+    ]
   },
 
   // ───────────────────────────── M03 硫磺谷 ─────────────────────────────
@@ -402,15 +406,15 @@ window.MAPS = {
       "TTTKTTTTTTTTTT===============U=================..............*******TTT***....**....**TTTT",
       "TTTKKKKKKKKKKKUUUUU==========KKKFFFFFFFFFFFF===FF..............****..*...*.....*....**TTTT",
       "TTTKKKKKKKKKKKKKKKKBBBBBBBBBBBBKKBBBBBBBBBBBBBB.......................................TTTT",
-      "TTTTKKKKKKKKKKKKKKKBBBBBBBBBBBBBBBBBBBBBBBBBBBBBU.......U..U......U...............UUU.TTTT",
-      "TTTTTTTTTTTTTTTTTTTK============================TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTT============================*TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTUUUUUUUUUUUUUUUUUUUUUUUUUUUUUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTUUUUUUUUUUUUUUUUUUUUUUUUUUUUUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTKKKKKKKKKKKKKKKBBBBBBBBBBBBBBBBBBBBBBBBBBBBB######################################TTTT",
+      "TTTTTTTTTTTTTTTTTTTK############################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTT############################*TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     start: { x: 34, y: 53 },
-    station: { x: 30, y: 53, name: "神木森林站" },
+    station: { x: 30, y: 53, name: "神木森林站", drawSign: false },
     exits: [],
     npcs: [
       { id: "elf_elder", x: 8, y: 9, sprite: "npc_elf_elder", dialog: "D_ELDER_IDLE", quest: "Q_ELF_1", quests: ["Q_ELF_1", "Q_ELF_3", "Q_ELF_4"] },
@@ -432,7 +436,7 @@ window.MAPS = {
       { monster: "mushroom", count: 2, area: [66, 24, 21, 13] },
       { monster: "owl", count: 2, area: [47, 46, 40, 10] }
     ],
-    inn: { npc: null, price: 0, x: 23, y: 9, name: "神木樹屋旅店", sign: "樹屋", dialog: "D_INN_SHENMU" },
+    inn: { npc: null, price: 10, x: 23, y: 9, name: "神木樹屋旅店", sign: "樹屋", dialog: "D_INN_SHENMU", dialog_nocoin: "D_INN_SHENMU_NOCOIN" },
     shop: null,
     lights: [
       { x: 5, y: 4, r: 1.2 },
@@ -547,7 +551,7 @@ window.MAPS = {
       { monster: "mudslime", count: 2, area: [46, 36, 19, 12] },
       { monster: "fiddler_crab", count: 2, area: [65, 33, 22, 16] }
     ],
-    inn: { npc: null, price: 0, x: 81, y: 9, name: "紅樹林地精旅舍", sign: "旅舍", dialog: "D_INN_MANGROVE" },
+    inn: { npc: null, price: 15, x: 81, y: 9, name: "紅樹林地精旅舍", sign: "旅舍", dialog: "D_INN_MANGROVE", dialog_nocoin: "D_INN_MANGROVE_NOCOIN" },
     shop: null,
     lights: [
       { x: 60, y: 5, r: 1.5 },
@@ -612,7 +616,7 @@ window.MAPS = {
       "~~~~~~~~~~~~~~~~~~~#######~~########~###############################################"
     ],
     start: { x: 2, y: 16 },
-    station: { x: 4, y: 14, name: "野柳海蝕站" },
+    station: { x: 4, y: 14, name: "野柳海蝕站", shelter: { x: 5, y: 12 } },
     exits: [
       { x: 0, y: 15, to: "M01", tx: 94, ty: 11 },
       { x: 0, y: 16, to: "M01", tx: 94, ty: 12 },
@@ -675,7 +679,7 @@ window.MAPS = {
       "#######...===========================================BBBB================######..KK#",
       "######....U*....===.........===............F.........F~~F#................*.####..##",
       "######....*.................===......UUUUUUF.........~~~####.........*.*.....KK..###",
-      "######............URRRRRRRUU===..RRRRRRRRRRF.........~~~#####UUUUUU######U......####",
+      "######............URRRRRRRUU===..RRRRRRRRRRF.........~~~#####UUUUUU######U.......###",
       "################.RRRRRRRRRRR===..RRRRRRRRRRFKUUUUUUUU~~~#################K.....#####",
       "################.RRRRRRRRRRR=**#FRRRRRRRRRR...#######~~~####################..######",
       "################FRRRRRRRRRRR===.FRRRRRRRRRR..########~~~############################",
@@ -703,7 +707,7 @@ window.MAPS = {
       "################HHHHHHHHHHHH#####HHHHHHHH############~~~############################"
     ],
     start: { x: 11, y: 16 },
-    station: { x: 12, y: 15, name: "哥布林村莊" },
+    station: { x: 12, y: 15, name: "哥布林村莊", shelter: { x: 13, y: 15 } },
     exits: [
       { x: 0, y: 3, to: "M06", tx: 82, ty: 4 },
       { x: 0, y: 4, to: "M06", tx: 82, ty: 5 }
@@ -724,7 +728,7 @@ window.MAPS = {
       { monster: "goblin", count: 2, area: [6, 27, 22, 14] },
       { monster: "bat", count: 2, area: [57, 26, 25, 15] }
     ],
-    inn: { npc: null, price: 0, x: 30, y: 12, name: "哥布林石屋客棧", sign: "客棧", dialog: "D_INN_GOBLIN" },
+    inn: { npc: null, price: 20, x: 30, y: 12, name: "哥布林石屋客棧", sign: "客棧", dialog: "D_INN_GOBLIN", dialog_nocoin: "D_INN_GOBLIN_NOCOIN" },
     shop: null,
     lights: [
       { x: 3, y: 2, r: 1.2 },
@@ -835,7 +839,7 @@ window.MAPS = {
       { monster: "boar", count: 2, area: [62, 20, 26, 14] },
       { monster: "wisp", count: 2, area: [14, 15, 26, 14] }
     ],
-    inn: { npc: null, price: 0, x: 69, y: 8, name: "月世界帳篷營地", sign: "營帳", dialog: "D_INN_MOON" },
+    inn: { npc: null, price: 30, x: 69, y: 8, name: "月世界帳篷營地", sign: "營帳", dialog: "D_INN_MOON", dialog_nocoin: "D_INN_MOON_NOCOIN" },
     shop: null,
     lights: [
       { x: 77, y: 13, r: 1.5 },
@@ -914,12 +918,12 @@ window.MAPS = {
       { x: 0, y: 46, to: "M01", tx: 94, ty: 38 }
     ],
     npcs: [
-      { id: "innkeeper_port", x: 6, y: 9, sprite: "npc_innkeeper", dialog: "D_PORT_INN_IDLE", quest: null, quests: [] },
-      { id: "blacksmith", x: 6, y: 19, sprite: "npc_blacksmith", dialog: "D_BLACKSMITH_IDLE", quest: "Q_SIDE_MAGNET", quests: ["Q_SIDE_MAGNET"] },
+      { id: "innkeeper_port", x: 6, y: 9, sprite: "npc_inn_port_m", dialog: "D_PORT_INN_IDLE", quest: null, quests: [] },
+      { id: "blacksmith", x: 6, y: 19, sprite: "npc_blacksmith_m", dialog: "D_BLACKSMITH_IDLE", quest: "Q_SIDE_MAGNET", quests: ["Q_SIDE_MAGNET"] },
       { id: "armor_keeper", x: 21, y: 19, sprite: "npc_shopkeeper", dialog: "D_ARMOR_IDLE", quest: null, quests: [] },
-      { id: "item_keeper", x: 33, y: 18, sprite: "npc_auntie_market", dialog: "D_ITEM_IDLE", quest: null, quests: [] },
+      { id: "item_keeper", x: 33, y: 18, sprite: "npc_uncle_market", dialog: "D_ITEM_IDLE", quest: null, quests: [] },
       { id: "merchant", x: 57, y: 17, sprite: "npc_merchant", dialog: "D_MERCHANT_IDLE", quest: "Q_MER_1", quests: ["Q_MER_1", "Q_MER_2", "Q_MER_3", "Q_MER_4"] },
-      { id: "taro_seller", x: 67, y: 17, sprite: "npc_auntie_taro", dialog: "D_TARO_IDLE", quest: "Q_SIDE_TARO", quests: ["Q_SIDE_TARO"] }
+      { id: "taro_seller", x: 67, y: 17, sprite: "npc_uncle_taro", dialog: "D_TARO_IDLE", quest: "Q_SIDE_TARO", quests: ["Q_SIDE_TARO"] }
     ],
     chests: [
       { id: "C_M09_1", x: 41, y: 1, subject: "數學", level: 2, reward: { gold: 30, item: "snack" } },
@@ -934,7 +938,7 @@ window.MAPS = {
       { monster: "seagull", count: 3, area: [56, 32, 24, 10] },
       { monster: "seagull", count: 2, area: [30, 43, 33, 10] }
     ],
-    inn: { npc: "innkeeper_port", price: 0, x: 6, y: 9, name: "山城民宿", sign: "民宿" },
+    inn: { npc: "innkeeper_port", price: 15, x: 6, y: 9, name: "山城民宿", sign: "民宿", dialog_nocoin: "D_INN_PORT_NOCOIN" },
     shop: { shop_id: "item", npc: "item_keeper", x: 33, y: 18 },
     extra_shops: [
       { x: 6, y: 19, shop_id: "weapon", npc: "blacksmith" },
@@ -1069,7 +1073,7 @@ window.MAPS = {
     ],
     npcs: [
       { id: "king", x: 40, y: 7, sprite: "npc_king", dialog: "D_KING_IDLE", quest: "Q_FINAL", quests: ["Q_FINAL"] },
-      { id: "guild", x: 15, y: 9, sprite: "npc_guild", dialog: "D_GUILD_IDLE", quest: null, quests: [] },
+      { id: "guild", x: 15, y: 9, sprite: "npc_guild_m", dialog: "D_GUILD_IDLE", quest: null, quests: [] },
       { id: "librarian", x: 75, y: 12, sprite: "npc_librarian", dialog: "D_LIBRARIAN_IDLE", quest: "Q_SIDE_LIB", quests: ["Q_SIDE_LIB"] }
     ],
     chests: [
@@ -1086,7 +1090,7 @@ window.MAPS = {
       { monster: "wisp", count: 2, area: [72, 17, 11, 24] },
       { monster: "wisp", count: 1, area: [57, 3, 24, 15] }
     ],
-    inn: { npc: null, price: 0, x: 53, y: 29, name: "府城老客棧", sign: "客棧", dialog: "D_INN_FUCHENG" },
+    inn: { npc: null, price: 35, x: 53, y: 29, name: "府城老客棧", sign: "客棧", dialog: "D_INN_FUCHENG", dialog_nocoin: "D_INN_FUCHENG_NOCOIN" },
     shop: null,
     lights: [
       { x: 34, y: 3, r: 1.2 },

@@ -102,11 +102,29 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 34,
   "frameH": 50
  },
+ "npc_blacksmith_m": {
+  "file": "assets/npcs/npc_blacksmith_m.png",
+  "type": "single",
+  "frameW": 41,
+  "frameH": 50
+ },
  "npc_bookstore": {
   "file": "assets/npcs/npc_bookstore.png",
   "type": "single",
   "frameW": 24,
   "frameH": 50
+ },
+ "npc_bookstore_m": {
+  "file": "assets/npcs/npc_bookstore_m.png",
+  "type": "single",
+  "frameW": 28,
+  "frameH": 50
+ },
+ "npc_buffalo": {
+  "file": "assets/npcs/npc_buffalo.png",
+  "type": "single",
+  "frameW": 135,
+  "frameH": 168
  },
  "npc_chief": {
   "file": "assets/npcs/npc_chief.png",
@@ -162,10 +180,34 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 29,
   "frameH": 50
  },
+ "npc_guild_m": {
+  "file": "assets/npcs/npc_guild_m.png",
+  "type": "single",
+  "frameW": 34,
+  "frameH": 50
+ },
+ "npc_inn_port_m": {
+  "file": "assets/npcs/npc_inn_port_m.png",
+  "type": "single",
+  "frameW": 35,
+  "frameH": 50
+ },
+ "npc_inn_shenmu_m": {
+  "file": "assets/npcs/npc_inn_shenmu_m.png",
+  "type": "single",
+  "frameW": 37,
+  "frameH": 50
+ },
  "npc_innkeeper": {
   "file": "assets/npcs/npc_innkeeper.png",
   "type": "single",
   "frameW": 28,
+  "frameH": 50
+ },
+ "npc_innkeeper_m": {
+  "file": "assets/npcs/npc_innkeeper_m.png",
+  "type": "single",
+  "frameW": 31,
   "frameH": 50
  },
  "npc_king": {
@@ -204,40 +246,58 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 38,
   "frameH": 50
  },
+ "npc_uncle_market": {
+  "file": "assets/npcs/npc_uncle_market.png",
+  "type": "single",
+  "frameW": 33,
+  "frameH": 50
+ },
+ "npc_uncle_taro": {
+  "file": "assets/npcs/npc_uncle_taro.png",
+  "type": "single",
+  "frameW": 30,
+  "frameH": 50
+ },
+ "npc_uncle_yam": {
+  "file": "assets/npcs/npc_uncle_yam.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
  "boss_bat": {
   "file": "assets/monsters/boss_bat.png",
   "type": "single",
-  "frameW": 226,
+  "frameW": 166,
   "frameH": 160
  },
  "boss_fog": {
   "file": "assets/monsters/boss_fog.png",
   "type": "single",
-  "frameW": 177,
+  "frameW": 178,
   "frameH": 176
  },
  "boss_frog": {
   "file": "assets/monsters/boss_frog.png",
   "type": "single",
-  "frameW": 167,
+  "frameW": 169,
   "frameH": 160
  },
  "boss_golem": {
   "file": "assets/monsters/boss_golem.png",
   "type": "single",
-  "frameW": 163,
+  "frameW": 167,
   "frameH": 160
  },
  "boss_octopus": {
   "file": "assets/monsters/boss_octopus.png",
   "type": "single",
-  "frameW": 193,
+  "frameW": 169,
   "frameH": 160
  },
  "boss_tree": {
   "file": "assets/monsters/boss_tree.png",
   "type": "single",
-  "frameW": 158,
+  "frameW": 160,
   "frameH": 160
  },
  "mon_armor": {
@@ -249,85 +309,91 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
  "mon_bat": {
   "file": "assets/monsters/mon_bat.png",
   "type": "single",
-  "frameW": 167,
+  "frameW": 105,
   "frameH": 96
  },
  "mon_boar": {
   "file": "assets/monsters/mon_boar.png",
   "type": "single",
-  "frameW": 98,
+  "frameW": 102,
   "frameH": 96
  },
  "mon_crab": {
   "file": "assets/monsters/mon_crab.png",
   "type": "single",
-  "frameW": 125,
+  "frameW": 109,
   "frameH": 96
  },
  "mon_dango": {
   "file": "assets/monsters/mon_dango.png",
   "type": "single",
-  "frameW": 52,
+  "frameW": 89,
+  "frameH": 96
+ },
+ "mon_fiddler_crab": {
+  "file": "assets/monsters/mon_fiddler_crab.png",
+  "type": "single",
+  "frameW": 100,
   "frameH": 96
  },
  "mon_frog": {
   "file": "assets/monsters/mon_frog.png",
   "type": "single",
-  "frameW": 94,
+  "frameW": 91,
   "frameH": 96
  },
  "mon_goblin": {
   "file": "assets/monsters/mon_goblin.png",
   "type": "single",
-  "frameW": 86,
+  "frameW": 92,
   "frameH": 96
  },
  "mon_mudslime": {
   "file": "assets/monsters/mon_mudslime.png",
   "type": "single",
-  "frameW": 101,
+  "frameW": 109,
   "frameH": 96
  },
  "mon_mushroom": {
   "file": "assets/monsters/mon_mushroom.png",
   "type": "single",
-  "frameW": 100,
+  "frameW": 109,
   "frameH": 96
  },
  "mon_owl": {
   "file": "assets/monsters/mon_owl.png",
   "type": "single",
-  "frameW": 87,
+  "frameW": 105,
   "frameH": 96
  },
  "mon_rabbit": {
   "file": "assets/monsters/mon_rabbit.png",
   "type": "single",
-  "frameW": 86,
+  "frameW": 93,
   "frameH": 96
  },
  "mon_rock": {
   "file": "assets/monsters/mon_rock.png",
   "type": "single",
-  "frameW": 127,
+  "frameW": 101,
   "frameH": 96
  },
  "mon_seagull": {
   "file": "assets/monsters/mon_seagull.png",
   "type": "single",
-  "frameW": 114,
+  "frameW": 100,
   "frameH": 96
  },
  "mon_sprout": {
   "file": "assets/monsters/mon_sprout.png",
   "type": "single",
-  "frameW": 87,
+  "frameW": 95,
   "frameH": 96
  },
  "mon_wisp": {
   "file": "assets/monsters/mon_wisp.png",
   "type": "single",
-  "frameW": 107,
+  "frameW": 87,
   "frameH": 96
  },
  "item_bat_wing": {

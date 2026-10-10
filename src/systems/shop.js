@@ -26,11 +26,33 @@
       .sort(function (a, b) { return a.price - b.price; });
   }
 
-  /** 回傳 {ok, reason?, item} */
+  /** v0.9.4 還差多少金幣才買得起（買得起＝0） */
+  function shortfall(state, price) { return Math.max(0, (Number(price) || 0) - (Number(state.player.coins) || 0)); }
+
+  /**
+   * v0.9.4 住旅店（老闆 2026-10-10 D23、40 號）：回傳 { action, price, short }
+   *   'pay'    金幣夠：付 price 住一晚（price 0 也算）
+   *   'free'   金幣不夠，但這家旅店 freeIfBroke（只有金包里溫泉旅館，每次都可以）：免費住
+   *   'refuse' 金幣不夠：不讓住（旅店老闆提醒可以回金包里溫泉旅館或去打怪）
+   * 只判斷，不改 state；扣錢用 payInn
+   */
+  function innStay(state, inn) {
+    var price = Math.max(0, Number(inn && inn.price) || 0), short = shortfall(state, price);
+    if (!short) return { action: 'pay', price: price, short: 0 };
+    return { action: inn && inn.freeIfBroke ? 'free' : 'refuse', price: price, short: short };
+  }
+  /** 依 innStay 的結果扣錢（'pay' 才扣；'free' 不扣；'refuse' 不能住）。回傳 innStay 的結果 */
+  function payInn(state, inn) {
+    var r = innStay(state, inn);
+    if (r.action === 'pay') state.player.coins -= r.price;
+    return r;
+  }
+
+  /** 回傳 {ok, reason?, item, short?} */
   function buy(state, id, items) {
     var it = items[id];
     if (!it || !(it.price > 0)) return { ok: false, reason: 'unknown' };
-    if (state.player.coins < it.price) return { ok: false, reason: 'coins', item: it };
+    if (state.player.coins < it.price) return { ok: false, reason: 'coins', item: it, short: shortfall(state, it.price) };
     state.player.coins -= it.price;
     state.inventory[id] = (state.inventory[id] || 0) + 1;
     return { ok: true, item: it };
@@ -117,7 +139,7 @@
     return { ok: true, price: e.price, item: e.item };
   }
 
-  var Shop = { SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet,
+  var Shop = { shortfall: shortfall, innStay: innStay, payInn: payInn, SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet,
     SELL_RATE: SELL_RATE, EQUIP_RATE: EQUIP_RATE, ITEM_RATE: ITEM_RATE, isPrecious: isPrecious, questNeeds: questNeeds, sellPrice: sellPrice, startLeft: startLeft, sellList: sellList, sell: sell };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Shop = Shop; }
   if (typeof module !== 'undefined') module.exports = Shop;

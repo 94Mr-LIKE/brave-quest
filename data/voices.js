@@ -34,10 +34,10 @@ window.VOICES = {
     temple_keeper:  { name: "廟公",           gender: "m", age: "elder", stage: "老年", look: "npc_chief",         pitch: 0.72, rate: 0.80, taigi: true,  persona: "慢條斯理、很和氣，像在廟埕泡茶聊天，句尾常拉長音。" },
     shopkeeper:     { name: "老街阿伯",       gender: "m", age: "adult", stage: "青年", look: "npc_shopkeeper",    pitch: 0.97, rate: 1.06, taigi: true,  persona: "嗓門大、愛招呼客人，講話很開朗，台語比華語順。" },   // 原 elder 0.90/0.95：圖是黑髮圓臉的年輕人
     fisher:         { name: "漁夫阿伯",       gender: "m", age: "adult", stage: "中年", look: "npc_fisher",        pitch: 0.75, rate: 0.97, taigi: true,  persona: "豪爽，聲音粗粗的，海風吹久了有點沙啞，笑聲很大。" },   // 原 elder 0.70/0.90：圖是灰黑頭髮、鬍渣的中年人
-    bookstore:      { name: "圖書館阿姨",     gender: "f", age: "adult", stage: "中年", look: "npc_bookstore",     pitch: 0.93, rate: 0.90, taigi: true,  persona: "溫柔有耐心，一個字一個字說清楚，偶爾說一句台語。" },   // 原 1.12/0.92；老闆指定中年女
-    innkeeper:      { name: "溫泉旅館老闆娘", gender: "f", age: "adult", stage: "中年", look: "npc_innkeeper",     pitch: 1.00, rate: 1.00, taigi: true,  persona: "親切愛笑，招呼客人很熱情，講話帶台語腔。" },   // 原 1.20/1.02；老闆指定中年女
+    bookstore:      { name: "圖書館阿伯",   gender: "m", age: "elder", stage: "老年", look: "npc_bookstore_m",   pitch: 0.84, rate: 0.92, taigi: true,  persona: "溫柔有耐心，一個字一個字說清楚，偶爾說一句台語。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 0.93/0.90）。語音組 10-11：新圖 npc_bookstore_m 是灰白髮老人→老年，0.80/0.88 改 0.84/0.92
+    innkeeper:      { name: "溫泉旅館老闆", gender: "m", age: "adult", stage: "中年", look: "npc_innkeeper_m",   pitch: 0.68, rate: 1.02, taigi: true,  persona: "親切愛笑，招呼客人很熱情，講話帶台語腔。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 1.00/1.00）。新圖 npc_innkeeper_m
     // ── 擎天草原、硫磺谷 ──
-    potato_seller:  { name: "賣地瓜的阿姨",   gender: "f", age: "adult", stage: "中年", look: "npc_auntie_yam",    pitch: 1.05, rate: 1.10, taigi: true,  persona: "大聲叫賣、很有活力，句子短短的，常用台語招呼。" },   // 原 1.15/1.12
+    potato_seller:  { name: "賣地瓜的阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_uncle_yam",     pitch: 0.76, rate: 0.95, taigi: true,  persona: "大聲叫賣、很有活力，句子短短的，常用台語招呼。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 1.05/1.10）。語音組 10-11：新圖 npc_uncle_yam 灰白髮→老年，0.78/1.12 改 0.76/0.95（老年 rate ≤ 0.95）
     hiker:          { name: "登山阿伯",       gender: "m", age: "adult", stage: "中年", look: "npc_fisher",        pitch: 0.86, rate: 0.90, taigi: true,  persona: "精神很好、愛叮嚀安全，講話一句一句很清楚。" },   // 原 elder 0.84/0.92：和漁夫阿伯同一張中年人的圖
     // ── 神木森林・精靈 ──
     elf_elder:      { name: "精靈長老",       gender: "f", age: "elder", stage: "老年", look: "npc_elf_elder",     pitch: 1.00, rate: 0.82, taigi: false, persona: "溫柔像在說故事，句子之間會停一下，很有智慧。" },
@@ -57,18 +57,18 @@ window.VOICES = {
     orc_bank:       { name: "獸人小班長",     gender: "m", age: "adult", stage: "青年", look: "npc_orc",           pitch: 0.98, rate: 0.94, taigi: false, persona: "認真負責，講話像在主持班會。" },   // 原 teen 1.15/1.00：用的是獸人獵人（成年）的圖
     // ── 山城市集 ──
     merchant:       { name: "外國商人",       gender: "f", age: "adult", stage: "青年", look: "npc_merchant",      pitch: 1.26, rate: 1.06, taigi: false, persona: "活潑愛笑，華語帶一點外國腔，常冒出簡單英文。" },
-    blacksmith:     { name: "鐵匠師傅",       gender: "f", age: "adult", stage: "青年", look: "npc_blacksmith",    pitch: 1.10, rate: 1.08, taigi: true,  persona: "俐落、說話乾脆，邊打鐵邊聊天。" },   // 原 1.00：年輕女性
+    blacksmith:     { name: "鐵匠師傅",     gender: "m", age: "adult", stage: "青年", look: "npc_blacksmith_m",  pitch: 0.96, rate: 1.14, taigi: true,  persona: "俐落、說話乾脆，邊打鐵邊聊天。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 1.10/1.08）。新圖 npc_blacksmith_m（青年男）
     armor_keeper:   { name: "防具店老闆",     gender: "m", age: "adult", stage: "青年", look: "npc_shopkeeper",    pitch: 0.92, rate: 1.00, taigi: true,  persona: "實在、講話直接，很關心客人安全。" },   // 原 0.85：和老街阿伯同一張年輕人的圖
-    item_keeper:    { name: "市場阿姨",       gender: "f", age: "adult", stage: "中年", look: "npc_auntie_market", pitch: 0.92, rate: 1.04, taigi: true,  persona: "爽快，算錢很快，叫你「慢慢仔揀」。" },   // 原 1.08/1.08（老闆說的「草藥阿姨」應是她，見 34 號報告）
-    innkeeper_port: { name: "山城民宿老闆娘", gender: "f", age: "adult", stage: "中年", look: "npc_innkeeper",     pitch: 0.98, rate: 0.85, taigi: true,  persona: "輕聲細語、慢慢說，讓人很放鬆。" },   // 原 1.05/0.90：和溫泉老闆娘同一張圖
-    taro_seller:    { name: "芋圓店阿姨",     gender: "f", age: "adult", stage: "中年", look: "npc_auntie_taro",   pitch: 1.04, rate: 0.92, taigi: true,  persona: "溫暖，像在哄小孩，愛誇人聰明。" },   // 原 1.22/0.95
+    item_keeper:    { name: "市場阿叔",     gender: "m", age: "adult", stage: "中年", look: "npc_uncle_market",  pitch: 0.80, rate: 1.20, taigi: true,  persona: "爽快，算錢很快，叫你「慢慢仔揀」。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 0.92/1.04）。新圖 npc_uncle_market
+    innkeeper_port: { name: "山城民宿老闆", gender: "m", age: "adult", stage: "青年", look: "npc_inn_port_m",    pitch: 0.95, rate: 0.80, taigi: true,  persona: "輕聲細語、慢慢說，讓人很放鬆。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 0.98/0.85）。語音組 10-11：新圖 npc_inn_port_m 是年輕人→青年，0.83 改 0.95
+    taro_seller:    { name: "芋圓店老闆",   gender: "m", age: "elder", stage: "老年", look: "npc_uncle_taro",    pitch: 0.64, rate: 0.92, taigi: true,  persona: "溫暖，像在哄小孩，愛誇人聰明。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 1.04/0.92）。語音組 10-11：新圖 npc_uncle_taro 灰白髮→老年，0.72/0.90 改 0.64/0.92
     // ── 府城古城 ──
     king:           { name: "城主",           gender: "m", age: "elder", stage: "老年", look: "npc_king",          pitch: 0.62, rate: 0.86, taigi: true,  persona: "威嚴但溫和，說話穩重、字字清楚。" },   // CTO：台語台詞補寫中，taigi 改 true
-    guild:          { name: "公會導師",       gender: "f", age: "adult", stage: "青年", look: "npc_guild",         pitch: 1.10, rate: 1.00, taigi: true,  persona: "有精神，像老師一樣鼓勵人。" },   // CTO：taigi 改 true
+    guild:          { name: "公會導師",     gender: "m", age: "adult", stage: "青年", look: "npc_guild_m",       pitch: 1.00, rate: 1.00, taigi: true,  persona: "有精神，像老師一樣鼓勵人。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 1.10/1.00）。新圖 npc_guild_m（青年男）
     librarian:      { name: "圖書館員",       gender: "m", age: "adult", stage: "青年", look: "npc_librarian",     pitch: 0.92, rate: 0.90, taigi: true,  persona: "斯文、輕聲細語，很愛書。" },   // CTO：taigi 改 true
     // ── v0.9.3 B14 各地旅店老闆（還沒有精靈圖：先設中年＝adult，性別暫定，待語音組確認）──
     // 語音組 2026-10-10：還沒有精靈圖，無法照外觀確認性別；先照名稱（老闆娘＝女、老闆＝男）設中年，音高調進中年範圍。有圖後請把 look 補上。
-    inn_shenmu:     { name: "樹屋旅店老闆娘", gender: "f", age: "adult", stage: "中年", look: null,                pitch: 1.04, rate: 0.86, taigi: true,  persona: "溫柔安靜，像在森林裡說悄悄話，讓人想睡。" },   // 原 1.17（青年女範圍）
+    inn_shenmu:     { name: "樹屋旅店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_inn_shenmu_m",  pitch: 0.74, rate: 0.82, taigi: true,  persona: "溫柔安靜，像在森林裡說悄悄話，讓人想睡。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 1.04/0.86）。新圖 npc_inn_shenmu_m（中年男）
     inn_mangrove:   { name: "地精旅舍老闆",   gender: "m", age: "adult", stage: "中年", look: null,                pitch: 0.88, rate: 1.15, taigi: false, persona: "勤快的地精，講話輕快，喜歡聊潮水漲退。" },
     inn_goblin:     { name: "石屋客棧老闆娘", gender: "f", age: "adult", stage: "中年", look: null,                pitch: 0.95, rate: 1.20, taigi: false, persona: "愛笑的哥布林，開口先「嘿嘿」，講話快快的。" },
     inn_moon:       { name: "帳篷營地老闆",   gender: "m", age: "adult", stage: "中年", look: null,                pitch: 0.80, rate: 0.94, taigi: true,  persona: "爽朗實在，講話不急不徐，很會照顧旅人。" },

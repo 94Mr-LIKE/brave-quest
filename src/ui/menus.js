@@ -85,14 +85,19 @@
       body.appendChild(h('p', { text: '你有 🪙 ' + st.player.coins + ' 金幣' }));
       var list = h('ul.list');
       if (mode === 'buy') {
-        J.Shop.catalog(shopId, D.items, D.shops ? (function () { var o = {}; Object.keys(D.shops).forEach(function (k) { o[k] = D.shops[k].items; }); return o; })() : null).forEach(function (it) {
+        var cat = J.Shop.catalog(shopId, D.items, D.shops ? (function () { var o = {}; Object.keys(D.shops).forEach(function (k) { o[k] = D.shops[k].items; }); return o; })() : null);
+        // v0.9.4（40 號）：有買不起的東西時，在清單上方提醒怎麼存錢
+        if (cat.some(function (it) { return J.Shop.shortfall(st, it.price) > 0; })) body.appendChild(h('p.small.shop-broke', { text: '錢不夠喔！去打幾隻怪物、完成委託，就能存到錢。' }));
+        cat.forEach(function (it) {
           var have = st.inventory[it.id] || 0;
           var info = [];
           if (it.atk) info.push('攻擊力 +' + it.atk);
           if (it.def) info.push('防禦力 +' + it.def);
           if (it.mpBonus) info.push('魔力 +' + it.mpBonus);
           if (it.job) info.push('限 ' + jobNames(G, it.job));
-          var b = h('button', { disabled: st.player.coins < it.price, onclick: function () { buy(it.id); } }, ['買（' + it.price + ' 金幣）']);
+          var short = J.Shop.shortfall(st, it.price);   // v0.9.4 買不起時寫「還差 N 金幣」
+          var b = h('button', { disabled: short > 0, onclick: function () { buy(it.id); } }, [short > 0 ? '還差 ' + short + ' 金幣' : '買（' + it.price + ' 金幣）']);
+          if (short > 0) b.setAttribute('aria-label', it.name + '：' + it.price + ' 金幣，還差 ' + short + ' 金幣');
           list.appendChild(h('li', {}, [icon(it, it.id), h('div.what', {}, [h('b', { text: it.name }), h('span.small', { text: '　已有 ' + have }), h('div.small', { text: it.desc + (info.length ? '（' + info.join('、') + '）' : '') })]), b]));
         });
       } else {
@@ -113,7 +118,7 @@
     }
     function buy(id) {
       var r = J.Shop.buy(st, id, D.items);
-      if (!r.ok) { J.UI.toast(r.reason === 'coins' ? '金幣不夠喔。' : '買不到。'); return; }
+      if (!r.ok) { J.UI.toast(r.reason === 'coins' ? '還差 ' + r.short + ' 金幣喔！去打幾隻怪物、完成委託，就能存到錢。' : '買不到。', 4500); return; }
       var it = D.items[id];
       if (it.job && it.type === 'weapon') G.rareItem(); else J.Audio.play('chest');   // 職業武器＝珍貴道具
       var cmp = J.Character.compareEquip(st, id, D);
@@ -284,16 +289,34 @@
   }
 
   // ---------------------------------------------------------------- 旅店
-  function inn(G, mapId, innInfo) {
-    var price = innInfo && innInfo.price ? innInfo.price : 0;
-    return J.UI.confirm('要在' + ((innInfo && innInfo.name) || '旅店') + '休息嗎？體力和魔力會全部回滿。' + (price ? '（' + price + ' 金幣）' : '（免費）'), '休息', '先不用').then(function (yes) {
+  /**
+   * v0.9.4（老闆 2026-10-10 D23、40 號）住旅店要收費。金幣不夠時：金包里溫泉旅館（inn.freeIfBroke）免費住、每次都可以；
+   * 其他旅店老闆說「金幣不夠喔！可以回金包里的溫泉旅館休息，或去打幾隻怪物存錢。」（inn.dialog_nocoin 台詞），不能住。金包里溫泉旅館免費住時也先播 inn.dialog_nocoin（D_INN_FREE）。
+   * 回傳 Promise：true＝住了（G.innRest 播短曲）；G.lastInnStay 記下結果（'pay'／'free'／'refuse'，測試用）
+   */
+  function inn(G, mapId, innInfo, npcId) {
+    var st = G.state, name = (innInfo && innInfo.name) || '旅店';
+    var stay = J.Shop.innStay(st, innInfo || {});
+    G.lastInnStay = stay;
+    if (stay.action === 'refuse') {
+      return G.say(innInfo && innInfo.dialog_nocoin, [{ who: npcId || '__inn', text: '金幣不夠喔！可以回金包里的溫泉旅館休息，或去打幾隻怪物存錢。' }]).then(function () { return false; });
+    }
+    var q = stay.action === 'free'
+      ? '要在' + name + '住一晚嗎？住一晚要 ' + stay.price + ' 金幣，你現在有 ' + st.player.coins + ' 金幣。'
+      : '要在' + name + '住一晚嗎？體力和魔力會全部回滿。' + (stay.price ? '（' + stay.price + ' 金幣）' : '（免費）');
+    return J.UI.confirm(q, stay.action === 'free' ? '拜託老闆' : '住一晚', '先不用').then(function (yes) {
       if (!yes) return false;
-      if (price && G.state.player.coins < price) { J.UI.toast('金幣不夠喔。'); return false; }
-      G.state.player.coins -= price;
-      J.Character.rest(G.state, G.data);   // 音樂（旅店短曲）由 G.innRest 播
-      J.UI.banner('體力和魔力都回滿了！');
-      G.save(); G.refreshHud();
-      return true;
+      var paid = J.Shop.payInn(st, innInfo || {});
+      G.lastInnStay = paid;
+      var go = function () {
+        J.Character.rest(st, G.data);   // 音樂（旅店短曲）由 G.innRest 播
+        J.UI.banner('體力和魔力都回滿了！');
+        G.save(); G.refreshHud();
+        return true;
+      };
+      // 免費住：老闆先說請客的話（D_INN_FREE），再休息
+      if (paid.action === 'free') return G.say(innInfo && innInfo.dialog_nocoin, [{ who: npcId || '__inn', text: '錢不夠也沒關係，這次讓你免費住一晚！' }]).then(go);
+      return go();
     });
   }
 

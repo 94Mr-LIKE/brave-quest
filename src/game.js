@@ -287,9 +287,9 @@
     else if (who === 'pet') { name = name || '番薯仔'; sprite = 'pet_imo'; }
     else if (who === 'narrator') { name = ''; }
     else if (/^animal:/.test(who)) { name = who.slice(7); sprite = G.animalSprite || null; }   // v0.9.3 會走動的動物（黃牛）
-    // v0.9.3 B14：旅店老闆的稱呼以 SPEAKERS 為準（例：「樹屋旅店老闆娘」）
-    else if (who === '__inn') { name = J.MapInfo.innKeeperName(G.mapScene && G.mapScene.map, G.data.dialogs, SP); sprite = 'npc_innkeeper'; }
-    else if (/^inn_/.test(who) && !G.npcIndex[who]) { sprite = 'npc_innkeeper'; }
+    // v0.9.3 B14：旅店老闆的稱呼以 SPEAKERS 為準（例：「樹屋旅店老闆」）；v0.9.4 圖依老闆性別選（MapInfo.innKeeperSprite）
+    else if (who === '__inn') { name = J.MapInfo.innKeeperName(G.mapScene && G.mapScene.map, G.data.dialogs, SP); sprite = J.MapInfo.innKeeperSprite(G.mapScene && G.mapScene.map, G.data.dialogs, window.VOICES, J.Assets.has); }
+    else if (/^inn_/.test(who) && !G.npcIndex[who]) { sprite = J.MapInfo.innSpeakerSprite(who, window.VOICES, J.Assets.has); }   // v0.9.4 審查：頭像和地圖上的老闆同性別
     else if (G.npcIndex[who]) { sprite = G.npcIndex[who].npc.sprite; name = name || G.npcIndex[who].npc.name || who; }
     else if (G.data.monsters[who]) { sprite = G.data.monsters[who].sprite; name = name || G.data.monsters[who].name; }
     if (name === null) name = who;
@@ -438,7 +438,7 @@
     var f = ids.length ? J.QuestLog.forNpc(st, Q, npc.id, ids) : null;
     // 旅店、商店老闆如果也有委託，先處理委託
     if (f && r.role !== 'quest') r = { role: 'quest' };
-    if (r.role === 'inn') { G.say(J.MapInfo.innDialog(map, npc), [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
+    if (r.role === 'inn') { G.say(J.MapInfo.innDialog(map, npc), [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info, npc.id).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
     if (r.role === 'shop') { G.say(npc.dialog, []).then(function () { J.Menus.shop(G, r.info.shop_id || 'general'); }); return; }
     if (r.role === 'travel') { G.say(npc.dialog, [{ who: npc.id, text: '要搭車去哪裡呢？' }]).then(function () { G.openWorldMap(); }); return; }
     if (r.role === 'guild') {
@@ -621,7 +621,7 @@
   G.animalTalk = function (spec) {
     G.animalSprite = spec.sprite;
     J.Audio.play('select');
-    return G.say(null, [{ who: 'animal:' + spec.name, text: spec.say }]);
+    return G.say(spec.dialog, [{ who: 'animal:' + spec.name, text: spec.say }]);   // v0.9.4 台詞在 dialogs.js（水牛：D_ANIMAL_BUFFALO）
   };
 
   G.inspectLamp = function (lamp, scene) {
