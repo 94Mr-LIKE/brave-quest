@@ -33,7 +33,7 @@ window.JOBS = {
     name: "魔法師", fav_subject: "自然", bonus: 1.5, unlock_level: 5,
     growth: { hp: 6, mp: 5, atk: 2 },
     skill: { id: "element_magic", name: "元素魔法", mp: 5, subject: "自然", effect: "hit_all",
-             desc: "答對一題，打到所有怪物。" },
+             desc: "答對一題，用魔法打出 1.5 倍的傷害。" },   // v0.9.6（45 號 F4）戰鬥一次只有一隻怪，實際效果是單體 ×1.5
     desc: "魔力最高。拿手科目是自然。"
   },
   archer: {
@@ -42,14 +42,14 @@ window.JOBS = {
     growth: { hp: 8, mp: 3, atk: 2 }, speed_bonus: 1.2,
     skill: { id: "first_shot", name: "先制射擊", mp: 3, subject: "英語", effect: "preemptive",
              desc: "戰鬥一開始先答一題，答對就先射一箭。" },
-    desc: "動作快，答題時間條多兩成。拿手科目是英語。"
+    desc: "動作快，答題時間條多兩成（家長把答題時間關掉時，改成每場戰鬥可以閃過一次答錯後的攻擊）。拿手科目是英語。"
   },
   bard: {
     sprite_f: "hero_bard", sprite_m: "heroM_bard",
     name: "吟遊詩人", fav_subject: "國語", bonus: 1.5, unlock_level: 5,
     growth: { hp: 7, mp: 4, atk: 2 },
     skill: { id: "cheer_song", name: "鼓舞之歌", mp: 3, subject: "國語", effect: "extend_timer", value: 1.5,
-             desc: "答對一題，下一題的時間條變成 1.5 倍長。" },
+             desc: "答對一題，下一題的時間條變成 1.5 倍長（家長把答題時間關掉時，改成下一次答對的傷害變成 1.3 倍）。" },   // v0.9.6（45 號 F5）
     desc: "會幫自己加油的輔助型。拿手科目是國語。"
   },
   priest: {

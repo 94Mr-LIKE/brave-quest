@@ -12,7 +12,22 @@
     toasts = document.getElementById('toasts');
     live = document.getElementById('sr-live');
     document.addEventListener('keydown', onKey, true);
+    // v0.9.6（47 號 B01）用滑鼠／手指點過的 HUD 按鈕不要一直留著焦點：
+    // 不然 Z 以外的「對話」鍵（空白鍵、Enter）會去按那個按鈕，重新打開背包、放大地圖。用鍵盤 Tab 過去的照舊（無障礙）
+    document.addEventListener('pointerdown', function (e) {
+      pointerMode = true;
+      if (e.target && e.target.closest && e.target.closest('#game')) blurHud();   // 點遊戲畫面（canvas 不會搶焦點）
+    }, true);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Tab') pointerMode = false; }, true);
+    document.addEventListener('click', function (e) {
+      if (!pointerMode || e.detail === 0) return;   // detail 0＝鍵盤按的
+      var b = e.target && e.target.closest && e.target.closest(HUD_SEL);
+      if (b) setTimeout(function () { if (document.activeElement === b) b.blur(); }, 0);
+    }, true);
   }
+  var pointerMode = false, HUD_SEL = '#hud button, #pad button, #prompt button';
+  function inHud(el) { return !!(el && el.closest && el.closest('#hud, #pad, #prompt')); }
+  function blurHud() { var a = document.activeElement; if (inHud(a) && a.blur) a.blur(); }
 
   function esc(s) { return window.JQ.Assets.esc(s == null ? '' : s); }
 
@@ -69,7 +84,9 @@
         stack.splice(i, 1);
         syncBodyClass();
         if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
-        if (entry.prevFocus && entry.prevFocus.focus && document.body.contains(entry.prevFocus)) { try { entry.prevFocus.focus(); } catch (e) { /* 忽略 */ } }
+        // v0.9.6（47 號 B01）用滑鼠點 HUD 按鈕打開的視窗：關掉後不要把焦點還給 HUD 按鈕（鍵盤操作的照舊還回去）
+        if (pointerMode && inHud(entry.prevFocus)) { blurHud(); if (inHud(document.activeElement) || (document.activeElement && entry.content.contains(document.activeElement))) document.activeElement.blur(); }
+        else if (entry.prevFocus && entry.prevFocus.focus && document.body.contains(entry.prevFocus)) { try { entry.prevFocus.focus(); } catch (e) { /* 忽略 */ } }
         if (!silent && entry.onClose) entry.onClose();
       }
     };
@@ -219,6 +236,24 @@
     });
   }
 
+  /**
+   * v0.9.6 多個選項（47 號 B02：有委託的旅店、商店老闆可以選「住宿／買東西」或「委託」）。
+   * options = [{ value, text, primary }]；回傳 Promise<value>，按 Esc 或關閉回傳 null（什麼都不做）
+   */
+  function choose(message, options) {
+    return new Promise(function (resolve) {
+      var done = false, handle, first = null;
+      var btns = options.map(function (o) {
+        var b = h('button' + (o.primary ? '.primary' : ''), { onclick: function () { done = true; handle.close(); resolve(o.value); } }, [o.text]);
+        if (o.primary && !first) first = b;
+        return b;
+      });
+      btns.push(h('button.ghost', { onclick: function () { done = true; handle.close(); resolve(null); } }, ['等一下']));
+      var box = h('div.win.panel.narrow.choose-box', {}, [h('p', { text: message }), h('div.row.end', {}, btns)]);
+      handle = open(box, { label: message, onClose: function () { if (!done) resolve(null); }, focus: first || btns[0] });
+    });
+  }
+
   window.JQ = window.JQ || {};
-  window.JQ.UI = { init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, blocksMove: blocksMove, closePassMove: closePassMove, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
+  window.JQ.UI = { choose: choose, init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, blocksMove: blocksMove, closePassMove: closePassMove, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
 })();

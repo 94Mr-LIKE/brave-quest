@@ -48,7 +48,7 @@ window.MAPS = {
       "TTF**..........*.......F**================================================BB==================TT",
       "TTFFFFFFFFFF==FFFFFFFFFF**================================================BB==================TT",
       "TTT.......*.==..........**========U.============UUUUUUUUUUUUUUUUUUUUUUUUU=BB*.......BB........TT",
-      "TTT.........==..........**==UUUUUUTTUUUUUUUU.==URRRRRTTTRRRTTTRRRRTTTRRRR*~~=U.....UBBU.*..UUUTT",
+      "TTT.........==..........**==UUUUUUTTUUUUUUUU.==URRRRRTTTRRRTTTRRRRTTTRRRR*~~=U.....KBBK.*..UUUTT",
       "TTT.U.......==..........**==RRRRRRTTRRRRRTTTT==*RRRRRTTTRRRTTTRRRRTTTRRRR*~~=K*****KBBK****KKKTT",
       "TTT**.......==U.........**==RRRRRRTTRRRRRTTTT==*HHHHHTTTHHHTTTHHHHTTTHHHH*~~=.*~~~*.BB.*~~~*~~TT",
       "TTT**.....*.==**........**==HHHHHHTTHHHHHTTTT==*HHHHHTTTHHHTTTHHHHTTTHHHH*~~***~~~*.BB.*~~~*~~TT",
@@ -72,12 +72,12 @@ window.MAPS = {
       "TTT*HHHHHHHHHHHH*=TTT~~~~*==.......TTTKKKK...==TTTRRHHHHHHHHHHHHHHHHHTTFTTT*..*.===***RRRRRRRRFT",
       "TTT*#####SS#####*=TT*~~~~*==.*........KKKKUUU==TTTHHHHHHHHHHHHHHHHHHHTTFTTT.....===***RRRRRRRRFT",
       "TTT===============..*~~~~*==.*........KKKK***==TTTHHHHHHHHH===HHHHHHHTTFTTT.....===***HHHHHHHHFT",
-      "TTT=U==========U==..*~~~~*==..........KKKK***==TTTHHHHHHKK=====KKHHHHTTFTTT.....===.**HHHHHHHHFT",
+      "TTT=K==========K==..*~~~~*==..........KKKK***==TTTHHHHHHKK=====KKHHHHTTFTTT.....===.**HHHHHHHHFT",
       "TTTU*U.UUUUU...*==.,*..*..==.,***........**,.==****K..K.KSSSSSSSK.K**TTFF.......===...=KK=K===FT",
       "TTTTTTTTTTTTTTTT========================================================F=====================FT",
-      "TTTTTTTTTTTTTTTT========================================================F,,,,,,,,,,,,,,,,,,,,=FT",
+      "TTTTTTTTTTTTTTTT===========================================UUU==========F,,,,,,,,,,,,,,,,,,,,=FT",
       "TTTTTTTTTTTTTTTT==....*...==...==............==....========UUU==========F,,,,,,,,,,,,,,,,,,,,=FT",
-      "TTTTTTTT..TTTTTT==.....*..==UUU==.U.....UUU..==....========KKK======.UF.F,,,,,,,,,U,,,,,,,,,,=FT",
+      "TTTTTTTT..TTTTTT==.....*..==UUU==.K.....UUU..==....========KKK======.UF.F,,,,,,,,,U,,,,,,,,,,=FT",
       "TTTTTTTT..TTTTTT==UUU.....==***==.K.....TTT..==....=========K========TF.F,,,,,,,,,K,,,,,,,,,,=FT",
       "TTTTUUUUUUUTTTTT==UUU...*.==***==..**...TTT..==....=================UTF.F,,,,,,,,,,,,,,,,,,,,=FT",
       "TTTTUTTTTTTTTTTT==TTT.....==***==...*...TTT..==.*..=================TTF.F,,,,,,,,,,,,,,,,,,,,=FT",
@@ -121,7 +121,6 @@ window.MAPS = {
     ],
     npcs: [
       { id: "chief", x: 57, y: 47, sprite: "npc_chief", dialog: "D_CHIEF_IDLE", quest: "Q_TUT_1", quests: ["Q_TUT_1", "Q_LAMPS"] },
-      { id: "temple_keeper", x: 63, y: 47, sprite: "npc_temple_keeper", dialog: "D_TEMPLE_IDLE", quest: null, quests: [] },
       { id: "bookstore", x: 12, y: 43, sprite: "npc_bookstore_m", dialog: "D_BOOK_IDLE", quest: "Q_SIDE_BOOK", quests: ["Q_SIDE_BOOK"] },
       { id: "shopkeeper", x: 31, y: 33, sprite: "npc_shopkeeper", dialog: "D_SHOP_IDLE", quest: null, quests: [] },
       { id: "innkeeper", x: 84, y: 16, sprite: "npc_innkeeper_m", dialog: "D_INN_IDLE", quest: "Q_TUT_3", quests: ["Q_TUT_3"] },
@@ -148,7 +147,7 @@ window.MAPS = {
     inn: { npc: "innkeeper", price: 5, x: 84, y: 16, name: "金包里溫泉旅館", sign: "溫泉", freeIfBroke: true, dialog_nocoin: "D_INN_FREE" },
     shop: { shop_id: "general", npc: "shopkeeper", x: 31, y: 33 },
     lights: [
-      { x: 34, y: 50, r: 1 },
+      { x: 34, y: 49, r: 1 },
       { x: 4, y: 44, r: 1 },
       { x: 15, y: 44, r: 1 },
       { x: 51, y: 45, r: 1 },
@@ -1037,10 +1036,10 @@ window.MAPS = {
       "#TT~~~~RRRRRRRRRRRRRRRRRRTTTT##KK==========KKKRRRRRRRRRRRRRRRRTTTTTTTTTTTTTTT#K===K#",
       "#TT~~~~RRRRRRRRRRRRRRRRRRTTTT##KK==========KKKRRRRRRRRRRRRRRRRTTTTTTTTTTTTTTT#K===K#",
       "#TT~~~~RRRRRRRRRRRRRRRRRRTTTT##TT==========KKKRRRRRRRRRRRRRRRRTTTTTTTTTTTTTTT#=====#",
-      "#TT~~~~RRRRRRRRRRRRRRRRRRTTTT##TTTTT=======#KKRRRRRRRRRRRRRRRRTTTTTTTTTTTTTTT#=====#",
+      "#TT~~~~RRRRRRRRRRRRRRRRRRTTTT##TTTTT=======#KKRRRRRRRRRRRRRRRRTTTTTTTTTTTTTTT#*====#",
       "#TT~~~~RRRRRRRRRRRRRRRRRRTTTT##TTTTT=======#HHHHHHHHHHHHHHHHHHTTTTTTTTTTTTTTT#=====#",
       "#TT~~~~RRRRRRRRRRRRRRRRRRTTTT##TTTTT=======#HHHHHHHHHHHHHHHHHHTTTTTTTTTTTTTTT#=====#",
-      "#TT~~~~HHHHHHHHHHHHHHHHHHTTTT##TTTTT=======#HHHHHHDDHHHHHHHHHHTTTTTTTTTTTTTTT#=====#",
+      "#TT~~~~HHHHHHHHHHHHHHHHHHTTTT##TTTTT=======#HHHHHHDDHHHHHHHHHHTTTTTTTTTTTTTTT#UU===#",
       "#TTTTTTHHHHHHHHHHHHHHHHHHTTTT#===================SSSSSTTTTTTT===========UUUUUUUUUU=#",
       "#TTTTTTTTTTTTTSSTTTTTTTTTTTTT#============TTTTTTT=====TTTTTTTTTTTT==TTTTTTTTTTTTTT=#",
       "#TTTTTTTTTTTTTSSTTTTTTTTTTTTT#============TTTTTTT=====TTTTTTTT~~~FBBF~~~~K~~~TTTTT=#",
@@ -1050,7 +1049,7 @@ window.MAPS = {
       "#TTTTTT~~~~~~T==T~~~~~~TTTTTT#=====KKK====TTTTTTTTT==TTTTTTTTT~~~FBBF~~~~~~~~TTTTT=#",
       "#TTTTTT~~~~~~T==T~~~~~~TTTTTT#=====KKK====TTTTTTTTT==TTTTTTTTT~~~FBBF~~~~~~~~TTTTT=#",
       "#TTTTTT~~~~~~T==T~~~~~~TTTTTT#=====KKK====TTTTTTTTT==TTTTTTTTT~~~FBBF~~~~~~~~TTTTT=#",
-      "#TTTTTT~~~~~~T==T~~~~~~TTTTTT#==U=======U=TTTTTTTTT==TTTTTTTTT~~~FBBF~~~~~~~~TTTTT=#",
+      "#TTTTTT~~~~~~T==T~~~~~~TTTTTT#==K=======K=TTTTTTTTT==TTTTTTTTT~~~FBBF~~~~~~~~TTTTT=#",
       "#TTTTTTTTTTTTT==TTTTTTTTTTTTT#==K=======K=TTTTTTTTT==TTTTTTTTTTTTT==TTTTTKTTTTTTTT=#",
       "#TTTTTTTTTTTTT==TTTTTTTTTTTTT#==K=======K=TTTTTTTTT==TTTTTTTTTTTTT==TTTTTTTTTTTTTT=#",
       "#TTTTTTTTTTTTT==TTTTTTTTTTTTT#==RRRRUUURRRTTTTTTTTT==TTTTTTTTTTTTT==TTTTTTTTTTTTTT=#",
@@ -1072,7 +1071,7 @@ window.MAPS = {
       "####################################################################################"
     ],
     start: { x: 17, y: 51 },
-    station: { x: 21, y: 50, name: "府城古城站", shelter: { x: 28, y: 49 } },
+    station: { x: 21, y: 50, name: "府城古城站", shelter: { x: 8, y: 49 } },
     exits: [
       { x: 41, y: 0, to: "M11", tx: 35, ty: 40 },
       { x: 42, y: 0, to: "M11", tx: 36, ty: 40 }
@@ -1128,7 +1127,7 @@ window.MAPS = {
       { x: 64, y: 45, r: 1.2 },
       { x: 45, y: 49, r: 1 },
       { x: 64, y: 49, r: 1 },
-      { x: 80, y: 49, r: 1 }
+      { x: 80, y: 49, r: 0.9 }
     ]
   },
 
@@ -1247,7 +1246,9 @@ window.MAPS = {
       { x: 12, y: 19, to: "M01", tx: 60, ty: 44 },
       { x: 13, y: 19, to: "M01", tx: 61, ty: 44 }
     ],
-    npcs: [],
+    npcs: [
+      { id: "temple_keeper", x: 17, y: 8, sprite: "npc_temple_keeper", dialog: "D_TEMPLE_INTRO", quest: null, quests: [] }
+    ],
     chests: [],
     spawns: [],
     inn: null,

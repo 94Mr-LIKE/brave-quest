@@ -159,7 +159,18 @@
     return { active: active, done: done };
   }
 
-  var QuestLog = { status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked };
+  /**
+   * v0.9.6（47 號 B02）旅店、商店老闆也有委託時怎麼辦：可以回報就先回報（'quest'）；有新委託或委託還在進行中 → 讓孩子選（'ask'）；
+   * 沒有委託 → 照常營業（'service'）；不是旅店、商店的人 → 委託（'quest'）
+   */
+  function serviceChoice(role, f, canCompleteNow) {
+    if (!f) return 'service';
+    if (role !== 'inn' && role !== 'shop') return 'quest';
+    if (f.status === 'active' && canCompleteNow) return 'quest';
+    return 'ask';
+  }
+
+  var QuestLog = { serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.QuestLog = QuestLog; }
   if (typeof module !== 'undefined') module.exports = QuestLog;
 })();

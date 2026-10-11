@@ -350,7 +350,9 @@
       var r = J.Character.changeJob(st, id, D);
       if (!r.ok) return;
       J.Audio.play('levelup');
-      J.UI.banner('轉職成「' + D.jobs[id].name + '」了！');
+      // v0.9.6（47 號 B06）神像前轉職：大橫幅會蓋住主角身上的祝福光芒 → 改成右上角的提示泡泡
+      if (opts.closeOnChange) J.UI.toast('轉職成「' + D.jobs[id].name + '」了！', 4000);
+      else J.UI.banner('轉職成「' + D.jobs[id].name + '」了！');
       G.onJobChanged();
       G.save(); render();
       if (opts.closeOnChange) handle.close();   // 神像轉職：關掉清單，讓孩子看到祝福光芒

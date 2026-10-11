@@ -10,8 +10,10 @@
   function h() { return J.UI.h.apply(null, arguments); }
   var SHOP_COLOR = { weapon: '#e0603a', armor: '#3b8fd6', item: '#2f8f4a', general: '#d0a020', inn: '#a15ad8' };
   var SHOP_SHORT = { weapon: '武', armor: '防', item: '道', general: '雜', inn: '旅' };
+  // v0.9.6（47 號 B07）小地圖的委託記號：顏色、符號和頭頂的泡泡（MapScene.makeUiTextures 的 ui:bang、ui:ready）一樣
+  var MARKS = { 'new': { color: '#ffd34d', sym: '!' }, ready: { color: '#7be08a', sym: '?' } };
   var LOCAL_W = 40, LOCAL_H = 25;   // 大地圖時小地圖顯示的範圍（格）
-  var box = null, canvas = null, caption = null, levelCap = null, timer = 0, gridCache = {};
+  var box = null, canvas = null, caption = null, levelCap = null, timer = 0, gridCache = {}, bigHandle = null;
   /** 「寶箱：還剩 N 個」（這張地圖還沒打開的寶箱數；沒有寶箱的地圖不顯示） */
   function chestText(info) {
     var cs = info.chests || [];
@@ -39,6 +41,21 @@
     return { x: x, y: y, w: w, h: hh };
   }
 
+  /** 置中寫字時，讓整個字串留在 0～canvasW 之內（左右留 3px）：回傳新的中心 x */
+  function labelX(x, textW, canvasW) {
+    var half = textW / 2 + 3;
+    if (textW + 6 >= canvasW) return canvasW / 2;
+    return Math.max(half, Math.min(canvasW - half, x));
+  }
+  /**
+   * v0.9.6（47 號 B13、B14）放大地圖畫布的大小上限：橫向（電腦、平板橫放）用一半寬，面板靠左放，右邊露出遊戲畫面可以點；
+   * 直向（平板直放）用幾乎整個寬度，人物清單排到下面
+   */
+  function bigMax(vw, vh) {
+    if (vh > vw) return { w: Math.min(700, vw - 60), h: Math.min(440, vh * 0.42) };
+    return { w: Math.min(580, vw * 0.5), h: Math.min(440, vh * 0.62) };
+  }
+
   /** v0.9.5 放大地圖上的地點名稱（白字深色描邊，小字；不蓋住圓點） */
   function drawPlaces(g, info, view, cw, ch) {
     var list = info.places || [];
@@ -46,9 +63,12 @@
     var fs = Math.max(11, Math.min(15, Math.round(Math.min(cw, ch) * 2)));
     g.font = 'bold ' + fs + 'px "Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
     g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+    var CW = view.w * cw;
     list.forEach(function (pl) {
       var x = (pl.x - view.x) * cw, y = (pl.y - view.y) * ch;
-      if (x < 0 || y < 0 || x > view.w * cw || y > view.h * ch) return;
+      if (x < 0 || y < 0 || x > CW || y > view.h * ch) return;
+      // v0.9.6（47 號 B13）地名夾在畫布裡（平板直向「海風國小（校門與操場）」左邊被切掉）
+      x = labelX(x, g.measureText(pl.name).width, CW);
       g.lineWidth = 3; g.strokeStyle = 'rgba(10,16,48,0.9)'; g.strokeText(pl.name, x, y);
       g.fillStyle = '#fff6d8'; g.fillText(pl.name, x, y);
     });
@@ -100,19 +120,26 @@
       g.beginPath(); g.moveTo(mx - mr, my - mr); g.lineTo(mx + mr, my + mr); g.moveTo(mx + mr, my - mr); g.lineTo(mx - mr, my + mr); g.stroke();
     }
     dot(info.player.x, info.player.y, '#ffd34d', r * 1.3);
-    // v0.9.5 有委託可以接／可以回報的人：圓點上方畫「！」（接委託黃色、回報橘色；和頭頂的記號同一個判斷）
+    // v0.9.5 有委託可以接／可以回報的人：圓點上方畫記號（和頭頂的記號同一個判斷）。
+    // v0.9.6（47 號 B07）和頭頂一致：有新委託＝黃色「!」（ui:bang #ffd34d）；可以回報＝綠色「?」（ui:ready #7be08a）
     info.npcs.forEach(function (n) {
       if (!n.mark || !inside(n.x, n.y)) return;
-      // 圓點上方一個醒目的圓形徽章，裡面一個粗的「!」（全形「！」在小字時太細，看不出來）
+      var m = MARKS[n.mark] || MARKS['new'];
+      // 圓點上方一個醒目的圓形徽章，裡面一個粗的符號（全形字在小字時太細，看不出來）
       var rad = big ? Math.max(8, r * 1.8) : Math.max(6, r * 1.4);
       var bx = px(n.x), by = py(n.y) - r - rad * 0.95;
       g.beginPath(); g.arc(bx, by, rad, 0, Math.PI * 2);
-      g.fillStyle = n.mark === 'ready' ? '#ff9a2e' : '#ffe14a'; g.fill();
+      g.fillStyle = m.color; g.fill();
       g.lineWidth = big ? 2.5 : 2; g.strokeStyle = '#1d2b5e'; g.stroke();
       g.fillStyle = '#1d2b5e';
-      var bw = Math.max(2, rad * 0.32);
-      g.fillRect(bx - bw / 2, by - rad * 0.62, bw, rad * 0.78);   // 「!」的直線
-      g.fillRect(bx - bw / 2, by + rad * 0.3, bw, bw);             // 「!」的點
+      if (m.sym === '!') {
+        var bw = Math.max(2, rad * 0.32);
+        g.fillRect(bx - bw / 2, by - rad * 0.62, bw, rad * 0.78);   // 「!」的直線
+        g.fillRect(bx - bw / 2, by + rad * 0.3, bw, bw);             // 「!」的點
+      } else {
+        g.font = '900 ' + Math.round(rad * 1.5) + 'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText('?', bx, by + rad * 0.08);
+      }
     });
     if (blink && Date.now() < blink.until && Math.floor(Date.now() / 200) % 2 === 0) {
       g.beginPath(); g.arc(px(blink.x), py(blink.y), r * 3, 0, Math.PI * 2); g.lineWidth = 3; g.strokeStyle = '#ffd34d'; g.stroke();
@@ -131,7 +158,8 @@
       canvas = h('canvas', { 'aria-hidden': 'true' });
       caption = h('span.mm-caption');
       levelCap = h('span.mm-level');   // v0.9.3 建議等級「Lv1–4」
-      box = h('button.minimap', { onclick: function () { if (!G.blocked()) openBig(G); }, 'aria-label': '小地圖（點一下放大）' }, [levelCap, canvas, caption]);
+      // v0.9.6（47 號 B03）放大地圖已經開著時再點小地圖＝關掉（不再疊出第二張）
+      box = h('button.minimap', { onclick: function () { if (bigHandle) { bigHandle.close(); return; } if (!G.blocked()) openBig(G); }, 'aria-label': '小地圖（點一下放大）' }, [levelCap, canvas, caption]);
       hud.appendChild(box);
     }
     var info = scene.minimapInfo();
@@ -157,7 +185,8 @@
     var sc = G.mapScene;
     if (!sc) return null;
     var info = sc.minimapInfo(), D = G.data, st = G.state;
-    var sz = size(info, Math.min(580, window.innerWidth * 0.5), Math.min(440, window.innerHeight * 0.62));
+    if (bigHandle && document.body.contains(bigHandle.node)) return bigHandle;   // v0.9.6 B03 已經開著就不再開
+    var mx = bigMax(window.innerWidth, window.innerHeight), sz = size(info, mx.w, mx.h);
     var big = h('canvas.minimap-big', { width: sz.w, height: sz.h, role: 'img', 'aria-label': (info.name || '') + '的地圖（點一下地圖，主角就會走過去）' });
     var blink = null, dest = null;
     function redraw() {
@@ -182,7 +211,7 @@
     info.npcs.forEach(function (n) {
       // v0.9.5 有委託可以接／回報的人，名單上也加「！」
       npcList.appendChild(h('li', {}, [h('button', { onclick: function () { blink = { x: n.x, y: n.y, until: Date.now() + 2000 }; sc.flashAt(n.x, n.y); } },
-        ['📍 ' + n.name + (n.mark ? (n.mark === 'ready' ? '（！可以回報）' : '（！有委託）') : '')])]));
+        ['📍 ' + n.name + (n.mark ? (n.mark === 'ready' ? '（？可以回報）' : '（！有委託）') : '')])]));
     });
     (info.places || []).forEach(function (pl) { npcList.appendChild(h('li.mm-place', {}, [h('span', { text: '🏯 ' + pl.name })])); });
     info.shops.forEach(function (s) { npcList.appendChild(h('li', {}, [h('span', { text: '🏠 ' + s.text + '（' + (SHOP_SHORT[s.kind] || '') + '）' })])); });
@@ -198,7 +227,7 @@
           h('div.small', { text: known ? ('已遇見 ' + r.seen + ' 次・已打倒 ' + r.defeated + ' 次') : '還沒遇見' })])]));
     });
     if (!ids.length) monList.appendChild(h('li', { text: '這裡沒有怪物。' }));
-    var legend = h('p.small', { text: '點地圖上的地方，主角就會走過去。🟡 你　🔵 人　！ 有委託　🟠 怪物　🔷 出口　⬜ 車站　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' });
+    var legend = h('p.small', { text: '點地圖上的地方，主角就會走過去。🟡 你　🔵 人　！ 有委託　？ 可以回報　🟠 怪物　🔷 出口　⬜ 車站　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' });
     var handle;
     var mapBox = h('div.mm-map', {}, [big, legend]);
     mapBox.style.width = sz.w + 6 + 'px';   // 圖例跟著地圖寬度換行
@@ -206,12 +235,14 @@
       h('h2', { text: '🗺️ ' + J.MapInfo.nameWithLevel({ name: info.name || '地圖', rec_level: sc.map.rec_level }, sc.mapId) + '（' + info.w + '×' + info.h + ' 格）' }),
       h('div.mm-body', {}, [mapBox, h('div.mm-side', {}, [h('h3', { text: '這裡的人（點一下看位置）' }), npcList, h('h3', { text: '這裡的怪物' }), monList])])]);
     // v0.9.3 放大地圖開著時主角仍然可以走（方向鍵、搖桿），地圖上的「你」會跟著動
-    handle = J.UI.open(panel, { label: (info.name || '') + '的地圖', passMove: true, onClose: function () { clearInterval(t); } });
+    handle = J.UI.open(panel, { label: (info.name || '') + '的地圖', passMove: true, onClose: function () { clearInterval(t); if (bigHandle === handle) bigHandle = null; } });
+    bigHandle = handle;
+    if (panel.parentNode) panel.parentNode.classList.add('mm-wrap');   // v0.9.6 B14：面板靠左放（見 style.css）
     draw(big, info, true);
     return handle;
   }
 
-  var Minimap = { chestText: chestText, attach: attach, openBig: openBig, draw: draw, viewFor: viewFor, LOCAL_W: LOCAL_W, LOCAL_H: LOCAL_H, lastTap: null };
+  var Minimap = { MARKS: MARKS, labelX: labelX, bigMax: bigMax, isBigOpen: function () { return !!(bigHandle && document.body.contains(bigHandle.node)); }, chestText: chestText, attach: attach, openBig: openBig, draw: draw, viewFor: viewFor, LOCAL_W: LOCAL_W, LOCAL_H: LOCAL_H, lastTap: null };
   window.JQ = window.JQ || {};
   window.JQ.Minimap = Minimap;
 })();

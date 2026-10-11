@@ -39,26 +39,44 @@
       });
     }
 
+    var lastSize = [0, 0];
     function render(imgW, imgH) {
-      Array.prototype.forEach.call(stage.querySelectorAll('.dot'), function (n) { n.parentNode.removeChild(n); });
+      lastSize = [imgW, imgH];
+      Array.prototype.forEach.call(stage.querySelectorAll('.dot, .dot-line'), function (n) { n.parentNode.removeChild(n); });
       side.innerHTML = '';
+      // v0.9.6（47 號 B04）北部的圓點（金包里、野柳、哥布林村莊、山城、紅樹林）很近會疊在一起：照畫面上的大小把圓點推開（至少 48px），
+      // 畫一條細線連回真正的位置；每個圓點都點得到（1280 寬、平板都一樣）
+      var sw = stage.clientWidth, shh = stage.clientHeight;
+      var fr = list.map(function (r) { return J.WorldMap.fraction(r.raw, imgW, imgH); });
+      var pos = (sw > 0 && shh > 0) ? J.WorldMap.spreadDots(fr.map(function (f) { return { x: f.fx * sw, y: f.fy * shh }; }), 48, sw, shh, 24) : null;
       list.forEach(function (r, i) {
-        var f = J.WorldMap.fraction(r.raw, imgW, imgH);
+        var f = fr[i];
         var state = r.here ? '目前在這裡' : (r.unlocked ? '可以前往' : '還沒解鎖');
         var can = r.unlocked && !r.here;
+        var left = pos ? pos[i].x / sw : f.fx, top = pos ? pos[i].y / shh : f.fy;
+        if (pos && Math.hypot(pos[i].x - f.fx * sw, pos[i].y - f.fy * shh) > 6) {
+          // 細線：從真正的位置連到推開後的圓點
+          var x0 = f.fx * sw, y0 = f.fy * shh, dx = pos[i].x - x0, dy = pos[i].y - y0;
+          stage.appendChild(h('span.dot-line', { 'aria-hidden': 'true', style: { left: x0 + 'px', top: y0 + 'px', width: Math.hypot(dx, dy) + 'px', transform: 'rotate(' + Math.atan2(dy, dx) + 'rad)' } }));
+        }
         stage.appendChild(h('button.dot' + (r.here ? '.here' : '') + (r.unlocked ? '' : '.locked'), {
-          style: { left: (f.fx * 100).toFixed(2) + '%', top: (f.fy * 100).toFixed(2) + '%' },
-          disabled: !can, title: r.name + '（' + state + '）', 'aria-label': r.name + '，' + state,
+          style: { left: (left * 100).toFixed(2) + '%', top: (top * 100).toFixed(2) + '%' },
+          disabled: !can, title: r.name + '（' + state + '）', 'aria-label': r.name + '，' + state, 'data-region': r.raw.id,
           onclick: function () { go(r); }
         }, [NUM[i] || String(i + 1)]));
+        // v0.9.6（47 號 B11）real_ref 本身已經有括號時不要再加一層
+        var ref = r.raw.real_ref ? (/^[（(]/.test(r.raw.real_ref) ? r.raw.real_ref : '（' + r.raw.real_ref + '）') : '';
         side.appendChild(h('li', {}, [
           h('button.pin' + (r.here ? '.here' : ''), { disabled: !can, onclick: function () { go(r); }, 'aria-label': r.name + '，' + state },
             [(NUM[i] || (i + 1)) + ' ' + (r.here ? '📍 ' : (r.unlocked ? '🚩 ' : '🔒 ')) + r.name]),
-          h('span.small', { text: r.here ? '目前在這裡' : (r.unlocked ? (r.raw.real_ref ? '（' + r.raw.real_ref + '）' : '') : lockedText(r)) })
+          h('span.small', { text: r.here ? '目前在這裡' : (r.unlocked ? ref : lockedText(r)) })
         ]));
       });
       if (!list.length) side.appendChild(h('li', { text: '還沒有可以去的地方。' }));
     }
+    // 視窗大小改變（平板轉向）時圓點重新排
+    var onResize = function () { if (document.body.contains(stage)) render(lastSize[0], lastSize[1]); else window.removeEventListener('resize', onResize); };
+    window.addEventListener('resize', onResize);
 
     var file = W.image || J.Assets.art().ui.world_taiwan || null;   // 預設 assets/ui/world_taiwan.png
     var url = file ? J.Assets.resolveUrl(J.Assets.mapImagePath(file)) : null;

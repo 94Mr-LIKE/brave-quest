@@ -14,11 +14,24 @@
     var titleArt = J.Assets.art().ui.title ? J.Assets.resolveUrl(J.Assets.art().ui.title) : null;
     if (titleArt) { screen.style.backgroundImage = 'url("' + titleArt + '")'; screen.classList.add('has-art'); }
     var handle = J.UI.open(screen, { modal: false, label: '標題畫面', escClose: false });
+    // v0.9.6 標題插畫變成會動的畫面（title_anim.js：WebGL；沒有 WebGL 或圖讀不到就維持原本的靜態背景圖）
+    // 標題視窗關閉（進入遊戲、讀存檔碼）時停止並釋放 WebGL 資源
+    var anim = !!(titleArt && J.TitleAnim && J.TitleAnim.start(screen, titleArt));
+    var closeTitle = handle.close;
+    handle.close = function () {
+      if (anim) { anim = false; try { J.TitleAnim.stop(); } catch (e) { /* 停不下來也不影響進遊戲 */ } }
+      return closeTitle.apply(handle, arguments);
+    };
+    /** 清掉標題畫面的內容（動畫畫布留著，放回最底層） */
+    function clearScreen() {
+      screen.innerHTML = '';
+      if (anim) J.TitleAnim.attach(screen);
+    }
     var heroes = h('div.title-heroes', { 'aria-hidden': 'true', html: J.Assets.domIcon(J.Assets.heroKey('f', 'novice'), { size: 96, label: '女' }) +
       J.Assets.domIcon('pet_imo', { size: 56, label: '番' }) + J.Assets.domIcon(J.Assets.heroKey('m', 'novice'), { size: 96, label: '男' }) });
 
     function frame(children) {
-      screen.innerHTML = '';
+      clearScreen();
       screen.appendChild(h('h1', { text: J.CONFIG.GAME_TITLE }));
       screen.appendChild(h('div.sub', { text: '國小三年級・學習冒險' }));
       screen.appendChild(heroes);
@@ -45,8 +58,9 @@
           if (J.Opening.play({ music: music, onDone: function () { menu(); } })) return;
         }
         menu();
-      } }, ['點一下開始']);
-      frame([tap, h('p.note', { text: '可以用滑鼠、觸控或鍵盤（方向鍵走路、空白鍵或 Z 鍵對話）來玩。' })]);
+      } }, ['點一下', h('wbr'), '開始']);   // 窄的直式手機才在「點一下／開始」之間換行（style.css：word-break: keep-all）
+      // v0.9.6 老闆：「開始」下移到主角腳邊（男生的右邊，不擋住兩位主角和番薯仔），說明文字跟著移；聯絡作者仍在最底下
+      frame([h('div.title-start', {}, [tap, h('p.note', { text: '可以用滑鼠、觸控或鍵盤（方向鍵走路、空白鍵或 Z 鍵對話）來玩。' })])]);
       setTimeout(function () { tap.focus(); }, 50);
     }
 
@@ -97,7 +111,7 @@
         err,
         h('div.row.end', {}, [h('button', { type: 'button', onclick: function () { menu(); } }, ['返回']), h('button.primary', { type: 'submit' }, ['出發！'])])
       ]);
-      screen.innerHTML = '';
+      clearScreen();
       screen.appendChild(form);
       setTimeout(function () { nameInput.focus(); }, 50);
     }
@@ -113,7 +127,7 @@
         });
       } }, [h('h2', { text: '用存檔碼繼續' }), h('p', { text: '貼上之前在「家長設定」產生的存檔碼。存檔碼錯了不會蓋掉原本的進度。' }), box, err,
         h('div.row.end', {}, [h('button', { type: 'button', onclick: function () { menu(); } }, ['返回']), h('button.primary', { type: 'submit' }, ['讀取'])])]);
-      screen.innerHTML = '';
+      clearScreen();
       screen.appendChild(form);
       setTimeout(function () { box.focus(); }, 50);
     }

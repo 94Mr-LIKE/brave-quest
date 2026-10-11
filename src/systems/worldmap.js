@@ -43,7 +43,37 @@
     return { fx: x, fy: y };
   }
 
-  var WorldMap = { isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction };
+  /**
+   * v0.9.6（47 號 B04）世界地圖北部的圓點疊在一起、點不到：把圓點在畫面上（像素）推開，圓心之間至少 minDist，
+   * 而且都留在 0～w、0～h 裡（離邊 margin）。真正的位置不動，畫面另外畫一條細線連回去。
+   * pts = [{x, y}]（像素）→ 回傳新的 [{x, y}]。固定次數的推開（同樣的輸入一定得到同樣的結果）
+   */
+  function spreadDots(pts, minDist, w, h, margin) {
+    var m = margin === undefined ? minDist / 2 : margin;
+    var out = pts.map(function (p) { return { x: Math.max(m, Math.min(w - m, p.x)), y: Math.max(m, Math.min(h - m, p.y)) }; });
+    for (var it = 0; it < 200; it++) {
+      var moved = false;
+      for (var i = 0; i < out.length; i++) for (var j = i + 1; j < out.length; j++) {
+        var dx = out[j].x - out[i].x, dy = out[j].y - out[i].y, d = Math.sqrt(dx * dx + dy * dy);
+        if (d >= minDist - 0.01) continue;
+        if (d < 0.01) { var a = (i * 2.399 + j * 1.3); dx = Math.cos(a); dy = Math.sin(a); d = 1; }   // 完全重疊：依編號決定方向
+        var push = (minDist - d) / 2 + 0.5, ux = dx / d, uy = dy / d;
+        out[i].x -= ux * push; out[i].y -= uy * push; out[j].x += ux * push; out[j].y += uy * push;
+        moved = true;
+      }
+      out.forEach(function (p) { p.x = Math.max(m, Math.min(w - m, p.x)); p.y = Math.max(m, Math.min(h - m, p.y)); });
+      if (!moved) break;
+    }
+    return out;
+  }
+  /** 兩兩之間最近的距離（測試用） */
+  function minGap(pts) {
+    var best = Infinity;
+    for (var i = 0; i < pts.length; i++) for (var j = i + 1; j < pts.length; j++) best = Math.min(best, Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y));
+    return best;
+  }
+
+  var WorldMap = { spreadDots: spreadDots, minGap: minGap, isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.WorldMap = WorldMap; }
   if (typeof module !== 'undefined') module.exports = WorldMap;
 })();

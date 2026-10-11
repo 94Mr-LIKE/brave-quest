@@ -328,6 +328,12 @@
     var id = G.data.jobRules && G.data.jobRules.change_map;
     return (id && G.data.maps[id] && G.data.maps[id].name) || '城裡';
   };
+  /** v0.9.6（47 號 B12）升到轉職等級時的提示：先說最近的金包里慈護宮（有神像的室內地圖），再說職業公會 */
+  G.jobUnlockText = function () {
+    var shrine = Object.keys(G.data.maps).filter(function (k) { return G.data.maps[k].statue; })[0];
+    var shrineName = shrine ? (G.data.maps[shrine].name || '慈護宮') : null;
+    return shrineName ? '可以轉職了！到' + shrineName + '的神像前，或' + G.jobMapName() + '的職業公會都可以。' : '可以到' + G.jobMapName() + '的職業公會轉職了！';
+  };
   /** 有五盞燈的地圖名字 */
   G.lampMapName = function () {
     var ids = Object.keys(G.data.maps).filter(function (k) { return G.data.maps[k].lamps; });
@@ -344,7 +350,7 @@
       G.jingle('levelup', null, 'levelup');
       J.UI.banner('等級提升！現在是 ' + G.state.player.level + ' 級');
       var unlock = (G.data.jobRules && G.data.jobRules.unlock_level) || 5;
-      if (G.state.player.level >= unlock && G.state.player.level - levels < unlock) J.UI.toast('可以到' + G.jobMapName() + '的職業公會轉職了！', 4000);
+      if (G.state.player.level >= unlock && G.state.player.level - levels < unlock) J.UI.toast(G.jobUnlockText(), 5000);
       G.refreshHud();
     }
   };
@@ -361,20 +367,23 @@
     if (G.pendingLevelUp > 0) { var plv = G.pendingLevelUp; G.pendingLevelUp = 0; setTimeout(function () { G.afterReward(plv); }, 800); }
     var st = G.state, map = scene.map;
     st.location = { map: scene.mapId, x: scene.p.tx, y: scene.p.ty };
+    var firstVisit = !st.visited[scene.mapId];   // v0.9.6 這份存檔第一次來這張地圖（慈護宮介紹只播一次）
     st.visited[scene.mapId] = true;
     if (map.inn) {
       var w = function (x, y) { return scene.walkable(x, y); };
       var spot = w(map.inn.x, map.inn.y + 1) ? { c: map.inn.x, r: map.inn.y + 1 } : J.Pathfind.nearestWalkable(w, scene.size.w, scene.size.h, { c: map.inn.x, r: map.inn.y }, null);
       if (spot) J.Character.setInn(st, scene.mapId, spot.c, spot.r);
     }
-    J.HUD.mapBanner(J.MapInfo.nameWithLevel(map, scene.mapId));   // v0.9.3 地名＋建議等級「擎天草原 Lv1–4」
+    // v0.9.3 地名＋建議等級「擎天草原 Lv1–4」。v0.9.6（47 號 B06）同一張地圖重新開始（轉職換走路圖）不再跳地名，免得蓋住轉職的光芒
+    if (enteredMap) J.HUD.mapBanner(J.MapInfo.nameWithLevel(map, scene.mapId));
     G.bgm(J.MapInfo.bgmFor(map));
     if (J.Minimap) J.Minimap.attach(G, scene);
     G.refreshHud();
     G.save();
     // v0.9.5 進廟（MT1：有神像的室內地圖）時，廟公介紹慈護宮
     // （場景物件換地圖時會重用：要確認 0.5 秒後還在同一張地圖、沒有正在換圖）
-    if (map.type === 'interior' && map.statue && enteredMap && !G.pendingIntro) {
+    // v0.9.6（47 號觀察 1、CTO）每份存檔只在第一次進廟時介紹；之後只有地名橫幅，要聽介紹可以面對正殿裡的廟公說話
+    if (map.type === 'interior' && map.statue && enteredMap && firstVisit && !G.pendingIntro) {
       var introMap = scene.mapId;
       setTimeout(function () { if (G.mapScene === scene && scene.mapId === introMap && !scene.transitioning && !G.mapChanging && !G.blocked()) G.templeIntro(scene); }, 500);
     }
@@ -407,12 +416,21 @@
       if (J.UI.blocksMove()) return;
       if (MAP[e.key]) { G.setHeld(MAP[e.key], true); e.preventDefault(); }
       else if (J.UI.isOpen()) return;
-      else if ((e.key === 'z' || e.key === 'Z' || e.key === ' ' || e.key === 'Enter') && (tag !== 'BUTTON')) {
+      else if (G.isActionKey(e.key, tag)) {
         if (G.mapScene && G.state) { e.preventDefault(); G.mapScene.actionKey(); }
       }
     });
     window.addEventListener('keyup', function (e) { if (MAP[e.key]) G.setHeld(MAP[e.key], false); });
     window.addEventListener('blur', function () { G.held = {}; G.heldOrder = []; });
+  };
+  /**
+   * v0.9.6（47 號 B01）哪些按鍵是「對話、調查」：Z 一律是（不管焦點停在哪個按鈕上）；
+   * 空白鍵、Enter 在焦點停在按鈕上時讓給那個按鈕（用鍵盤 Tab 到按鈕的人要能按它），其他時候也是對話。
+   * 用滑鼠點過的 HUD 按鈕會自動失去焦點（hud.js、dom.js），所以空白鍵、Enter 不會再重新打開背包。
+   */
+  G.isActionKey = function (key, tag) {
+    if (key === 'z' || key === 'Z') return true;
+    return (key === ' ' || key === 'Enter') && tag !== 'BUTTON';
   };
   G.setHeld = function (d, on) {
     G.held[d] = on;
@@ -491,14 +509,37 @@
     return G.say(R.temple_intro || 'D_TEMPLE_INTRO', [{ who: 'narrator', text: '這裡是金包里慈護宮。' }]);
   };
 
-  G.talkTo = function (npc, scene) {
+  /**
+   * v0.9.6（47 號 B02）旅店、商店老闆也有委託時：可以回報就先回報；其他情形（有新委託、委託進行中）讓孩子選
+   * 「住宿／買賣東西」或「委託」。回傳 'service'｜'quest'｜'ask'（純判斷，node 測試用）
+   */
+  G.serviceChoice = function (role, f, canComplete) { return J.QuestLog.serviceChoice(role, f, canComplete); };
+
+  G.talkTo = function (npc, scene, opts) {
     if (G.blocked()) return;
+    opts = opts || {};
     var map = scene.map, st = G.state, Q = G.data.quests;
     var r = npcRole(npc, map);
     var ids = questIds(npc);
     var f = ids.length ? J.QuestLog.forNpc(st, Q, npc.id, ids) : null;
-    // 旅店、商店老闆如果也有委託，先處理委託
-    if (f && r.role !== 'quest') r = { role: 'quest' };
+    // 旅店、商店老闆如果也有委託：可以回報就先回報，不然讓孩子選（v0.9.6 B02：委託沒做完也能住宿、買東西）
+    if (f && r.role !== 'quest' && !opts.service) {
+      var how = opts.quest ? 'quest' : G.serviceChoice(r.role, f, f.status === 'active' && J.QuestLog.canComplete(st, Q, f.id, G.data));
+      if (how === 'ask') {
+        var qq = Q[f.id];
+        G.lastChoice = { npc: npc.id, role: r.role, quest: f.id };   // 測試用
+        J.UI.choose(G.speaker(npc.id).name + '：要做什麼呢？', [
+          { value: 'service', text: r.role === 'inn' ? '🛏️ 住宿' : '🛒 買賣東西', primary: true },
+          { value: 'quest', text: (f.status === 'available' ? '📜 聽委託' : '📜 委託「' + qq.title + '」') }
+        ]).then(function (v) {
+          if (v === 'service') G.talkTo(npc, scene, { service: true });
+          else if (v === 'quest') G.talkTo(npc, scene, { quest: true });
+        });
+        return;
+      }
+      if (how === 'quest') r = { role: 'quest' };
+    }
+    if (opts.service) f = null;
     if (r.role === 'inn') { G.say(J.MapInfo.innDialog(map, npc), [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info, npc.id).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
     if (r.role === 'shop') { G.say(npc.dialog, []).then(function () { J.Menus.shop(G, r.info.shop_id || 'general'); }); return; }
     if (r.role === 'travel') { G.say(npc.dialog, [{ who: npc.id, text: '要搭車去哪裡呢？' }]).then(function () { G.openWorldMap(); }); return; }
@@ -816,7 +857,8 @@
     ctx.el.cmds.innerHTML = '';
     if (!on) return;
     var skill = s.skill;
-    var skillOk = skill && G.state.player.mp >= (skill.mp || 0) && !(skill.effect === 'preempt' && b.turns > 0);
+    // v0.9.6（45 號 F3）先制射擊：這場答過題（答錯也算）就不能用；原本用 b.turns（只有打中才 +1）
+    var skillOk = skill && G.state.player.mp >= (skill.mp || 0) && !(skill.effect === 'preempt' && !J.Battle.canPreempt(ctx.qn));
     var atk = h('button.primary', { onclick: function () { G.battack('attack'); } }, ['⚔️ 攻擊']);
     ctx.el.cmds.appendChild(atk);
     ctx.el.cmds.appendChild(h('button', { disabled: !skillOk, title: skill ? skill.desc : '轉職後才有技能', onclick: function () { G.battack('skill'); } },
@@ -859,6 +901,13 @@
     G.brender();
     if (!r.correct) {
       J.Session.abandon(ctx.sess);
+      // v0.9.6（45 號 F5）答題時間「關閉」時，弓箭手的特色改成：每場戰鬥可以閃過一次答錯後的攻擊
+      if (J.Battle.dodgeOnWrong(b, st.settings.answerTime, s.timeMult)) {
+        ctx.dodged = (ctx.dodged || 0) + 1;   // 測試用
+        G.bmsg('沒打中……但是弓箭手身手敏捷，閃過了這次攻擊！（每場戰鬥一次）');
+        setTimeout(function () { G.bcommands(true); }, 700);
+        return;
+      }
       G.bmsg(r.timeout ? '時間到！這一擊沒打出去……' : '沒打中……');
       setTimeout(G.bmonsterTurn, 700);
       return;
@@ -870,7 +919,13 @@
       if (skill.effect === 'double') hits = [1, 1];
       else if (skill.effect === 'all') { hits = [1]; mult = 1.5; }
       else if (skill.effect === 'preempt') hits = [1];
-      else if (skill.effect === 'time') { b.timeBuff = skill.value || 1.5; G.bmsg('鼓舞之歌！下一題的時間變長了。'); sc.healEffect(); G.brender(); setTimeout(function () { G.bcommands(true); }, 600); return; }
+      else if (skill.effect === 'time') {
+        // v0.9.6（45 號 F5）不計時模式：時間條沒有作用 → 改成下一次答對的傷害 ×1.3
+        var se = J.Battle.songEffect(st.settings.answerTime, skill.value);
+        if (se.kind === 'power') { b.powerBuff = se.mult; G.bmsg('鼓舞之歌！下一次答對，傷害變成 ' + se.mult + ' 倍。'); }
+        else { b.timeBuff = se.mult; G.bmsg('鼓舞之歌！下一題的時間變長了。'); }
+        sc.healEffect(); G.brender(); setTimeout(function () { G.bcommands(true); }, 600); return;
+      }
       else if (skill.effect === 'heal') {
         var amt = Math.max(1, Math.round(s.maxHp * (skill.value || 0.3)));
         st.player.hp = Math.min(s.maxHp, st.player.hp + amt);
@@ -880,7 +935,9 @@
         return;
       }
     } else hits = [1];
-    var i = 0, msgs = [];
+    var power = J.Battle.takePowerBuff(b);   // v0.9.6 鼓舞之歌（不計時模式）的傷害加成，用在這次答對的每一擊
+    if (power > 1) { mult *= power; ctx.powerUsed = power; }
+    var i = 0, msgs = power > 1 ? ['鼓舞之歌的力量！'] : [];
     (function next() {
       if (i >= hits.length || b.over) { G.brender(); G.bmsg(msgs.join(' ')); if (b.over) setTimeout(G.bvictory, 700); else setTimeout(function () { G.bcommands(true); }, 500); return; }
       var d = J.Battle.damage({ atk: s.atk, level: q.level, elapsedMs: r.elapsedMs, limitMs: r.limitMs, favored: favored, favoredMult: s.favoredMult, mult: mult, bossMult: b.boss ? C.BOSS_DAMAGE_MULT : 1 });
@@ -890,7 +947,7 @@
       // v0.9.3 生氣了 = 進入下一階段、攻擊 +20%
       if (h.phaseUp) J.UI.banner(G.battleCtx.mon.name + '生氣了！攻擊變強了！', 'rage-banner');
       var left = b.phases - Math.min(b.phase, b.phases);
-      msgs.push((d.crit ? '會心一擊！' : '') + (favored && i === 0 ? '拿手科目！' : '') + '打出 ' + h.dealt + ' 點傷害！' +
+      msgs.push(J.Battle.hitMessage({ crit: d.crit, favored: favored, first: i === 0, dealt: h.dealt, damage: d.damage, phaseUp: h.phaseUp, held: h.held, over: b.over }) +   // v0.9.6 B10
         (h.phaseUp ? G.battleCtx.mon.name + '生氣了！攻擊變強了！（第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段' + (left ? '，還剩 ' + left + ' 個階段' : '，最後一個階段') + '）' : '') +
         (h.held && !b.over ? G.battleCtx.mon.name + '撐住了！再答對 ' + J.Battle.needCorrect(b) + ' 題' + (b.phase >= b.phases ? '就能打倒它！' : '就會進入下一個階段！') : ''));
       G.brender();

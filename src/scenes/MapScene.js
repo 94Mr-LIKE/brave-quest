@@ -20,6 +20,8 @@
   var ROW = { down: 0, left: 1, right: 2, up: 3 };
   var STEP_MS = C.STEP_MS;
   var RESPAWN_MS = C.MONSTER_RESPAWN_MS;
+  var FG_CELL_DEPTH = 40000;   // 上層格（'U'：從背景切出來、畫在角色上方的那一格）
+  var LABEL_DEPTH = 45000;     // v0.9.6 站名小牌：一定在上層格之上（不然會被背景蓋掉一部分字）；在前景大圖（50000）、剪影（60000）之下
   var GLOW_DEPTH = 1;       // 燈光光暈：背景（0）與傳送光圈（0.5）之上、所有角色（深度＝腳底 y ≥ 32）之下
   var BUCKET = 8;          // 大地圖備援圖塊的分區大小（格）：鏡頭外的分區隱藏
 
@@ -34,7 +36,7 @@
       this.startFacing = data.facing || 'down';
       this.map = G().data.maps[this.mapId];
       // 場景重新開始時物件會留著上一張地圖的值：車站要先清掉（不然沒有車站的地圖會顯示上一張的「在○○站搭車」）
-      this.station = null; this.stationSign = null; this.stationLabel = null; this.stationShelter = null;
+      this.station = null; this.stationSign = null; this.stationLabel = null; this.stationLabelInfo = null; this.stationShelter = null;
       // 上一張地圖的 hasBg、主角狀態也不要留著（create 之前讀到舊值會誤判「新地圖已經好了」）
       this.hasBg = false; this.p = null;
       this.safePts = null;   // 同樣的原因：下車點安全範圍是每張地圖各自算的
@@ -115,7 +117,7 @@
       this.cullAt = 0;
       // 場景重新開始（換地圖）時同一個物件會被重用：上一張地圖的分塊、分區資料要清掉
       this.safePts = null;
-      this.bgChunks = null; this.buckets = null; this.groundLayer = null; this.bucketKey = null; this.fgBuckets = null; this.glows = [];
+      this.bgChunks = null; this.buckets = null; this.groundLayer = null; this.bucketKey = null; this.fgBuckets = null; this.glows = []; this.upperSet = null;
       this.tileset = g.data.tilesets[map.tileset] || g.data.tilesets.village;
       this.frames = {};
       (window.TILE_FRAMES ? window.TILE_FRAMES.names : []).forEach(function (n, i) { self.frames[n] = i; });
@@ -440,9 +442,14 @@
         var key = art ? J.Assets.texKey('obj_station') : 'ui:station';
         this.stationSign = this.add.image(stn.x * T + T / 2, stn.y * T + T, key).setOrigin(0.5, 1).setDepth((stn.y + 1) * T - 1);
         if (stn.name) {
-          this.stationLabel = this.add.text(stn.x * T + T / 2, stn.y * T + T - this.stationSign.displayHeight - 2, stn.name, {
-            fontFamily: '"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif', fontSize: '13px', fontStyle: 'bold',
-            color: '#1e4a8a', backgroundColor: '#f4f4f0', padding: { x: 5, y: 2 } }).setOrigin(0.5, 1).setDepth((stn.y + 1) * T + 3);
+          // v0.9.6（46 號地圖稽核：M04「神木森林站」只顯示「木森林站」，第一個字被白底框切掉）：
+          // 不再用 Phaser 的 text（框的寬度和實際畫出來的字寬對不上），改成自己在畫布上量字寬、畫白底框和字，框一定比字寬
+          var lab = this.stationLabelTexture(stn.name);
+          this.stationLabel = this.add.image(stn.x * T + T / 2, stn.y * T + T - this.stationSign.displayHeight - 2, lab.key)
+            .setOrigin(0.5, 1).setScale(1 / lab.res).setDepth(LABEL_DEPTH);
+          // ↑ 真正切字的原因：M04 站名的左半邊壓到上層格（'U'，從背景切出來畫在角色上方，深度 40000），被背景蓋住。
+          //   站名是要給人看的字，一律畫在上層格之上（LABEL_DEPTH）
+          this.stationLabelInfo = { text: stn.name, textW: lab.textW, boxW: lab.boxW, displayW: this.stationLabel.displayWidth, depth: LABEL_DEPTH, fgDepth: FG_CELL_DEPTH };   // 測試用
         }
       }
       // v0.9.4 B17（老闆 D17「每個車站都可以有」）：背景沒有畫站房的車站旁放候車亭（maps.js station.shelter = 左上角格子，3×3 格；只擋最下面一排）
@@ -507,7 +514,7 @@
         if (lit && !was) self.sparkle(l.img.x, l.img.y - T * 1.3, 0xfff3a0);
         // 點亮的知識燈：柔和的圓形暖光
         if (lit && !l.glow) l.glow = self.addGlow(l.img.x, l.img.y - T * 1.45, 1.1);
-        if (!lit && l.glow) { l.glow.destroy(); l.glow = null; }
+        if (!lit && l.glow) { self.removeGlow(l.glow); l.glow = null; }
       });
     }
 
@@ -525,6 +532,47 @@
         img.setDepth((sg.y + 1) * T + 2);
         self.signs.push({ spot: sg, img: img });
       });
+    }
+
+    /**
+     * v0.9.6（47 號 B05）慈護宮正殿：站到供桌、拜墊附近時，鏡頭往上移，讓神像露在 HUD 下面（神像在地圖最上方，鏡頭跟著主角時看不到）。
+     * 鏡頭上緣對準神像上方一點（不超出地圖），主角仍在畫面裡；離開供桌一帶慢慢回到正常跟隨。
+     */
+    shrineCamera() {
+      var st = this.map.statue, cam = this.cameras.main;
+      if (!st || !this.player || !cam) return;
+      var want = 0;
+      if (this.p && this.p.ty <= st.y + 7) {
+        var viewH = cam.worldView.height || (cam.height / (cam.zoom || 1));
+        var top = Math.max(0, (st.y - 4.5) * T);   // 神像腳底在 (st.y+1)*T、約 3 格高；上緣再多留一點給 HUD
+        // 鏡頭上緣＝top，但主角的腳要留在畫面裡（離下緣至少 1.2 格）
+        want = Math.max(0, Math.min(this.player.y - (top + viewH / 2), viewH / 2 - T * 1.2));
+      }
+      var cur = cam.followOffset.y;
+      if (Math.abs(cur - want) > 0.5) cam.setFollowOffset(0, cur + (want - cur) * 0.15);
+      else if (cur !== want) cam.setFollowOffset(0, want);
+      this.shrineCamOffset = cam.followOffset.y;   // 測試用
+    }
+
+    /**
+     * v0.9.6 站名小牌：白底藍字。用同一個畫布量字寬再畫，框寬＝字寬＋左右各 5px（不會切字）。
+     * 畫布用 2 倍解析度畫（res），顯示時縮回 1 倍，字比較清楚。回傳 { key, textW, boxW, res }（textW、boxW 是 1 倍的像素）
+     */
+    stationLabelTexture(name) {
+      var res = 2, padX = 5, h = 19;
+      var font = 'bold 13px "Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
+      var key = 'ui:stationlabel:' + name;
+      var m = document.createElement('canvas').getContext('2d'); m.font = font;
+      var textW = Math.ceil(m.measureText(name).width), boxW = textW + padX * 2;
+      if (!this.textures.exists(key)) {
+        var c = document.createElement('canvas'); c.width = boxW * res; c.height = h * res;
+        var g = c.getContext('2d'); g.scale(res, res);
+        g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, boxW, h);
+        g.font = font; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = '#1e4a8a';
+        g.fillText(name, padX, h / 2 + 1);   // 從左邊 padX 開始畫，整行都在框裡
+        this.textures.addCanvas(key, c);
+      }
+      return { key: key, textW: textW, boxW: boxW, res: res };
     }
 
     /** v0.9.5 地標匾額：紅底金字、金色外框（比照店家招牌的大小，字橫寫；不畫神像、不畫香火） */
@@ -617,9 +665,46 @@
       img.__color = color || null;   // 測試用
       var sc = (T * 3 * (r || 1)) / 128;
       img.setScale(sc).setAlpha(0.7);
-      img.__tw = this.tweens.add({ targets: img, alpha: 0.5, scale: sc * 0.93, duration: 1100 + Math.random() * 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+      // v0.9.6（46 號地圖稽核：M01 #4、#11，M04 #9–#15 的光暈被上層格切成方塊）：
+      // 上層格（'U'）是從背景切出來、蓋在角色上面的那一格，地面的光暈（深度 1）被它蓋住就缺一塊。
+      // 光暈碰到的每一格上層格，另外在上層格之上（FG_CELL_DEPTH＋1）畫一塊「只裁出那一格」的同一張光暈補回去；
+      // 其他地方仍然是地面光暈（角色不會被洗白）。剪影（60000）在補片之上，剪影的判斷只看格子（fgSet），不受光暈影響。
+      // 有補片的光暈只做明暗呼吸、不縮放（縮放會讓補片和格子對不齊）。
+      var copies = this.glowFgPatches(img, sc);
+      img.__fgCopies = copies;
+      var targets = [img].concat(copies);
+      img.__tw = this.tweens.add(copies.length ? { targets: targets, alpha: 0.5, duration: 1100 + Math.random() * 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' }
+        : { targets: img, alpha: 0.5, scale: sc * 0.93, duration: 1100 + Math.random() * 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
       (this.glows || (this.glows = [])).push(img);
       return img;
+    }
+
+    /** 光暈和上層格重疊的地方：每一格做一塊裁好的補片（同一張光暈貼圖、同位置、同大小），畫在上層格之上。回傳補片陣列 */
+    glowFgPatches(img, sc) {
+      var self = this, up = this.upperSet || (this.upperSet = J.MapInfo.upperCells(this.map, G().data.tilesets).set);
+      var half = 64 * sc, left = img.x - half, top = img.y - half, out = [];
+      var x0 = Math.floor(left / T), x1 = Math.floor((img.x + half - 0.001) / T), y0 = Math.floor(top / T), y1 = Math.floor((img.y + half - 0.001) / T);
+      for (var cy = y0; cy <= y1; cy++) for (var cx = x0; cx <= x1; cx++) {
+        if (!up[cx + ',' + cy]) continue;
+        // 這一格在光暈貼圖（128×128）裡的範圍
+        var tx = Math.max(0, (cx * T - left) / sc), ty = Math.max(0, (cy * T - top) / sc);
+        var tw = Math.min(128, ((cx + 1) * T - left) / sc) - tx, th = Math.min(128, ((cy + 1) * T - top) / sc) - ty;
+        if (tw <= 0 || th <= 0) continue;
+        var p = self.add.image(img.x, img.y, img.texture.key).setBlendMode(Phaser.BlendModes.ADD).setDepth(FG_CELL_DEPTH + 1)
+          .setScale(sc).setAlpha(img.alpha).setCrop(tx, ty, tw, th);
+        p.__cell = cx + ',' + cy;   // 測試用
+        out.push(p);
+      }
+      return out;
+    }
+
+    /** 拿掉一個光暈（連同上層格上的補片） */
+    removeGlow(g) {
+      if (!g) return;
+      (g.__fgCopies || []).forEach(function (p) { p.destroy(); });
+      if (g.__tw) g.__tw.remove();
+      this.glows = (this.glows || []).filter(function (x) { return x !== g; });
+      g.destroy();
     }
 
     buildLights() {
@@ -645,10 +730,10 @@
           var k0 = chunks[0], cx = c.x * T / k0.kx, cy = c.y * T / k0.ky, cw = T / k0.kx, chh = T / k0.ky;
           var ck = chunks.filter(function (k) { return cx >= k.sx - 0.5 && cx < k.sx + k.sw - 0.5 && cy >= k.sy - 0.5 && cy < k.sy + k.sh - 0.5; })[0] || k0;
           img = self.add.image(ck.sx * ck.kx, ck.sy * ck.ky, ck.key).setOrigin(0, 0).setScale(ck.kx, ck.ky)
-            .setCrop(Math.max(0, cx - ck.sx), Math.max(0, cy - ck.sy), Math.min(cw, ck.sx + ck.sw - cx), Math.min(chh, ck.sy + ck.sh - cy)).setDepth(40000);
+            .setCrop(Math.max(0, cx - ck.sx), Math.max(0, cy - ck.sy), Math.min(cw, ck.sx + ck.sw - cx), Math.min(chh, ck.sy + ck.sh - cy)).setDepth(FG_CELL_DEPTH);
         } else {
           var d = self.defAt(c.x, c.y);
-          img = self.add.image(c.x * T, c.y * T, self.tex, self.frameOf(d.tile)).setOrigin(0, 0).setScale(S).setDepth(40000);
+          img = self.add.image(c.x * T, c.y * T, self.tex, self.frameOf(d.tile)).setOrigin(0, 0).setScale(S).setDepth(FG_CELL_DEPTH);
         }
         var bk = Math.floor(c.x / BUCKET) + ',' + Math.floor(c.y / BUCKET);
         (self.fgBuckets[bk] || (self.fgBuckets[bk] = [])).push(img);
@@ -1155,6 +1240,8 @@
 
     interact(t) {
       var g = G();
+      // v0.9.6（47 號 B08）放大地圖開著時和人說話、開寶箱：先關掉地圖，對話和題目才不會疊在地圖上
+      if (J.UI.isOpen() && !J.UI.blocksMove()) { J.UI.closePassMove(); g.closedMapForTalk = (g.closedMapForTalk || 0) + 1; }
       this.p.path = [];
       J.HUD.prompt(null);
       if (t.kind === 'npc') g.talkTo(t.npc, this);
@@ -1203,6 +1290,7 @@
       this.updatePet(delta);
       this.updateGhost();
 
+      this.shrineCamera();
       if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); }
       this.wanderMonsters(time);
       if (!g.busy) this.wanderAnimals(time);
@@ -1262,6 +1350,7 @@
         if (v === g.__inView) return;
         g.__inView = v;
         g.setVisible(v);
+        (g.__fgCopies || []).forEach(function (p) { p.setVisible(v); });
         if (g.__tw) { if (v) g.__tw.resume(); else g.__tw.pause(); }
       });
       if (this.fgBuckets) {

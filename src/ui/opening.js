@@ -747,7 +747,7 @@
     if (ready) frame(curT());
   }
   function curT() {
-    if (!cur) return 0;
+    if (!cur || !ready) return 0;   // v0.9.6（47 號 B15）圖還沒讀完（還沒開始播）時是 0 秒，不是 45
     var now = cur.paused ? cur.pausedAt : performance.now();
     return Math.min(DUR, Math.max(0, (now - cur.t0) / 1000));
   }
@@ -797,9 +797,10 @@
     var skipBtn = h('button.opening-skip', { type: 'button', 'aria-label': '跳過片頭', onclick: function (e) { e.stopPropagation(); skip(); } }, ['跳過 ▸▸']);
     var loadEl = h('div.opening-loading', { text: '片頭載入中……' });
     var stage = h('div.opening-stage', {}, [cv, loadEl, skipBtn]);
-    var overlay = h('div.opening', { role: 'dialog', 'aria-label': '片頭動畫（右下角可以跳過）' }, [stage]);
+    // v0.9.6（47 號 B09）焦點放在片頭畫面本身（不是「跳過」）：小朋友按空白鍵、Enter 不會一下子就跳過；要跳過請點按鈕或按 Esc（Tab 也能移到按鈕）
+    var overlay = h('div.opening', { role: 'dialog', 'aria-label': '片頭動畫（右下角可以跳過）', tabindex: '-1' }, [stage]);
     // 放進視窗堆疊（擋住走路、Esc 會關掉＝跳過）；不是 modal 遮罩，畫面自己蓋滿全螢幕
-    var handle = J.UI.open(overlay, { modal: false, label: '片頭動畫', focus: skipBtn, onClose: function () { if (cur && cur.overlay === overlay) skip(); } });
+    var handle = J.UI.open(overlay, { modal: false, label: '片頭動畫', focus: overlay, onClose: function () { if (cur && cur.overlay === overlay) skip(); } });
     cur = { overlay: overlay, stage: stage, handle: handle, raf: 0, t0: 0, paused: false, pausedAt: 0, done: false, onDone: opts.onDone || null, music: !!opts.music };
     stats.plays++;
     var me = cur;

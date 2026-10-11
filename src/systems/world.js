@@ -23,11 +23,11 @@
     swordsman: { name: '劍士', favored: '數學', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 10, mp: 1, atk: 2 },
       skill: { name: '連斬', mp: 4, subject: '數學', effect: 'double', desc: '答一題數學，答對就連打兩下。' } },
     mage: { name: '魔法師', favored: '自然', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 6, mp: 5, atk: 2 },
-      skill: { name: '元素魔法', mp: 5, subject: '自然', effect: 'all', desc: '答對一題，魔法打到所有怪物。' } },
+      skill: { name: '元素魔法', mp: 5, subject: '自然', effect: 'all', desc: '答對一題，用魔法打出 1.5 倍的傷害。' } },
     archer: { name: '弓箭手', favored: '英語', bonus: 1.5, min_level: 5, time_mult: 1.2, growth: { hp: 8, mp: 3, atk: 2 },
       skill: { name: '先制射擊', mp: 3, subject: '英語', effect: 'preempt', desc: '戰鬥一開始先答一題，答對就先射一箭。' } },
     bard: { name: '吟遊詩人', favored: '國語', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 7, mp: 4, atk: 2 },
-      skill: { name: '鼓舞之歌', mp: 3, subject: '國語', effect: 'time', value: 1.5, desc: '答對一題，下一題的時間條變成 1.5 倍長。' } },
+      skill: { name: '鼓舞之歌', mp: 3, subject: '國語', effect: 'time', value: 1.5, desc: '答對一題，下一題的時間條變成 1.5 倍長（家長把答題時間關掉時，改成下一次答對的傷害變成 1.3 倍）。' } },
     priest: { name: '祭司', favored: '社會', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 7, mp: 4, atk: 2 },
       skill: { name: '治癒', mp: 4, subject: '社會', effect: 'heal', value: 0.3, desc: '答對一題，回復三成的體力。' } }
   };

@@ -185,7 +185,41 @@
   function pause(t) { t.paused = true; }
   function resume(t) { t.paused = false; }
 
+  /**
+   * v0.9.6（47 號 B10）一擊的訊息。頭目到了階段門檻時，多出來的傷害會被門檻吃掉（例：會心一擊算出 50，實際只扣 4）：
+   * 這時不寫「會心一擊」和小小的數字，改說「一口氣打到門檻！」，小朋友才不會以為答得快反而打得少。
+   * o = { crit, favored, first（這次答對的第一擊）, dealt, damage, phaseUp, held, over }
+   */
+  function hitMessage(o) {
+    var capped = o.dealt < o.damage && !o.over;
+    var s = (o.crit && !capped ? '會心一擊！' : '') + (o.favored && o.first ? '拿手科目！' : '');
+    if (capped && o.phaseUp) return s + '一口氣打到門檻！';
+    return s + '打出 ' + o.dealt + ' 點傷害！';
+  }
+
+  // ---- v0.9.6（45 號職業稽核 F3、F5）
+  /** 先制射擊只能在「這場還沒答過題」時用（答錯也算答過；原本用 b.turns，只有打中才 +1，答錯後還能用） */
+  function canPreempt(questionsAsked) { return !(questionsAsked > 0); }
+  /** 家長把答題時間設成「關閉」（不計時） */
+  function timerOff(mode) { return MODE_MULT[mode] === 0; }
+  /**
+   * 「關閉時間條」時，和時間條有關的職業特色改成替代效果（不讓孩子白扣魔力）：
+   * - 吟遊詩人「鼓舞之歌」：平常＝下一題時間條 ×1.5；不計時＝下一次答對的傷害 ×1.3（OFF_SONG_POWER）
+   * - 弓箭手（時間條 ×1.2）：不計時＝每場戰鬥可以閃過一次「答錯後怪物的攻擊」（不扣體力）
+   */
+  var OFF_SONG_POWER = 1.3;
+  function songEffect(mode, value) { return timerOff(mode) ? { kind: 'power', mult: OFF_SONG_POWER } : { kind: 'time', mult: value || 1.5 }; }
+  /** 答錯時：弓箭手在不計時模式下這場還沒閃過 → 這次閃開（記在 b.dodgeUsed），回傳 true */
+  function dodgeOnWrong(b, mode, timeMult) {
+    if (!timerOff(mode) || !(timeMult > 1) || b.dodgeUsed) return false;
+    b.dodgeUsed = true;
+    return true;
+  }
+  /** 答對打出傷害時，用掉鼓舞之歌的傷害加成（沒有就是 1） */
+  function takePowerBuff(b) { var m = b.powerBuff || 1; b.powerBuff = 1; return m; }
+
   var Battle = {
+    hitMessage: hitMessage, canPreempt: canPreempt, timerOff: timerOff, OFF_SONG_POWER: OFF_SONG_POWER, songEffect: songEffect, dodgeOnWrong: dodgeOnWrong, takePowerBuff: takePowerBuff,
     DIFF: DIFF, TIME_SEC: TIME_SEC, MODE_MULT: MODE_MULT, CRIT_MULT: CRIT_MULT, FAVORED_MULT: FAVORED_MULT, FLEE_RATE: FLEE_RATE,
     BOSS_PHASES: BOSS_PHASES, PER_PHASE: PER_PHASE, PHASE_DMG_STEP: PHASE_DMG_STEP, BOND_MAX: BOND_MAX,
     timeLimitMs: timeLimitMs, damage: damage, monsterAttack: monsterAttack, phaseMult: phaseMult, bond: bond, bondExp: bondExp, tryFlee: tryFlee,

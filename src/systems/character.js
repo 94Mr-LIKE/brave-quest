@@ -115,7 +115,13 @@
         if (jobs.indexOf(jobId) < 0) state.equipment[slot] = null;
       }
     });
-    restoreFull(state, data);
+    // v0.9.6（老闆 2026-10-11）：轉職不再補滿體力、魔力（避免反覆轉職免費補血；慈護宮神像和職業公會都一樣）。
+    // 做法：維持目前的數值，只把它限制在新職業的最大值以內（最大值會因成長值、職業限定裝備卸下而變）。
+    // 不照比例換算：換到最大值比較大的職業時，照比例會讓體力變多（例 30/62 → 34/70），等於變相補血。
+    var p = state.player, s = stats(state, data);
+    if (p.hp > s.maxHp) p.hp = s.maxHp;
+    if (p.mp > s.maxMp) p.mp = s.maxMp;
+    if (p.hp < 0 || p.mp < 0) clampVitals(state, data);   // -1＝舊存檔的「全滿」記號，照原本的意思處理
     return { ok: true };
   }
 

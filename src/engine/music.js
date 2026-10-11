@@ -566,6 +566,28 @@
     (REC_HINTS[id] || []).forEach(function (j) { recLoad(j); });
     return true;
   }
+  /**
+   * v0.9.6（發布前 smoke：戰鬥 BGM 一直是合成版）：等預錄音檔超過 REC_WAIT 秒、這次先用合成版播的 BGM，
+   * 等預錄音檔解碼好了就「升級」：接著同樣的經過時間（合成版的拍數 × 每拍秒數；兩版編曲不同，不是同一小節）淡入預錄版、淡出合成版（各 0.8 秒）。
+   * 預錄檔下載或解碼失敗時不在這裡重試（交給換曲時的 startBgm），免得整首播放期間每 30 秒重新下載一次（審查 2026-10-12）。
+   * 原因：下載＋解碼一首 0.8～1.4 MB 的 m4a，在換地圖（Phaser 載入大地圖背景，主執行緒長任務 1～1.4 秒）時常常要 1.5～2 秒，
+   * 剛好卡在 REC_WAIT 1.5 秒的邊緣；以前一旦退回合成版，整首都是合成版，直到換曲。平板更慢，更容易整段都聽合成版。
+   * 不把 REC_WAIT 拉長：那會讓孩子在換地圖、進戰鬥時聽到更久的「沒有音樂」。
+   */
+  function recUpgrade(A, now) {
+    var b = S.bgm;
+    if (!b || b.kind === 'rec' || !S.bgmId || S.bgmId !== S.want || !recMeta(S.bgmId) || !recSupported()) return false;
+    var it = recReady(S.bgmId, A.ctx);
+    if (!it) return false;   // 還在下載／解碼（startBgm 已經開始載入；失敗時不在這裡重試）
+    var t0 = now + 0.06, sg = song('bgm', S.bgmId), sec = sg && sg.spb ? b.position(t0) * sg.spb : 0;
+    var bus = ensureBus(A);
+    b.stop(0.8);
+    S.bgm = new RecPlayer(S.bgmId, it, A.ctx, bus.bgmRec, t0, sec, 0.8, true);
+    stats.recPlays++; stats.recUpgrades = (stats.recUpgrades || 0) + 1;
+    stats.source = 'recorded';
+    return true;
+  }
+
   /** 暫停 BGM 並記住位置 */
   function holdBgm(fade) {
     if (!S.bgm) return;
@@ -609,6 +631,7 @@
       var resume = S.held && S.held.id === S.want;
       startBgm(S.want, resume ? S.held.pos : 0, resume ? 0.9 : 0.25, resume ? S.held.kind : null);
     }
+    if (!S.jingle) recUpgrade(A, now);
     if (S.bgm) S.bgm.schedule(until);
     if (!S.bgm && !S.jingle && !S.want) stopTimer();
   }
