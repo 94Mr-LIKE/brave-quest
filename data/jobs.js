@@ -64,5 +64,8 @@ window.JOBS = {
 
 window.JOB_RULES = {
   change_map: "M10", change_npc: "guild", unlock_level: 5, change_cost: 0,
-  dialog_locked: "D_GUILD_IDLE", dialog_open: "D_GUILD_JOB"
+  dialog_locked: "D_GUILD_IDLE", dialog_open: "D_GUILD_JOB",
+  // v0.9.5 金包里慈護宮（MT1）媽祖神像也能轉職（等級條件同上；職業公會維持原樣）。台詞：進廟時 temple_intro（廟公），
+  // 轉職成功配光芒效果時 temple_bless（廟公：「這是你自己努力得來的」），最後 temple_done（番薯仔）
+  temple_intro: "D_TEMPLE_INTRO", temple_bless: "D_TEMPLE_BLESS", temple_done: "D_TEMPLE_JOB_DONE"
 };

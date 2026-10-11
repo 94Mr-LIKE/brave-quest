@@ -67,8 +67,9 @@ button[aria-pressed="true"], button.selected { background: #f2c14e; color: #2a1e
 /* ---------- 遮罩與面板 ---------- */
 .modal-back { position: absolute; inset: 0; background: rgba(6, 10, 30, .55); display: flex; align-items: center; justify-content: center; padding: 10px; }
 /* v0.9.3 放大地圖開著時也能走：遮罩變淡、點得穿（搖桿在遮罩上方照常可用） */
-.modal-back.pass { background: rgba(6, 10, 30, .18); pointer-events: none; }
-.modal-back.pass > * { pointer-events: auto; }
+/* v0.9.5：原本被「#layer > * { pointer-events: auto }」（id 選擇器比較強）蓋掉，遮罩其實點不穿 → 點面板外的遊戲畫面不能走。選擇器加上 #layer */
+#layer > .modal-back.pass, .modal-back.pass { background: rgba(6, 10, 30, .18); pointer-events: none; }
+#layer > .modal-back.pass > *, .modal-back.pass > * { pointer-events: auto; }
 .panel { width: min(920px, 96vw); max-height: 94vh; overflow: auto; }
 .panel.narrow { width: min(620px, 96vw); }
 .panel .close { float: right; }
@@ -248,6 +249,19 @@ body.panel-open #toasts { top: auto; right: auto; left: 50%; bottom: max(14px, e
 .mm-body > .mm-map { flex: 0 1 auto; max-width: 100%; }   /* 寬度由 minimap.js 設成地圖寬，圖例跟著換行，名單排在右邊 */
 .mm-body canvas { display: block; border: 3px solid #fff; border-radius: 8px; max-width: 100%; }
 .mm-side { flex: 1; min-width: 200px; max-height: 62vh; overflow: auto; }
+/* v0.9.5 片頭動畫：蓋滿全螢幕、16:9 置中；右下角「跳過」 */
+.opening { position: fixed; inset: 0; z-index: 120; background: #000; display: flex; align-items: center; justify-content: center; pointer-events: auto;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+.opening-stage { position: relative; background: #000; overflow: hidden; touch-action: manipulation; }
+.opening-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; }
+.opening-skip { position: absolute; right: 2%; bottom: 3.5%; min-height: 48px; min-width: 104px; padding: 6px 18px; font-size: clamp(18px, 2.2vw, 24px); font-weight: bold;
+  letter-spacing: 2px; background: rgba(18, 26, 62, .72); border: 3px solid #f4f1e6; border-radius: 10px; box-shadow: none; }
+.opening-skip:hover, .opening-skip:focus-visible { background: rgba(42, 61, 128, .92); }
+.opening-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #d9e2ff; }
+.opening-loading[hidden] { display: none; }
+body.opening-on #pad, body.opening-on #hud, body.opening-on #prompt { visibility: hidden; }
+.mm-body canvas.minimap-big { cursor: crosshair; touch-action: manipulation; }   /* v0.9.5 點放大地圖就走過去 */
+.map-banner.place-banner { background: #9e1a14; color: #ffd95a; border-color: #e0b040; }   /* v0.9.5 地標提示：比照匾額紅底金字 */
 .list.compact li { padding: 4px 8px; }
 .book-icon.unknown img, .book-icon.unknown span { filter: brightness(0) opacity(.55); }
 .done-quests summary { cursor: pointer; font-size: 22px; color: var(--accent); margin: 10px 0; min-height: 44px; display: flex; align-items: center; }

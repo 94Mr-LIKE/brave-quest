@@ -80,8 +80,10 @@
       // v0.9.3 會走動的動物（黃牛）：美術還沒畫時用暫代圖（四方向走路格式）
       J.MapInfo.animalSpecs(map).forEach(function (a) { A.queue(self, a.sprite, a.name); });
       // v0.9.4 車站：新站牌、候車亭（sprites.js 有才載入；沒有時用程式畫的站牌）
-      if (map.station && map.station.drawSign !== false && A.has('obj_station')) A.queue(this, 'obj_station');
+      if (map.station && A.has('obj_station')) A.queue(this, 'obj_station');   // v0.9.5 每個車站都畫站牌
       if (map.station && map.station.shelter && A.has('obj_bus_shelter')) A.queue(this, 'obj_bus_shelter');
+      // v0.9.5 廟內的媽祖神像（MT1）：美術的 obj_mazu_statue 還沒到時用暫代圖（色塊＋字）
+      if (map.statue) A.queue(this, map.statue.sprite || J.MapInfo.STATUE_SPRITE, '媽祖');
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
@@ -165,6 +167,8 @@
       this.buildExits();
       this.buildObjects();
       this.buildCharacters();
+      // v0.9.5 地標提示：一開始就站在地標範圍裡（例如存檔在廟前）不跳提示，走出去再走進來才跳
+      this.landmarkNow = this.p ? J.MapInfo.landmarkAt(map, this.p.tx, this.p.ty) : null;
       this.buildMonsters();
       this.buildAnimals();
       this.buildSigns();
@@ -428,16 +432,17 @@
       var stn = this.map.station;
       this.station = stn || null;
       this.stationSign = null;
-      // v0.9.3（33 號稽核）：背景圖已經畫了站牌的地圖（maps.js station.drawSign:false）不再疊程式站牌；互動照常
+      // v0.9.5（老闆 2026-10-11 在金包里說「車站也沒有」：背景上的站牌看不出來）：每個車站都畫程式站牌，站牌上方寫站名。
+      // （v0.9.3 的 drawSign:false 已經從 maps.js 拿掉；舊資料若還有 drawSign:false 仍照舊不畫）
       if (stn && stn.drawSign !== false) {
         // v0.9.4 B17：美術的新站牌（sprite obj_station，牌面空白），站名由程式寫在站牌上方的小牌子
         var art = this.hasArt('obj_station');
         var key = art ? J.Assets.texKey('obj_station') : 'ui:station';
         this.stationSign = this.add.image(stn.x * T + T / 2, stn.y * T + T, key).setOrigin(0.5, 1).setDepth((stn.y + 1) * T - 1);
-        if (art && stn.name) {
+        if (stn.name) {
           this.stationLabel = this.add.text(stn.x * T + T / 2, stn.y * T + T - this.stationSign.displayHeight - 2, stn.name, {
-            fontFamily: '"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif', fontSize: '12px', fontStyle: 'bold',
-            color: '#1e4a8a', backgroundColor: '#f4f4f0', padding: { x: 4, y: 1 } }).setOrigin(0.5, 1).setDepth((stn.y + 1) * T - 0.5);
+            fontFamily: '"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif', fontSize: '13px', fontStyle: 'bold',
+            color: '#1e4a8a', backgroundColor: '#f4f4f0', padding: { x: 5, y: 2 } }).setOrigin(0.5, 1).setDepth((stn.y + 1) * T + 3);
         }
       }
       // v0.9.4 B17（老闆 D17「每個車站都可以有」）：背景沒有畫站房的車站旁放候車亭（maps.js station.shelter = 左上角格子，3×3 格；只擋最下面一排）
@@ -445,6 +450,26 @@
       if (stn && stn.shelter && this.hasArt('obj_bus_shelter')) {
         var sh = stn.shelter;
         this.stationShelter = this.add.image((sh.x + 1.5) * T, (sh.y + 3) * T, J.Assets.texKey('obj_bus_shelter')).setOrigin(0.5, 1).setDepth((sh.y + 3) * T - 1);
+      }
+      // v0.9.5（老闆：金包里慈護宮要看得到）：地標的匾額（maps.js landmarks[].plaque，程式畫的紅底金字，掛在廟門楣）
+      // 位置＝美術在背景上留的空白匾額（M01 門楣、MT1 正殿後牆）；字（老闆 2026-10-11 指定「慈護宮」三個字）＝plaque.text
+      this.plaques = [];
+      J.MapInfo.plaqueSpots(this.map).forEach(function (pq) {
+        var img = self.add.image(pq.x * T, pq.y * T, self.plaqueTexture(pq.text, pq.w * T, pq.h * T)).setOrigin(0.5).setDepth(Math.ceil(pq.y + 0.5) * T + 2);
+        self.plaques.push({ spot: pq, img: img });
+      });
+      // v0.9.5 媽祖神像（MT1；在拜墊那一列面對供桌或神像按 A＝轉職）。
+      // 地圖組：神座 2 格寬（statue.x 和 x+1），中心在兩格交界（MT1：像素 x=384）、神像腳底對齊 statue.y 的下緣（像素 y=192）
+      // 美術圖 obj_mazu_statue（64×96）照原尺寸畫；還沒有圖時暫代圖縮成約 2.2 格高
+      this.statueImg = null;
+      if (this.map.statue) {
+        var skey = this.map.statue.sprite || J.MapInfo.STATUE_SPRITE, sk = J.Assets.texKey(skey);
+        if (this.textures.exists(sk)) {
+          var si = this.add.image((this.map.statue.x + 1) * T, (this.map.statue.y + 1) * T, sk).setOrigin(0.5, 1);
+          if (!this.hasArt(skey) && si.height > 0) si.setScale((T * 2.2) / si.height);
+          si.setDepth((this.map.statue.y + 1) * T);
+          this.statueImg = si;
+        }
       }
       this.chestArt = this.hasArt('chest_closed') && this.hasArt('chest_open');
       (this.map.chests || []).forEach(function (c) {
@@ -500,6 +525,48 @@
         img.setDepth((sg.y + 1) * T + 2);
         self.signs.push({ spot: sg, img: img });
       });
+    }
+
+    /** v0.9.5 地標匾額：紅底金字、金色外框（比照店家招牌的大小，字橫寫；不畫神像、不畫香火） */
+    plaqueTexture(text, boxW, boxH) {
+      // boxW、boxH（像素）＝背景上空白匾額的大小：照這個大小畫（字的大小跟著高度）；沒給時依字數自動決定
+      var bw = Math.round(boxW || 0), bh = Math.round(boxH || 0);
+      var key = 'ui:plaque:' + text + ':' + bw + 'x' + bh;
+      if (this.textures.exists(key)) return key;
+      var fs = bh ? Math.max(12, Math.min(26, Math.round(bh * 0.66))) : 15;
+      var font = 'bold ' + fs + 'px "Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
+      var m = document.createElement('canvas').getContext('2d'); m.font = font;
+      var w = Math.max(bw, Math.ceil(m.measureText(text).width) + 22), h = Math.max(bh, fs + 11);
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      var g = c.getContext('2d');
+      g.fillStyle = '#3a1208'; g.fillRect(0, 0, w, h);                 // 深色外緣
+      g.fillStyle = '#e0b040'; g.fillRect(1, 1, w - 2, h - 2);         // 金框
+      g.fillStyle = '#9e1a14'; g.fillRect(4, 4, w - 8, h - 8);         // 紅底
+      g.fillStyle = '#b82a20'; g.fillRect(4, 4, w - 8, 3);             // 上緣亮一點
+      g.fillStyle = '#f4d27a'; g.fillRect(2, 2, 2, 2); g.fillRect(w - 4, 2, 2, 2); g.fillRect(2, h - 4, 2, 2); g.fillRect(w - 4, h - 4, 2, 2);
+      g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+      // 匾額寬、字少（「慈護宮」）時一個字一個字平均排開，像真的橫匾；不然整行置中
+      var chars = text.split(''), spread = bw && chars.length <= 4 && fs * chars.length * 1.5 < w;
+      var gap = spread ? Math.min(fs * 1.9, (w - 16) / chars.length) : 0;
+      chars.forEach(function (ch, i) {
+        var cx = spread ? w / 2 + (i - (chars.length - 1) / 2) * gap : null;
+        if (!spread && i > 0) return;
+        var t = spread ? ch : text, x = spread ? cx : w / 2;
+        g.lineWidth = 3; g.strokeStyle = '#4a0c06'; g.strokeText(t, x, h / 2 + 1);
+        g.fillStyle = '#ffd95a'; g.fillText(t, x, h / 2 + 1);
+      });
+      this.textures.addCanvas(key, c);
+      return key;
+    }
+
+    /** v0.9.5 走進地標範圍（例如金包里慈護宮廟前）：跳出地名提示；同一個地標要走出去再進來才會再跳 */
+    checkLandmark() {
+      var lm = J.MapInfo.landmarkAt(this.map, this.p.tx, this.p.ty);
+      if (lm === this.landmarkNow) return;
+      this.landmarkNow = lm;
+      if (!lm) return;
+      J.HUD.mapBanner(lm.name, 'place-banner');
+      var g = G(); g.landmarkLog = (g.landmarkLog || []).concat([lm.name]).slice(-20);   // 測試用
     }
 
     /** 沒有招牌圖時：木頭招牌＋文字 */
@@ -920,7 +987,8 @@
 
     // ---------------------------------------------------------------- 移動
     onPointer(pointer) {
-      if (J.UI.isOpen() || this.transitioning || G().busy) return;
+      // v0.9.5 放大地圖（passMove 視窗）開著時，點面板外露出來的遊戲畫面也能走（只有擋路的視窗才不理會）
+      if (!this.p || J.UI.blocksMove() || this.transitioning || G().busy) return;
       var x = Math.floor(pointer.worldX / T), y = Math.floor(pointer.worldY / T);
       if (x < 0 || y < 0 || x >= this.size.w || y >= this.size.h) return;
       var target = this.interactableAt(x, y);
@@ -979,6 +1047,19 @@
       return true;
     }
 
+    /**
+     * v0.9.5 點放大地圖上的一格：用 A* 走過去（地圖保持開著）。點到不能走的格子（房子、NPC、水）就走到最近的可走格。
+     * 不和 NPC、寶箱互動（只是走過去）。回傳目的地格子 {x, y}；走不到或現在不能走回傳 null
+     */
+    walkFromMap(x, y) {
+      var p = this.p;
+      if (!p || this.transitioning || G().busy || J.UI.blocksMove()) return null;
+      x = Math.max(0, Math.min(this.size.w - 1, x)); y = Math.max(0, Math.min(this.size.h - 1, y));
+      if (!this.walkTo(x, y, null)) return null;
+      var last = p.path.length ? p.path[p.path.length - 1] : { c: p.tx, r: p.ty };
+      return { x: last.c, y: last.r };
+    }
+
     tryStep(dir) {
       var p = this.p, d = DIRS[dir];
       p.facing = dir;
@@ -1013,6 +1094,7 @@
     arrive() {
       var p = this.p, g = G();
       g.state.location = { map: this.mapId, x: p.tx, y: p.ty };
+      this.checkLandmark();
       var ex = J.World.exitAt(this.map, p.tx, p.ty);
       if (ex) { p.path = []; p.pending = null; this.goExit(ex); return true; }
       if (!p.path.length && p.pending) {
@@ -1042,6 +1124,8 @@
       for (i = 0; i < this.chests.length; i++) if (this.chests[i].data.x === x && this.chests[i].data.y === y) return { kind: 'chest', chest: this.chests[i].data };
       for (i = 0; i < this.lamps.length; i++) if (this.lamps[i].data.x === x && this.lamps[i].data.y === y) return { kind: 'lamp', lamp: this.lamps[i].data };
       if (this.station && this.station.x === x && this.station.y === y) return { kind: 'station', station: this.station };
+      var sh = J.MapInfo.shrineAt(this.map, x, y);   // v0.9.5 媽祖神像、供桌
+      if (sh) return { kind: 'shrine', spot: sh };
       var an = this.animalAt(x, y);
       if (an) return { kind: 'animal', animal: an };
       return null;
@@ -1077,6 +1161,7 @@
       else if (t.kind === 'chest') g.openChest(t.chest, this);
       else if (t.kind === 'lamp') g.inspectLamp(t.lamp, this);
       else if (t.kind === 'station') g.useStation(t.station, this);
+      else if (t.kind === 'shrine') g.shrineJob(this);
       else if (t.kind === 'animal') { t.animal.nextMove = Math.max(t.animal.nextMove, this.time.now + 2500); g.animalTalk(t.animal.spec); }   // 說話時先站著不動
     }
 
@@ -1085,6 +1170,7 @@
       if (t.kind === 'animal') return '摸摸' + t.animal.spec.name;
       if (t.kind === 'chest') return G().state.chests[t.chest.id] ? '看看寶箱' : '打開寶箱';
       if (t.kind === 'station') return '在' + (t.station.name || '車站') + '搭車';
+      if (t.kind === 'shrine') return '在神像前轉職';
       return '看看' + t.lamp.subject + '燈';
     }
 
@@ -1264,13 +1350,40 @@
         bg: this.hasBg ? this.textures.get('map:' + this.bgFile).getSourceImage() : null,
         walk: function (x, y) { return self.walkable(x, y); },
         player: { x: this.p.tx, y: this.p.ty },
-        npcs: this.npcs.filter(function (n) { return !n.data.virtual; }).map(function (n) { return { id: n.data.id, name: g.speaker(n.data.id).name, x: n.data.x, y: n.data.y }; }),
+        // v0.9.5 mark：有委託可以接（'new'）或可以回報（'ready'）→ 小地圖、放大地圖畫「！」（和頭頂的記號同一個判斷 G.npcMarker）
+        npcs: this.npcs.filter(function (n) { return !n.data.virtual; }).map(function (n) { var mk = g.npcMarker(n.data); return { id: n.data.id, name: g.speaker(n.data.id).name, x: n.data.x, y: n.data.y, mark: mk ? (mk === 'ready' ? 'ready' : 'new') : null }; }),
         exits: (this.map.exits || []).map(function (e) { return { x: e.x, y: e.y, to: e.to, name: (g.data.maps[e.to] || {}).name || e.to }; }),
         shops: (this.signs || []).map(function (s) { return { kind: s.spot.kind, text: s.spot.text, x: s.spot.npcX, y: s.spot.npcY }; }),
         station: this.station ? { x: this.station.x, y: this.station.y, name: this.station.name } : null,
+        places: J.MapInfo.placeLabels(this.map),   // v0.9.5 放大地圖上寫地點名稱（金包里慈護宮等）
         chests: this.chests.map(function (c) { return { x: c.data.x, y: c.data.y, open: !!g.state.chests[c.data.id] }; }),
         monsters: this.monsters.filter(function (m) { return m.active; }).map(function (m) { return { id: m.id, x: m.tx, y: m.ty, boss: m.boss }; })
       };
+    }
+
+    /**
+     * v0.9.5 媽祖的祝福（在神像前轉職）：金色光柱從上方灑在主角身上、光芒旋轉、四周冒出光點（約 1.6 秒）。
+     * 不閃爍刺眼（亮度柔和、沒有快速明暗交替）。G.blessCount 測試用
+     */
+    blessFx() {
+      var self = this, x = this.player.x, y = this.player.y - T * 0.8;
+      G().blessCount = (G().blessCount || 0) + 1;
+      var glow = this.add.image(x, y, this.glowTexture('#ffe08a')).setBlendMode(Phaser.BlendModes.ADD).setDepth(62000).setScale(0.2).setAlpha(0);
+      this.tweens.add({ targets: glow, scale: 3.2, alpha: { from: 0.95, to: 0 }, duration: 1600, ease: 'Sine.out', onComplete: function () { glow.destroy(); } });
+      // 光柱
+      var beam = this.add.rectangle(x, y - T * 3, T * 1.6, T * 7, 0xfff2b0, 0.55).setBlendMode(Phaser.BlendModes.ADD).setDepth(62001).setScale(0.2, 1);
+      this.tweens.add({ targets: beam, scaleX: 1, alpha: { from: 0.6, to: 0 }, duration: 1500, ease: 'Sine.inOut', onComplete: function () { beam.destroy(); } });
+      // 旋轉的光芒（8 道）
+      var rays = this.add.graphics({ x: x, y: y }).setDepth(62002).setBlendMode(Phaser.BlendModes.ADD);
+      rays.fillStyle(0xffe9a0, 0.5);
+      for (var i = 0; i < 8; i++) {
+        var a = i * Math.PI / 4, a1 = a - 0.09, a2 = a + 0.09, R = T * 3;
+        rays.fillTriangle(0, 0, Math.cos(a1) * R, Math.sin(a1) * R, Math.cos(a2) * R, Math.sin(a2) * R);
+      }
+      rays.setScale(0.3);
+      this.tweens.add({ targets: rays, angle: 90, scale: 1.2, alpha: { from: 0.9, to: 0 }, duration: 1600, ease: 'Sine.out', onComplete: function () { rays.destroy(); } });
+      [0, 250, 500].forEach(function (d) { self.time.delayedCall(d, function () { if (self.player) self.sparkle(self.player.x, self.player.y - T, 0xffe08a); }); });
+      if (this.statueImg) this.tweens.add({ targets: this.statueImg, alpha: { from: 1, to: 0.75 }, duration: 400, yoyo: true });
     }
 
     /** 小地圖點 NPC：在遊戲畫面閃一下那個位置 */

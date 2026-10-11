@@ -31,7 +31,7 @@ window.VOICES = {
     // ── 金包里 ──
     // 語音組 2026-10-10：stage＝外觀年齡、look＝精靈圖（對照表 tools/voice/npc_looks.js）；有改的行在行尾註明原值
     chief:          { name: "里長伯",         gender: "m", age: "elder", stage: "老年", look: "npc_chief",         pitch: 0.78, rate: 0.85, taigi: true,  persona: "熱心又愛照顧人，說話慢慢的，常夾台語，「好啦好啦」掛在嘴邊。" },
-    temple_keeper:  { name: "廟公",           gender: "m", age: "elder", stage: "老年", look: "npc_chief",         pitch: 0.72, rate: 0.80, taigi: true,  persona: "慢條斯理、很和氣，像在廟埕泡茶聊天，句尾常拉長音。" },
+    temple_keeper:  { name: "廟公",           gender: "m", age: "elder", stage: "老年", look: "npc_temple_keeper", pitch: 0.72, rate: 0.80, taigi: true,  persona: "慢條斯理、很和氣，像在廟埕泡茶聊天，句尾常拉長音。" },   // v0.9.5 廟公專屬圖（灰白平頭、深藍唐衫、竹掃帚；老年男）。前端依 CTO 指示改 look，請語音組確認
     shopkeeper:     { name: "老街阿伯",       gender: "m", age: "adult", stage: "青年", look: "npc_shopkeeper",    pitch: 0.97, rate: 1.06, taigi: true,  persona: "嗓門大、愛招呼客人，講話很開朗，台語比華語順。" },   // 原 elder 0.90/0.95：圖是黑髮圓臉的年輕人
     fisher:         { name: "漁夫阿伯",       gender: "m", age: "adult", stage: "中年", look: "npc_fisher",        pitch: 0.75, rate: 0.97, taigi: true,  persona: "豪爽，聲音粗粗的，海風吹久了有點沙啞，笑聲很大。" },   // 原 elder 0.70/0.90：圖是灰黑頭髮、鬍渣的中年人
     bookstore:      { name: "圖書館阿伯",   gender: "m", age: "elder", stage: "老年", look: "npc_bookstore_m",   pitch: 0.84, rate: 0.92, taigi: true,  persona: "溫柔有耐心，一個字一個字說清楚，偶爾說一句台語。" },   // v0.9.4 老闆 2026-10-11：講台語的角色一律男性（原 f 0.93/0.90）。語音組 10-11：新圖 npc_bookstore_m 是灰白髮老人→老年，0.80/0.88 改 0.84/0.92

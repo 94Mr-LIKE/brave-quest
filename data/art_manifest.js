@@ -33,6 +33,9 @@ window.ART = {
   },
   "M11": {
    "bg": "bg_M11.webp"
+  },
+  "MT1": {
+   "bg": "bg_MT1.webp"
   }
  },
  "battle": {
@@ -55,6 +58,7 @@ window.ART = {
   "light_glow": "assets/ui/light_glow.png",
   "obj_bus_shelter": "assets/ui/obj_bus_shelter.png",
   "obj_bus_sign": "assets/ui/obj_bus_sign.png",
+  "obj_mazu_statue": "assets/ui/obj_mazu_statue.png",
   "sign_armor": "assets/ui/sign_armor.png",
   "sign_general": "assets/ui/sign_general.png",
   "sign_inn": "assets/ui/sign_inn.png",

@@ -321,12 +321,14 @@
   }
 
   // ---------------------------------------------------------------- 職業公會
-  function guild(G) {
+  /** 轉職清單。opts（v0.9.5 媽祖神像也用這一套）＝{ title, label, onChange(jobId)：轉職成功後（祝福光芒） } */
+  function guild(G, opts) {
+    opts = opts || {};
     var st = G.state, D = G.data;
     var handle;
     var body = h('div');
-    var panel = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']), h('h2', { text: '⚔️ 職業公會' }), body]);
-    handle = J.UI.open(panel, { label: '職業公會', onClose: function () { G.refreshHud(); } });
+    var panel = h('div.win.panel.guild-panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']), h('h2', { text: opts.title || '⚔️ 職業公會' }), body]);
+    handle = J.UI.open(panel, { label: opts.label || '職業公會', onClose: function () { G.refreshHud(); } });
     function render() {
       body.innerHTML = '';
       body.appendChild(h('p', { text: '到 ' + ((D.jobRules && D.jobRules.unlock_level) || 5) + ' 級就能轉職，之後可以免費換職業。職業只改變戰鬥方式和外觀，所有委託一樣要五科都學喔！' }));
@@ -351,6 +353,8 @@
       J.UI.banner('轉職成「' + D.jobs[id].name + '」了！');
       G.onJobChanged();
       G.save(); render();
+      if (opts.closeOnChange) handle.close();   // 神像轉職：關掉清單，讓孩子看到祝福光芒
+      if (opts.onChange) { try { opts.onChange(id); } catch (e) { console.error(e); } }
     }
     render();
   }

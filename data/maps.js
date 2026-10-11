@@ -11,7 +11,7 @@
  *   '.' 地面   ',' 花草/裝飾地面   '=' 路/石板/月台   '%' 淺泥/淺灘/沙   'D' 門   'B' 橋/木棧道   'S' 樓梯   'c' 地毯（以上可走）
  *   'T' 樹/柱   '#' 牆/岩壁/城牆/泥岩脊   '~' 水   'H' 房屋牆   'R' 屋頂   'F' 柵欄   '*' 灌木/岩石   'K' 大型擺設（以上擋路）
  *
- * v0.5 大地圖：全部 11 張 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42），
+ * v0.5 大地圖：M01、M02、M03、M04、M05、M06、M07、M08、M09、M10、M11 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42），
  *   格子依 GPT 背景逐格重描（來源 tools/bigmaps/<ID>.txt／.json，背景 docs/assets/maps/bg_<ID>.webp）。
  *
  * 地區之間：
@@ -62,16 +62,16 @@ window.MAPS = {
       "TTTHHHHHHHTT===TTHHHHHHHHT==HHHHHHH*HHHHHHTTT==HHHHHHTTTHHHHHHHHHHHHHHHHH*~~*HHHHHH*BB*HHHHHHTTT",
       "TTTHHHHHHHTT===TTHHHHHHHHT==HHHHHHH*HHHHHH***==HHHHHHTTTHHHHHHHHHHHHHHHHH*~~*HHHHHH*BB*HHHHHHTTT",
       "TTT==========================================================================================TTT",
-      "TTT=================================================UU==============U.=======================TTT",
-      "TTT=================================================UUUUUUUUUUUUUUUUUUUU====UU========.U~~~~~TTT",
+      "TTT=================================================UUUUUUUUUUUUUUU=U.=======================TTT",
+      "TTT=================================================UURRRRRRRRRRRUUUUUUU====UU========.U~~~~~TTT",
       "TTTUUUUUUUUUUUUUU=......*.==...*........UUUU.==UUUUUURRRRRRRRRRRRRRRUTUU**..**....**.=**~~~~~TTT",
       "TTT*RRRRRRRRRRRR*=.,*.....==.,..........TTTT.==TTTRRRRRRRRRRRRRRRRRRRTRR========================",
       "TTT*RRRRRRRRRRRR*=.UU.....==........UU..TTTT.==TTTRRRRRRRRRRRRRRRRRRRTTR========================",
       "TTT*HHHHHHHHHHHH*=TTTUUUUU==.......TTTU.TTTT.==TTTRRRRRRRRRRRRRRRRRRRTFFFFFFFFFF===FFFFFFFFFFFFT",
       "TTT*HHHHHHHHHHHH*=TTT~~~~*==.*.....TTTTUKK...==TTTRRRRRRRRRRRRRRRRRRRTTFTTT....*===***RRRRRRRRFT",
-      "TTT*HHHHHHHHHHHH*=TTT~~~~*==.......TTTKKKK...==TTTRRRRRRRRRRRRRRRRRRRTTFTTT*..*.===***RRRRRRRRFT",
+      "TTT*HHHHHHHHHHHH*=TTT~~~~*==.......TTTKKKK...==TTTRRHHHHHHHHHHHHHHHHHTTFTTT*..*.===***RRRRRRRRFT",
       "TTT*#####SS#####*=TT*~~~~*==.*........KKKKUUU==TTTHHHHHHHHHHHHHHHHHHHTTFTTT.....===***RRRRRRRRFT",
-      "TTT===============..*~~~~*==.*........KKKK***==TTTHHHHHHHHHHHHHHHHHHHTTFTTT.....===***HHHHHHHHFT",
+      "TTT===============..*~~~~*==.*........KKKK***==TTTHHHHHHHHH===HHHHHHHTTFTTT.....===***HHHHHHHHFT",
       "TTT=U==========U==..*~~~~*==..........KKKK***==TTTHHHHHHKK=====KKHHHHTTFTTT.....===.**HHHHHHHHFT",
       "TTTU*U.UUUUU...*==.,*..*..==.,***........**,.==****K..K.KSSSSSSSK.K**TTFF.......===...=KK=K===FT",
       "TTTTTTTTTTTTTTTT========================================================F=====================FT",
@@ -90,7 +90,7 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     start: { x: 36, y: 34 },
-    station: { x: 46, y: 15, name: "金包里客運站", drawSign: false },
+    station: { x: 46, y: 15, name: "金包里客運站", shelter: { x: 47, y: 13 } },
     places: [
       { name: "海風國小（校門與操場）", x: 2, y: 8, w: 22, h: 11 },
       { name: "金包里客運站", x: 31, y: 11, w: 13, h: 5 },
@@ -105,17 +105,23 @@ window.MAPS = {
       { name: "地瓜田", x: 70, y: 39, w: 25, h: 16 },
       { name: "燭火雙岩", x: 86, y: 0, w: 6, h: 4 }
     ],
+    landmarks: [
+      { name: "金包里慈護宮", area: [50, 45, 21, 8], plaque: { x: 60.156, y: 39.375, w: 4.3, h: 1.05, text: "慈護宮" } }
+    ],
     exits: [
       { x: 95, y: 11, to: "M06", tx: 1, ty: 15 },
       { x: 95, y: 12, to: "M06", tx: 1, ty: 16 },
       { x: 95, y: 37, to: "M09", tx: 1, ty: 45 },
       { x: 95, y: 38, to: "M09", tx: 1, ty: 46 },
       { x: 45, y: 59, to: "M02", tx: 43, ty: 1 },
-      { x: 46, y: 59, to: "M02", tx: 44, ty: 1 }
+      { x: 46, y: 59, to: "M02", tx: 44, ty: 1 },
+      { x: 59, y: 43, to: "MT1", tx: 11, ty: 18 },
+      { x: 60, y: 43, to: "MT1", tx: 12, ty: 18 },
+      { x: 61, y: 43, to: "MT1", tx: 13, ty: 18 }
     ],
     npcs: [
       { id: "chief", x: 57, y: 47, sprite: "npc_chief", dialog: "D_CHIEF_IDLE", quest: "Q_TUT_1", quests: ["Q_TUT_1", "Q_LAMPS"] },
-      { id: "temple_keeper", x: 63, y: 47, sprite: "npc_chief", dialog: "D_TEMPLE_IDLE", quest: null, quests: [] },
+      { id: "temple_keeper", x: 63, y: 47, sprite: "npc_temple_keeper", dialog: "D_TEMPLE_IDLE", quest: null, quests: [] },
       { id: "bookstore", x: 12, y: 43, sprite: "npc_bookstore_m", dialog: "D_BOOK_IDLE", quest: "Q_SIDE_BOOK", quests: ["Q_SIDE_BOOK"] },
       { id: "shopkeeper", x: 31, y: 33, sprite: "npc_shopkeeper", dialog: "D_SHOP_IDLE", quest: null, quests: [] },
       { id: "innkeeper", x: 84, y: 16, sprite: "npc_innkeeper_m", dialog: "D_INN_IDLE", quest: "Q_TUT_3", quests: ["Q_TUT_3"] },
@@ -414,7 +420,7 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     start: { x: 34, y: 53 },
-    station: { x: 30, y: 53, name: "神木森林站", drawSign: false },
+    station: { x: 30, y: 53, name: "神木森林站", shelter: { x: 27, y: 52 } },
     exits: [],
     npcs: [
       { id: "elf_elder", x: 8, y: 9, sprite: "npc_elf_elder", dialog: "D_ELDER_IDLE", quest: "Q_ELF_1", quests: ["Q_ELF_1", "Q_ELF_3", "Q_ELF_4"] },
@@ -527,7 +533,7 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     start: { x: 55, y: 49 },
-    station: { x: 52, y: 49, name: "紅樹林濕地站" },
+    station: { x: 52, y: 49, name: "紅樹林濕地站", shelter: { x: 53, y: 48 } },
     exits: [],
     npcs: [
       { id: "gnome_chief", x: 59, y: 9, sprite: "npc_gnome_chief", dialog: "D_GNOME_CHIEF_IDLE", quest: "Q_GNO_1", quests: ["Q_GNO_1", "Q_GNO_3", "Q_GNO_4"] },
@@ -819,7 +825,7 @@ window.MAPS = {
       "##########################################################################################"
     ],
     start: { x: 12, y: 46 },
-    station: { x: 4, y: 46, name: "月世界站", drawSign: false },
+    station: { x: 4, y: 46, name: "月世界站", shelter: { x: 15, y: 41 } },
     exits: [],
     npcs: [
       { id: "orc_chief", x: 81, y: 8, sprite: "npc_orc_chief", dialog: "D_ORC_CHIEF_IDLE", quest: "Q_ORC_1", quests: ["Q_ORC_1", "Q_ORC_3", "Q_ORC_4"] },
@@ -912,7 +918,7 @@ window.MAPS = {
       "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     ],
     start: { x: 41, y: 45 },
-    station: { x: 43, y: 45, name: "山城市集站", drawSign: false },
+    station: { x: 43, y: 45, name: "山城市集站", noShelter: "背景在站牌西邊已經畫了一座有屋頂、長椅和燈籠的候車亭（約 x35–41、y40–45）；站牌前是兩格寬的車道，東邊是石階出口，再放一座會擋路或疊在背景候車亭上" },
     exits: [
       { x: 0, y: 45, to: "M01", tx: 94, ty: 37 },
       { x: 0, y: 46, to: "M01", tx: 94, ty: 38 }
@@ -1066,7 +1072,7 @@ window.MAPS = {
       "####################################################################################"
     ],
     start: { x: 17, y: 51 },
-    station: { x: 21, y: 50, name: "府城古城站", drawSign: false },
+    station: { x: 21, y: 50, name: "府城古城站", shelter: { x: 28, y: 49 } },
     exits: [
       { x: 41, y: 0, to: "M11", tx: 35, ty: 40 },
       { x: 42, y: 0, to: "M11", tx: 36, ty: 40 }
@@ -1203,5 +1209,50 @@ window.MAPS = {
       { x: 8, y: 27, r: 1.2 },
       { x: 44, y: 25, r: 1.5 }
     ]
+  },
+
+  // ───────────────────────────── MT1 金包里慈護宮（v0.9.5 新增；來源 tools/bigmaps/MT1.txt／.json）─────────────────────────────
+  MT1: {
+    name: "金包里慈護宮", type: "interior", level: 1, bgm: "village", battle_bg: "town", tileset: "village",
+    real_ref: "新北市金山區金包里慈護宮（正殿；金包里街 16 號）",
+    art_note: "慈護宮正殿室內（24×20 格）：上方中間是神龕和神像，前面供桌；兩側紅柱；下方中間是門口，出去就是 M01 廟埕。依老闆 2026-10-11 指示新增，背景 art_src/v1/temple/bg_MT1.png。",
+    grid: [
+      "########################",
+      "####TT##KKKKKKKK##T#####",
+      "KKKKTT##KKKKKKKK##T#KKKK",
+      "KKKKTT##KKKKKKKK##T#KKKK",
+      "KKKKTTK#KKKKKKKK#KT#KKKK",
+      "KKK#TTK.KKKKKKKK.KT#KKKK",
+      "KKK#TT..KKKKKKKK..TTKKKK",
+      "#..UTT..KKKKKKKK..TUU..#",
+      "#..UU...KKKKKKKK...UU..#",
+      "#..UU...KKKKKKKK...UU..#",
+      "#..UU.....====.....UU..#",
+      "#..UU.....====.....UU..#",
+      "#..UU.....====.....UU..#",
+      "#..UU.....====.....UU..#",
+      "#..TT.....====.....TT..#",
+      "##########====##########",
+      "#######K##====####K#####",
+      "#######K##====####K#####",
+      "##########====##########",
+      "###########===##########"
+    ],
+    start: { x: 12, y: 18 },
+    plaques: [
+      { x: 12.016, y: 1, w: 4.1, h: 1.05, text: "慈護宮" }
+    ],
+    exits: [
+      { x: 11, y: 19, to: "M01", tx: 59, ty: 44 },
+      { x: 12, y: 19, to: "M01", tx: 60, ty: 44 },
+      { x: 13, y: 19, to: "M01", tx: 61, ty: 44 }
+    ],
+    npcs: [],
+    chests: [],
+    spawns: [],
+    inn: null,
+    shop: null,
+    altar: { x: 11, y: 9, span: [8, 15] },
+    statue: { x: 11, y: 5 }
   }
 };

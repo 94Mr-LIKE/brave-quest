@@ -51,7 +51,7 @@
       settings: function () { if (!G.blocked()) J.Settings.open(G); },
       joystick: function (dir, force) { G.joy = { dir: dir, force: force }; },
       // 在搖桿上「輕點一下」（沒有拖曳）：當作點了搖桿底下的地圖（例如搖桿蓋住的寶箱）
-      mapTap: function (cx, cy) { G.lastMapTap = { x: cx, y: cy }; if (G.mapScene && !G.blocked() && !J.UI.isOpen()) G.mapScene.tapAtClient(cx, cy); },
+      mapTap: function (cx, cy) { G.lastMapTap = { x: cx, y: cy }; if (G.mapScene && !G.blocked() && !J.UI.blocksMove()) G.mapScene.tapAtClient(cx, cy); },   // v0.9.5 放大地圖開著也能點
       action: function () { if (G.mapScene && !J.UI.isOpen()) G.mapScene.actionKey(); },
       cancel: function () {
         // B 鍵：有視窗就關掉（同 Esc），沒有就打開背包選單
@@ -260,6 +260,21 @@
     if (!G.state) { try { window.JQ.Music.setVolume(J.State.AUDIO.MUSIC_VOL.mid); } catch (e) { /* 忽略 */ } }
     try { window.JQ.Music.playBgm(id); } catch (e) { /* 音樂出錯不影響遊戲 */ }
   };
+  /** v0.9.5 家長設定「重看片頭動畫」：播片頭（配標題序曲），結束後換回原本地圖的音樂 */
+  G.replayOpening = function () {
+    if (!J.Opening || J.Opening.isPlaying() || G.blocked()) return false;
+    var prev = G.currentBgm, music = G.musicReady() && !(G.state && G.state.settings.music === false);
+    document.body.classList.add('opening-on');
+    // 片頭蓋滿整個畫面：先讓遊戲畫面（Phaser）睡著，平板只需要畫片頭，比較順
+    var slept = false;
+    try { if (G.phaser && G.phaser.loop && G.phaser.loop.sleep) { G.phaser.loop.sleep(); slept = true; } } catch (e) { slept = false; }
+    return J.Opening.play({ music: music, onDone: function () {
+      document.body.classList.remove('opening-on');
+      if (slept) { try { G.phaser.loop.wake(); } catch (e) { /* 忽略 */ } }
+      G.held = {}; G.heldOrder = [];
+      if (music && prev) { G.currentBgm = null; G.bgm(prev); }
+    } });
+  };
   G.stopBgm = function (ms) { if (G.musicReady()) { try { window.JQ.Music.stopBgm(ms || 300); } catch (e) { /* 忽略 */ } } };
   /**
    * 短曲（勝利、升級、委託完成、旅店休息、珍貴道具、點燈、累倒、開寶箱、結局）。
@@ -337,6 +352,10 @@
   // ---------------------------------------------------------------- 地圖
   G.onMapReady = function (scene) {
     G.mapScene = scene;
+    G.mapReadyCount = (G.mapReadyCount || 0) + 1;   // v0.9.5 慈護宮轉職：等轉職後重新開始的場景好了再放光芒
+    // v0.9.5 從別張地圖「走進來」才算進廟（轉職換走路圖時同一張地圖重新開始，不再介紹一次）
+    var enteredMap = G.lastReadyMap !== scene.mapId;
+    G.lastReadyMap = scene.mapId;
     G.mapChanging = 0;
     if (G.pendingChange) { var pc = G.pendingChange; G.pendingChange = null; setTimeout(function () { G.changeMap(pc[0], pc[1], pc[2], pc[3]); }, 0); }
     if (G.pendingLevelUp > 0) { var plv = G.pendingLevelUp; G.pendingLevelUp = 0; setTimeout(function () { G.afterReward(plv); }, 800); }
@@ -353,6 +372,12 @@
     if (J.Minimap) J.Minimap.attach(G, scene);
     G.refreshHud();
     G.save();
+    // v0.9.5 進廟（MT1：有神像的室內地圖）時，廟公介紹慈護宮
+    // （場景物件換地圖時會重用：要確認 0.5 秒後還在同一張地圖、沒有正在換圖）
+    if (map.type === 'interior' && map.statue && enteredMap && !G.pendingIntro) {
+      var introMap = scene.mapId;
+      setTimeout(function () { if (G.mapScene === scene && scene.mapId === introMap && !scene.transitioning && !G.mapChanging && !G.blocked()) G.templeIntro(scene); }, 500);
+    }
     if (G.pendingIntro) {
       G.pendingIntro = false;
       setTimeout(function () { G.say('D_INTRO', [{ who: 'pet', text: '我是番薯仔！我們一起把光找回來吧！' }]).then(function () { J.UI.toast('找頭上有「！」的人說話吧！', 4000); }); }, 400);
@@ -428,6 +453,42 @@
     if (J.QuestLog.canComplete(G.state, G.data.quests, f.id, G.data)) return 'ready';
     if ((q.kind || 'help') === 'help') return 'bang';
     return null;
+  };
+
+  /**
+   * v0.9.5（老闆 2026-10-11）：金包里慈護宮正殿（MT1）的媽祖神像也能轉職——和職業公會同一套流程（J.Menus.guild）、同樣的等級條件，
+   * 轉職時加上祝福光芒（MapScene.blessFx）。職業公會先保留（等老闆決定）。
+   */
+  G.shrineJob = function (scene) {
+    if (G.blocked()) return;
+    var st = G.state, unlock = (G.data.jobRules && G.data.jobRules.unlock_level) || 5;
+    G.shrineLog = (G.shrineLog || 0) + 1;   // 測試用
+    // 播放順序（CTO 2026-10-11）：進廟時 D_TEMPLE_INTRO（G.onMapReady）→ 神像前轉職流程 → 轉職成功配光芒、D_TEMPLE_BLESS → D_TEMPLE_JOB_DONE（番薯仔）
+    // 台詞欄位在 jobs.js 的 JOB_RULES.temple_*（職業公會的 dialog_open 維持原樣）。36 號：不讓神明說話；不寫點香、擲筊、求籤
+    var R = G.data.jobRules || {};
+    if (st.player.level < unlock) { G.say(null, [{ who: 'narrator', text: '等你到 ' + unlock + ' 級，就能在這裡轉職喔！' }]); return; }
+    J.Menus.guild(G, { title: '✨ 慈護宮・轉職', label: '慈護宮轉職', closeOnChange: true, onChange: function () {
+      // 轉職會重新開始地圖場景（換主角的走路圖，G.onJobChanged）：等場景好了再放光芒；
+      // 先讓孩子看到光芒（約 1 秒），再出現廟公的祝福；這段時間 busy，不能走、不會被打斷
+      G.busy = true;
+      var tries = 0, ready0 = G.mapReadyCount || 0;
+      (function waitScene() {
+        var sc = G.mapScene;
+        if (((G.mapReadyCount || 0) <= ready0 || !sc || !sc.p) && tries++ < 60) { setTimeout(waitScene, 100); return; }
+        if (sc && sc.blessFx && sc.p) sc.blessFx();
+        setTimeout(function () {
+          G.busy = false;
+          G.say(R.temple_bless || 'D_TEMPLE_BLESS', [{ who: 'narrator', text: '這是你自己努力得來的！' }])
+            .then(function () { return G.say(R.temple_done || 'D_TEMPLE_JOB_DONE', [{ who: 'pet', text: '新職業也要五科一起加油喔！' }]); });
+        }, 1000);
+      })();
+    } });
+  };
+  /** v0.9.5 進廟（有神像的室內地圖）時廟公介紹：D_TEMPLE_INTRO */
+  G.templeIntro = function (scene) {
+    var R = G.data.jobRules || {};
+    G.templeIntroLog = (G.templeIntroLog || 0) + 1;   // 測試用
+    return G.say(R.temple_intro || 'D_TEMPLE_INTRO', [{ who: 'narrator', text: '這裡是金包里慈護宮。' }]);
   };
 
   G.talkTo = function (npc, scene) {

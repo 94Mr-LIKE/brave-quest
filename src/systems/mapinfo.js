@@ -1,5 +1,5 @@
 /*
- * 地圖上的輔助計算（v0.4）：上層格（前景）、招牌位置、背景音樂、怪物遊走目標、寵物站位、燈光位置
+ * 地圖上的輔助計算（v0.4）：上層格（前景）、招牌位置、背景音樂、怪物遊走目標、寵物站位、燈光位置；v0.9.5 地標、放大地圖點選
  * 純計算，可以在 node 測試。
  */
 (function () {
@@ -155,6 +155,8 @@
 
   /** 地圖的 BGM：maps.js 的 bgm 是這六種之一就用它，否則依圖塊組 */
   function bgmFor(map) {
+    // v0.9.5 室內地圖（MT1 金包里慈護宮正殿）：用安靜的曲子（沿用現有的 forest「神祕、安靜」；maps.js 寫 castle 時用莊嚴的 castle）
+    if (map && map.type === 'interior') return map.bgm === 'castle' ? 'castle' : 'forest';
     if (map && MAP_BGM.indexOf(map.bgm) >= 0) return map.bgm;
     return TILESET_BGM[map && map.tileset] || 'field';
   }
@@ -361,7 +363,80 @@
     return false;
   }
 
-  var MapInfo = { ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+  // ---------------------------------------------------------------- 地標與地點名稱（v0.9.5 老闆：金包里慈護宮要看得到）
+  /**
+   * maps.js 的 landmarks: [{ name, area: [x, y, w, h], plaque: { x, y } }]
+   * area＝走進來時跳出地名提示的範圍（廟前廣場）；plaque＝匾額中心（格子座標，可以有小數），沒有就不畫
+   */
+  function landmarks(map) {
+    return ((map && map.landmarks) || []).filter(function (l) { return l && l.name && Array.isArray(l.area) && l.area.length === 4; });
+  }
+  /** 這一格在哪個地標的提示範圍裡；不在任何地標裡回傳 null */
+  function landmarkAt(map, x, y) {
+    var ls = landmarks(map);
+    for (var i = 0; i < ls.length; i++) {
+      var a = ls[i].area;
+      if (x >= a[0] && y >= a[1] && x < a[0] + a[2] && y < a[1] + a[3]) return ls[i];
+    }
+    return null;
+  }
+  /**
+   * 放大地圖上要寫的地點名稱：maps.js 的 places（設施範圍）＋地標；回傳 [{ name, x, y }]（格子座標）。
+   * x＝範圍中線；y＝範圍上緣往下 1.5 格（寫在建築物上方，不蓋住廣場上的人和「！」）
+   */
+  function placeLabels(map) {
+    var out = [];
+    function at(x, y, w, h) { return { x: x + w / 2, y: y + Math.min(1.5, h / 2) }; }
+    ((map && map.places) || []).forEach(function (p) { if (p && p.name) { var c = at(p.x, p.y, p.w, p.h); out.push({ name: p.name, x: c.x, y: c.y }); } });
+    landmarks(map).forEach(function (l) {
+      if (out.some(function (o) { return o.name.indexOf(l.name) >= 0; })) return;   // 「金包里慈護宮與廟埕」已經寫了名字
+      var c = at(l.area[0], l.area[1], l.area[2], l.area[3]);
+      out.push({ name: l.name, x: c.x, y: c.y });
+    });
+    return out;
+  }
+  /**
+   * v0.9.5 廟內的神像（MT1）：maps.js 的 statue、altar 都是 { x, y }（不可走的擺設）。面對任一個按 A 都是向神像祈求（轉職）。
+   * 回傳 [{ kind: 'statue'|'altar', x, y }]
+   */
+  var STATUE_SPRITE = 'obj_mazu_statue', STATUE_NAME = '媽祖神像';
+  function shrineSpots(map) {
+    var out = [];
+    ['statue', 'altar'].forEach(function (k) {
+      var s = map && map[k];
+      if (s && typeof s.x === 'number' && typeof s.y === 'number') out.push({ kind: k, x: s.x, y: s.y });
+    });
+    return out;
+  }
+  /** span：[x0, x1]＝同一列 x0～x1 都算（長供桌：拜墊那一列面對供桌任何一格都能轉職；地圖組 MT1.json） */
+  function shrineAt(map, x, y) {
+    var keys = ['statue', 'altar'];
+    for (var i = 0; i < keys.length; i++) {
+      var s = map && map[keys[i]];
+      if (!s || typeof s.x !== 'number' || s.y !== y) continue;
+      var sp = Array.isArray(s.span) && s.span.length === 2 ? s.span : [s.x, s.x];
+      if (x >= sp[0] && x <= sp[1]) return { kind: keys[i], x: s.x, y: s.y };
+    }
+    return null;
+  }
+  /** 要寫字的匾額：地標的 plaque ＋ maps.js 的 plaques（MT1 正殿後牆）。回傳 [{ x, y, w, h, text }]（格子座標，x、y＝寫字中心） */
+  function plaqueSpots(map) {
+    var out = [];
+    landmarks(map).forEach(function (l) { if (l.plaque) out.push({ x: l.plaque.x, y: l.plaque.y, w: l.plaque.w || 0, h: l.plaque.h || 0, text: l.plaque.text || l.name }); });
+    ((map && map.plaques) || []).forEach(function (p) { if (p && p.text) out.push({ x: p.x, y: p.y, w: p.w || 0, h: p.h || 0, text: p.text }); });
+    return out;
+  }
+
+  /**
+   * 點放大地圖（v0.9.5）：點的位置（相對於畫布左上角的 CSS 像素）→ 地圖格子。
+   * cssW、cssH＝畫布在畫面上的大小；view＝畫布顯示的範圍（格），預設整張。點到畫布外回傳 null
+   */
+  function tileFromMinimap(px, py, cssW, cssH, view) {
+    if (!(cssW > 0 && cssH > 0) || px < 0 || py < 0 || px >= cssW || py >= cssH) return null;
+    return { x: view.x + Math.min(view.w - 1, Math.floor(px / cssW * view.w)), y: view.y + Math.min(view.h - 1, Math.floor(py / cssH * view.h)) };
+  }
+
+  var MapInfo = { STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
     wanderTarget: wanderTarget, petSpot: petSpot, glowRgb: glowRgb, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
     LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.MapInfo = MapInfo; }

@@ -171,8 +171,9 @@
     promptEl.hidden = false;
   }
 
-  function mapBanner(name) {
-    var n = J.UI.h('div.win.map-banner', { text: name, 'aria-hidden': 'true' });
+  /** 地名提示（換地圖時的地圖名稱；v0.9.5 也用在地標，cls＝'place-banner'） */
+  function mapBanner(name, cls) {
+    var n = J.UI.h('div.win.map-banner' + (cls ? '.' + cls : ''), { text: name, 'aria-hidden': 'true' });
     document.getElementById('ui').appendChild(n);
     setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 2700);
     J.UI.announce('來到了' + name);

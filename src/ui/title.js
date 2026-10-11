@@ -38,6 +38,12 @@
     function tapScreen() {
       var tap = h('button.primary.tap', { onclick: function () {
         J.Audio.unlock(); J.TTS.warmUp(); J.Audio.play('select');
+        // v0.9.5 片頭動畫：第一次（還沒看過）在選單之前播，配標題序曲；看過就直接進選單（家長設定可以重看）
+        if (J.Opening && J.Opening.shouldPlay()) {
+          var M = window.JQ.Music, music = false;
+          try { music = !!(M && M.current && M.current().want === 'title'); } catch (e) { music = false; }   // 存檔裡關掉音樂時，標題曲本來就沒有播
+          if (J.Opening.play({ music: music, onDone: function () { menu(); } })) return;
+        }
         menu();
       } }, ['點一下開始']);
       frame([tap, h('p.note', { text: '可以用滑鼠、觸控或鍵盤（方向鍵走路、空白鍵或 Z 鍵對話）來玩。' })]);

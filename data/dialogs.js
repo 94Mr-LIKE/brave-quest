@@ -560,6 +560,26 @@ window.DIALOGS = {
     { who: "temple_keeper", text: "出門要看紅綠燈，早點回來喔。",
       taigi: { hanji: "出門愛看青紅燈，較早轉來喔。", tailo: "Tshut-mn̂g ài khuànn tshenn-âng-ting, khah tsá tńg--lâi--ooh.", huayu: "出門要看紅綠燈，早點回來喔。" } }
   ],
+  // ═════════════ 金包里慈護宮：第一次轉職（v0.9.5，36 號 v5 第七節）═════════════
+  // 依 36 號 7.1 官方資料（S202–S204）；傳說一律用「相傳」。不讓神明說話，不寫點香、擲筊、求籤、收費或因果。
+  // 轉職的祝福由廟公說，一定要說「這是你自己努力得來的」（36 號 7.3）。
+  D_TEMPLE_INTRO: [
+    { who: "temple_keeper", emotion: "平靜", text: "這裡是金包里慈護宮，金山人都叫它「大廟」。",
+      taigi: { hanji: "這是金包里慈護宮，金山人攏叫伊「大廟」。", tailo: "Tse sī Kim-pau-lí Tsû-hōo-kiong, Kim-suann-lâng lóng kiò i “Tuā-biō”.", huayu: "這裡是金包里慈護宮，金山人都叫它「大廟」。" } },
+    { who: "temple_keeper", emotion: "平靜", text: "廟裡主要拜金面媽祖，已經有兩百多年了。",
+      taigi: { hanji: "廟內主要拜金面媽祖，已經兩百外年矣。", tailo: "Biō lāi tsú-iàu pài Kim-bīn Má-tsóo, í-king nn̄g-pah guā nî--ah.", huayu: "廟裡主要拜金面媽祖，已經有兩百多年了。" } },
+    { who: "temple_keeper", emotion: "神祕", text: "相傳二媽的神像從海上漂到野柳海岸，被漁民發現。",
+      taigi: { hanji: "相傳二媽的神像流到野柳的海墘，予討海人看著。", tailo: "Siong-thuân Jī-má ê sîn-siōng lâu kàu Iá-liú ê hái-kînn, hōo thó-hái-lâng khuànn--tio̍h.", huayu: "相傳二媽的神像從海上漂到野柳海岸，被漁民發現。" } }
+  ],
+  D_TEMPLE_BLESS: [
+    { who: "temple_keeper", emotion: "開心", text: "你這陣子真認真，這是你自己努力得來的！",
+      taigi: { hanji: "你這站足認真，這攏是你家己拍拚來的！", tailo: "Lí tsit-tsām tsiok jīn-tsin, tse lóng sī lí ka-kī phah-piànn lâi--ê!", huayu: "你這陣子真認真，這是你自己努力得來的！" } },
+    { who: "temple_keeper", emotion: "開心", text: "祝你一路平安，媽祖也會保佑你。",
+      taigi: { hanji: "祝你一路平安，媽祖嘛會保庇你。", tailo: "Tsiok lí tsi̍t-lōo pîng-an, Má-tsóo mā ē pó-pì lí.", huayu: "祝你一路平安，媽祖也會保佑你。" } }
+  ],
+  D_TEMPLE_JOB_DONE: [
+    { who: "pet", emotion: "開心", text: "哇，身上亮亮的！新職業也要五科一起加油喔！" }
+  ],
   D_BOOK_IDLE: [
     { who: "bookstore", text: "不會的題目，提示會說課本哪裡有教。",
       taigi: { hanji: "袂曉的題目，提示會講課本佗位有教。", tailo: "Bē-hiáu ê tê-bo̍k, thê-sī ē kóng khò-pún tó-uī ū kà.", huayu: "不會的題目，提示會說課本哪裡有教。" } }

@@ -155,6 +155,10 @@
       }
       body.appendChild(radioRow('螢幕搖桿與 A／B 鍵', 'touch', [{ value: 'auto', label: '自動（觸控裝置才顯示）' }, { value: 'on', label: '一直顯示' }, { value: 'off', label: '不顯示' }],
         st.settings.touchControls || 'auto', function (v) { st.settings.touchControls = v; G.save(); G.applySettings(); }));
+      // v0.9.5 片頭動畫：看過一次之後預設不播，這裡可以重看
+      body.appendChild(h('h3', { text: '🎬 片頭動畫' }));
+      body.appendChild(h('div.row', {}, [h('button.replay-opening', { onclick: function () { handle.close(); G.replayOpening(); } }, ['▶ 重看片頭動畫']),
+        h('span.small', { text: '（約 45 秒，右下角可以跳過）' })]));
       body.appendChild(radioRow('台語對話的小字', 'taigi', [{ value: 'both', label: '台羅＋華語' }, { value: 'huayu', label: '只有華語翻譯' }, { value: 'tailo', label: '只有台羅' }, { value: 'none', label: '不顯示' }],
         st.settings.taigiSub || 'both', function (v) { st.settings.taigiSub = v; G.save(); }));
 

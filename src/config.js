@@ -20,7 +20,7 @@
     // 戰鬥
     BOSS_DAMAGE_MULT: 1.3,
     // 戰鬥背景：maps.js 的 battle_bg 若對得到 assets/battle/bb_<名稱>.png 就用它；否則用這張「地圖 ID → 戰鬥背景」對照表
-    BATTLE_BG_BY_MAP: { M01: 'harbor', M02: 'grass', M03: 'volcano', M04: 'forest', M05: 'swamp', M06: 'cave', M07: 'cave', M08: 'badlands', M09: 'town', M10: 'castle', M11: 'castle' },
+    BATTLE_BG_BY_MAP: { M01: 'harbor', M02: 'grass', M03: 'volcano', M04: 'forest', M05: 'swamp', M06: 'cave', M07: 'cave', M08: 'badlands', M09: 'town', M10: 'castle', M11: 'castle', MT1: 'town' },   // v0.9.5 MT1 慈護宮正殿：沒有怪物、不會遇敵（地圖組建議 town）
     // 舊名稱 → 現有的戰鬥背景
     BATTLE_BG_ALIAS: { rock: 'badlands', castle_top: 'castle', field: 'grass', village: 'harbor', hill: 'badlands' }, // 頭目戰時主角傷害倍率（頭目戰後段偏長，用這個縮短；1 = 不加成）
     MONSTER_RESPAWN_MS: 30000,

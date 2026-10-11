@@ -1,4 +1,4 @@
-/* 由 tools/build_art.py 自動產生；v0.9.4 起怪物圖改用 art_src/v1/redesign/processed（不要重跑 build_art.py，會用舊圖蓋回），水牛、站牌、候車亭為手動加入。美術：GPT 繪製＋程式後製（去背、切格、縮放、限色）。 */
+/* 由 tools/build_art.py 自動產生；v0.9.4 起怪物圖改用 art_src/v1/redesign/processed（不要重跑 build_art.py，會用舊圖蓋回），水牛、站牌、候車亭、v0.9.5 媽祖神像 obj_mazu_statue 與廟公 npc_temple_keeper 為手動加入。美術：GPT 繪製＋程式後製（去背、切格、縮放、限色）。 */
 window.SPRITES = {
  "hero_novice": {
   "file": "assets/chars/hero_novice.png",
@@ -652,6 +652,18 @@ window.SPRITES = {
   "file": "assets/npcs/npc_inn_shenmu_m.png",
   "type": "single",
   "frameW": 37,
+  "frameH": 50
+ },
+ "obj_mazu_statue": {
+  "file": "assets/ui/obj_mazu_statue.png",
+  "type": "single",
+  "frameW": 64,
+  "frameH": 96
+ },
+ "npc_temple_keeper": {
+  "file": "assets/npcs/npc_temple_keeper.png",
+  "type": "single",
+  "frameW": 30,
   "frameH": 50
  }
 };

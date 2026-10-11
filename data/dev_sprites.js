@@ -246,6 +246,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 38,
   "frameH": 50
  },
+ "npc_temple_keeper": {
+  "file": "assets/npcs/npc_temple_keeper.png",
+  "type": "single",
+  "frameW": 30,
+  "frameH": 50
+ },
  "npc_uncle_market": {
   "file": "assets/npcs/npc_uncle_market.png",
   "type": "single",
