@@ -541,8 +541,15 @@
     try {
       var A = window.JQ && window.JQ.Audio && window.JQ.Audio.context ? window.JQ.Audio.context() : null;
       if (A && typeof fetch === 'function' && location.protocol !== 'file:') {
-        getBuffer(A.ctx, full).then(function (buf) {
+        // v1.0.1（手機廟公沒聲音）：AudioContext 被系統暫停時，以前照樣「播」（start 了但時間不走），保險時間一到就算播完 → 整句沒聲音。
+        // 現在先恢復；恢復不了（例如不是使用者點擊觸發）就改用 <audio> 播；<audio> 也被擋就退回「提示音＋念華語」（不會默默沒聲音）
+        var ensure;
+        if (A.ctx.state === 'running' || !A.ctx.state) ensure = Promise.resolve(true);   // 已經在跑（或測試用的假 context 沒有 state）就不用等
+        else ensure = window.JQ.Audio.ensureRunning ? window.JQ.Audio.ensureRunning() : Promise.resolve(false);
+        Promise.all([getBuffer(A.ctx, full), ensure]).then(function (r) {
+          var buf = r[0];
           if (my !== token || settled) return;
+          if (A.ctx.state && A.ctx.state !== 'running') { stats.notRunning = (stats.notRunning || 0) + 1; viaElement(); return; }
           var s = A.ctx.createBufferSource(), g = A.ctx.createGain();
           s.buffer = buf;
           s.playbackRate.value = rate;

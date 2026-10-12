@@ -190,6 +190,8 @@
       // 存檔
       body.appendChild(h('h3', { text: '💾 存檔' }));
       body.appendChild(h('p.small', { text: '目前存在：' + G.provider.label + '。存檔只放在這台裝置，不會上傳。換裝置時可以用「存檔碼」搬家。' }));
+      // v1.0.1 已遊玩人數（成品匣 23 號 SOP 第三節）
+      body.appendChild(h('p.small.counter-note', { text: '建立角色時會匿名回報一次『+1』，不含名字或任何資料。首頁的「已有 N 位冒險者加入」就是這個數字。' }));
       var codeBox = h('textarea', { readonly: true, 'aria-label': '存檔碼' });
       var importBox = h('textarea', { 'aria-label': '貼上存檔碼', placeholder: '把存檔碼貼在這裡' });
       body.appendChild(h('div.row', {}, [
@@ -220,6 +222,17 @@
       body.appendChild(h('div.row', {}, [h('button', { onclick: function () {
         J.UI.confirm('確定要刪除這台裝置上的存檔嗎？刪除後無法復原（建議先產生存檔碼）。', '刪除', '取消').then(function (y) { if (y) G.deleteSave(); });
       } }, ['刪除存檔'])]));
+      // v1.0.1 還原升級前（v0.9）的存檔：v1.0 升級舊存檔前會備份一份；有備份才顯示
+      var restoreRow = h('div.row.restore-row', { hidden: true });
+      body.appendChild(restoreRow);
+      if (G.provider.hasBackup) G.provider.hasBackup().then(function (has) {
+        if (!has) return;
+        restoreRow.hidden = false;
+        restoreRow.appendChild(h('button.restore-backup', { onclick: function () {
+          J.UI.confirm('要把存檔換回 v1.0 升級前（v0.9 版）的樣子嗎？升級之後的進度都會不見（建議先產生存檔碼）。換回去之後會重新整理，遊戲會照常再升級一次。', '還原', '取消')
+            .then(function (y) { if (y) G.restoreBackup(); });
+        } }, ['還原升級前的存檔（v0.9）']));
+      });
       body.appendChild(h('p.small', { text: '雲端存檔：目前不提供（Google 登入不適用以兒童為對象的應用程式）。請用「存檔碼」備份或換裝置。' }));
       body.appendChild(h('p.small', { text: 'iPad 請用 Safari「分享→加入主畫面」後，從主畫面圖示開啟，存檔比較不會被清除；也請定期用存檔碼／QR Code 備份。' }));
 

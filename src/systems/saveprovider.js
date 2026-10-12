@@ -122,6 +122,24 @@
     if (!raw) return Promise.resolve('');
     return Promise.resolve(Save.checkRaw(raw));
   };
+  /** v1.0.1：有沒有「升級前（v0.9）」的備份（家長設定的還原按鈕用） */
+  LocalSaveProvider.prototype.hasBackup = function (slot) {
+    try { return Promise.resolve(this.storage.getItem(backupKeyFor(slot)) !== null); } catch (e) { return Promise.resolve(false); }
+  };
+  /**
+   * v1.0.1：把升級前的備份放回存檔欄位（重新整理後會照常再升級一次）。備份本身留著，不刪。
+   * 回傳 Promise<{ok}>；沒有備份或寫不進去回 {ok:false, reason}
+   */
+  LocalSaveProvider.prototype.restoreBackup = function (slot) {
+    var st = this.storage;
+    return Promise.resolve((function () {
+      var raw;
+      try { raw = st.getItem(backupKeyFor(slot)); } catch (e) { return { ok: false, reason: 'read' }; }
+      if (raw === null) return { ok: false, reason: 'none' };
+      try { st.setItem(keyFor(slot), raw); } catch (e) { return { ok: false, reason: 'write' }; }
+      return { ok: true };
+    })());
+  };
   LocalSaveProvider.prototype.list = function () {
     var st = this.storage, out = [];
     allKeys(st).forEach(function (k) {   // 只看 bq_save 開頭的 key

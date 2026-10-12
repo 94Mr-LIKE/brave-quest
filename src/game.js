@@ -68,9 +68,13 @@
 
   G.showTitle = function () {
     J.HUD.show(false);
+    // v1.0.1 首頁「已有 N 位冒險者加入」：讀到數字才顯示（3 秒逾時、500、離線都不顯示）
+    var counterEl = J.UI.h('p.title-count', { hidden: true, 'aria-live': 'polite' });
+    if (J.Counter) J.Counter.fetchCount().then(function (n) { G.counterShown = n; if (n !== null) { counterEl.textContent = J.Counter.label(n); counterEl.hidden = false; } });
     Promise.all([G.provider.load(SLOT), G.provider.loadError(SLOT)]).then(function (r) {
       var s = r[0], err = r[1];
       var titleHandle = J.Title.show({
+        counterEl: counterEl,
         summary: s ? { name: s.player.name, level: s.player.level, job: s.player.job } : null,
         loadError: s ? '' : err, migrated: !!(s && s.migratedFrom),
         onContinue: function () { G.state = s; G.startWorld(false); },
@@ -141,6 +145,8 @@
     else st.lastInn = { map: m1, x: start.x, y: start.y };
     G.state = st;
     G.startWorld(true);
+    // v1.0.1 建立角色成功：這台裝置第一次才匿名送一次 +1（不含名字或任何資料；失敗不重送、不影響遊戲）
+    if (J.Counter) { try { J.Counter.reportNew(window.localStorage).then(function (r) { G.counterReport = r; }); } catch (e) { G.counterReport = 'skipped'; } }
   };
 
   G.startWorld = function (isNew) {
@@ -232,7 +238,7 @@
    * 戰鬥結束（G.bend）才寫。戰鬥中途重新整理 → 回到戰鬥前的狀態（這場答題的金幣、經驗值都還沒寫入，不會重複拿）。
    */
   G.save = function (force) {
-    if (!G.state) return Promise.resolve();
+    if (!G.state || G.restoring) return Promise.resolve();
     if (G.inBattle()) { G.saveSkipped = (G.saveSkipped || 0) + 1; return Promise.resolve(false); }
     G.lastSave = Date.now();
     return G.provider.save(SLOT, G.state).catch(function (e) { J.UI.toast('存檔失敗：' + e.message); });
@@ -1303,6 +1309,18 @@
       G.state = r.state;
       G.save(true).then(function () { location.reload(); });
     });
+    });
+  };
+
+  /** v1.0.1 家長設定：還原升級前（v0.9）的存檔 → 重新整理（讀檔時照常再升級一次）。重新整理前不能再存檔，不然會蓋掉剛還原的 */
+  G.restoreBackup = function () {
+    clearInterval(G.tickTimer);
+    G.restoring = true;
+    return G.provider.restoreBackup(SLOT).then(function (r) {
+      if (!r.ok) { G.restoring = false; G.tickTimer = setInterval(G.tick, 1000); J.UI.toast('還原失敗，原本的存檔沒有變動。'); return r; }
+      G.state = null;
+      setTimeout(function () { location.reload(); }, 200);
+      return r;
     });
   };
 
