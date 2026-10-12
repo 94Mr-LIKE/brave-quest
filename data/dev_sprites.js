@@ -12,10 +12,34 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 34,
   "frameH": 50
  },
+ "heroM_dancer": {
+  "file": "assets/chars/heroM_dancer.png",
+  "type": "walk",
+  "frameW": 31,
+  "frameH": 50
+ },
+ "heroM_fighter": {
+  "file": "assets/chars/heroM_fighter.png",
+  "type": "walk",
+  "frameW": 31,
+  "frameH": 50
+ },
+ "heroM_jester": {
+  "file": "assets/chars/heroM_jester.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50
+ },
  "heroM_mage": {
   "file": "assets/chars/heroM_mage.png",
   "type": "walk",
   "frameW": 29,
+  "frameH": 50
+ },
+ "heroM_merchant": {
+  "file": "assets/chars/heroM_merchant.png",
+  "type": "walk",
+  "frameW": 30,
   "frameH": 50
  },
  "heroM_novice": {
@@ -30,10 +54,28 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 29,
   "frameH": 50
  },
+ "heroM_sailor": {
+  "file": "assets/chars/heroM_sailor.png",
+  "type": "walk",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "heroM_shepherd": {
+  "file": "assets/chars/heroM_shepherd.png",
+  "type": "walk",
+  "frameW": 34,
+  "frameH": 50
+ },
  "heroM_swordsman": {
   "file": "assets/chars/heroM_swordsman.png",
   "type": "walk",
   "frameW": 30,
+  "frameH": 50
+ },
+ "heroM_tamer": {
+  "file": "assets/chars/heroM_tamer.png",
+  "type": "walk",
+  "frameW": 27,
   "frameH": 50
  },
  "hero_archer": {
@@ -48,10 +90,34 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 32,
   "frameH": 50
  },
+ "hero_dancer": {
+  "file": "assets/chars/hero_dancer.png",
+  "type": "walk",
+  "frameW": 38,
+  "frameH": 50
+ },
+ "hero_fighter": {
+  "file": "assets/chars/hero_fighter.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 50
+ },
+ "hero_jester": {
+  "file": "assets/chars/hero_jester.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50
+ },
  "hero_mage": {
   "file": "assets/chars/hero_mage.png",
   "type": "walk",
   "frameW": 37,
+  "frameH": 50
+ },
+ "hero_merchant": {
+  "file": "assets/chars/hero_merchant.png",
+  "type": "walk",
+  "frameW": 33,
   "frameH": 50
  },
  "hero_novice": {
@@ -66,10 +132,28 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 35,
   "frameH": 50
  },
+ "hero_sailor": {
+  "file": "assets/chars/hero_sailor.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 50
+ },
+ "hero_shepherd": {
+  "file": "assets/chars/hero_shepherd.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50
+ },
  "hero_swordsman": {
   "file": "assets/chars/hero_swordsman.png",
   "type": "walk",
   "frameW": 33,
+  "frameH": 50
+ },
+ "hero_tamer": {
+  "file": "assets/chars/hero_tamer.png",
+  "type": "walk",
+  "frameW": 31,
   "frameH": 50
  },
  "pet_imo": {
@@ -402,6 +486,24 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 87,
   "frameH": 96
  },
+ "item_abacus_dagger": {
+  "file": "assets/items/item_abacus_dagger.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
+ "item_amulet": {
+  "file": "assets/items/item_amulet.png",
+  "type": "icon",
+  "frameW": 32,
+  "frameH": 32
+ },
+ "item_anchor_axe": {
+  "file": "assets/items/item_anchor_axe.png",
+  "type": "icon",
+  "frameW": 28,
+  "frameH": 32
+ },
  "item_bat_wing": {
   "file": "assets/items/item_bat_wing.png",
   "type": "icon",
@@ -426,6 +528,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 26,
   "frameH": 32
  },
+ "item_clapper": {
+  "file": "assets/items/item_clapper.png",
+  "type": "icon",
+  "frameW": 37,
+  "frameH": 32
+ },
+ "item_cloak": {
+  "file": "assets/items/item_cloak.png",
+  "type": "icon",
+  "frameW": 29,
+  "frameH": 32
+ },
  "item_crystal": {
   "file": "assets/items/item_crystal.png",
   "type": "icon",
@@ -444,10 +558,22 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 33,
   "frameH": 32
  },
+ "item_gloves": {
+  "file": "assets/items/item_gloves.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
  "item_harp": {
   "file": "assets/items/item_harp.png",
   "type": "icon",
   "frameW": 31,
+  "frameH": 32
+ },
+ "item_heavy_armor": {
+  "file": "assets/items/item_heavy_armor.png",
+  "type": "icon",
+  "frameW": 33,
   "frameH": 32
  },
  "item_herb": {
@@ -474,10 +600,22 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 31,
   "frameH": 32
  },
+ "item_light_armor": {
+  "file": "assets/items/item_light_armor.png",
+  "type": "icon",
+  "frameW": 27,
+  "frameH": 32
+ },
  "item_mushroom_cap": {
   "file": "assets/items/item_mushroom_cap.png",
   "type": "icon",
   "frameW": 40,
+  "frameH": 32
+ },
+ "item_ribbon_fan": {
+  "file": "assets/items/item_ribbon_fan.png",
+  "type": "icon",
+  "frameW": 35,
   "frameH": 32
  },
  "item_robe": {
@@ -510,10 +648,28 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 30,
   "frameH": 32
  },
+ "item_steel_sword": {
+  "file": "assets/items/item_steel_sword.png",
+  "type": "icon",
+  "frameW": 30,
+  "frameH": 32
+ },
  "item_sticky_ball": {
   "file": "assets/items/item_sticky_ball.png",
   "type": "icon",
   "frameW": 40,
+  "frameH": 32
+ },
+ "item_tamer_whip": {
+  "file": "assets/items/item_tamer_whip.png",
+  "type": "icon",
+  "frameW": 38,
+  "frameH": 32
+ },
+ "item_whip": {
+  "file": "assets/items/item_whip.png",
+  "type": "icon",
+  "frameW": 32,
   "frameH": 32
  },
  "item_wood_sword": {

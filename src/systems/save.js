@@ -11,6 +11,7 @@
   var isNode = typeof module !== 'undefined' && typeof require === 'function';
   var State = isNode ? require('./state.js') : window.JQ.State;
   var Bestiary = isNode ? require('./bestiary.js') : window.JQ.Bestiary;
+  var JobMigrate = isNode ? require('./jobmigrate.js') : window.JQ.JobMigrate;
 
   var KEY_PREFIX = 'bq_';
   var SAVE_KEY = 'bq_save';
@@ -116,12 +117,59 @@
     if (!s.daily.tasks.every(function (t) { return isObj(t) && Array.isArray(t.seen); })) { s.daily.tasks = []; s.daily.date = ''; }
     ['location', 'lastInn'].forEach(function (k) { if (s[k] !== null && !(isObj(s[k]) && typeof s[k].map === 'string')) s[k] = null; });
     if (s.pendingVariant !== null && !isObj(s.pendingVariant)) s.pendingVariant = null;
+    repairJobs(s);
     return s;
+  }
+
+  function num(v) { return typeof v === 'number' && isFinite(v); }
+  function int(v, min, dflt) { return num(v) ? Math.max(min, Math.floor(v)) : dflt; }
+  /**
+   * v1.0（夜班審查第 7 點）：職業、保底、技能欄、立志小考的每一筆都檢查型別，壞掉的改成安全值（不會算出 NaN）。
+   * - player.level／exp：數字（等級 ≥1、經驗 ≥0）；player.job 不是字串 → 見習
+   * - player.jobs：{ 職業: {lv ≥1 整數, exp ≥0} }，不是物件的那一筆刪掉；一定有 novice；目前職業和 level／exp 一致
+   * - player.floor：只留 hp／mp／atk／def 的有限數字（≥0）
+   * - player.skillSlots：null 或字串陣列
+   * - trial：{ 職業: {lastFailDate 字串, tries ≥0, lastQ 字串陣列, inProgress null 或 {at, date}, passedAt ≥0} }
+   * - trialLog：陣列，只留物件
+   */
+  function repairJobs(s) {
+    var p = s.player;
+    p.level = int(p.level, 1, 1);
+    p.exp = int(p.exp, 0, 0);
+    if (typeof p.job !== 'string' || !p.job) p.job = 'novice';
+    if (!isObj(p.jobs)) p.jobs = {};
+    Object.keys(p.jobs).forEach(function (k) {
+      var r = p.jobs[k];
+      if (!isObj(r)) { delete p.jobs[k]; return; }
+      p.jobs[k] = { lv: int(r.lv, 1, 1), exp: int(r.exp, 0, 0) };
+    });
+    if (!p.jobs.novice) p.jobs.novice = { lv: p.job === 'novice' ? p.level : 1, exp: p.job === 'novice' ? p.exp : 0 };
+    p.jobs[p.job] = { lv: p.level, exp: p.exp };
+    var fl = isObj(p.floor) ? p.floor : {};
+    p.floor = {};
+    ['hp', 'mp', 'atk', 'def'].forEach(function (k) { if (num(fl[k]) && fl[k] > 0) p.floor[k] = fl[k]; });
+    if (p.skillSlots !== null && !(Array.isArray(p.skillSlots) && p.skillSlots.every(function (x) { return typeof x === 'string'; }))) p.skillSlots = null;
+    if (!isObj(s.trial)) s.trial = {};
+    Object.keys(s.trial).forEach(function (k) {
+      var r = s.trial[k];
+      if (!isObj(r)) { delete s.trial[k]; return; }
+      var ip = isObj(r.inProgress) ? { at: int(r.inProgress.at, 0, 0), date: typeof r.inProgress.date === 'string' ? r.inProgress.date : '' } : null;
+      s.trial[k] = {
+        lastFailDate: typeof r.lastFailDate === 'string' ? r.lastFailDate : '',
+        tries: int(r.tries, 0, 0),
+        lastQ: Array.isArray(r.lastQ) ? r.lastQ.filter(function (x) { return typeof x === 'string'; }) : [],
+        inProgress: ip,
+        passedAt: int(r.passedAt, 0, 0)
+      };
+    });
+    s.trialLog = Array.isArray(s.trialLog) ? s.trialLog.filter(isObj) : [];
   }
 
   /** 舊版本存檔升級＋補預設值 */
   function migrate(s) {
     if (s.version === 1) migrateV1toV2(s);
+    // v1.0 第一批（48 號第 5 節）：v2 → v3 職業資料（等級換算、遷移保底、法袍換成同價防具）；要在補預設值之前
+    if (JobMigrate.needs(s)) JobMigrate.migrate(s);
     State.migrateAudio(s.settings);   // v0.9.3 語速：舊的預設 1 倍 → 新的預設「稍快」（要在補預設值之前）
     var defaults = State.createNewState(s.player && s.player.name, s.player && s.player.gender, s.createdAt || 0);
     State.fillDefaults(s, defaults);
@@ -182,15 +230,28 @@
     try { return { ok: true, state: migrate(obj) }; } catch (e) { return { ok: false, error: '存檔碼內容壞掉了' }; }
   }
 
+  /**
+   * v1.0（夜班審查）：舊存檔升級失敗時給畫面看的說明。原本的存檔不會被動到（遷移前也另外備份一份）。
+   */
+  var MIGRATE_FAIL = '舊存檔升級失敗（原本的存檔還在，請先請家長產生存檔碼）';
+  /** 存檔字串讀得進來嗎：格式、結構，再拿「複本」試跑一次升級（不改原本的資料）。回傳錯誤說明或 '' */
+  function checkRaw(raw) {
+    var obj;
+    try { obj = JSON.parse(raw); } catch (e) { return '存檔內容壞掉了'; }
+    var err = validateState(obj);
+    if (err) return err;
+    try { migrate(JSON.parse(raw)); } catch (e) { return MIGRATE_FAIL; }
+    return '';
+  }
   /** 讀取失敗原因（給畫面提示「存檔無法讀取，要重新開始嗎？」用）；'' 代表正常或沒有存檔 */
   function loadError(storage) {
     var raw;
     try { raw = storage.getItem(SAVE_KEY); } catch (e) { return '瀏覽器不允許讀取存檔'; }
     if (!raw) return '';
-    try { return validateState(JSON.parse(raw)); } catch (e) { return '存檔內容壞掉了'; }
+    return checkRaw(raw);
   }
 
-  var Save = { KEY_PREFIX: KEY_PREFIX, LEGACY_SAVE_KEY: LEGACY_SAVE_KEY, MAX_CODE_LEN: MAX_CODE_LEN, repairState: repairState, loadError: loadError, migrateV1toV2: migrateV1toV2, SAVE_KEY: SAVE_KEY, CODE_PREFIX: CODE_PREFIX, fnv1a: fnv1a, utf8ToBase64: utf8ToBase64, base64ToUtf8: base64ToUtf8, validateState: validateState, migrate: migrate, save: save, load: load, hasSave: hasSave, clear: clear, exportCode: exportCode, importCode: importCode };
+  var Save = { repairJobs: repairJobs, MIGRATE_FAIL: MIGRATE_FAIL, checkRaw: checkRaw, KEY_PREFIX: KEY_PREFIX, LEGACY_SAVE_KEY: LEGACY_SAVE_KEY, MAX_CODE_LEN: MAX_CODE_LEN, repairState: repairState, loadError: loadError, migrateV1toV2: migrateV1toV2, SAVE_KEY: SAVE_KEY, CODE_PREFIX: CODE_PREFIX, fnv1a: fnv1a, utf8ToBase64: utf8ToBase64, base64ToUtf8: base64ToUtf8, validateState: validateState, migrate: migrate, save: save, load: load, hasSave: hasSave, clear: clear, exportCode: exportCode, importCode: importCode };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Save = Save; }
   if (typeof module !== 'undefined') module.exports = Save;
 })();

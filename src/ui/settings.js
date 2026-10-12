@@ -125,6 +125,10 @@
       body.appendChild(radioRow('戰鬥答題時間', 'time', ['relaxed', 'standard', 'off'].map(function (k) { return { value: k, label: TIME_LABEL[k] }; }),
         st.settings.answerTime, function (v) { st.settings.answerTime = v; G.save(); }));
       body.appendChild(h('p.small', { text: '標準：1 星題 30 秒、2 星 40 秒、3 星 60 秒、4 星 90 秒。朗讀時時間條會暫停。' }));
+      // v1.0（48 號 2.6、F10）技能特效：減少動態效果時只顯示數字
+      body.appendChild(radioRow('技能特效（動態效果）', 'motion', [{ value: 'auto', label: '跟裝置設定' }, { value: 'off', label: '播放特效' }, { value: 'on', label: '減少動態（只顯示數字）' }],
+        st.settings.reduceMotion || 'auto', function (v) { st.settings.reduceMotion = v; G.save(); }));
+      body.appendChild(h('p.small', { text: '技能特效約 0.4～2 秒，點一下可以跳過；閃光每秒最多 3 次。對光線敏感的孩子請選「減少動態」。' }));
       // 語音（對話與題目朗讀）：家長可以整個關掉
       var apply = function () { G.save(); G.applySettings(); };
       body.appendChild(radioRow('語音（對話、題目朗讀）', 'tts', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.tts, function (v) { st.settings.tts = v; apply(); }));
@@ -173,6 +177,15 @@
       body.appendChild(t);
       body.appendChild(h('p', { text: '需要加強的單元：' + (r.weakUnits.length ? r.weakUnits.map(function (u) { return u.subject + '「' + u.unit + '」（' + Math.round(u.rate * 100) + '%）'; }).join('、') : '資料還不夠') }));
       body.appendChild(h('p', { text: '今天玩了 ' + r.todayMin + ' 分鐘・累計 ' + r.totalMin + ' 分鐘・冒險 ' + r.adventureDays + ' 天' }));
+      // v1.0 立志小考紀錄（CTO Q7：不給經驗值、金幣，但記進家長報表）
+      var tl = (st.trialLog || []).slice(-8).reverse();
+      if (tl.length) {
+        body.appendChild(h('p', { text: '立志小考：' }));
+        body.appendChild(h('ul.small.trial-log', {}, tl.map(function (e) {
+          var jn = (G.data.jobs[e.job] || {}).name || e.job;
+          return h('li', { text: e.date + '　' + jn + '　' + (e.quit ? '考到一半離開（算考過一次）' : '答對 ' + e.correct + '／' + e.total + (e.pass ? '　通過' : '　沒通過')) });
+        })));
+      }
 
       // 存檔
       body.appendChild(h('h3', { text: '💾 存檔' }));

@@ -40,7 +40,8 @@
     var ref = o.limitMs > 0 ? o.limitMs : (TIME_SEC[o.level] || 30) * 1000;
     var frac = Math.max(0, Math.min(1, (o.elapsedMs || 0) / ref));
     var speed = 1 + SPEED_MAX * (1 - frac);
-    var crit = (o.elapsedMs || 0) <= ref / 3;
+    // v1.0：武鬥家的會心區間是前 2/5（critFrac）；「一定會心」的技能（crit）自己乘 1.5，這裡不再算（noCrit）
+    var crit = !o.noCrit && (o.elapsedMs || 0) <= ref * Math.max(1 / 3, Number(o.critFrac) || 0);
     var dmg = (o.atk || 1) * (DIFF[o.level] || 1) * speed * (crit ? CRIT_MULT : 1) * (o.favored ? (o.favoredMult || FAVORED_MULT) : 1) * (o.mult || 1) * (o.bossMult || 1);
     return { damage: Math.max(1, Math.round(dmg)), crit: crit, speed: speed };
   }
@@ -74,8 +75,10 @@
   /** 經驗值套用親密度：exp ×（1＋bondPct%），四捨五入 */
   function bondExp(exp, bondPct) { return Math.round((exp || 0) * (1 + Math.max(0, bondPct || 0) / 100)); }
 
-  function tryFlee(isBoss, rng) {
+  /** sure＝船員「逃跑一定成功」（頭目戰還是不能逃） */
+  function tryFlee(isBoss, rng, sure) {
     if (isBoss) return false;
+    if (sure) return true;
     return (rng || Math.random)() < FLEE_RATE;
   }
 
@@ -85,8 +88,171 @@
     return {
       monster: monster, hp: monster.hp, maxHp: monster.hp, boss: !!monster.boss,
       phases: phases, perPhase: monster.boss ? (monster.phase_q || PER_PHASE) : 0,
-      phase: 1, phaseCorrect: 0, over: false, result: null, turns: 0, timeBuff: 1
+      phase: 1, phaseCorrect: 0, over: false, result: null, turns: 0, timeBuff: 1, fx: newFx()
     };
+  }
+
+  // ---------------------------------------------------------------- v1.0 第一批：技能效果、職業特性（48 號 2.5–2.7、26 號 5.3）
+  /** 這場戰鬥裡持續中的效果（技能留下來的） */
+  function newFx() {
+    return { guard: 0, guardM: 1, stun: 0, stunUsed: 0, weak: 0, weakM: 1, up: 0, upM: 1, charge: 1, revive: null,
+      timeUp: 0, timeM: 1, power: 0, powerM: 1, goldM: 1, steal: 0, dodged: 0 };
+  }
+  function fxOf(b) { if (!b.fx) b.fx = newFx(); return b.fx; }
+  var ATTACK_EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet', 'random'];
+  var STUN_EFFECTS = ['stun'];
+  /** 技能的「攻擊威力」（給模擬、選單排序用）：不造成傷害的技能是 0 */
+  function skillPower(s) {
+    var t = s.tierMult || s.tier_mult || (typeof s.tier === 'number' ? s.tier : 1), a = s.arg || {};
+    if (['hit', 'hit_weak', 'hit_stun', 'hit_gold', 'pet', 'steal'].indexOf(s.eff) >= 0) return (a.p || 1) * t;
+    if (s.eff === 'multi') return (a.n || 1) * (a.p || 1) * t;
+    if (s.eff === 'crit') return (a.p || 1) * CRIT_MULT * t;
+    if (s.eff === 'random') {
+      var tb = a.table || [], hs = tb.filter(function (x) { return x[0] === 'hit'; });
+      return tb.length ? hs.reduce(function (x, y) { return x + y[1]; }, 0) / tb.length * t : 0;
+    }
+    return 0;
+  }
+  /**
+   * 能不能選這個技能。回傳 { ok, reason }：mp（魔力不夠）、stun（頭目戰的「停止」每場只能 1 次，已經用過）、
+   * armed（不倒祈願已經在身上了）
+   */
+  function canUseSkill(b, skill, mp) {
+    if (!skill) return { ok: false, reason: 'none' };
+    if ((mp || 0) < (skill.mp || 0)) return { ok: false, reason: 'mp' };
+    var fx = fxOf(b);
+    if (b.boss && STUN_EFFECTS.indexOf(skill.eff) >= 0 && fx.stunUsed) return { ok: false, reason: 'stun' };
+    if (skill.eff === 'revive' && fx.revive) return { ok: false, reason: 'armed' };
+    return { ok: true };
+  }
+  /** 頭目戰：答對但沒有造成傷害（回復、防護、增益、停止），這一階段也算答對一題（48 號 2.7）；體力沒變，所以不會跨過門檻 */
+  function countCorrect(b) {
+    if (!b.boss || b.over) return false;
+    b.phaseCorrect += 1;
+    b.turns += 1;
+    return true;
+  }
+  function stunMonster(b, fx) {
+    if (b.boss && fx.stunUsed) return false;
+    fx.stun = 1;
+    if (b.boss) fx.stunUsed = 1;
+    return true;
+  }
+  /**
+   * 答對、用了技能：先套用技能本身的效果（26 號 5.3 的 17 種）。
+   * ctx = { maxHp, timerOff（家長把答題時間關掉）, trait, rng }
+   * 回傳 { eff（random 抽到的結果）, attack（要不要打）, hits, mult, noCrit, heal, stunned, noEffect, offPower, counted }
+   *   attack＝false 時：頭目戰這一題已經算進階段（counted），呼叫的人不用再呼叫 hit
+   */
+  function useSkill(b, skill, ctx) {
+    ctx = ctx || {};
+    var fx = fxOf(b), a = skill.arg || {}, e = skill.eff, rng = ctx.rng || Math.random, trait = ctx.trait || {};
+    var out = { eff: e, attack: false, hits: 1, mult: 1, noCrit: false, heal: 0 };
+    if (e === 'random') {
+      var tb = a.table || [['hit', 1]], pick = tb[Math.floor(rng() * tb.length)] || tb[0];
+      out.picked = pick;
+      if (pick[0] === 'heal') { e = 'heal'; a = { r: pick[1] }; } else { e = 'hit'; a = { p: pick[1] }; }
+      out.eff = e;
+    }
+    switch (e) {
+      case 'heal': out.heal = Math.max(1, Math.floor((ctx.maxHp || 0) * (a.r || 0) * (trait.healPow || 1))); break;
+      case 'revive': fx.revive = { r: a.r || 0.5 }; break;
+      case 'guard': fx.guard = a.t || 1; fx.guardM = a.m === undefined ? 0.5 : a.m; break;
+      case 'weaken': fx.weak = a.t || 1; fx.weakM = a.m === undefined ? 0.7 : a.m; break;
+      case 'stun': out.stunned = stunMonster(b, fx); out.noEffect = !out.stunned; break;
+      case 'atk_up': fx.up = a.t || 1; fx.upM = a.m || 1; break;
+      case 'charge': fx.charge = a.m || 1; break;
+      case 'time_up':
+        // CTO 2026-10-12（Q1）：答題時間「關閉」時，加時間的技能（鼓舞之歌、影子步）改成接下來 t 次答對傷害 ×1.3（沿用 v0.9.6）
+        if (ctx.timerOff) { fx.power = a.t || 1; fx.powerM = OFF_SONG_POWER; out.offPower = OFF_SONG_POWER; }
+        else {
+          fx.timeUp = a.t || 1; fx.timeM = a.m || 1.5;
+          if (a.atk && !(fx.up > 0 && fx.upM >= a.atk)) { fx.up = 1; fx.upM = a.atk; }
+        }
+        break;
+      default:
+        out.attack = true;
+        if (e === 'hit_weak') { fx.weak = a.t || 1; fx.weakM = a.m === undefined ? 0.8 : a.m; }
+        if (e === 'hit_stun') out.stunned = stunMonster(b, fx);
+        if (e === 'hit_gold') fx.goldM = Math.max(fx.goldM, a.g || 1);
+        if (e === 'steal') fx.steal += 1;
+        if (e === 'multi') { out.hits = a.n || 2; out.mult = a.p || 1; }
+        else if (e === 'crit') { out.mult = (a.p || 1) * CRIT_MULT; out.noCrit = true; out.sureCrit = true; }
+        else out.mult = a.p || 1;
+        out.mult *= (skill.tierMult || 1) * (trait.skillPow || 1);
+    }
+    if (!out.attack) out.counted = countCorrect(b);
+    return out;
+  }
+  /**
+   * 答對後的一次攻擊（普通攻擊或攻擊技能）。48 號 2.7：多段攻擊每一下的傷害先加起來，只呼叫一次 hit（頭目階段只 +1）。
+   * o = { atk, level, elapsedMs, limitMs, favored, favoredMult, bossMult, hits, mult, noCrit, sureCrit, trait, dmgMult（裝備特效）, rng }
+   * 回傳 { total, parts（每一下，畫面一下一下播；加起來＝total）, crit, pet（牧羊人番薯仔追加的次數）, buffs:[用掉的增益] }
+   */
+  function attack(b, o) {
+    var fx = fxOf(b), trait = o.trait || {}, rng = o.rng || Math.random, mult = o.mult || 1, buffs = [];
+    if (fx.up > 0) { mult *= fx.upM; fx.up -= 1; buffs.push('up'); }
+    if (fx.charge !== 1) { mult *= fx.charge; fx.charge = 1; buffs.push('charge'); }
+    if (fx.power > 0) { mult *= fx.powerM; fx.power -= 1; buffs.push('power'); }
+    var n = Math.max(1, o.hits || 1), raw = [], crit = !!o.sureCrit, pet = 0, sum = 0;
+    for (var i = 0; i < n; i++) {
+      var d = damage({ atk: o.atk, level: o.level, elapsedMs: o.elapsedMs, limitMs: o.limitMs, favored: o.favored, favoredMult: o.favoredMult,
+        mult: mult, bossMult: o.bossMult, critFrac: trait.critFrac, noCrit: o.noCrit });
+      var v = d.damage;
+      crit = crit || d.crit;
+      if (trait.petHit && rng() < trait.petHit) { v += Math.round((o.atk || 1) * 0.5); pet += 1; }   // 牧羊人：番薯仔追加一擊（物攻 ×0.5）
+      raw.push(v); sum += v;
+    }
+    var k = (trait.power || 1) * (o.dmgMult || 1);   // 劍士「力量」×1.15、專屬武器特效
+    var total = Math.max(1, Math.round(sum * k)), parts = [], acc = 0;
+    raw.forEach(function (v, j) { var p = j === raw.length - 1 ? total - acc : Math.max(1, Math.round(v * k)); if (j < raw.length - 1) acc += p; parts.push(p); });
+    if (parts[parts.length - 1] < 1) parts[parts.length - 1] = 1;
+    return { total: total, parts: parts, crit: crit, pet: pet, buffs: buffs };
+  }
+  /** 下一題的時間條倍率（影子步、鼓舞之歌；每出一題用掉一次，不管答對答錯） */
+  function nextTimeMult(b) {
+    var fx = fxOf(b);
+    if (fx.timeUp > 0) { fx.timeUp -= 1; return fx.timeM; }
+    return 1;
+  }
+  /**
+   * 怪物的回合（答錯、超時、用道具、逃跑失敗之後）。o = { def, trait, rng }
+   * 順序：停止（迷惑舞步、安眠曲、落雷術）→ 舞者閃過（10%）→ 搞笑藝人逗笑（8%）→ 減弱 → 防護 → 劍士被打 ×0.9
+   * 回傳 { skipped: 'stun'|'evade'|'laugh'|null, damage, guarded, weakened, mult（頭目階段倍率） }
+   */
+  function monsterTurn(b, mon, o) {
+    o = o || {};
+    var fx = fxOf(b), rng = o.rng || Math.random, trait = o.trait || {}, pm = phaseMult(b);
+    if (fx.stun > 0) { fx.stun -= 1; return { skipped: 'stun', damage: 0, mult: pm }; }
+    if (trait.evade && rng() < trait.evade) return { skipped: 'evade', damage: 0, mult: pm };
+    if (trait.laugh && rng() < trait.laugh) return { skipped: 'laugh', damage: 0, mult: pm };
+    var weakened = fx.weak > 0, m = { atk: (mon.atk || 1) * (weakened ? fx.weakM : 1) };
+    if (weakened) fx.weak -= 1;
+    var d = monsterAttack(m, o.def, rng, pm), guarded = fx.guard > 0;
+    if (guarded) { d = d * fx.guardM; fx.guard -= 1; }
+    d = Math.max(1, Math.ceil(d * (trait.dmgTaken || 1)));
+    return { skipped: null, damage: d, guarded: guarded, weakened: weakened, mult: pm };
+  }
+  /** 累倒時：身上有「不倒祈願」就馬上站起來（體力回到上限 × r），用掉 */
+  function tryRevive(b, state, maxHp) {
+    var fx = fxOf(b);
+    if (!fx.revive || state.player.hp > 0) return 0;
+    var hp = Math.max(1, Math.floor((maxHp || 1) * fx.revive.r));
+    state.player.hp = hp; fx.revive = null;
+    return hp;
+  }
+  /** 神奇口袋：從怪物的掉落物裡拿一樣（沒有掉落物就拿不到） */
+  function stealItem(monster, rng) {
+    var ds = (monster.drops || []).filter(function (d) { return d && d.item; });
+    if (!ds.length) return null;
+    return ds[Math.floor((rng || Math.random)() * ds.length)].item.replace(/^item_/, '');
+  }
+  /** 勝利後的職業特性：吟遊詩人回魔（至少 1 點）、商人與生意興隆的金幣倍率、魔物大師的朋友卡 */
+  function victoryTraits(b, trait, maxMp, rng) {
+    var fx = fxOf(b), r = { mp: 0, goldMult: (trait.gold || 1) * (fx.goldM || 1), friend: false };
+    if (trait.mpRegen) r.mp = Math.max(1, Math.round((maxMp || 0) * trait.mpRegen));
+    if (trait.friendCard && (rng || Math.random)() < trait.friendCard) r.friend = true;
+    return r;
   }
 
   /** 頭目第 k 階段結束時的 體力 門檻（剩 2/3、1/3、0） */
@@ -156,24 +322,25 @@
   }
 
   /** 掉寶。bondPct（親密度，0～10）：每一樣的掉落率 ×（1＋bondPct%）（例：30% → 33%；37 號設計），最多 100% */
-  function dropRate(d, bondPct) {
+  /** dropMult：v1.0 弓箭手掉寶率 ×1.5 */
+  function dropRate(d, bondPct, dropMult) {
     var base = d.rate === undefined ? 1 : Number(d.rate) || 0;
-    return Math.min(1, base * (1 + Math.max(0, bondPct || 0) / 100));
+    return Math.min(1, base * (1 + Math.max(0, bondPct || 0) / 100) * (dropMult || 1));
   }
-  function rollDrops(monster, rng, bondPct) {
+  function rollDrops(monster, rng, bondPct, dropMult) {
     rng = rng || Math.random;
     var got = [];
     (monster.drops || []).forEach(function (d) {
-      if (d && d.item && rng() < dropRate(d, bondPct)) got.push(d.item.replace(/^item_/, ''));
+      if (d && d.item && rng() < dropRate(d, bondPct, dropMult)) got.push(d.item.replace(/^item_/, ''));
     });
     return got;
   }
 
   /**
-   * 打倒怪物的獎勵（不含答題本身的 經驗值）：經驗值 × 地圖係數 ×（1＋親密度%）、金幣（親密度不加金幣）。四捨五入
+   * 打倒怪物的獎勵（不含答題本身的 經驗值）：經驗值 × 地圖係數 ×（1＋親密度%）、金幣（親密度不加金幣）×goldMult（v1.0 商人、生意興隆）。四捨五入
    */
-  function victoryReward(monster, coef, bondPct) {
-    return { exp: bondExp(Math.round((monster.exp || 0) * (coef || 1)), bondPct), gold: Math.round(monster.gold || 0) };
+  function victoryReward(monster, coef, bondPct, goldMult) {
+    return { exp: bondExp(Math.round((monster.exp || 0) * (coef || 1)), bondPct), gold: Math.round((monster.gold || 0) * (goldMult || 1)) };
   }
 
   // ---------------------------------------------------------------- 時間條
@@ -194,7 +361,7 @@
     var capped = o.dealt < o.damage && !o.over;
     var s = (o.crit && !capped ? '會心一擊！' : '') + (o.favored && o.first ? '拿手科目！' : '');
     if (capped && o.phaseUp) return s + '一口氣打到門檻！';
-    return s + '打出 ' + o.dealt + ' 點傷害！';
+    return s + (o.hits > 1 ? '連打 ' + o.hits + ' 下，' : '') + '打出 ' + o.dealt + ' 點傷害！' + (o.pet ? '番薯仔也衝上去咬了一口！' : '');
   }
 
   // ---- v0.9.6（45 號職業稽核 F3、F5）
@@ -219,6 +386,8 @@
   function takePowerBuff(b) { var m = b.powerBuff || 1; b.powerBuff = 1; return m; }
 
   var Battle = {
+    newFx: newFx, ATTACK_EFFECTS: ATTACK_EFFECTS, skillPower: skillPower, canUseSkill: canUseSkill, countCorrect: countCorrect, useSkill: useSkill, attack: attack,
+    nextTimeMult: nextTimeMult, monsterTurn: monsterTurn, tryRevive: tryRevive, stealItem: stealItem, victoryTraits: victoryTraits,
     hitMessage: hitMessage, canPreempt: canPreempt, timerOff: timerOff, OFF_SONG_POWER: OFF_SONG_POWER, songEffect: songEffect, dodgeOnWrong: dodgeOnWrong, takePowerBuff: takePowerBuff,
     DIFF: DIFF, TIME_SEC: TIME_SEC, MODE_MULT: MODE_MULT, CRIT_MULT: CRIT_MULT, FAVORED_MULT: FAVORED_MULT, FLEE_RATE: FLEE_RATE,
     BOSS_PHASES: BOSS_PHASES, PER_PHASE: PER_PHASE, PHASE_DMG_STEP: PHASE_DMG_STEP, BOND_MAX: BOND_MAX,

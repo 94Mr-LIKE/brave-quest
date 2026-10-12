@@ -370,3 +370,24 @@ body.modal-open .load-bar { display: none; }
 .minimap .mm-caption[hidden] { display: none; }
 .minimap .mm-level { display: block; font-size: 14px; line-height: 1.3; color: #9fe0ff; padding: 1px 4px 3px; white-space: nowrap; }   /* v0.9.3 建議等級 */
 .minimap .mm-level[hidden] { display: none; }
+
+/* ---- v1.0 第一批（48 號 v2）：立志小考、轉職清單、技能選單 ---- */
+.trial .trial-lamps { display: flex; flex-wrap: wrap; gap: 12px; margin: 4px 0 6px; font-size: 18px; color: #8a93b8; }
+.trial .lamp.on { color: #ffd34d; font-weight: bold; text-shadow: 0 0 8px rgba(255, 211, 77, .7); }
+.trial .trial-timer > i { background: linear-gradient(90deg, #7cc4ff, #b8e0ff); }   /* 倒數不用紅色、不變色 */
+.trial .trial-timer .label { color: #0b1236; text-shadow: none; font-weight: bold; }
+.trial .feedback.soft { color: #ffe9a8; }
+.trial .trial-novoice { color: #ffe9a8; margin: 0 0 6px; }
+.trial .trial-score { font-size: 24px; font-weight: bold; margin: 6px 0; }
+.trial .trial-units { margin: 4px 0 8px 1.2em; font-size: 18px; }
+.job-list li.soon { opacity: .75; }
+.icon.silhouette { filter: brightness(0) opacity(.7); }
+.job-card { margin-top: 2px; }
+.job-card summary { cursor: pointer; font-size: 16px; color: #cfe0ff; }
+.job-card .job-skills { margin: 2px 0 0 1.2em; padding: 0; }
+.battle-ui .skill-btn .skill-icon { margin-right: 2px; }
+.shop-tabs { display: flex; gap: 6px; margin: 4px 0; }
+.shop-jobs { display: inline-flex; gap: 2px; vertical-align: middle; margin-left: 4px; }
+.shop-jobs .icon { width: 24px; height: 24px; }
+li.cant-use { opacity: .6; }
+.fx-note { color: #ffd34d; }

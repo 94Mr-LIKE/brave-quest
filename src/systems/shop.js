@@ -26,6 +26,16 @@
       .sort(function (a, b) { return a.price - b.price; });
   }
 
+  /** v1.0（48 號 3.5、S16）：還沒開放的職業（JOB_RULES.open_jobs）的專屬裝備不列出來 */
+  function forOpenJobs(list, data) {
+    var open = data && data.jobRules && data.jobRules.open_jobs;
+    if (!Array.isArray(open)) return list;
+    return list.filter(function (it) {
+      var jobs = it.job ? (Array.isArray(it.job) ? it.job : [it.job]) : null;
+      return !jobs || jobs.some(function (j) { return open.indexOf(j) >= 0; });
+    });
+  }
+
   /** v0.9.4 還差多少金幣才買得起（買得起＝0） */
   function shortfall(state, price) { return Math.max(0, (Number(price) || 0) - (Number(state.player.coins) || 0)); }
 
@@ -139,7 +149,7 @@
     return { ok: true, price: e.price, item: e.item };
   }
 
-  var Shop = { shortfall: shortfall, innStay: innStay, payInn: payInn, SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet,
+  var Shop = { forOpenJobs: forOpenJobs, shortfall: shortfall, innStay: innStay, payInn: payInn, SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet,
     SELL_RATE: SELL_RATE, EQUIP_RATE: EQUIP_RATE, ITEM_RATE: ITEM_RATE, isPrecious: isPrecious, questNeeds: questNeeds, sellPrice: sellPrice, startLeft: startLeft, sellList: sellList, sell: sell };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Shop = Shop; }
   if (typeof module !== 'undefined') module.exports = Shop;

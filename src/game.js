@@ -80,7 +80,7 @@
           if (!res.ok) return res.error;
           // 本機已經有存檔時，先確認才取代（審查 F-13）；取消就什麼都不動
           var ask = s ? J.UI.confirm('這會取代目前的存檔（等級 ' + s.player.level + '、名字 ' + s.player.name + '），確定嗎？', '確定取代', '取消')
-            : Promise.resolve(true);
+            : err ? J.UI.confirm('這會取代這台裝置上讀不進來的存檔，確定嗎？', '確定取代', '取消') : Promise.resolve(true);
           return ask.then(function (yes) {
             if (!yes) return '已取消，原本的存檔沒有變動。';
             G.state = res.state;
@@ -152,6 +152,11 @@
     if (moved.length) console.info('[存檔] 地圖尺寸改變，位置已換算：', moved);
     // v0.7：上次在戰鬥中關掉或重新整理 → 存檔裡還有沒結算的經驗值，現在結算（進地圖後再顯示升級）
     G.pendingLevelUp = J.Session.settlePlayerExp(st);
+    // v1.0 立志小考：上次考到一半就關掉（inProgress）→ 算考過一次、沒通過（48 號第 4 節）
+    G.pendingTrialQuit = J.JobTrial.recover(st);
+    // v1.0 舊存檔升級（Save.migrate 留下的紀錄）：進地圖後說明一次
+    // 紀錄要等孩子看完說明才清掉（看到一半關掉網頁，下次還會再播；夜班審查第 5 點）
+    if (st.migratedV3) G.pendingMigrate = st.migratedV3;
     G.applySettings(true);
     G.save(true);
     J.HUD.show(true);
@@ -332,7 +337,7 @@
   G.jobUnlockText = function () {
     var shrine = Object.keys(G.data.maps).filter(function (k) { return G.data.maps[k].statue; })[0];
     var shrineName = shrine ? (G.data.maps[shrine].name || '慈護宮') : null;
-    return shrineName ? '可以轉職了！到' + shrineName + '的神像前，或' + G.jobMapName() + '的職業公會都可以。' : '可以到' + G.jobMapName() + '的職業公會轉職了！';
+    return shrineName ? '可以考立志小考了！到' + shrineName + '的神像前，或' + G.jobMapName() + '的職業公會都可以，考過就能轉職。' : '可以到' + G.jobMapName() + '的職業公會考立志小考了！';
   };
   /** 有五盞燈的地圖名字 */
   G.lampMapName = function () {
@@ -349,8 +354,9 @@
       J.Character.onLevelUp(G.state, G.data);
       G.jingle('levelup', null, 'levelup');
       J.UI.banner('等級提升！現在是 ' + G.state.player.level + ' 級');
-      var unlock = (G.data.jobRules && G.data.jobRules.unlock_level) || 5;
-      if (G.state.player.level >= unlock && G.state.player.level - levels < unlock) J.UI.toast(G.jobUnlockText(), 5000);
+      var unlock = (G.data.jobRules && G.data.jobRules.unlock_level) || 10;
+      // v1.0：只有見習冒險者升到 10 級時提示（轉職後職業等級從 1 開始，再升到 10 級不用再提示）
+      if (G.state.player.job === 'novice' && G.state.player.level >= unlock && G.state.player.level - levels < unlock) J.UI.toast(G.jobUnlockText(), 5000);
       G.refreshHud();
     }
   };
@@ -386,6 +392,23 @@
     if (map.type === 'interior' && map.statue && enteredMap && firstVisit && !G.pendingIntro) {
       var introMap = scene.mapId;
       setTimeout(function () { if (G.mapScene === scene && scene.mapId === introMap && !scene.transitioning && !G.mapChanging && !G.blocked()) G.templeIntro(scene); }, 500);
+    }
+    if (G.pendingMigrate) {
+      var mg = G.pendingMigrate; G.pendingMigrate = null;
+      G.migrateShown = mg;   // 測試用
+      setTimeout(function () {
+        G.say('D_MIGRATE_V3', [{ who: 'narrator', text: '勇者大冒險更新了！頭目每個階段都要答對 2 題，才會換到下一個階段。' }]).then(function () {
+          if (mg.robe) return G.say(mg.robe.refund ? 'D_MIGRATE_ROBE_NOVICE' : 'D_MIGRATE_ROBE', [{ who: 'narrator', text: '法袍已經換成同樣價錢的防具。' }]);
+        }).then(function () {
+          if (G.state) { delete G.state.migratedV3; G.migrateDone = true; G.save(); }   // 看完了才清掉
+        });
+      }, 500);
+    }
+    if (G.pendingTrialQuit && G.pendingTrialQuit.length) {
+      var quit = G.pendingTrialQuit; G.pendingTrialQuit = null;
+      var PET = ((G.data.jobRules || {}).trial_dialogs || {}).pet || {};
+      setTimeout(function () { G.say(PET.quit || 'D_TRIAL_QUIT_PET', [{ who: 'pet', text: '上次的立志小考沒有考完，算考過一次喔。明天再來考吧！' }]); }, 600);
+      G.trialQuitShown = quit;   // 測試用
     }
     if (G.pendingIntro) {
       G.pendingIntro = false;
@@ -479,15 +502,74 @@
    */
   G.shrineJob = function (scene) {
     if (G.blocked()) return;
-    var st = G.state, unlock = (G.data.jobRules && G.data.jobRules.unlock_level) || 5;
     G.shrineLog = (G.shrineLog || 0) + 1;   // 測試用
-    // 播放順序（CTO 2026-10-11）：進廟時 D_TEMPLE_INTRO（G.onMapReady）→ 神像前轉職流程 → 轉職成功配光芒、D_TEMPLE_BLESS → D_TEMPLE_JOB_DONE（番薯仔）
-    // 台詞欄位在 jobs.js 的 JOB_RULES.temple_*（職業公會的 dialog_open 維持原樣）。36 號：不讓神明說話；不寫點香、擲筊、求籤
-    var R = G.data.jobRules || {};
-    if (st.player.level < unlock) { G.say(null, [{ who: 'narrator', text: '等你到 ' + unlock + ' 級，就能在這裡轉職喔！' }]); return; }
-    J.Menus.guild(G, { title: '✨ 慈護宮・轉職', label: '慈護宮轉職', closeOnChange: true, onChange: function () {
-      // 轉職會重新開始地圖場景（換主角的走路圖，G.onJobChanged）：等場景好了再放光芒；
-      // 先讓孩子看到光芒（約 1 秒），再出現廟公的祝福；這段時間 busy，不能走、不會被打斷
+    G.jobPlace('temple');
+  };
+
+  /**
+   * v1.0 第一批（48 號 1.5、2.4、第 4 節；35 號第十二節）：慈護宮神像（temple，廟公）、府城職業公會（guild，公會導師）規則一樣。
+   * 見習還不到 10 級、也沒有以前當過的職業 → locked 台詞。其他 → 轉職清單：
+   *   換回以前當過的（back）：D_JOB_BACK → 換；小考通過過的（change）：D_JOB_LV1 → 換；
+   *   立志小考（trial）：今天考過沒通過 → D_TRIAL_AGAIN；剩不到 15 分鐘 → 提醒；可以考 → D_TRIAL_INTRO → 20 題 →
+   *     通過：D_TRIAL_PASS → D_JOB_LV1 → 轉職（光芒、換裝、存檔；慈護宮再播 D_TEMPLE_BLESS、D_TEMPLE_JOB_DONE）；
+   *     沒通過：D_TRIAL_FAIL → 結果畫面（答錯的單元）→ D_TRIAL_FAIL_PET。
+   */
+  G.jobPlace = function (place) {
+    if (G.blocked()) return Promise.resolve();
+    var st = G.state, R = G.data.jobRules || {}, TD = (R.trial_dialogs || {})[place] || {}, PET = (R.trial_dialogs || {}).pet || {};
+    var need = (R.master_level && R.master_level.novice) || R.unlock_level || 10;
+    var held = Object.keys(st.player.jobs || {}).some(function (j) { return j !== st.player.job; });
+    G.jobPlaceLog = (G.jobPlaceLog || []).concat([place]);   // 測試用
+    if (J.JobTrial.noviceLevel(st) < need && !held) {
+      return G.say(TD.locked || (place === 'guild' ? 'D_GUILD_IDLE' : 'D_TEMPLE_LOCKED'), [{ who: place === 'guild' ? 'guild' : 'temple_keeper', text: '見習冒險者到 ' + need + ' 級，就能來考立志小考喔。' }]);
+    }
+    var intro = place === 'guild' ? G.say(R.dialog_open || 'D_GUILD_JOB', []) : Promise.resolve();
+    return intro.then(function () {
+      J.Menus.guild(G, { place: place, title: place === 'guild' ? '⚔️ 職業公會' : '✨ 慈護宮・轉職', label: place === 'guild' ? '職業公會' : '慈護宮轉職',
+        onPick: function (jobId, kind) { G.jobPick(place, jobId, kind); } });
+    });
+  };
+
+  /** 轉職清單上按了某個職業 */
+  G.jobPick = function (place, jobId, kind) {
+    var st = G.state, D = G.data, R = D.jobRules || {}, TD = (R.trial_dialogs || {})[place] || {}, PET = (R.trial_dialogs || {}).pet || {};
+    var who = place === 'guild' ? 'guild' : 'temple_keeper', name = D.jobs[jobId].name;
+    if (kind === 'back') return G.say(TD.back, [{ who: who, text: '以前當過「' + name + '」，免費換回去！' }]).then(function () { return G.doJobChange(place, jobId); });
+    if (kind === 'change') return G.say(TD.lv1, [{ who: who, text: '換了職業，等級會從 1 開始，能力有保底，不用擔心。' }]).then(function () { return G.doJobChange(place, jobId); });
+    var c = J.JobTrial.canStart(st, jobId, D, Date.now());
+    if (!c.ok) {
+      if (c.reason === 'today') return G.say(TD.again, [{ who: who, text: '今天已經考過了，明天再來喔！' }]);
+      if (c.reason === 'time') return G.say(null, [{ who: 'pet', text: '今天只剩 ' + c.minutes + ' 分鐘，考不完的。明天精神飽滿再來考吧！' }]);
+      return Promise.resolve();
+    }
+    return G.say(TD.intro, [{ who: who, text: '立志小考有 20 題，答對 16 題就通過。' }]).then(function () {
+      return J.TrialUI.run(G, jobId, place);
+    }).then(function (res) {
+      G.lastTrial = res;   // 測試用
+      if (!res) { J.UI.toast('題目還在準備中，先去冒險吧！'); return; }
+      if (res.pass) {
+        return G.say(TD.pass, [{ who: who, text: '恭喜你，立志小考過關了！' }])
+          .then(function () { return G.say(TD.lv1, [{ who: who, text: '換了職業，等級會從 1 開始，能力有保底，不用擔心。' }]); })
+          .then(function () { return G.doJobChange(place, jobId); });
+      }
+      return G.say(TD.fail, [{ who: who, text: '這次差一點點，明天可以再來考。' }])
+        .then(function () { return G.say(PET.fail || 'D_TRIAL_FAIL_PET', [{ who: 'pet', text: '我們去做委託、開寶箱多練習，明天再來！' }]); });
+    });
+  };
+
+  /** 轉職：換職業（自動換裝）→ 換主角圖 → 光芒 → 慈護宮的祝福台詞；回傳 Promise */
+  G.doJobChange = function (place, jobId) {
+    var st = G.state, D = G.data, R = D.jobRules || {};
+    var r = J.Character.changeJob(st, jobId, D);
+    if (!r.ok) return Promise.resolve(r);
+    J.Audio.play('levelup');
+    J.UI.toast('轉職成「' + D.jobs[jobId].name + '」了！' + (r.back ? '（等級 ' + st.player.level + '）' : '等級從 1 開始。'), 4000);
+    if (r.gear && r.gear.on.length) setTimeout(function () { J.UI.toast('換上了' + r.gear.on.map(function (id) { return (D.items[id] || {}).name || id; }).join('、') + '！', 3500); }, 600);
+    G.lastJobChange = { job: jobId, back: r.back, gear: r.gear, place: place };   // 測試用
+    G.onJobChanged();
+    G.save();
+    return new Promise(function (resolve) {
+      // 轉職會重新開始地圖場景（換主角的走路圖）：等場景好了再放光芒；先讓孩子看到光芒（約 1 秒）再說話
       G.busy = true;
       var tries = 0, ready0 = G.mapReadyCount || 0;
       (function waitScene() {
@@ -496,12 +578,14 @@
         if (sc && sc.blessFx && sc.p) sc.blessFx();
         setTimeout(function () {
           G.busy = false;
-          G.say(R.temple_bless || 'D_TEMPLE_BLESS', [{ who: 'narrator', text: '這是你自己努力得來的！' }])
-            .then(function () { return G.say(R.temple_done || 'D_TEMPLE_JOB_DONE', [{ who: 'pet', text: '新職業也要五科一起加油喔！' }]); });
+          var p = place === 'temple' ? G.say(R.temple_bless || 'D_TEMPLE_BLESS', [{ who: 'narrator', text: '這是你自己努力得來的！' }])
+            .then(function () { return G.say(R.temple_done || 'D_TEMPLE_JOB_DONE', [{ who: 'pet', text: '新職業也要五科一起加油喔！' }]); }) : Promise.resolve();
+          p.then(function () { G.save(); resolve(r); });
         }, 1000);
       })();
-    } });
+    });
   };
+
   /** v0.9.5 進廟（有神像的室內地圖）時廟公介紹：D_TEMPLE_INTRO */
   G.templeIntro = function (scene) {
     var R = G.data.jobRules || {};
@@ -543,12 +627,7 @@
     if (r.role === 'inn') { G.say(J.MapInfo.innDialog(map, npc), [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info, npc.id).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
     if (r.role === 'shop') { G.say(npc.dialog, []).then(function () { J.Menus.shop(G, r.info.shop_id || 'general'); }); return; }
     if (r.role === 'travel') { G.say(npc.dialog, [{ who: npc.id, text: '要搭車去哪裡呢？' }]).then(function () { G.openWorldMap(); }); return; }
-    if (r.role === 'guild') {
-      var unlock = (G.data.jobRules && G.data.jobRules.unlock_level) || 5;
-      if (st.player.level >= unlock) G.say((G.data.jobRules && G.data.jobRules.dialog_open) || 'D_GUILD_JOB', []).then(function () { J.Menus.guild(G); });
-      else G.say(npc.dialog || 'D_GUILD_IDLE', [{ who: npc.id, text: '到 ' + unlock + ' 級，就能來這裡選職業喔。' }]);
-      return;
-    }
+    if (r.role === 'guild') { G.jobPlace('guild'); return; }   // v1.0：和慈護宮同一套（立志小考）
     if (f && f.status === 'active') {
       var q = Q[f.id];
       if (J.QuestLog.canComplete(st, Q, f.id, G.data)) { G.completeQuest(f.id, scene); return; }
@@ -844,6 +923,8 @@
     ctx.el.top.appendChild(h('span.bar.boss', { role: 'progressbar', 'aria-label': mon.name + ' 的體力', 'aria-valuenow': String(hpPct), style: { width: '220px' } }, [h('i', { style: { width: hpPct + '%' } })].concat(marks)));
     var need = J.Battle.needCorrect(b);
     if (b.boss && !b.over && need > 0 && b.held) ctx.el.top.appendChild(h('div.small.boss-need', { text: '再答對 ' + need + ' 題' + (left ? '進入下一階段' : '就能打倒') }));
+    // v1.0（48 號 2.7）回復、增益技能答對也算一題，但體力沒變不會換階段 → 題數夠了，要再打中一下
+    else if (b.boss && !b.over && need === 0 && b.held) ctx.el.top.appendChild(h('div.small.boss-need', { text: '題數夠了！再打中一下' + (left ? '就進入下一階段' : '就能打倒') }));
     ctx.el.status.innerHTML = '';
     ctx.el.status.appendChild(h('div', { html: '<b style="color:#ffd34d">' + J.UI.esc(st.player.name) + '</b>　等級 ' + st.player.level }));
     ctx.el.status.appendChild(h('div', {}, ['體力 ', h('span.bar.hp', { role: 'progressbar', 'aria-label': '體力' }, [h('i', { style: { width: pct(st.player.hp, s.maxHp) + '%' } })]), ' ' + st.player.hp + '/' + s.maxHp]));
@@ -856,16 +937,37 @@
     var ctx = G.battleCtx, h = J.UI.h, s = G.stats(), b = ctx.b;
     ctx.el.cmds.innerHTML = '';
     if (!on) return;
-    var skill = s.skill;
-    // v0.9.6（45 號 F3）先制射擊：這場答過題（答錯也算）就不能用；原本用 b.turns（只有打中才 +1）
-    var skillOk = skill && G.state.player.mp >= (skill.mp || 0) && !(skill.effect === 'preempt' && !J.Battle.canPreempt(ctx.qn));
+    // v1.0（48 號 2.6、F6）：技能欄 4 格 → 按「技能」打開清單再選
+    var has = s.skills && s.skills.length;
     var atk = h('button.primary', { onclick: function () { G.battack('attack'); } }, ['⚔️ 攻擊']);
     ctx.el.cmds.appendChild(atk);
-    ctx.el.cmds.appendChild(h('button', { disabled: !skillOk, title: skill ? skill.desc : '轉職後才有技能', onclick: function () { G.battack('skill'); } },
-      [skill ? '✨ ' + skill.name + '（魔力 ' + skill.mp + '）' : '✨ 技能']));
+    ctx.el.cmds.appendChild(h('button.skill-open', { disabled: !has, title: has ? '選一個技能，答對才會發動' : '見習冒險者 Lv4 會學到第一個技能', onclick: G.bskills }, ['✨ 技能']));
     ctx.el.cmds.appendChild(h('button', { onclick: G.bitems }, ['🎒 道具']));
     ctx.el.cmds.appendChild(h('button', { disabled: b.boss, onclick: G.bflee }, ['🏃 逃跑']));
     setTimeout(function () { atk.focus(); }, 30);
+  };
+
+  /** 技能的小圖示（48 號 2.6：用特效類型的小圖示，不另外畫） */
+  G.skillIcon = function (sk) { return J.SkillFx && J.SkillFx.icon ? J.SkillFx.icon(sk) : '✨'; };
+  var SKILL_WHY = { mp: '魔力不夠', stun: '這場已經停過一次', armed: '已經在身上了' };
+
+  /** 技能清單（技能欄裡的 4 個）：魔力不夠變灰；答錯不扣魔力 */
+  G.bskills = function () {
+    var ctx = G.battleCtx, h = J.UI.h, s = G.stats(), b = ctx.b, st = G.state;
+    ctx.el.cmds.innerHTML = '';
+    var first = null;
+    (s.skills || []).forEach(function (sk) {
+      var c = J.Battle.canUseSkill(b, sk, st.player.mp), why = c.ok ? '' : (SKILL_WHY[c.reason] || '');
+      var btn = h('button.skill-btn', { disabled: !c.ok, 'data-skill': sk.id, title: (sk.desc || '') + (why ? '（' + why + '）' : ''),
+        onclick: function () { G.battack('skill', sk); } },
+        [h('span.skill-icon', { 'aria-hidden': 'true', text: G.skillIcon(sk) }), ' ' + sk.name + '（魔力 ' + sk.mp + '）' + (why ? '・' + why : '')]);
+      if (c.ok && !first) first = btn;
+      ctx.el.cmds.appendChild(btn);
+    });
+    var back = h('button.ghost', { onclick: function () { G.bcommands(true); } }, ['返回']);
+    ctx.el.cmds.appendChild(back);
+    G.bmsg('選一個技能。答對才會發動，答錯不扣魔力。');
+    setTimeout(function () { (first || back).focus(); }, 30);
   };
 
   G.bsubject = function () {
@@ -874,18 +976,22 @@
     return mon.subject;
   };
 
-  G.battack = function (kind) {
+  G.battack = function (kind, sk) {
     var ctx = G.battleCtx, st = G.state, s = G.stats(), b = ctx.b;
-    var skill = kind === 'skill' ? s.skill : null;
-    var subject = skill ? (skill.subject || s.favored || G.bsubject()) : G.bsubject();
+    var skill = kind === 'skill' ? (sk || s.skill) : null;
+    if (skill && !J.Battle.canUseSkill(b, skill, st.player.mp).ok) return;
+    // 職業技能出拿手科目的題目、一律算拿手 ×1.5（CTO Q12，和模擬一致）；見習的技能出怪物的科目
+    var subject = skill && skill.subject ? skill.subject : G.bsubject();
+    var favored = skill && skill.subject ? true : subject === s.favored;
     var bossMult = b.boss ? C.BOSS_DAMAGE_MULT : 1;
-    var estL4 = J.Battle.damage({ atk: s.atk, level: 4, elapsedMs: 0, limitMs: 90000, favored: subject === s.favored, favoredMult: s.favoredMult, bossMult: bossMult }).damage;
+    var estL4 = Math.round(J.Battle.damage({ atk: s.atk, level: 4, elapsedMs: 0, limitMs: 90000, favored: favored, favoredMult: s.favoredMult, bossMult: bossMult }).damage * ((s.trait && s.trait.power) || 1) * (s.dmgMult || 1));
     var force = J.Battle.needsFinalL4(b, estL4) ? 4 : undefined;
     var q = J.Session.next(ctx.sess, Date.now(), { subject: subject, forceLevel: force });
     if (!q) { G.bmsg('「' + subject + '」的題目還在準備中……'); return; }
     ctx.qn++;
     G.bcommands(false);
-    var timerMs = J.Battle.timeLimitMs(q.level, st.settings.answerTime, s.timeMult * (b.timeBuff || 1));
+    // 影子步、鼓舞之歌：接下來幾題的時間條變長（每出一題用掉一次）
+    var timerMs = J.Battle.timeLimitMs(q.level, st.settings.answerTime, s.timeMult * (b.timeBuff || 1) * J.Battle.nextTimeMult(b));
     b.timeBuff = 1;
     J.Quiz.ask({
       session: ctx.sess, mode: 'battle', state: st, timerMs: timerMs,
@@ -912,61 +1018,106 @@
       setTimeout(G.bmonsterTurn, 700);
       return;
     }
-    var favored = q.subject === s.favored;
-    var hits = [], mult = 1;
+    // v1.0（48 號 2.6、2.7、F6）：17 種技能效果；多段攻擊一次呼叫 Battle.hit；回復、增益答對也算頭目的一題
+    var favored = skill && skill.subject ? true : q.subject === s.favored;
+    var use = null, opt = { hits: 1, mult: 1, noCrit: false, sureCrit: false }, pre = [];
     if (skill) {
-      st.player.mp = Math.max(0, st.player.mp - (skill.mp || 0));
-      if (skill.effect === 'double') hits = [1, 1];
-      else if (skill.effect === 'all') { hits = [1]; mult = 1.5; }
-      else if (skill.effect === 'preempt') hits = [1];
-      else if (skill.effect === 'time') {
-        // v0.9.6（45 號 F5）不計時模式：時間條沒有作用 → 改成下一次答對的傷害 ×1.3
-        var se = J.Battle.songEffect(st.settings.answerTime, skill.value);
-        if (se.kind === 'power') { b.powerBuff = se.mult; G.bmsg('鼓舞之歌！下一次答對，傷害變成 ' + se.mult + ' 倍。'); }
-        else { b.timeBuff = se.mult; G.bmsg('鼓舞之歌！下一題的時間變長了。'); }
-        sc.healEffect(); G.brender(); setTimeout(function () { G.bcommands(true); }, 600); return;
-      }
-      else if (skill.effect === 'heal') {
-        var amt = Math.max(1, Math.round(s.maxHp * (skill.value || 0.3)));
-        st.player.hp = Math.min(s.maxHp, st.player.hp + amt);
-        sc.healEffect(); G.brender(); G.refreshHud();
-        G.bmsg(skill.name + '！體力回復了 ' + amt + ' 點。');
-        setTimeout(function () { G.bcommands(true); }, 600);
+      st.player.mp = Math.max(0, st.player.mp - (skill.mp || 0));   // 答對才扣魔力
+      use = J.Battle.useSkill(b, skill, { maxHp: s.maxHp, timerOff: J.Battle.timerOff(st.settings.answerTime), trait: s.trait });
+      ctx.lastSkill = { id: skill.id, eff: use.eff, attack: use.attack, counted: !!use.counted, heal: use.heal || 0 };   // 測試用
+      ctx.skillLog = (ctx.skillLog || []).concat([skill.id]);
+      G.bmsg(G.skillIcon(skill) + ' ' + skill.name + '！');
+      if (!use.attack) {
+        if (use.heal) st.player.hp = Math.min(s.maxHp, st.player.hp + use.heal);
+        G.skillFx(skill, use, function () {
+          G.brender(); G.refreshHud();
+          G.bmsg(G.skillText(skill, use));
+          setTimeout(function () { G.bcommands(true); }, 500);
+        });
         return;
       }
-    } else hits = [1];
-    var power = J.Battle.takePowerBuff(b);   // v0.9.6 鼓舞之歌（不計時模式）的傷害加成，用在這次答對的每一擊
-    if (power > 1) { mult *= power; ctx.powerUsed = power; }
-    var i = 0, msgs = power > 1 ? ['鼓舞之歌的力量！'] : [];
-    (function next() {
-      if (i >= hits.length || b.over) { G.brender(); G.bmsg(msgs.join(' ')); if (b.over) setTimeout(G.bvictory, 700); else setTimeout(function () { G.bcommands(true); }, 500); return; }
-      var d = J.Battle.damage({ atk: s.atk, level: q.level, elapsedMs: r.elapsedMs, limitMs: r.limitMs, favored: favored, favoredMult: s.favoredMult, mult: mult, bossMult: b.boss ? C.BOSS_DAMAGE_MULT : 1 });
-      var h = J.Battle.hit(b, d.damage);
-      sc.hitEffect(h.dealt, d.crit);
-      if (h.phaseUp) sc.phaseEffect();
-      // v0.9.3 生氣了 = 進入下一階段、攻擊 +20%
-      if (h.phaseUp) J.UI.banner(G.battleCtx.mon.name + '生氣了！攻擊變強了！', 'rage-banner');
-      var left = b.phases - Math.min(b.phase, b.phases);
-      msgs.push(J.Battle.hitMessage({ crit: d.crit, favored: favored, first: i === 0, dealt: h.dealt, damage: d.damage, phaseUp: h.phaseUp, held: h.held, over: b.over }) +   // v0.9.6 B10
-        (h.phaseUp ? G.battleCtx.mon.name + '生氣了！攻擊變強了！（第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段' + (left ? '，還剩 ' + left + ' 個階段' : '，最後一個階段') + '）' : '') +
-        (h.held && !b.over ? G.battleCtx.mon.name + '撐住了！再答對 ' + J.Battle.needCorrect(b) + ' 題' + (b.phase >= b.phases ? '就能打倒它！' : '就會進入下一個階段！') : ''));
-      G.brender();
-      i++;
-      setTimeout(next, 450);
-    })();
+      opt = { hits: use.hits, mult: use.mult, noCrit: use.noCrit, sureCrit: use.sureCrit };
+      if (use.stunned) pre.push(ctx.mon.name + '麻麻的，下一次不能攻擊！');
+      if (use.picked) pre.push('表演抽到：' + (use.picked[0] === 'heal' ? '回復' : '大攻擊') + '！');
+    }
+    var at = J.Battle.attack(b, { atk: s.atk, level: q.level, elapsedMs: r.elapsedMs, limitMs: r.limitMs, favored: favored, favoredMult: s.favoredMult,
+      bossMult: b.boss ? C.BOSS_DAMAGE_MULT : 1, hits: opt.hits, mult: opt.mult, noCrit: opt.noCrit, sureCrit: opt.sureCrit, trait: s.trait, dmgMult: s.dmgMult });
+    if (at.buffs.indexOf('power') >= 0) { ctx.powerUsed = (b.fx && b.fx.powerM) || J.Battle.OFF_SONG_POWER; pre.push('鼓舞的力量！'); }
+    if (at.buffs.indexOf('charge') >= 0) pre.push('蓄滿力氣的一擊！');
+    if (at.buffs.indexOf('up') >= 0) pre.push('力量湧上來了！');
+    var hr = J.Battle.hit(b, at.total);
+    ctx.lastAttack = { total: at.total, parts: at.parts, dealt: hr.dealt, hits: opt.hits, crit: at.crit, skill: skill ? skill.id : null };   // 測試用
+    // 畫面一下一下播：被頭目門檻吃掉時，照比例縮小每一下
+    var shown = at.parts.slice();
+    if (hr.dealt < at.total) {
+      var k = hr.dealt / at.total, acc = 0;
+      shown = at.parts.map(function (p, j) { if (j === at.parts.length - 1) return Math.max(0, hr.dealt - acc); var v = Math.round(p * k); acc += v; return v; });
+    }
+    var left = b.phases - Math.min(b.phase, b.phases), mon = ctx.mon;
+    var msg = pre.concat([J.Battle.hitMessage({ crit: at.crit, favored: favored, first: true, dealt: hr.dealt, damage: at.total, phaseUp: hr.phaseUp, held: hr.held, over: b.over, hits: opt.hits, pet: at.pet }) +
+      (hr.phaseUp ? mon.name + '生氣了！攻擊變強了！（第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段' + (left ? '，還剩 ' + left + ' 個階段' : '，最後一個階段') + '）' : '') +
+      (hr.held && !b.over ? mon.name + '撐住了！再答對 ' + J.Battle.needCorrect(b) + ' 題' + (b.phase >= b.phases ? '就能打倒它！' : '就會進入下一個階段！') : '')]).join(' ');
+    var play = function (done) {
+      var i = 0;
+      (function next() {
+        if (i >= shown.length) { done(); return; }
+        sc.hitEffect(shown[i], at.crit && i === 0);
+        i++;
+        setTimeout(next, shown.length > 1 ? 260 : 0);
+      })();
+    };
+    var finish = function () {
+      if (hr.phaseUp) { sc.phaseEffect(); J.UI.banner(mon.name + '生氣了！攻擊變強了！', 'rage-banner'); }   // v0.9.3 生氣了 = 進入下一階段、攻擊 +20%
+      G.brender(); G.bmsg(msg);
+      if (b.over) setTimeout(G.bvictory, 700); else setTimeout(function () { G.bcommands(true); }, 500);
+    };
+    G.brender();
+    if (skill) G.skillFx(skill, use, function () { play(finish); }); else play(finish);
+  };
+
+  /** 技能特效（M3：JQ.SkillFx 程式畫；可跳過、減少動態效果）。沒有特效模組時直接往下 */
+  G.skillFx = function (skill, use, done) {
+    var sc = G.battleCtx && G.battleCtx.scene;
+    if (J.SkillFx && sc && J.SkillFx.play) { J.SkillFx.play(sc, skill, use, done); return; }
+    if (sc && use && (use.heal || use.eff === 'revive' || use.eff === 'guard')) sc.healEffect();
+    done();
+  };
+
+  /** 不造成傷害的技能答對後的訊息 */
+  G.skillText = function (skill, use) {
+    var mon = G.battleCtx.mon, a = skill.arg || {}, n = skill.name + '！';
+    switch (use.eff) {
+      case 'heal': return n + '體力回復了 ' + use.heal + ' 點。';
+      case 'revive': return n + '這場累倒時，會馬上站起來。';
+      case 'guard': return n + '接下來被打 ' + (a.t || 1) + ' 次，傷害變成一半。';
+      case 'weaken': return n + mon.name + '變沒力氣了（' + (a.t || 1) + ' 次）。';
+      case 'stun': return use.stunned ? n + mon.name + '下一次不能攻擊！' : n + mon.name + '這場已經停過一次，沒有效果。';
+      case 'atk_up': return n + '接下來 ' + (a.t || 1) + ' 次攻擊變強了！';
+      case 'charge': return n + '下一次攻擊會變超強！';
+      case 'time_up': return use.offPower ? n + '接下來答對 ' + (a.t || 1) + ' 次，傷害變成 ' + use.offPower + ' 倍。' : n + '接下來 ' + (a.t || 1) + ' 題的時間變長了' + (a.atk ? '，也打得比較痛' : '') + '。';
+      default: return n;
+    }
   };
 
   G.bmonsterTurn = function () {
     var ctx = G.battleCtx, mon = ctx.mon, s = G.stats(), st = G.state;
-    var pm = J.Battle.phaseMult(ctx.b);   // v0.9.3 頭目每進一個階段傷害 +20%
-    var dmg = J.Battle.monsterAttack(mon, s.def, null, pm);
-    var h = J.Battle.heroHurt(st, dmg);
-    ctx.lastHit = { dmg: dmg, mult: pm };   // 測試用
+    // v1.0：停止、閃過、逗笑、減弱、防護、劍士被打 ×0.9（48 號 2.5、F5）；頭目每進一個階段傷害 +20%（v0.9.3）
+    var t = J.Battle.monsterTurn(ctx.b, mon, { def: s.def, trait: s.trait });
+    ctx.lastHit = { dmg: t.damage, mult: t.mult, skipped: t.skipped };   // 測試用
+    if (t.skipped) {
+      G.bmsg(t.skipped === 'stun' ? mon.name + '麻麻的，動不了！' : t.skipped === 'evade' ? '輕巧一轉，閃過了' + mon.name + '的攻擊！' : mon.name + '笑到忘了攻擊！');
+      setTimeout(function () { G.bcommands(true); }, 700);
+      return;
+    }
+    var h = J.Battle.heroHurt(st, t.damage);
+    var revived = h.ko ? J.Battle.tryRevive(ctx.b, st, s.maxHp) : 0;
     ctx.scene.hurtEffect();
     G.brender(); G.refreshHud();
-    G.bmsg(mon.name + (pm > 1 ? '（生氣中）' : '') + '撞了過來！受到 ' + dmg + ' 點傷害。');
+    G.bmsg(mon.name + (t.mult > 1 ? '（生氣中）' : '') + '撞了過來！受到 ' + t.damage + ' 點傷害。' + (t.guarded ? '（擋住了一半）' : '') +
+      (revived ? '　不倒祈願！又站起來了（體力 ' + revived + '）！' : ''));
+    if (revived) ctx.scene.healEffect();
     G.save();
-    if (h.ko) setTimeout(G.bko, 900);
+    if (h.ko && !revived) setTimeout(G.bko, 900);
     else setTimeout(function () { G.bcommands(true); }, 700);
   };
 
@@ -995,7 +1146,8 @@
   G.bflee = function () {
     var ctx = G.battleCtx;
     G.bcommands(false);
-    if (J.Battle.tryFlee(ctx.b.boss)) {
+    var tr = G.stats().trait || {};
+    if (J.Battle.tryFlee(ctx.b.boss, null, !!tr.fleeSure)) {   // v1.0 船員：逃跑一定成功
       G.state.stats.battles.fled = (G.state.stats.battles.fled || 0) + 1;
       G.bmsg('順利逃開了！');
       setTimeout(function () { G.bend('fled'); }, 700);
@@ -1010,13 +1162,18 @@
     ctx.scene.wakeEffect();
     var lvl = st.player.level;
     var bond = J.Battle.bond(st);   // v0.9.3 親密度（番薯仔的愛心，隱藏屬性）：掉寶率、經驗值 +N%（不加金幣、畫面不說明）
-    var vr = J.Battle.victoryReward(mon, G.coef(ctx.mapId), bond);
+    var s0 = G.stats(), vt = J.Battle.victoryTraits(ctx.b, s0.trait || {}, s0.maxMp);   // v1.0 吟遊詩人回魔、商人／生意興隆金幣、魔物大師朋友卡
+    var vr = J.Battle.victoryReward(mon, G.coef(ctx.mapId), bond, vt.goldMult);
     // v0.9.3 C1：經驗值和金幣只在打倒怪物時給（怪物的 exp×地圖係數×親密度、gold）；戰鬥中答對不給
     var ans = J.Session.settleBattle(ctx.sess);   // 只有這場完成的每日小任務金幣、舊存檔的暫存經驗值
     J.Exp.addExp(st.player, vr.exp);
     st.player.coins += vr.gold;
     ctx.reward = { exp: vr.exp, coins: vr.gold + ans.daily, monsterGold: vr.gold, daily: ans.daily, bond: bond };   // 測試用
-    var drops = J.Battle.rollDrops(mon, null, bond);
+    var drops = J.Battle.rollDrops(mon, null, bond, (s0.trait && s0.trait.drop) || 1);   // v1.0 弓箭手掉寶率 ×1.5
+    for (var si = 0; si < ((ctx.b.fx && ctx.b.fx.steal) || 0); si++) { var got = J.Battle.stealItem(mon); if (got) drops.push(got); }   // 神奇口袋
+    if (vt.mp > 0) st.player.mp = Math.min(s0.maxMp, st.player.mp + vt.mp);
+    if (vt.friend) { st.bestiary[mon.id] = st.bestiary[mon.id] || {}; st.bestiary[mon.id].friend = true; }   // 怪物朋友卡（魔物大師，第一批只記資料）
+    ctx.traits = vt;   // 測試用
     drops.forEach(function (it) { J.Character.addItem(st, it, 1); });
     st.stats.battles.won = (st.stats.battles.won || 0) + 1;
     J.Bestiary.defeated(st, mon.id);   // 怪物名冊：打倒
@@ -1024,6 +1181,8 @@
     G.jingle(mon.boss && drops.length ? 'rare_item' : 'victory', null, null, 7000);
     var lines = [mon.wake, '經驗值 +' + ctx.reward.exp + '　金幣 +' + ctx.reward.coins];
     if (drops.length) lines.push('得到：' + drops.map(function (d) { return (G.data.items[d] || {}).name || d; }).join('、'));
+    if (vt.mp > 0) lines.push('琴聲讓魔力回復 ' + vt.mp + ' 點');
+    if (vt.friend) lines.push('拿到「' + mon.name + '」的怪物朋友卡！');
     G.bmsg(lines.join('　'));
     G.refreshHud();
     var done = [];
@@ -1164,11 +1323,13 @@
     if ((ev.indexOf('limit') >= 0 || G.limitPending) && !G.limitHandle) {
       // 打贏後（勝利畫面、戰後對話）inBattle() 已是 false，但戰鬥還沒結束：一樣等到按「繼續」之後
       // v0.9.3：放大地圖（passMove 視窗）開著時還能走，不能拿來延後上限 → 用 blocksMove()，顯示上限前先關掉放大地圖
-      if (G.inBattle() || (G.battleCtx && !G.battleCtx.over) || G.busy || J.UI.blocksMove() || (G.mapScene && G.mapScene.transitioning)) { G.limitPending = true; }
+      // v1.0 立志小考（G.inTrial）考試中不會被每日上限打斷，考完才顯示
+      if (G.inTrial || G.inBattle() || (G.battleCtx && !G.battleCtx.over) || G.busy || J.UI.blocksMove() || (G.mapScene && G.mapScene.transitioning)) { G.limitPending = true; }
       else if (J.Playtime.isOverLimit(st.playtime, st.settings, now)) { G.limitPending = false; G.save(); J.UI.closeLoadBars && J.UI.closeLoadBars(); J.UI.closePassMove(); J.Settings.limitScreen(G); return; }
       else G.limitPending = false;
     }
-    if (ev.indexOf('rest') >= 0) J.Settings.restReminder();
+    if (ev.indexOf('rest') >= 0) { if (G.inTrial) G.restPending = true; else J.Settings.restReminder(); }
+    else if (G.restPending && !G.inTrial) { G.restPending = false; J.Settings.restReminder(); }
     if (now - G.lastSave > 30000) G.save();
   };
   document.addEventListener('visibilitychange', function () { if (G.state) { J.Playtime.pause(G.state.playtime); if (document.visibilityState === 'hidden') G.save(); } });
@@ -1199,6 +1360,7 @@
     },
     inBattle: function () { return !!(G.battleCtx && !G.battleCtx.over && G.battleCtx.b); },
     currentQuestion: function () {
+      if (G.inTrial && G.inTrial.cur) { var tq = G.inTrial.cur; return { id: tq.id, type: tq.type, answer: tq.answer, options: tq.options, subject: tq.subject, trial: true }; }   // v1.0 立志小考（選項打亂後的答案）
       var s = (G.battleCtx && !G.battleCtx.over && G.battleCtx.sess) || G._lastSess;
       return s && s.q ? { id: s.q.id, type: s.q.type, answer: s.q.answer, options: s.q.options, subject: s.q.subject } : null;
     },

@@ -9,6 +9,25 @@
   function icon(it, id) { return h('span.icon', { html: J.Assets.domIcon(it.sprite || ('item_' + id), { size: 40, label: it.name, alt: '' }) }); }
   function closeBtn(fn) { return h('button.close.ghost', { onclick: fn, 'aria-label': '關閉' }, ['✕ 關閉']); }
 
+  /** 誰能用（48 號 3.5）：通用「大家都能用」、專屬武器「○○專用」、其他列出能用的職業 */
+  function whoCan(G, it) {
+    var jobs = J.Character.usableJobs(it, G.data);
+    if (jobs === null) return '大家都能用';
+    var open = (G.data.jobRules && G.data.jobRules.open_jobs) || null;
+    if (open) jobs = jobs.filter(function (j) { return open.indexOf(j) >= 0; });
+    if (it.job) return jobNames(G, jobs) + '專用';
+    return jobNames(G, jobs) + '能用';
+  }
+  /** 能用的職業頭像（通用不畫） */
+  /** 說明文字裡已經寫了誰能用（items.js 的 desc 多半有「○○專用」「大家都能用」）就不再重複 */
+  function whoCanText(G, it) { var d = it.desc || ''; return /專用|能用|能穿/.test(d) ? '' : whoCan(G, it); }
+  function jobFaces(G, it) {
+    var jobs = J.Character.usableJobs(it, G.data), open = (G.data.jobRules && G.data.jobRules.open_jobs) || null;
+    if (!jobs) return null;
+    if (open) jobs = jobs.filter(function (j) { return open.indexOf(j) >= 0; });
+    return h('span.shop-jobs', { 'aria-hidden': 'true' }, jobs.map(function (j) { return h('span.icon', { html: J.Assets.domIcon(J.Assets.heroKey(G.state.player.gender, j), { size: 24, label: (G.data.jobs[j] || {}).name, alt: '' }) }); }));
+  }
+
   function jobNames(G, jobs) {
     if (!jobs) return '';
     return (Array.isArray(jobs) ? jobs : [jobs]).map(function (j) { return (G.data.jobs[j] || {}).name || j; }).join('、');
@@ -25,7 +44,9 @@
       var s = G.stats();
       body.innerHTML = '';
       body.appendChild(h('p', { text: '等級 ' + st.player.level + '　職業：' + s.jobName + (s.favored ? '（拿手科目：' + s.favored + '，傷害 ×' + s.favoredMult + '）' : '') }));
-      body.appendChild(h('p', { text: '體力 ' + st.player.hp + '/' + s.maxHp + '　魔力 ' + st.player.mp + '/' + s.maxMp + '　攻擊力 ' + s.atk + '　防禦力 ' + s.def }));
+      // v1.0（48 號 2.1、B7）：力量＝能力的攻擊（不含武器）、物攻＝力量＋武器攻擊，兩個都顯示
+      body.appendChild(h('p.status-line', { text: '體力 ' + st.player.hp + '/' + s.maxHp + '　魔力 ' + st.player.mp + '/' + s.maxMp + '　力量 ' + s.power + '　物攻 ' + s.atk + '　防禦力 ' + s.def +
+        (s.dmgMult > 1 ? '　（武器特效：攻擊傷害 +' + Math.round((s.dmgMult - 1) * 100) + '%）' : '') }));
       var w = st.equipment.weapon && D.items[st.equipment.weapon], a = st.equipment.armor && D.items[st.equipment.armor];
       body.appendChild(h('p', { text: '武器：' + (w ? w.name : '（沒有）') + '　防具：' + (a ? a.name : '（沒有）') }));
       body.appendChild(h('p.small', { text: '番薯仔的愛心：' + '❤'.repeat(Math.min(10, st.pet.hearts)) + (st.pet.hearts > 10 ? ' ×' + st.pet.hearts : '') + (st.pet.hearts ? '' : '（還沒有，餵點心試試看）') }));
@@ -43,14 +64,38 @@
           else btns.push(h('button', { onclick: function () { equip(id); } }, ['裝備']));
         }
         var extra = [];
-        if (it.atk) extra.push('攻擊力 +' + it.atk);
+        if (it.atk) extra.push('攻擊 +' + it.atk);
         if (it.def) extra.push('防禦力 +' + it.def);
         if (it.mpBonus) extra.push('魔力 +' + it.mpBonus);
-        if (it.job) extra.push('限 ' + jobNames(G, it.job));
+        if ((it.type === 'weapon' || it.type === 'armor') && whoCanText(G, it)) extra.push(whoCanText(G, it));
+        if (it.fx_desc) extra.push('特效：' + it.fx_desc);
         list.appendChild(h('li', {}, [icon(it, id), h('div.what', {}, [h('b', { text: it.name + ' ×' + st.inventory[id] }), h('div.small', { text: (TYPE_NAME[it.type] || '') + '　' + it.desc + (extra.length ? '（' + extra.join('、') + '）' : '') })])].concat(btns)));
       });
+      body.appendChild(skillSlots());
       body.appendChild(h('h3', { text: '道具' }));
       body.appendChild(list);
+    }
+    /** v1.0（48 號 2.6、F8）技能欄 4 格：從學會的技能裡挑；沒挑過＝最新學會的 4 個（現在職業的優先） */
+    function skillSlots() {
+      var s = G.stats(), box = h('div.skill-slots');
+      box.appendChild(h('h3', { text: '✨ 技能欄（' + s.skills.length + '／4）' }));
+      if (!s.learned.length) { box.appendChild(h('p.small', { text: '見習冒險者 Lv4 會學到第一個技能。' })); return box; }
+      box.appendChild(h('p.small', { text: '戰鬥時只能用技能欄裡的 4 個。點一下放進去或拿出來。' }));
+      var on = {}; s.skills.forEach(function (k) { on[k.id] = 1; });
+      var row = h('div.row.skill-pick');
+      s.learned.forEach(function (k) {
+        row.appendChild(h('button' + (on[k.id] ? '.selected' : ''), { 'data-skill': k.id, 'aria-pressed': String(!!on[k.id]), title: k.desc,
+          onclick: function () {
+            var ids = s.skills.map(function (x) { return x.id; });
+            if (on[k.id]) ids = ids.filter(function (x) { return x !== k.id; });
+            else if (ids.length >= 4) { J.UI.toast('技能欄滿了（4 個），先拿掉一個。'); return; }
+            else ids.push(k.id);
+            J.Character.setSkillSlots(st, D, ids); G.save(); render();
+          } }, [(J.SkillFx ? J.SkillFx.icon(k) + ' ' : '') + k.name + '（' + (D.jobs[k.job] || {}).name + '・魔力 ' + k.mp + '）']));
+      });
+      box.appendChild(row);
+      if (Array.isArray(st.player.skillSlots)) box.appendChild(h('button.ghost', { onclick: function () { st.player.skillSlots = null; G.save(); render(); } }, ['回到預設（最新的 4 個）']));
+      return box;
     }
     function use(id) {
       var r = J.Character.useItem(st, id, D);
@@ -73,7 +118,7 @@
     var body = h('div');
     var tabBuy = h('button', { role: 'tab', 'aria-selected': 'true', onclick: function () { mode = 'buy'; render(); } }, ['買東西']);
     var tabSell = h('button', { role: 'tab', 'aria-selected': 'false', onclick: function () { mode = 'sell'; render(); } }, ['賣東西']);
-    var mode = 'buy';
+    var mode = 'buy', show = 'mine';   // v1.0（48 號 3.5）：預設只列「現在能用的＋通用」，另有「全部」
     var handle;
     var panel = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']),
       h('h2', { text: '🏪 ' + (shopInfo.name || '商店') }), h('p.small', { text: '只用遊戲裡的金幣買東西，沒有真錢、沒有抽獎。' }), h('div.tabs', { role: 'tablist' }, [tabBuy, tabSell]), body]);
@@ -85,27 +130,42 @@
       body.appendChild(h('p', { text: '你有 🪙 ' + st.player.coins + ' 金幣' }));
       var list = h('ul.list');
       if (mode === 'buy') {
-        var cat = J.Shop.catalog(shopId, D.items, D.shops ? (function () { var o = {}; Object.keys(D.shops).forEach(function (k) { o[k] = D.shops[k].items; }); return o; })() : null);
+        var cat = J.Shop.forOpenJobs(J.Shop.catalog(shopId, D.items, D.shops ? (function () { var o = {}; Object.keys(D.shops).forEach(function (k) { o[k] = D.shops[k].items; }); return o; })() : null), D);
+        var equipShop = cat.some(function (it) { return it.type === 'weapon' || it.type === 'armor'; });
+        if (equipShop) {
+          var canUse = function (it) { return (it.type !== 'weapon' && it.type !== 'armor') || J.Character.usable(it, st.player.job, D); };
+          var nAll = cat.length, mine = cat.filter(canUse);
+          body.appendChild(h('div.tabs.shop-tabs', { role: 'tablist' }, [
+            h('button', { role: 'tab', 'data-show': 'mine', 'aria-selected': String(show === 'mine'), onclick: function () { show = 'mine'; render(); } }, ['現在能用的＋通用（' + mine.length + '）']),
+            h('button', { role: 'tab', 'data-show': 'all', 'aria-selected': String(show === 'all'), onclick: function () { show = 'all'; render(); } }, ['全部（' + nAll + '）'])]));
+          if (cat.some(function (it) { return it.type === 'weapon'; })) body.appendChild(h('p.small', { text: '劍士的力量最大；其他職業有自己的專屬武器幫忙（特效讓攻擊傷害變高）。' }));
+          if (show === 'mine') cat = mine;
+        }
         // v0.9.4（40 號）：有買不起的東西時，在清單上方提醒怎麼存錢
         if (cat.some(function (it) { return J.Shop.shortfall(st, it.price) > 0; })) body.appendChild(h('p.small.shop-broke', { text: '錢不夠喔！去打幾隻怪物、完成委託，就能存到錢。' }));
         cat.forEach(function (it) {
           var have = st.inventory[it.id] || 0;
           var info = [];
-          if (it.atk) info.push('攻擊力 +' + it.atk);
+          if (it.atk) info.push('攻擊 +' + it.atk);
           if (it.def) info.push('防禦力 +' + it.def);
           if (it.mpBonus) info.push('魔力 +' + it.mpBonus);
-          if (it.job) info.push('限 ' + jobNames(G, it.job));
+          var gearItem = it.type === 'weapon' || it.type === 'armor';
+          var cant = gearItem && !J.Character.usable(it, st.player.job, D);
+          var fxNote = it.fx_desc ? h('div.small.fx-note', { text: '特效：' + it.fx_desc }) : null;
+          var tip = st.player.job === 'novice' && it.id === 'cloak' ? h('div.small', { text: '轉職以後會有更適合的防具喔。' }) : null;
           var short = J.Shop.shortfall(st, it.price);   // v0.9.4 買不起時寫「還差 N 金幣」
-          var b = h('button', { disabled: short > 0, onclick: function () { buy(it.id); } }, [short > 0 ? '還差 ' + short + ' 金幣' : '買（' + it.price + ' 金幣）']);
+          var b = h('button', { disabled: short > 0, onclick: function () { if (cant) confirmBuy(it); else buy(it.id); } }, [short > 0 ? '還差 ' + short + ' 金幣' : '買（' + it.price + ' 金幣）']);
           if (short > 0) b.setAttribute('aria-label', it.name + '：' + it.price + ' 金幣，還差 ' + short + ' 金幣');
-          list.appendChild(h('li', {}, [icon(it, it.id), h('div.what', {}, [h('b', { text: it.name }), h('span.small', { text: '　已有 ' + have }), h('div.small', { text: it.desc + (info.length ? '（' + info.join('、') + '）' : '') })]), b]));
+          list.appendChild(h('li' + (cant ? '.cant-use' : ''), { 'data-id': it.id }, [icon(it, it.id), h('div.what', {}, [h('b', { text: it.name }), h('span.small', { text: '　已有 ' + have }),
+            gearItem ? jobFaces(G, it) : null,
+            h('div.small', { text: (gearItem && whoCanText(G, it) ? whoCanText(G, it) + '　' : '') + it.desc + (info.length ? '（' + info.join('、') + '）' : '') }), fxNote, tip]), b]));
         });
       } else {
         // v0.9.2：裝備原價 50%、道具 25%（無條件捨去）；任務素材、重要任務道具、一開始拿到的不能賣；身上正在用的要先卸下
         body.appendChild(h('p.small', { text: '裝備用原價的一半收購，道具用原價的四分之一。任務素材、重要任務道具和一開始拿到的東西不能賣；身上正在用的要先卸下。' }));
         var rows = J.Shop.sellList(st, D.items, D.quests);
         if (!rows.length) list.appendChild(h('li', { text: '背包裡沒有可以賣的東西。' }));
-        var WHY = { material: '任務素材，不能賣', equipped: '正在裝備中，先到背包卸下才能賣', quest: '重要任務道具', start: '一開始拿到的，不能賣', free: '這個不能賣' };
+        var WHY = { material: '任務素材，不能賣', equipped: '正在裝備中，先到背包卸下才能賣', quest: '重要道具（珍貴的紀念），不能賣', start: '一開始拿到的，不能賣', free: '這個不能賣' };
         rows.forEach(function (r) {
           var it = r.item;
           var note = r.ok ? (r.count < r.have ? '（可以賣 ' + r.count + ' 個' + (r.start ? '；一開始拿到的 ' + r.start + ' 個不能賣' : '') + (r.equipped ? '；身上正在用 1 個' : '') + '）' : '') : WHY[r.reason];
@@ -116,6 +176,10 @@
       }
       body.appendChild(list);
     }
+    /** 現在的職業不能用的裝備：可以買，買前確認（48 號 3.5） */
+    function confirmBuy(it) {
+      J.UI.confirm('「' + it.name + '」' + whoCan(G, it) + '，現在的職業（' + G.stats().jobName + '）不能用。還是要買嗎？', '要買', '不買').then(function (yes) { if (yes) buy(it.id); });
+    }
     function buy(id) {
       var r = J.Shop.buy(st, id, D.items);
       if (!r.ok) { J.UI.toast(r.reason === 'coins' ? '還差 ' + r.short + ' 金幣喔！去打幾隻怪物、完成委託，就能存到錢。' : '買不到。', 4500); return; }
@@ -124,7 +188,8 @@
       var cmp = J.Character.compareEquip(st, id, D);
       var change = function (c) {
         var parts = [];
-        if (c.before.atk !== c.after.atk) parts.push('攻擊力 ' + c.before.atk + '→' + c.after.atk);
+        if (c.before.atk !== c.after.atk) parts.push('物攻 ' + c.before.atk + '→' + c.after.atk);
+        if (c.before.dmgMult !== c.after.dmgMult) parts.push('攻擊傷害 ' + (c.after.dmgMult > c.before.dmgMult ? '+' : '') + Math.round((c.after.dmgMult - c.before.dmgMult) * 100) + '%');
         if (c.before.def !== c.after.def) parts.push('防禦力 ' + c.before.def + '→' + c.after.def);
         if (c.before.maxMp !== c.after.maxMp) parts.push('魔力上限 ' + c.before.maxMp + '→' + c.after.maxMp);
         return parts.join('、');
@@ -320,8 +385,31 @@
     });
   }
 
-  // ---------------------------------------------------------------- 職業公會
-  /** 轉職清單。opts（v0.9.5 媽祖神像也用這一套）＝{ title, label, onChange(jobId)：轉職成功後（祝福光芒） } */
+  // ---------------------------------------------------------------- 職業公會、慈護宮神像（v1.0 48 號 1.4、1.5、2.4、F8）
+  var TRAIT_TEXT = {
+    power: '力量最大：所有攻擊傷害 ×1.15', dmgTaken: '被打到的傷害 −10%', critFrac: '會心一擊的時間比較長（前 2/5）', skillPow: '攻擊技能威力 ×1.15',
+    healPow: '回復技能效果 ×1.2', evade: '答錯時有時候會閃過攻擊', time: '答題時間條 ×1.2；打倒怪物時比較容易拿到東西', drop: null, mpRegen: '打贏後回復一點魔力',
+    fleeSure: '逃跑一定成功（頭目戰不能逃）', petHit: '答對時番薯仔有時候會追加一擊', laugh: '答錯時怪物有時候會笑到忘了攻擊', friendCard: '打倒怪物有時候會拿到怪物朋友卡', gold: '戰鬥拿到的金幣 ×1.25'
+  };
+  function traitText(j) { return Object.keys(j.trait || {}).map(function (k) { return TRAIT_TEXT[k]; }).filter(Boolean).join('；'); }
+  /** 這個職業在清單上的狀態：current、back（以前當過）、change（小考通過了）、trial（可以考）、today（明天再來）、level（見習還不到 10 級）、closed（即將開放） */
+  function jobState(G, id) {
+    var st = G.state, D = G.data;
+    if (st.player.job === id) return { kind: 'current' };
+    var c = J.Character.canChangeJob(st, id, D);
+    if (c.ok) return { kind: c.back ? 'back' : 'change' };
+    if (c.reason === 'closed') return { kind: 'closed' };
+    if (c.reason === 'level') return { kind: 'level', need: c.need };
+    var t = J.JobTrial.canStart(st, id, D, Date.now());
+    if (t.ok) return { kind: 'trial' };
+    return { kind: t.reason === 'today' ? 'today' : t.reason === 'time' ? 'time' : 'trial', minutes: t.minutes };
+  }
+  var JOB_BTN = { back: '換回去（免費）', change: '轉職', trial: '立志小考', today: '明天再來考', time: '今天時間不夠', level: '見習 10 級才能考', closed: '即將開放' };
+
+  /**
+   * 轉職清單。opts＝{ title, label, place（'temple'｜'guild'）, onPick(jobId, kind)：孩子按了按鈕（清單先關掉） }
+   * 每個職業一張說明卡：拿手科目、特性、能用的武器防具、4 個技能（學會的等級）。
+   */
   function guild(G, opts) {
     opts = opts || {};
     var st = G.state, D = G.data;
@@ -331,34 +419,38 @@
     handle = J.UI.open(panel, { label: opts.label || '職業公會', onClose: function () { G.refreshHud(); } });
     function render() {
       body.innerHTML = '';
-      body.appendChild(h('p', { text: '到 ' + ((D.jobRules && D.jobRules.unlock_level) || 5) + ' 級就能轉職，之後可以免費換職業。職業只改變戰鬥方式和外觀，所有委託一樣要五科都學喔！' }));
-      var list = h('ul.list');
+      var need = (D.jobRules && D.jobRules.master_level && D.jobRules.master_level.novice) || 10;
+      body.appendChild(h('p', { text: '見習冒險者 ' + need + ' 級以後，通過「立志小考」就能轉職；以前當過的職業可以免費換回去。轉職後等級從 1 開始，能力有保底，不用擔心。' }));
+      body.appendChild(h('p.small', { text: '職業只改變戰鬥方式和外觀，所有委託一樣要五科都學喔！' }));
+      var list = h('ul.list.job-list');
       Object.keys(D.jobs).forEach(function (id) {
-        var j = D.jobs[id];
-        var c = J.Character.canChangeJob(st, id, D);
-        var cur = st.player.job === id;
-        var btn = cur ? h('button.selected', { disabled: true }, ['目前的職業']) :
-          h('button', { disabled: !c.ok, onclick: function () { change(id); } }, [c.ok ? '轉職' : (c.reason === 'level' ? '需要 ' + c.need + ' 級' : '不能轉')]);
+        var j = D.jobs[id], s = jobState(G, id);
         var key = J.Assets.heroKey(st.player.gender, id);
-        list.appendChild(h('li', {}, [h('span.icon', { html: J.Assets.domIcon(key, { size: 40, label: j.name, alt: '' }) }), h('div.what', {}, [
-          h('b', { text: j.name }), h('span.small', { text: j.favored ? '　拿手科目：' + j.favored : '' }),
-          h('div.small', { text: (j.desc || '') + (j.skill ? '　技能「' + j.skill.name + '」（魔力 ' + j.skill.mp + '）：' + (j.skill.desc || '') : '') })]), btn]));
+        var silhouette = s.kind === 'closed';
+        var btn = s.kind === 'current' ? h('button.selected', { disabled: true }, ['目前的職業']) :
+          h('button', { 'data-job': id, 'data-kind': s.kind, disabled: ['back', 'change', 'trial'].indexOf(s.kind) < 0, onclick: function () { handle.close(); if (opts.onPick) opts.onPick(id, s.kind); } },
+            [JOB_BTN[s.kind] || '不能轉']);
+        var lv = J.Character.jobLevel(st, id);
+        var learned = (j.skills || []).map(function (sk) { return (lv >= sk.lv ? '✔' : 'Lv' + sk.lv) + ' ' + (J.SkillFx ? J.SkillFx.icon(sk) : '') + sk.name + '（魔力 ' + sk.mp + '）：' + sk.desc; });
+        var gear = [];
+        // 只列現在實際裝得上的類別（從 items.js 推算，不寫死）
+        var wfs = J.Character.equipFams(id, D, 'weapon'), afs = J.Character.equipFams(id, D, 'armor');
+        if (wfs.length) gear.push('武器：' + J.Character.famNames(wfs));
+        if (afs.length) gear.push('防具：' + J.Character.famNames(afs));
+        var card = h('details.job-card', {}, [h('summary', { text: '說明卡' }),
+          h('div.small', { text: j.desc || '' }),
+          traitText(j) ? h('div.small', { text: '特性：' + traitText(j) }) : null,
+          gear.length ? h('div.small', { text: gear.join('　') }) : null,
+          h('ul.small.job-skills', {}, learned.map(function (t) { return h('li', { text: t }); }))]);
+        list.appendChild(h('li', { 'data-job': id, class: silhouette ? 'soon' : null }, [
+          h('span.icon' + (silhouette ? '.silhouette' : ''), { html: J.Assets.domIcon(key, { size: 40, label: j.name, alt: '' }) }),
+          h('div.what', {}, [h('b', { text: silhouette ? '？？？（即將開放）' : j.name }), h('span.small', { text: (j.favored ? '　拿手科目：' + j.favored : '') + (lv && id !== 'novice' ? '　Lv' + lv : '') }),
+            silhouette ? null : card]), btn]));
       });
       body.appendChild(list);
     }
-    function change(id) {
-      var r = J.Character.changeJob(st, id, D);
-      if (!r.ok) return;
-      J.Audio.play('levelup');
-      // v0.9.6（47 號 B06）神像前轉職：大橫幅會蓋住主角身上的祝福光芒 → 改成右上角的提示泡泡
-      if (opts.closeOnChange) J.UI.toast('轉職成「' + D.jobs[id].name + '」了！', 4000);
-      else J.UI.banner('轉職成「' + D.jobs[id].name + '」了！');
-      G.onJobChanged();
-      G.save(); render();
-      if (opts.closeOnChange) handle.close();   // 神像轉職：關掉清單，讓孩子看到祝福光芒
-      if (opts.onChange) { try { opts.onChange(id); } catch (e) { console.error(e); } }
-    }
     render();
+    return handle;
   }
 
   window.JQ = window.JQ || {};

@@ -32,6 +32,15 @@
     slot = slot || DEFAULT_SLOT;
     return slot === DEFAULT_SLOT ? Save.SAVE_KEY : Save.SAVE_KEY + ':' + slot;
   }
+  /**
+   * v1.0（夜班審查）：舊版存檔（schema 3 以前）升級前的備份 key：bq_save_v2_backup（其他欄位 bq_save_v2_backup:<欄位>）。
+   * 不是 bq_save 或 bq_save:<欄位>，所以 list() 不會把它當成存檔欄位。
+   */
+  var BACKUP_KEY = Save.SAVE_KEY + '_v2_backup';
+  function backupKeyFor(slot) {
+    slot = slot || DEFAULT_SLOT;
+    return slot === DEFAULT_SLOT ? BACKUP_KEY : BACKUP_KEY + ':' + slot;
+  }
 
   function summary(slot, s) {
     return { slot: slot, name: s.player.name, level: s.player.level, job: s.player.job, gender: s.player.gender, savedAt: s.savedAt || 0 };
@@ -98,15 +107,20 @@
       try {
         var obj = JSON.parse(raw);
         if (Save.validateState(obj)) return null;
+        // 升級前先備份原本的字串（只寫一次：已經有備份就不覆蓋；寫不進去也照樣讀）
+        if (!(obj.version >= 3)) {
+          try { if (st.getItem(backupKeyFor(slot)) === null) st.setItem(backupKeyFor(slot), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
+        }
         return Save.migrate(obj);
-      } catch (e) { return null; }
+      } catch (e) { return null; }   // 升級失敗：回傳 null，loadError 會說明原因；原本的存檔不動
     })());
   };
+  /** 讀不進來的原因（'' ＝正常或沒有存檔）。格式對、但升級失敗時回傳 Save.MIGRATE_FAIL（拿複本試跑，不改原本的資料） */
   LocalSaveProvider.prototype.loadError = function (slot) {
     var raw;
     try { raw = this.storage.getItem(keyFor(slot)); } catch (e) { return Promise.resolve('瀏覽器不允許讀取存檔'); }
     if (!raw) return Promise.resolve('');
-    try { return Promise.resolve(Save.validateState(JSON.parse(raw))); } catch (e) { return Promise.resolve('存檔內容壞掉了'); }
+    return Promise.resolve(Save.checkRaw(raw));
   };
   LocalSaveProvider.prototype.list = function () {
     var st = this.storage, out = [];
@@ -146,7 +160,7 @@
   CloudSaveProvider.prototype.list = notReady;
   CloudSaveProvider.prototype['delete'] = notReady;
 
-  var SaveProvider = { migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
+  var SaveProvider = { BACKUP_KEY: BACKUP_KEY, backupKeyFor: backupKeyFor, migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.SaveProvider = SaveProvider; }
   if (typeof module !== 'undefined') module.exports = SaveProvider;
 })();

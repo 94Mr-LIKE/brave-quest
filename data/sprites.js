@@ -1,4 +1,4 @@
-/* 由 tools/build_art.py 自動產生；v0.9.4 起怪物圖改用 art_src/v1/redesign/processed（不要重跑 build_art.py，會用舊圖蓋回），水牛、站牌、候車亭、v0.9.5 媽祖神像 obj_mazu_statue 與廟公 npc_temple_keeper 為手動加入。美術：GPT 繪製＋程式後製（去背、切格、縮放、限色）。 */
+/* 由 tools/build_art.py 自動產生；v0.9.4 起怪物圖改用 art_src/v1/redesign/processed（不要重跑 build_art.py，會用舊圖蓋回），水牛、站牌、候車亭、v0.9.5 媽祖神像 obj_mazu_statue 與廟公 npc_temple_keeper 為手動加入。美術：GPT 繪製＋程式後製（去背、切格、縮放、限色）。  v1.0 第一批：7 個新職業走路圖、7 個裝備圖示（art_src/v1/jobs_v1/processed，2026-10-12 交件）。*/
 window.SPRITES = {
  "hero_novice": {
   "file": "assets/chars/hero_novice.png",
@@ -665,5 +665,245 @@ window.SPRITES = {
   "type": "single",
   "frameW": 30,
   "frameH": 50
+ },
+ "hero_fighter": {
+  "file": "assets/chars/hero_fighter.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_fighter": {
+  "file": "assets/chars/heroM_fighter.png",
+  "type": "walk",
+  "frameW": 31,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_dancer": {
+  "file": "assets/chars/hero_dancer.png",
+  "type": "walk",
+  "frameW": 38,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_dancer": {
+  "file": "assets/chars/heroM_dancer.png",
+  "type": "walk",
+  "frameW": 31,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_sailor": {
+  "file": "assets/chars/hero_sailor.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_sailor": {
+  "file": "assets/chars/heroM_sailor.png",
+  "type": "walk",
+  "frameW": 29,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_shepherd": {
+  "file": "assets/chars/hero_shepherd.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_shepherd": {
+  "file": "assets/chars/heroM_shepherd.png",
+  "type": "walk",
+  "frameW": 34,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_jester": {
+  "file": "assets/chars/hero_jester.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_jester": {
+  "file": "assets/chars/heroM_jester.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_tamer": {
+  "file": "assets/chars/hero_tamer.png",
+  "type": "walk",
+  "frameW": 31,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_tamer": {
+  "file": "assets/chars/heroM_tamer.png",
+  "type": "walk",
+  "frameW": 27,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_merchant": {
+  "file": "assets/chars/hero_merchant.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_merchant": {
+  "file": "assets/chars/heroM_merchant.png",
+  "type": "walk",
+  "frameW": 30,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "item_steel_sword": {
+  "file": "assets/items/item_steel_sword.png",
+  "type": "icon",
+  "frameW": 30,
+  "frameH": 32
+ },
+ "item_cloak": {
+  "file": "assets/items/item_cloak.png",
+  "type": "icon",
+  "frameW": 29,
+  "frameH": 32
+ },
+ "item_heavy_armor": {
+  "file": "assets/items/item_heavy_armor.png",
+  "type": "icon",
+  "frameW": 33,
+  "frameH": 32
+ },
+ "item_light_armor": {
+  "file": "assets/items/item_light_armor.png",
+  "type": "icon",
+  "frameW": 27,
+  "frameH": 32
+ },
+ "item_anchor_axe": {
+  "file": "assets/items/item_anchor_axe.png",
+  "type": "icon",
+  "frameW": 28,
+  "frameH": 32
+ },
+ "item_gloves": {
+  "file": "assets/items/item_gloves.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
+ "item_whip": {
+  "file": "assets/items/item_whip.png",
+  "type": "icon",
+  "frameW": 32,
+  "frameH": 32
+ },
+ "item_ribbon_fan": {
+  "file": "assets/items/item_ribbon_fan.png",
+  "type": "icon",
+  "frameW": 35,
+  "frameH": 32
+ },
+ "item_clapper": {
+  "file": "assets/items/item_clapper.png",
+  "type": "icon",
+  "frameW": 37,
+  "frameH": 32
+ },
+ "item_tamer_whip": {
+  "file": "assets/items/item_tamer_whip.png",
+  "type": "icon",
+  "frameW": 38,
+  "frameH": 32
+ },
+ "item_abacus_dagger": {
+  "file": "assets/items/item_abacus_dagger.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
+ "item_amulet": {
+  "file": "assets/items/item_amulet.png",
+  "type": "icon",
+  "frameW": 32,
+  "frameH": 32
  }
 };

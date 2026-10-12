@@ -1,4 +1,4 @@
-/* 遊戲狀態（存檔內容）的結構定義與建立 — schema v2（v0.2 多地圖冒險） */
+/* 遊戲狀態（存檔內容）的結構定義與建立 — schema v3（v1.0 第一批：職業分開記等級、保底、技能欄、立志小考） */
 (function () {
   'use strict';
   var isNode = typeof module !== 'undefined' && typeof require === 'function';
@@ -6,7 +6,7 @@
   var Daily = isNode ? require('./daily.js') : window.JQ.Daily;
   var Playtime = isNode ? require('./playtime.js') : window.JQ.Playtime;
 
-  var SCHEMA_VERSION = 2;
+  var SCHEMA_VERSION = 3;   // v1.0 第一批（48 號 F9）：player.jobs、player.floor、player.skillSlots、trial
   var SUBJECTS = ['國語', '英語', '數學', '自然', '社會'];
   var NAME_MAX = 8;
   var ANSWER_TIME_MODES = ['relaxed', 'standard', 'off'];
@@ -77,8 +77,12 @@
         level: 1, exp: 0, totalExp: 0, coins: 30, job: 'novice', hp: -1, mp: -1,   // hp/mp = -1 代表「補滿」
         title: '',                                                                  // 怪物名冊拿到的稱號（顯示在名字旁）
         pendingExp: 0,                                                              // v0.7 戰鬥中答對、還沒結算的經驗值（v0.9.3 起只剩舊存檔會有；讀檔時結算）
-        pendingDaily: 0                                                             // v0.9.3 戰鬥中完成每日小任務、還沒給的金幣（戰鬥結束或下次讀檔時結算）
+        pendingDaily: 0,                                                            // v0.9.3 戰鬥中完成每日小任務、還沒給的金幣（戰鬥結束或下次讀檔時結算）
+        // v1.0 第一批（48 號 2.4、F9）：每個職業分開記等級；保底；技能欄（null＝最新學會的 4 個）
+        jobs: { novice: { lv: 1, exp: 0 } }, floor: {}, skillSlots: null
       },
+      trialLog: [],               // v1.0 立志小考紀錄（家長報表；最多 30 筆）
+      trial: {},                  // v1.0 立志小考 { 職業id: { lastFailDate, tries, lastQ:[題目id], inProgress, passedAt } }
       inventory: { herb: 2, eraser: 1, guide: 1, snack: 1 },
       startItems: { herb: 2, eraser: 1, guide: 1, snack: 1 },   // v0.9.2 建立角色時一開始給的（不能賣）；舊存檔沒有這筆時補上同樣的初始配置
       equipment: { weapon: null, armor: null },
@@ -109,7 +113,8 @@
       settings: { dailyLimitMin: Playtime.DEFAULT_LIMIT, tts: true, sound: true, answerTime: 'standard', touchControls: 'auto', taigiSub: 'both',
         voiceAuto: true, voiceVolume: 0.9, voiceRate: 1, voiceLang: 'taigi', voiceCloud: true, music: true, musicVolume: 0.55,
         // v0.9.3（老闆 2026-10-10）：語速預設「稍快」（舊的 1 倍 × 1.15）；音樂、語音音量改成 小／中／大，預設都是「中」；可以選語音（'' = 依角色自動挑）
-        voiceSpeed: AUDIO.SPEED_DEFAULT, voiceVol: 'mid', musicVol: 'mid', voiceName: '' },
+        voiceSpeed: AUDIO.SPEED_DEFAULT, voiceVol: 'mid', musicVol: 'mid', voiceName: '',
+        reduceMotion: 'auto' },   // v1.0 技能特效：'auto' 跟裝置的 prefers-reduced-motion、'on' 只顯示數字、'off' 一律播放
       ending: false
     };
   }
@@ -119,7 +124,7 @@
    * 根因（審查 F-06）：inventory 的預設是 {herb:2, eraser:1, guide:1, snack:1}，而 removeItem 用完時會刪掉該鍵，
    * 以前逐鍵補預設值會讓用完的道具在讀檔後「長回來」。
    */
-  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered', 'qhist', 'bestiary', 'bestiaryClaims', 'mapDims', 'startItems'];
+  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered', 'qhist', 'bestiary', 'bestiaryClaims', 'mapDims', 'startItems', 'player.jobs', 'player.floor', 'trial'];
 
   /** 以預設值補齊缺漏欄位（舊存檔、匯入存檔用），不覆蓋已有的值；字典型欄位只在整個不存在時才補 */
   function fillDefaults(target, defaults, path) {

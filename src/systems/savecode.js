@@ -46,7 +46,9 @@
   var SHORT = { status: 's', progress: 'p', seen: 'n', defeated: 'k', location: 'L', lastInn: 'I', mapDims: 'M', inventory: 'v',
     equipment: 'q', bestiary: 'b', answered: 'A', adaptive: 'D', stats: 'S', units: 'u', subjects: 'j', submissions: 'm',
     firstTry: 'f', done: 'd', settings: 'G', player: 'P', quests: 'Q', chests: 'C', visited: 'V', playtime: 'T', daily: 'Y',
-    battles: 'B', weapon: 'w', armor: 'a', createdAt: 'c', bestiaryClaims: 'K', stickers: 'X', titles: 'H', lights: 'l', lamps: 'o' };
+    battles: 'B', weapon: 'w', armor: 'a', createdAt: 'c', bestiaryClaims: 'K', stickers: 'X', titles: 'H', lights: 'l', lamps: 'o',
+    // v1.0 第一批（48 號 F9）
+    jobs: 'J', floor: 'F', skillSlots: 'N', trial: 'R', trialLog: 'W', lastFailDate: 'x', passedAt: 'z', inProgress: 'i', tries: 'r', lastQ: 'g' };
   var LONG = {};
   Object.keys(SHORT).forEach(function (k) { LONG['~' + SHORT[k]] = k; });
   function renameKeys(v, table) {
@@ -99,6 +101,8 @@
     var keep = {};
     [s.location, s.lastInn].forEach(function (l) { if (l && s.mapDims && s.mapDims[l.map]) keep[l.map] = s.mapDims[l.map]; });
     s.mapDims = keep;
+    // v1.0 立志小考上次的題目：換成題庫序號（字典沒有的照原樣）
+    Object.keys(s.trial || {}).forEach(function (j) { var r = s.trial[j]; if (r && Array.isArray(r.lastQ)) r.lastQ = r.lastQ.map(function (id) { return id in D.qi ? D.qi[id] : id; }); });
     var out = diff(s, d, '') || {};
     out.version = state.version;
     out.player = out.player || {};
@@ -132,6 +136,7 @@
     if (ok) (Array.isArray(o.answered) ? o.answered : []).forEach(function (dv, j) { acc = j ? acc + dv : dv; if (D.ids[acc]) ans[D.ids[acc]] = true; });
     (o.answeredRaw || []).forEach(function (k) { ans[k] = true; });
     o.answered = ans;
+    Object.keys(o.trial || {}).forEach(function (j) { var r = o.trial[j]; if (r && Array.isArray(r.lastQ)) r.lastQ = r.lastQ.map(function (k) { return typeof k === 'number' ? (ok ? D.ids[k] : null) : k; }).filter(Boolean); });
     delete o.answeredRaw;
     delete o._d;
     return o;

@@ -234,7 +234,8 @@
         'px;background:url(\'' + url + '\') no-repeat;background-size:' + Math.round(fw * 3 * scale) + 'px ' + Math.round(fh * 4 * scale) +
         'px;background-position:-' + Math.round(fw * scale) + 'px 0;image-rendering:pixelated"></span>';
     }
-    return '<img src="' + url + '" alt="' + esc(alt) + '" style="height:' + size + 'px;image-rendering:pixelated">';
+    // v1.0：比較寬的圖示（寬 35–38、高 32）放進正方形格子時等比縮小、置中（object-fit: contain），不會撐開版面
+    return '<img src="' + url + '" alt="' + esc(alt) + '" style="width:' + size + 'px;height:' + size + 'px;object-fit:contain;object-position:center;image-rendering:pixelated">';
   }
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }

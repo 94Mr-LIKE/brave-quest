@@ -17,23 +17,14 @@
   // 主角 1 級的數值（jobs.js 的 PLAYER_BASE 沒寫時用這份；07 第 5 節）
   var CORE_BASE = { hp: 30, mp: 10, atk: 6, def: 0 };
 
-  // 07 第 4 節的職業表（jobs.js 沒寫時用這份）。growth = 每升一級的成長
+  // v1.0 第一批（48 號 2.1–2.6）：jobs.js 沒載入時只保證有見習冒險者（真正的職業表在 jobs.js）
   var CORE_JOBS = {
-    novice: { name: '見習冒險者', favored: null, bonus: 1, min_level: 1, time_mult: 1, growth: { hp: 8, mp: 3, atk: 2 }, skill: null },
-    swordsman: { name: '劍士', favored: '數學', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 10, mp: 1, atk: 2 },
-      skill: { name: '連斬', mp: 4, subject: '數學', effect: 'double', desc: '答一題數學，答對就連打兩下。' } },
-    mage: { name: '魔法師', favored: '自然', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 6, mp: 5, atk: 2 },
-      skill: { name: '元素魔法', mp: 5, subject: '自然', effect: 'all', desc: '答對一題，用魔法打出 1.5 倍的傷害。' } },
-    archer: { name: '弓箭手', favored: '英語', bonus: 1.5, min_level: 5, time_mult: 1.2, growth: { hp: 8, mp: 3, atk: 2 },
-      skill: { name: '先制射擊', mp: 3, subject: '英語', effect: 'preempt', desc: '戰鬥一開始先答一題，答對就先射一箭。' } },
-    bard: { name: '吟遊詩人', favored: '國語', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 7, mp: 4, atk: 2 },
-      skill: { name: '鼓舞之歌', mp: 3, subject: '國語', effect: 'time', value: 1.5, desc: '答對一題，下一題的時間條變成 1.5 倍長（家長把答題時間關掉時，改成下一次答對的傷害變成 1.3 倍）。' } },
-    priest: { name: '祭司', favored: '社會', bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 7, mp: 4, atk: 2 },
-      skill: { name: '治癒', mp: 4, subject: '社會', effect: 'heal', value: 0.3, desc: '答對一題，回復三成的體力。' } }
+    novice: { name: '見習冒險者', tier: 'novice', mods: { hp: 1, mp: 1, atk: 1, def: 1 }, fav: null, bonus: 1, trait: {}, wf: [], af: [], skills: [] }
   };
-
-  // jobs.js 的 effect 名稱 → 引擎內部名稱
-  var EFFECT_ALIASES = { double_hit: 'double', hit_all: 'all', preemptive: 'preempt', extend_timer: 'time', heal: 'heal', double: 'double', all: 'all', preempt: 'preempt', time: 'time' };
+  // 48 號 2.6：17 種效果代碼（26 號 5.3 的子集）
+  var EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet', 'random', 'heal', 'guard', 'revive', 'stun', 'weaken', 'atk_up', 'charge', 'time_up'];
+  var DAMAGE_EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet'];
+  var TIER_MULT = { novice: 0.9, basic: 1.0 };
 
   // 戰鬥背景別名：maps.js 的 battle_bg → 實際的背景圖
   var BG_ALIASES = { grass: 'grass', field: 'grass', forest: 'forest', swamp: 'swamp', cave: 'cave', town: 'town', castle: 'castle', rock: 'rock', harbor: 'harbor', castle_top: 'castle_top', volcano: 'volcano', badlands: 'badlands', rock_hill: 'rock' };
@@ -72,6 +63,8 @@
         pet: Number(eff.pet || it.pet || 0),
         desc: it.desc || it.description || '', sprite: it.sprite || it.icon || ('item_' + key),
         job: it.jobs || it.job || null, not_for_sale: !!it.not_for_sale,
+        // v1.0（48 號 F2）：fam＝類別（沒寫＝通用）、fx.dmg＝攻擊傷害 +x、fx_desc＝給孩子看的特效說明
+        fam: isEquip ? (it.fam || 'gen') : null, fx: Object.assign({}, it.fx || {}), fx_desc: it.fx_desc || '',
         precious: !!it.precious, rare: !!it.rare, quest: !!it.quest   // 重要任務道具、劇情關鍵道具（不能賣）
       };
     });
@@ -81,32 +74,32 @@
     return out;
   }
 
-  function normalizeSkill(sk, base) {
-    if (!sk) return base || null;
-    if (typeof sk === 'string') return base ? Object.assign({}, base, { name: sk }) : { name: sk, mp: 3, effect: 'double' };
-    var merged = Object.assign({}, base || {}, sk);
-    merged.effect = EFFECT_ALIASES[merged.effect] || (base && base.effect) || 'double';
-    merged.mp = Number(merged.mp || 0);
-    return merged;
+  /** 技能（48 號 F1）：補上所屬職業、職階係數、科目（＝所屬職業的拿手科目；見習沒有拿手，用怪物的科目） */
+  function normalizeSkill(sk, jobId, job) {
+    var tier = job.tier || 'basic';
+    return {
+      id: sk.id, job: jobId, lv: Number(sk.lv || 1), name: sk.name || sk.id, eff: sk.eff, arg: Object.assign({}, sk.arg || {}),
+      mp: Number(sk.mp || 0), desc: sk.desc || '', fx: Object.assign({ type: 'strike', color: '#FFFFFF', ms: 600 }, sk.fx || {}),
+      tier: tier, tierMult: TIER_MULT[tier] || 1, subject: job.fav || null, fav: !!job.fav,
+      damage: DAMAGE_EFFECTS.indexOf(sk.eff) >= 0 || sk.eff === 'random'
+    };
   }
 
   function normalizeJobs(raw) {
     var out = {};
-    Object.keys(CORE_JOBS).forEach(function (id) { out[id] = Object.assign({}, CORE_JOBS[id]); });
-    var src = raw || {};
+    var src = Object.assign({}, CORE_JOBS, raw || {});
     Object.keys(src).forEach(function (id) {
       var j = src[id] || {};
-      var base = out[id] || { name: id, favored: null, bonus: 1.5, min_level: 5, time_mult: 1, growth: { hp: 8, mp: 3, atk: 2 }, skill: null };
-      out[id] = {
-        name: j.name || base.name,
-        favored: j.fav_subject || j.favored || j.subject || base.favored || null,
-        bonus: Number(j.bonus || base.bonus || 1.5),
-        min_level: Number(j.unlock_level || j.min_level || base.min_level),
-        time_mult: Number(j.speed_bonus || j.time_mult || base.time_mult || 1),
-        growth: Object.assign({}, base.growth, j.growth || {}),
-        skill: j.skill === null ? null : normalizeSkill(j.skill, base.skill),
-        desc: j.desc || base.desc || ''
+      var mods = Object.assign({ hp: 1, mp: 1, atk: 1, def: 1 }, j.mods || {});
+      var job = {
+        id: id, name: j.name || id, tier: j.tier || (id === 'novice' ? 'novice' : 'basic'), mods: mods,
+        fav: j.fav || null, favored: j.fav || null, bonus: Number(j.bonus || (j.fav ? 1.5 : 1)),
+        trait: Object.assign({}, j.trait || {}), wf: (j.wf || []).slice(), af: (j.af || []).slice(),
+        time_mult: Number((j.trait && j.trait.time) || 1),
+        sprite_f: j.sprite_f || ('hero_' + id), sprite_m: j.sprite_m || ('heroM_' + id), desc: j.desc || ''
       };
+      job.skills = (j.skills || []).map(function (sk) { return normalizeSkill(sk, id, job); });
+      out[id] = job;
     });
     return out;
   }
@@ -131,6 +124,23 @@
     return out;
   }
 
+  /** JOB_RULES（48 號 F1）：沒寫的欄位用規格的預設值 */
+  var DEFAULT_RULES = {
+    open_jobs: ['novice'], places: [], growth: { hp: 8, mp: 2, atk: 2, def: 0.5 }, floor_ratio: 0.5, transfer_step: 0.2,
+    master_level: { novice: 10, basic: 30 }, tier_mult: TIER_MULT, skill_slots: 4,
+    trial: { pass: 16, per_subject: { 1: 2, 2: 2 }, time_ratio: 0.75, term: '三上', min_minutes_left: 15 },
+    change_npc: 'guild', unlock_level: 10
+  };
+  function normalizeJobRules(r) {
+    var out = Object.assign({}, DEFAULT_RULES, r || {});
+    out.growth = Object.assign({}, DEFAULT_RULES.growth, (r && r.growth) || {});
+    out.master_level = Object.assign({}, DEFAULT_RULES.master_level, (r && r.master_level) || {});
+    out.trial = Object.assign({}, DEFAULT_RULES.trial, (r && r.trial) || {});
+    if (out.open_jobs.indexOf('novice') < 0) out.open_jobs = ['novice'].concat(out.open_jobs);
+    out.unlock_level = out.master_level.novice;   // 舊程式讀的「幾級可以轉職」＝見習出師等級
+    return out;
+  }
+
   /** shops.js 有兩種寫法：{id: [品項]} 或 {id: {name, items:[品項]}}，統一成後者 */
   function normalizeShops(raw) {
     if (!raw) return null;
@@ -147,7 +157,7 @@
     return {
       maps: w.MAPS || {}, tilesets: w.TILESETS || {}, quests: w.QUESTS || {}, dialogs: w.DIALOGS || {},
       monsters: normalizeMonsters(w.MONSTERS), items: normalizeItems(w.ITEMS), jobs: normalizeJobs(w.JOBS),
-      base: Object.assign({}, CORE_BASE, w.PLAYER_BASE || {}), jobRules: w.JOB_RULES || { change_npc: 'guild', unlock_level: 5 },
+      base: Object.assign({}, CORE_BASE, w.PLAYER_BASE || {}), jobRules: normalizeJobRules(w.JOB_RULES),
       sprites: w.SPRITES || {}, shops: normalizeShops(w.SHOPS), npcNames: w.NPC_NAMES || {}
     };
   }
@@ -226,7 +236,7 @@
 
   function mapCoef(level) { return [1.0, 1.1, 1.2, 1.3, 1.5][Math.max(1, Math.min(5, level | 0)) - 1]; }
 
-  var World = { CORE_ITEMS: CORE_ITEMS, CORE_BASE: CORE_BASE, battleBg: battleBg, normalizeShops: normalizeShops, CORE_JOBS: CORE_JOBS, normalizeItems: normalizeItems, normalizeJobs: normalizeJobs, normalizeMonsters: normalizeMonsters, fromWindow: fromWindow, size: size, charAt: charAt, tileDef: tileDef, blockers: blockers, isWalkable: isWalkable, exitAt: exitAt, validate: validate, mapCoef: mapCoef };
+  var World = { EFFECTS: EFFECTS, DAMAGE_EFFECTS: DAMAGE_EFFECTS, TIER_MULT: TIER_MULT, normalizeJobRules: normalizeJobRules, CORE_ITEMS: CORE_ITEMS, CORE_BASE: CORE_BASE, battleBg: battleBg, normalizeShops: normalizeShops, CORE_JOBS: CORE_JOBS, normalizeItems: normalizeItems, normalizeJobs: normalizeJobs, normalizeMonsters: normalizeMonsters, fromWindow: fromWindow, size: size, charAt: charAt, tileDef: tileDef, blockers: blockers, isWalkable: isWalkable, exitAt: exitAt, validate: validate, mapCoef: mapCoef };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.World = World; }
   if (typeof module !== 'undefined') module.exports = World;
 })();

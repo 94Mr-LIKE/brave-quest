@@ -73,7 +73,8 @@
       box.appendChild(h('button' + (o.summary ? '' : '.primary'), { onclick: newGame }, ['新的冒險']));
       box.appendChild(h('button', { onclick: importCode }, ['用存檔碼繼續']));
       var notes = [];
-      if (o.loadError) notes.push(h('p.note', { role: 'alert', text: '原本的存檔沒辦法讀取（' + o.loadError + '）。可以用存檔碼還原，或開始新的冒險。' }));
+      // v1.0（夜班審查）：舊存檔升級失敗的說明本身就寫了該怎麼做，直接顯示
+      if (o.loadError) notes.push(h('p.note.load-error', { role: 'alert', text: /原本的存檔還在/.test(o.loadError) ? o.loadError : '原本的存檔沒辦法讀取（' + o.loadError + '）。可以用存檔碼還原，或開始新的冒險。' }));
       if (o.migrated) notes.push(h('p.note', { text: '已經把舊版的等級、金幣和學習紀錄搬過來了！故事會重新開始。' }));
       if (message) notes.push(h('p.note', { role: 'alert', text: message }));
       notes.push(h('p.note', { text: '存檔只放在這台裝置。要換裝置時，請家長在「設定」產生存檔碼。' }));
@@ -101,6 +102,8 @@
         if (!raw.trim() || clean === '小冒險者' && raw.trim() !== '小冒險者') { err.textContent = '請取一個 1 到 8 個字的冒險者名字（不用填真名）。'; nameInput.focus(); return; }
         var go = function () { handle.close(true); o.onNew(clean, gender); };
         if (o.summary) J.UI.confirm('這台裝置已經有「' + o.summary.name + '」的存檔，開始新的冒險會蓋掉它。要繼續嗎？', '蓋掉，開始新的', '不要').then(function (y) { if (y) go(); });
+        // v1.0（夜班審查）：讀不進來的存檔（例如舊存檔升級失敗）一樣要先確認，不能默默蓋掉
+        else if (o.loadError) J.UI.confirm('這台裝置有一份現在讀不進來的存檔。開始新的冒險會蓋掉它（升級前的舊存檔另外有備份）。建議先請家長處理。還是要開始新的嗎？', '蓋掉，開始新的', '不要').then(function (y) { if (y) go(); });
         else go();
       } }, [
         h('h2', { text: '新的冒險' }),
