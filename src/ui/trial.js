@@ -206,7 +206,7 @@
         stage.appendChild(h('p.trial-score', { text: '答對 ' + res.correct + ' 題／' + res.total + ' 題（' + res.need + ' 題以上就通過）' }));
         if (res.pass) stage.appendChild(h('p', { text: '🎉 通過了！得到稱號「' + res.title + '」和「' + ((D.items[res.amulet] || {}).name || '護身符') + '」。' }));
         else {
-          stage.appendChild(h('p', { text: '這次還差一點點。明天可以再來考一次！' }));
+          stage.appendChild(h('p', { text: '這次還沒過，沒關係。明天可以再來考一次！' }));
           if (res.wrongUnits.length) {
             stage.appendChild(h('p.small', { text: '可以再練習的單元：' }));
             stage.appendChild(h('ul.trial-units', {}, res.wrongUnits.map(function (u) { return h('li', { text: u }); })));

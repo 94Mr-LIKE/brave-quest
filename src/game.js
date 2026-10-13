@@ -415,7 +415,7 @@
     if (G.pendingTrialQuit && G.pendingTrialQuit.length) {
       var quit = G.pendingTrialQuit; G.pendingTrialQuit = null;
       var PET = ((G.data.jobRules || {}).trial_dialogs || {}).pet || {};
-      setTimeout(function () { G.say(PET.quit || 'D_TRIAL_QUIT_PET', [{ who: 'pet', text: '上次的立志小考沒有考完，算考過一次喔。明天再來考吧！' }]); }, 600);
+      setTimeout(function () { G.say(PET.quit || 'D_TRIAL_QUIT_PET', [{ who: 'pet', text: '上次小考中途離開，也算考一次喔。明天再一起加油！' }]); }, 600);
       G.trialQuitShown = quit;   // 測試用
     }
     if (G.pendingIntro) {
@@ -560,7 +560,7 @@
           .then(function () { return G.say(TD.lv1, [{ who: who, text: '換了職業，等級會從 1 開始，能力有保底，不用擔心。' }]); })
           .then(function () { return G.doJobChange(place, jobId); });
       }
-      return G.say(TD.fail, [{ who: who, text: '這次差一點點，明天可以再來考。' }])
+      return G.say(TD.fail, [{ who: who, text: '這次還沒過，沒關係。明天可以再來考。' }])
         .then(function () { return G.say(PET.fail || 'D_TRIAL_FAIL_PET', [{ who: 'pet', text: '我們去做委託、開寶箱多練習，明天再來！' }]); });
     });
   };

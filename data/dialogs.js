@@ -574,8 +574,8 @@ window.DIALOGS = {
   D_TEMPLE_BLESS: [
     { who: "temple_keeper", emotion: "開心", text: "你這陣子真認真，這是你自己努力得來的！",
       taigi: { hanji: "你這站足認真，這攏是你家己拍拚來的！", tailo: "Lí tsit-tsām tsiok jīn-tsin, tse lóng sī lí ka-kī phah-piànn lâi--ê!", huayu: "你這陣子真認真，這是你自己努力得來的！" } },
-    { who: "temple_keeper", emotion: "開心", text: "祝你一路平安，媽祖也會保佑你。",
-      taigi: { hanji: "祝你一路平安，媽祖嘛會保庇你。", tailo: "Tsiok lí tsi̍t-lōo pîng-an, Má-tsóo mā ē pó-pì lí.", huayu: "祝你一路平安，媽祖也會保佑你。" } }
+    { who: "temple_keeper", emotion: "開心", text: "一路平安，媽祖也會保佑你。",
+      taigi: { hanji: "一路平安，媽祖嘛會保庇你。", tailo: "Tsi̍t-lōo pîng-an, Má-tsóo mā ē pó-pì lí.", huayu: "一路平安，媽祖也會保佑你。" } }
   ],
   D_TEMPLE_JOB_DONE: [
     { who: "pet", emotion: "開心", text: "哇，身上亮亮的！新職業也要五科一起加油喔！" }
@@ -597,22 +597,23 @@ window.DIALOGS = {
       taigi: { hanji: "攏總二十題，五科逐科四題，回答著十六題就過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-la̍k tê tō kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 16 題就過關。" } },
     { who: "temple_keeper", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。",
       taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
-    { who: "temple_keeper", emotion: "平靜", text: "提示和卡片不能用；考到一半離開，也算考一次。",
-      taigi: { hanji: "提示佮卡片袂使用；考一半離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; khó tsi̍t-puànn lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；考到一半離開，也算考一次。" } }
+    { who: "temple_keeper", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。",
+      taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } }
   ],
   D_TRIAL_INTRO_GUILD: [
     { who: "guild", emotion: "開心", text: "要換新職業，先來考立志小考吧！",
       taigi: { hanji: "欲換新的職業，先來考立志小考！", tailo: "Beh uānn sin ê tsit-gia̍p, sing lâi khó li̍p-tsì sió-khó!", huayu: "要換新職業，先來考立志小考吧！" } },
-    { who: "guild", emotion: "平靜", text: "一共 20 題，五科各 4 題，答對 16 題就過關。",
-      taigi: { hanji: "攏總二十題，五科逐科四題，回答著十六題就過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-la̍k tê tō kuè-kuan.", huayu: "一共 20 題，五科各 4 題，答對 16 題就過關。" } },
+    { who: "guild", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 16 題就過關。",
+      taigi: { hanji: "攏總二十題，五科逐科四題，回答著十六題就過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-la̍k tê tō kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 16 題就過關。" } },
     { who: "guild", emotion: "平靜", text: "題目念完，才開始算時間，慢慢聽清楚。",
       taigi: { hanji: "題目念了，才開始算時間，慢慢仔聽予清楚。", tailo: "Tê-bo̍k liām liáu, tsiah khai-sí sǹg sî-kan, bān-bān-á thiann hōo tshing-tshó.", huayu: "題目念完，才開始算時間，慢慢聽清楚。" } },
-    { who: "guild", emotion: "平靜", text: "提示、卡片不能用；中途離開也算考一次喔。",
-      taigi: { hanji: "提示、卡片袂使用；考一半離開嘛算考一擺喔。", tailo: "Thê-sī, khah-phìnn bē-sái īng; khó tsi̍t-puànn lī-khui mā sǹg khó tsi̍t pái--ooh.", huayu: "提示、卡片不能用；中途離開也算考一次喔。" } }
+    { who: "guild", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。",
+      taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } }
   ],
   D_TRIAL_PASS_TEMPLE: [
-    { who: "temple_keeper", emotion: "開心", text: "恭喜你，立志小考過關了！",
-      taigi: { hanji: "恭喜你，立志小考過關矣！", tailo: "Kiong-hí lí, li̍p-tsì sió-khó kuè-kuan--ah!", huayu: "恭喜你，立志小考過關了！" } }
+    // 老闆 2026-10-13「說話統一一致」：和公會導師 D_TRIAL_PASS_GUILD_0 相同。𠢕（gâu）是擴充 B 區字，前端負責替代顯示
+    { who: "temple_keeper", emotion: "開心", text: "恭喜你！祝你越來越厲害喔！",
+      taigi: { hanji: "恭喜你！祝你愈來愈𠢕喔！", tailo: "Kiong-hí--lí! Tsiok lí jú lâi jú gâu--ooh!", huayu: "恭喜你！祝你越來越厲害喔！" } }
   ],
   D_TRIAL_PASS_GUILD: [
     // 老闆 2026-10-13 選定候選 B（原句「真好，立志小考過關矣！」語意不通順、太生硬）。𠢕（gâu）是擴充 B 區字，前端負責替代顯示
@@ -622,28 +623,28 @@ window.DIALOGS = {
       taigi: { hanji: "這是你家己拍拚來的，新職業嘛愛加油！", tailo: "Tse sī lí ka-kī phah-piànn lâi--ê, sin tsit-gia̍p mā ài ka-iû!", huayu: "這是你自己努力得來的，新職業也要加油！" } }
   ],
   D_TRIAL_FAIL_TEMPLE: [
-    { who: "temple_keeper", emotion: "平靜", text: "這次差一點點，沒關係。",
-      taigi: { hanji: "這擺差一屑仔，無要緊。", tailo: "Tsit pái tsha tsi̍t-sut-á, bô iàu-kín.", huayu: "這次差一點點，沒關係。" } },
+    { who: "temple_keeper", emotion: "平靜", text: "這次還沒過，沒關係。",
+      taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
     { who: "temple_keeper", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。",
       taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, bîn-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
     { who: "temple_keeper", emotion: "開心", text: "當見習冒險者，一樣能打倒魔王喔！",
       taigi: { hanji: "做見習冒險者，仝款會當拍贏魔王喔！", tailo: "Tsò kiàn-si̍p mōo-hiám-tsiá, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "當見習冒險者，一樣能打倒魔王喔！" } }
   ],
   D_TRIAL_FAIL_GUILD: [
-    { who: "guild", emotion: "平靜", text: "差一點點！沒關係，這次就當作練習。",
-      taigi: { hanji: "差一屑仔！無要緊，這擺就當做練習。", tailo: "Tsha tsi̍t-sut-á! Bô iàu-kín, tsit pái tō tòng-tsò liān-si̍p.", huayu: "差一點點！沒關係，這次就當作練習。" } },
+    { who: "guild", emotion: "平靜", text: "這次還沒過，沒關係。",
+      taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
     { who: "guild", emotion: "平靜", text: "把答錯的單元多練習，明天再來考。",
       taigi: { hanji: "共毋著的單元加練習，明仔載閣來考。", tailo: "Kā m̄-tio̍h ê tan-guân ke liān-si̍p, bîn-á-tsài koh lâi khó.", huayu: "把答錯的單元多練習，明天再來考。" } },
     { who: "guild", emotion: "開心", text: "當見習冒險者也能打倒魔王，不用煩惱！",
       taigi: { hanji: "做見習冒險者嘛會當拍贏魔王，免煩惱！", tailo: "Tsò kiàn-si̍p mōo-hiám-tsiá mā ē-tàng phah-iânn môo-ông, bián huân-ló!", huayu: "當見習冒險者也能打倒魔王，不用煩惱！" } }
   ],
   D_TRIAL_AGAIN_TEMPLE: [
-    { who: "temple_keeper", emotion: "平靜", text: "今天考過一次了，明天再來喔。",
-      taigi: { hanji: "今仔日考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi--ooh.", huayu: "今天考過一次了，明天再來喔。" } }
+    { who: "temple_keeper", emotion: "平靜", text: "今天已經考一次了，明天再來喔。",
+      taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
   ],
   D_TRIAL_AGAIN_GUILD: [
-    { who: "guild", emotion: "平靜", text: "今天已經考過一次了，明天再來吧！",
-      taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來！", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi!", huayu: "今天已經考過一次了，明天再來吧！" } }
+    { who: "guild", emotion: "平靜", text: "今天已經考一次了，明天再來喔。",
+      taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
   ],
   D_JOB_LV1_TEMPLE: [
     { who: "temple_keeper", emotion: "平靜", text: "換了職業，等級會從 1 開始。",
@@ -652,8 +653,8 @@ window.DIALOGS = {
       taigi: { hanji: "毋過能力袂減傷濟，免煩惱。", tailo: "M̄-koh lîng-li̍k bē kiám siunn tsē, bián huân-ló.", huayu: "不過能力有保底，不會少太多，不用擔心。" } }
   ],
   D_JOB_LV1_GUILD: [
-    { who: "guild", emotion: "平靜", text: "提醒你：轉職後等級從 1 開始喔。",
-      taigi: { hanji: "共你提醒：換職業了後，等級對一級開始喔。", tailo: "Kā lí thê-tshénn: uānn tsit-gia̍p liáu-āu, tíng-kip tuì tsi̍t kip khai-sí--ooh.", huayu: "提醒你：轉職後等級從 1 開始喔。" } },
+    { who: "guild", emotion: "平靜", text: "提醒你：換職業以後，等級從 1 開始喔。",
+      taigi: { hanji: "共你提醒：換職業了後，等級對一級開始喔。", tailo: "Kā lí thê-tshénn: uānn tsit-gia̍p liáu-āu, tíng-kip tuì tsi̍t kip khai-sí--ooh.", huayu: "提醒你：換職業以後，等級從 1 開始喔。" } },
     { who: "guild", emotion: "開心", text: "能力有保底，不會少太多，放心！",
       taigi: { hanji: "能力袂減傷濟，放心！", tailo: "Lîng-li̍k bē kiám siunn tsē, hòng-sim!", huayu: "能力有保底，不會少太多，放心！" } }
   ],
@@ -682,7 +683,7 @@ window.DIALOGS = {
     { who: "pet", emotion: "開心", text: "沒關係！我們去做委託、開寶箱多練習，明天再來！" }
   ],
   D_TRIAL_QUIT_PET: [
-    { who: "pet", emotion: "平靜", text: "上次小考沒考完，算考過一次喔。明天再一起加油！" }
+    { who: "pet", emotion: "平靜", text: "上次小考中途離開，也算考一次喔。明天再一起加油！" }
   ],
   // 舊存檔升級（48 號 v2 第 5 節，旁白）
   D_MIGRATE_V3: [
@@ -774,8 +775,8 @@ window.DIALOGS = {
       taigi: { hanji: "見習冒險者到十級，就會使來遮考立志小考喔。", tailo: "Kiàn-si̍p mōo-hiám-tsiá kàu tsa̍p kip, tō ē-sái lâi tsia khó li̍p-tsì sió-khó--ooh.", huayu: "見習冒險者到 10 級，就能來這裡考立志小考喔。" } }
   ],
   D_GUILD_JOB: [
-    { who: "guild", text: "你已經 10 級了！想當哪一種冒險者？",
-      taigi: { hanji: "你已經十級矣！想欲揀佗一个職業？", tailo: "Lí í-king tsa̍p kip--ah! Siūnn-beh kíng tó tsi̍t ê tsit-gia̍p?", huayu: "你已經 10 級了！想當哪一種冒險者？" } },
+    { who: "guild", text: "你已經 10 級了！想選哪一個職業？",
+      taigi: { hanji: "你已經十級矣！想欲揀佗一个職業？", tailo: "Lí í-king tsa̍p kip--ah! Siūnn-beh kíng tó tsi̍t ê tsit-gia̍p?", huayu: "你已經 10 級了！想選哪一個職業？" } },
     { who: "guild", text: "新職業要考立志小考；以前當過的，免費換回去。",
       taigi: { hanji: "新的職業愛考立志小考；以早做過的，免錢換轉去。", tailo: "Sin ê tsit-gia̍p ài khó li̍p-tsì sió-khó; í-tsá tsò--kuè ê, bián-tsînn uānn tńg-khì.", huayu: "新職業要考立志小考；以前當過的，免費換回去。" } },
     { who: "pet", text: "不管選哪個，五科都要加油喔！" }
