@@ -574,8 +574,9 @@ window.DIALOGS = {
   D_TEMPLE_BLESS: [
     { who: "temple_keeper", emotion: "開心", text: "你這陣子真認真，這是你自己努力得來的！",
       taigi: { hanji: "你這站足認真，這攏是你家己拍拚來的！", tailo: "Lí tsit-tsām tsiok jīn-tsin, tse lóng sī lí ka-kī phah-piànn lâi--ê!", huayu: "你這陣子真認真，這是你自己努力得來的！" } },
-    { who: "temple_keeper", emotion: "開心", text: "一路平安，媽祖也會保佑你。",
-      taigi: { hanji: "一路平安，媽祖嘛會保庇你。", tailo: "Tsi̍t-lōo pîng-an, Má-tsóo mā ē pó-pì lí.", huayu: "一路平安，媽祖也會保佑你。" } }
+    // 老闆 2026-10-13：把「你」去掉。保庇不帶受詞結尾，依辭典用例「磕頭求神明保庇。」「拜請眾神來保庇。」
+    { who: "temple_keeper", emotion: "開心", text: "一路平安，媽祖也會保佑。",
+      taigi: { hanji: "一路平安，媽祖嘛會保庇。", tailo: "Tsi̍t-lōo pîng-an, Má-tsóo mā ē pó-pì.", huayu: "一路平安，媽祖也會保佑。" } }
   ],
   D_TEMPLE_JOB_DONE: [
     { who: "pet", emotion: "開心", text: "哇，身上亮亮的！新職業也要五科一起加油喔！" }
