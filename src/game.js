@@ -41,6 +41,8 @@
     }
     J.SaveProvider.migrateLegacyKeys(storage);   // 舊 key「jinshan-quest-save」→「bq_save」
     G.provider = new J.SaveProvider.LocalSaveProvider(storage);
+    // v1.0.2（老闆「舊玩家也要算進去」）：這台裝置已經有存檔、還沒送過 +1 → 啟動時送一次（非同步，不擋標題畫面；失敗不重送）
+    if (J.Counter) setTimeout(function () { try { J.Counter.reportExisting(storage).then(function (r) { G.counterBoot = r; }); } catch (e) { G.counterBoot = 'skipped'; } }, 0);
     // 請瀏覽器把本站資料標成「持久保存」，降低存檔被自動清除的機會（不支援或被拒絕都不影響遊戲）
     try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (e) { /* 忽略 */ }
     J.UI.init();

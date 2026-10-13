@@ -615,8 +615,9 @@ window.DIALOGS = {
       taigi: { hanji: "恭喜你，立志小考過關矣！", tailo: "Kiong-hí lí, li̍p-tsì sió-khó kuè-kuan--ah!", huayu: "恭喜你，立志小考過關了！" } }
   ],
   D_TRIAL_PASS_GUILD: [
-    { who: "guild", emotion: "開心", text: "太好了，立志小考過關！",
-      taigi: { hanji: "真好，立志小考過關矣！", tailo: "Tsin hó, li̍p-tsì sió-khó kuè-kuan--ah!", huayu: "太好了，立志小考過關！" } },
+    // 老闆 2026-10-13 選定候選 B（原句「真好，立志小考過關矣！」語意不通順、太生硬）。𠢕（gâu）是擴充 B 區字，前端負責替代顯示
+    { who: "guild", emotion: "開心", text: "恭喜你！祝你越來越厲害喔！",
+      taigi: { hanji: "恭喜你！祝你愈來愈𠢕喔！", tailo: "Kiong-hí--lí! Tsiok lí jú lâi jú gâu--ooh!", huayu: "恭喜你！祝你越來越厲害喔！" } },
     { who: "guild", emotion: "開心", text: "這是你自己努力得來的，新職業也要加油！",
       taigi: { hanji: "這是你家己拍拚來的，新職業嘛愛加油！", tailo: "Tse sī lí ka-kī phah-piànn lâi--ê, sin tsit-gia̍p mā ài ka-iû!", huayu: "這是你自己努力得來的，新職業也要加油！" } }
   ],

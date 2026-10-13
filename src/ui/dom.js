@@ -206,10 +206,14 @@
         speaker.textContent = sp.name || '';
         speaker.hidden = !sp.name;
         current = window.JQ.DialogText.view(l, ctx.taigiSub, ctx.playerName);
-        text.textContent = current.main;
+        // v1.0.2 罕用字（例：𠢕 U+20895）這台裝置畫不出來時改顯示台羅（rarechars.js 的替代表），不會出現方框
+        var RC = window.JQ.RareChars, fam = '';
+        try { fam = window.getComputedStyle(text).fontFamily; } catch (e) { fam = ''; }
+        var fix = function (s) { return RC ? RC.apply(s, function (c) { return RC.canRender(c, fam); }) : s; };
+        text.textContent = fix(current.main);
         text.lang = current.isTaigi ? 'nan-Hant-TW' : 'zh-Hant-TW';
         tailo.textContent = current.tailo; tailo.hidden = !current.tailo;
-        huayu.textContent = current.huayu ? '（華語：' + current.huayu + '）' : ''; huayu.hidden = !current.huayu;
+        huayu.textContent = current.huayu ? '（華語：' + fix(current.huayu) + '）' : ''; huayu.hidden = !current.huayu;
         portrait.innerHTML = sp.sprite ? window.JQ.Assets.domIcon(sp.sprite, { size: 80, label: sp.name || '？', alt: sp.name || '' }) : '<span class="ph">' + (sp.name ? esc(sp.name.slice(0, 1)) : '…') + '</span>';
         portrait.style.visibility = l.who === 'narrator' ? 'hidden' : 'visible';
         nextBtn.textContent = i === lines.length - 1 ? '好 ✓' : '下一句 ▶';

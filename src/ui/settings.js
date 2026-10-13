@@ -191,7 +191,7 @@
       body.appendChild(h('h3', { text: '💾 存檔' }));
       body.appendChild(h('p.small', { text: '目前存在：' + G.provider.label + '。存檔只放在這台裝置，不會上傳。換裝置時可以用「存檔碼」搬家。' }));
       // v1.0.1 已遊玩人數（成品匣 23 號 SOP 第三節）
-      body.appendChild(h('p.small.counter-note', { text: '建立角色時會匿名回報一次『+1』，不含名字或任何資料。首頁的「已有 N 位冒險者加入」就是這個數字。' }));
+      body.appendChild(h('p.small.counter-note', { text: '建立角色或第一次打開這個版本時，會匿名回報一次『+1』，不含名字或任何資料。首頁的「已有 N 位冒險者加入」就是這個數字。' }));
       var codeBox = h('textarea', { readonly: true, 'aria-label': '存檔碼' });
       var importBox = h('textarea', { 'aria-label': '貼上存檔碼', placeholder: '把存檔碼貼在這裡' });
       body.appendChild(h('div.row', {}, [
