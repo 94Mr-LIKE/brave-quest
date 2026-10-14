@@ -56,6 +56,36 @@
     return { w: Math.min(580, vw * 0.5), h: Math.min(440, vh * 0.62) };
   }
 
+  /**
+   * v1.0.5（老闆 2026-10-14：小朋友還沒學過方位）方位圖的位置與大小：左下角，四個字「北東南西」都在畫布裡。
+   * 地圖一律「上北下南、左西右東」（maps.js：金包里北邊是海、往南到擎天草原、往東到野柳，和真實地理一致）。
+   * 放左下角、不放四邊正中間：出口常在四邊正中間，字會擋住出口。回傳 { cx, cy, arm, fs, outer }（像素）
+   */
+  function compassBox(W, H, big) {
+    var fs = big ? Math.max(13, Math.min(18, Math.round(Math.min(W, H) * 0.045))) : Math.max(10, Math.min(13, Math.round(Math.min(W, H) * 0.11)));
+    var arm = Math.round(fs * 1.25), outer = arm + Math.round(fs * 0.75), pad = big ? 6 : 3;
+    return { cx: pad + outer, cy: H - pad - outer, arm: arm, fs: fs, outer: outer };
+  }
+  /** 畫方位圖：半透明深色圓底、紅色箭頭指北、四個字。畫在圓點下面，不蓋住人物、出口、委託記號 */
+  function drawCompass(g, W, H, big) {
+    var c = compassBox(W, H, big), cx = c.cx, cy = c.cy, a = c.arm, s = c.fs * 0.32;
+    g.save();
+    g.beginPath(); g.arc(cx, cy, c.outer, 0, Math.PI * 2);
+    g.fillStyle = 'rgba(11,18,54,0.55)'; g.fill();
+    g.lineWidth = 1; g.strokeStyle = 'rgba(255,255,255,0.55)'; g.stroke();
+    var tip = a - c.fs * 0.55;   // 箭頭不碰到字
+    g.lineWidth = big ? 2 : 1.5; g.strokeStyle = 'rgba(255,255,255,0.8)';
+    g.beginPath(); g.moveTo(cx - tip, cy); g.lineTo(cx + tip, cy); g.moveTo(cx, cy); g.lineTo(cx, cy + tip); g.stroke();
+    g.beginPath(); g.moveTo(cx, cy - tip); g.lineTo(cx - s, cy); g.lineTo(cx + s, cy); g.closePath();   // 指北的紅色箭頭
+    g.fillStyle = '#ff5a5a'; g.fill();
+    g.font = 'bold ' + c.fs + 'px "Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = 'rgba(10,16,48,0.95)';
+    [['北', 0, -a, '#ffb0b0'], ['南', 0, a, '#ffffff'], ['西', -a, 0, '#ffffff'], ['東', a, 0, '#ffffff']].forEach(function (d) {
+      g.strokeText(d[0], cx + d[1], cy + d[2]); g.fillStyle = d[3]; g.fillText(d[0], cx + d[1], cy + d[2]);
+    });
+    g.restore();
+  }
+
   /** v0.9.5 放大地圖上的地點名稱（白字深色描邊，小字；不蓋住圓點） */
   function drawPlaces(g, info, view, cw, ch) {
     var list = info.places || [];
@@ -91,6 +121,7 @@
     }
     if (!ok) g.drawImage(gridImage(info), view.x * 4, view.y * 4, view.w * 4, view.h * 4, 0, 0, W, H);
     g.fillStyle = 'rgba(10,18,50,0.18)'; g.fillRect(0, 0, W, H);
+    drawCompass(g, W, H, big);
     if (big) drawPlaces(g, info, view, cw, ch);
     function px(x) { return (x - view.x + 0.5) * cw; }
     function py(y) { return (y - view.y + 0.5) * ch; }
@@ -227,7 +258,7 @@
           h('div.small', { text: known ? ('已遇見 ' + r.seen + ' 次・已打倒 ' + r.defeated + ' 次') : '還沒遇見' })])]));
     });
     if (!ids.length) monList.appendChild(h('li', { text: '這裡沒有怪物。' }));
-    var legend = h('p.small', { text: '點地圖上的地方，主角就會走過去。🟡 你　🔵 人　！ 有委託　？ 可以回報　🟠 怪物　🔷 出口　⬜ 車站　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' });
+    var legend = h('p.small', { text: '方位：上面是北，下面是南，左邊是西，右邊是東。點地圖上的地方，主角就會走過去。🟡 你　🔵 人　！ 有委託　？ 可以回報　🟠 怪物　🔷 出口　⬜ 車站　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' });
     var handle;
     var mapBox = h('div.mm-map', {}, [big, legend]);
     mapBox.style.width = sz.w + 6 + 'px';   // 圖例跟著地圖寬度換行
@@ -242,7 +273,7 @@
     return handle;
   }
 
-  var Minimap = { MARKS: MARKS, labelX: labelX, bigMax: bigMax, isBigOpen: function () { return !!(bigHandle && document.body.contains(bigHandle.node)); }, chestText: chestText, attach: attach, openBig: openBig, draw: draw, viewFor: viewFor, LOCAL_W: LOCAL_W, LOCAL_H: LOCAL_H, lastTap: null };
+  var Minimap = { MARKS: MARKS, labelX: labelX, compassBox: compassBox, bigMax: bigMax, isBigOpen: function () { return !!(bigHandle && document.body.contains(bigHandle.node)); }, chestText: chestText, attach: attach, openBig: openBig, draw: draw, viewFor: viewFor, LOCAL_W: LOCAL_W, LOCAL_H: LOCAL_H, lastTap: null };
   window.JQ = window.JQ || {};
   window.JQ.Minimap = Minimap;
 })();
