@@ -5,6 +5,8 @@
  *  2. 停頓寬限：主角一格一格走，番薯仔每格會短暫追上；距離很近但停不到 IDLE_MS 毫秒就不切成站姿。
  *  3. 站姿沿用目前方向（原本固定切成「面朝下」，每格都在走路圖與站姿之間切換）。
  *  4. 透明度平滑：經過障礙時用漸變，不在 1 與 0.5 之間每一格硬切。
+ *  5. v1.0.6 主角可以斜走：番薯仔一樣走主角走過的格子（目標＝主角上一格），主角的每一步都不斜穿牆角，
+ *     所以番薯仔從上一格直線走到下一格也不會穿牆角；斜走時的方向規則和主角一樣（見 chooseDir）。
  */
 (function () {
   'use strict';
@@ -20,16 +22,19 @@
     return Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
   }
 
-  /** 依遲滯規則決定方向：目前方向所在的軸仍有明顯位移就不換。 */
+  /**
+   * 依遲滯規則決定方向（v1.0.6 配合主角斜走，和主角同一套規則）：
+   * - 某一軸明顯大於另一軸（HYST 倍以上）→ 那一軸的方向（同一軸只換正負號）
+   * - 差不多斜的位移：目前面向其中一個分量方向就不換（不閃爍）；否則面向橫向（和主角斜走時一樣）
+   */
   function chooseDir(cur, dx, dy) {
     var ax = Math.abs(dx), ay = Math.abs(dy);
-    var curHoriz = cur === 'left' || cur === 'right';
-    var want = axisDir(dx, dy);
-    var wantHoriz = want === 'left' || want === 'right';
-    if (wantHoriz === curHoriz) return want;                 // 同一軸，只是正負號
-    if (wantHoriz && ax < ay * HYST && ay > NEAR) return cur;  // 想換成水平，但水平不夠明顯
-    if (!wantHoriz && ay < ax * HYST && ax > NEAR) return cur; // 想換成垂直，但垂直不夠明顯
-    return want;
+    if (ax <= NEAR && ay <= NEAR) return cur || axisDir(dx, dy);
+    var h = dx > 0 ? 'right' : 'left', v = dy > 0 ? 'down' : 'up';
+    if (ay <= NEAR || ax >= ay * HYST) return h;   // 水平明顯
+    if (ax <= NEAR || ay >= ax * HYST) return v;   // 垂直明顯
+    if (cur === h || cur === v) return cur;        // 斜的：目前方向是其中一個分量就不換
+    return h;
   }
 
   /**
@@ -53,6 +58,13 @@
     return { x: x, y: y, dir: st.dir, moving: st.moving };
   }
 
+  /**
+   * v1.0.6 這一步番薯仔的速度：主角每走一步就把目標換成主角的上一格，距離（dist）可能是 1 格（直走）或 √2 格（斜走）。
+   * 距離超過 1 格時等比例加快，讓番薯仔每一步都在主角走完這一步之前到達目標格
+   * （不會落後、從半路直線切過去穿過牆角）。base＝走 1 格的速度（每毫秒像素）、tile＝一格幾像素。
+   */
+  function speedFor(base, dist, tile) { return base * Math.max(1, dist / tile); }
+
   /** 平滑透明度：onWalkable＝目前所在格可走（不可走表示正暫時穿過障礙）。 */
   function fadeAlpha(st, onWalkable, delta) {
     var target = onWalkable ? 1 : GHOST_ALPHA;
@@ -62,7 +74,7 @@
     return st.alpha;
   }
 
-  var PetFollow = { create: create, step: step, chooseDir: chooseDir, fadeAlpha: fadeAlpha, IDLE_MS: IDLE_MS, GHOST_ALPHA: GHOST_ALPHA };
+  var PetFollow = { create: create, step: step, chooseDir: chooseDir, fadeAlpha: fadeAlpha, speedFor: speedFor, IDLE_MS: IDLE_MS, GHOST_ALPHA: GHOST_ALPHA };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.PetFollow = PetFollow; }
   if (typeof module !== 'undefined') module.exports = PetFollow;
 })();

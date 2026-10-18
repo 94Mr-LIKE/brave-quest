@@ -61,8 +61,27 @@
         menu();
       } }, ['點一下', h('wbr'), '開始']);   // 窄的直式手機才在「點一下／開始」之間換行（style.css：word-break: keep-all）
       // v0.9.6 老闆：「開始」下移到主角腳邊（男生的右邊，不擋住兩位主角和番薯仔），說明文字跟著移；聯絡作者仍在最底下
-      frame([h('div.title-start', {}, [tap, h('p.note', { text: '可以用滑鼠、觸控或鍵盤（方向鍵走路、空白鍵或 Z 鍵對話）來玩。' })])]);
+      frame([h('div.title-start', {}, [tap, h('p.note', { text: '可以用滑鼠、觸控或鍵盤（方向鍵走路，兩鍵一起按就斜走；空白鍵或 Z 鍵對話）來玩。' })])]);
       setTimeout(function () { tap.focus(); }, 50);
+    }
+
+    /**
+     * v1.0.6「存檔有限」提醒（systems/savetip.js）：選單出現時最多每 7 天顯示一次（bq_save_tip_at 記時間）。
+     * 放在選單按鈕下面的小框（不蓋住「繼續冒險」「新的冒險」），按「知道了」收起來；這次開啟回到選單時照樣顯示，直到收起來。
+     * 從主畫面圖示開啟（standalone／fullscreen）時只提醒備份存檔碼。
+     */
+    var saveTipText, saveTipClosed = false;
+    function saveTipBox() {
+      if (saveTipText === undefined) {
+        saveTipText = null;
+        try { saveTipText = J.SaveTip ? J.SaveTip.take(window.localStorage, Date.now(), window) : null; } catch (e) { saveTipText = null; }
+      }
+      if (!saveTipText || saveTipClosed) return null;
+      var tip = h('div.win.save-tip', { role: 'note', 'aria-label': '存檔提醒' }, [
+        h('span.save-tip-icon', { 'aria-hidden': 'true', text: '💾' }),
+        h('span.save-tip-text', { text: saveTipText }),
+        h('button.ghost.save-tip-close', { onclick: function () { saveTipClosed = true; if (tip.parentNode) tip.parentNode.removeChild(tip); } }, ['知道了'])]);
+      return tip;
     }
 
     function menu(message) {
@@ -78,7 +97,9 @@
       if (o.loadError) notes.push(h('p.note.load-error', { role: 'alert', text: /原本的存檔還在/.test(o.loadError) ? o.loadError : '原本的存檔沒辦法讀取（' + o.loadError + '）。可以用存檔碼還原，或開始新的冒險。' }));
       if (o.migrated) notes.push(h('p.note', { text: '已經把舊版的等級、金幣和學習紀錄搬過來了！故事會重新開始。' }));
       if (message) notes.push(h('p.note', { role: 'alert', text: message }));
-      notes.push(h('p.note', { text: '存檔只放在這台裝置。要換裝置時，請家長在「設定」產生存檔碼。' }));
+      var tip = saveTipBox();
+      if (tip) notes.push(tip);
+      else notes.push(h('p.note', { text: '存檔只放在這台裝置。要換裝置時，請家長在「設定」產生存檔碼。' }));
       frame([box].concat(notes));
       setTimeout(function () { var b = box.querySelector('button'); if (b) b.focus(); }, 50);
     }

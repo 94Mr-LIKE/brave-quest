@@ -39,12 +39,13 @@
     hudEl.appendChild(card);
     hudEl.appendChild(btns);
 
-    // 觸控：左下虛擬搖桿（拖曳方向與力度控制移動，放開就停）、右下 A 鍵（對話／調查）與 B 鍵（取消／選單）
+    // 觸控：左下虛擬搖桿（拖曳方向與力度控制移動，放開就停；v1.0.6 8 個方向，可以斜走）、右下 A 鍵（對話／調查）與 B 鍵（取消／選單）
     var C = J.CONFIG;
     padEl.innerHTML = '';
     var knob = h('div.knob');
-    var joy = h('div.joystick', { role: 'application', 'aria-label': '移動搖桿：按住往想走的方向拖', style: { width: C.JOYSTICK_SIZE + 'px', height: C.JOYSTICK_SIZE + 'px' } }, [knob]);
+    var joy = h('div.joystick', { role: 'application', 'aria-label': '移動搖桿：按住往想走的方向拖，也可以斜著走', style: { width: C.JOYSTICK_SIZE + 'px', height: C.JOYSTICK_SIZE + 'px' } }, [knob]);
     var active = null;
+    var joyDir = null;   // v1.0.6 目前搖桿的方向（8 方向；遲滯用）：放開、重新按下時清掉
     function moveKnob(e) {
       var r = joy.getBoundingClientRect();
       var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
@@ -54,8 +55,9 @@
       var force = Math.min(1, dist / rad);
       var k = dist > rad ? rad / dist : 1;
       knob.style.transform = 'translate(' + (dx * k) + 'px,' + (dy * k) + 'px)';
-      var dir = null;
-      if (force >= C.JOYSTICK_DEADZONE) dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      // v1.0.6 斜走：8 個 45° 扇區，目前方向的扇區邊界放寬約 8°（手指抖動時不會在兩個方向間跳）；力度照舊控制速度
+      var dir = J.Move8.joyDir(dx, dy, force, C.JOYSTICK_DEADZONE, joyDir);
+      joyDir = dir;
       handlers.joystick(dir, force);
     }
     var holdUntil = 0;   // 外圈輕點：保持方向一小段時間讓主角走一步（期間忽略 lostpointercapture 的放開）
@@ -63,6 +65,7 @@
       if (holdUntil > Date.now()) return;
       if (active === null || (e && e.pointerId !== active)) return;
       active = null;
+      joyDir = null;
       knob.style.transform = '';
       handlers.joystick(null, 0);
     }
@@ -70,7 +73,7 @@
     var start = null, engaged = false, armT = 0, lastE = null;
     var pressSeq = 0;   // 每次按下 +1：外圈輕點的放開計時器只放開「自己那一次」按壓（快速連點、滑鼠同一個 pointerId 都不會誤放開新的按壓）
     joy.addEventListener('pointerdown', function (e) {
-      holdUntil = 0; pressSeq++;
+      holdUntil = 0; pressSeq++; joyDir = null;
       e.preventDefault(); active = e.pointerId; try { joy.setPointerCapture(e.pointerId); } catch (x) { /* 忽略 */ }
       start = { x: e.clientX, y: e.clientY, t: Date.now() }; engaged = false; lastE = e;
       clearTimeout(armT);

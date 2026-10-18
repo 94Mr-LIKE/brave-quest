@@ -345,6 +345,14 @@ body.modal-open #toasts .toast.bg { display: none; }
 
 /* v0.8 瀏覽器縮放提示（只在電腦版、縮放不是 100% 左右時出現） */
 .title-screen .zoom-hint { display: flex; align-items: center; gap: 10px; font-size: 18px; padding: 8px 10px 8px 16px; margin: 0 12px 12px; max-width: min(640px, 94vw); flex: none; }
+/* v1.0.6 家長設定的存檔提醒：黃色框、比一般小字醒目 */
+.save-warn { margin: 10px 0; padding: 8px 12px; border: 2px solid #ffd34d; border-radius: 10px; background: rgba(255, 211, 77, .14); font-size: 20px; line-height: 1.55; }
+.save-warn strong { display: block; color: #ffe08a; margin-bottom: 2px; }
+/* v1.0.6「存檔有限」提醒：選單按鈕下面的小框（不蓋住按鈕；按「知道了」收起來） */
+.title-screen .save-tip { display: flex; align-items: center; gap: 10px; font-size: 18px; line-height: 1.45; text-align: left; padding: 8px 10px 8px 14px; margin: 14px 12px 0; max-width: min(900px, 94vw); flex: none; border-color: #ffd34d; }
+.title-screen .save-tip .save-tip-icon { font-size: 24px; flex: none; }
+.title-screen .save-tip .save-tip-close { min-height: 44px; min-width: 44px; padding: 4px 12px; font-size: 18px; flex: none; }
+@media (orientation: landscape) and (max-height: 500px) { .title-screen .save-tip { font-size: 15px; margin-top: 8px; } }
 .title-screen .zoom-hint .zoom-close { min-height: 36px; min-width: 36px; padding: 2px 8px; font-size: 18px; flex: none; }
 
 /* ---------------- v0.9 試玩稽核：版面修正 ---------------- */

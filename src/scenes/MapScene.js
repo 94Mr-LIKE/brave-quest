@@ -5,6 +5,8 @@
  * - 沒有 bg 時才退回程式產生的圖塊（開發用備援），樹冠、屋頂依「腳底 y」和角色前後排序
  * - 網址加 ?debug=1：把 grid 半透明疊在背景上（綠＝可走、紅＝擋、藍＝出口），方便校對碰撞
  * - 點擊／觸控地面用 A* 走過去；方向鍵／WASD／螢幕方向鍵也能走
+ * - v1.0.6 斜走（8 方向、仍然是格子移動；規則在 systems/move8.js）：不斜穿牆角、貼牆斜推會順著滑、
+ *   斜走一步的時間是直走的 √2 倍；走路圖只有四方向，斜走時面向橫向（原本面向其中一個分量方向就不轉）
  * - 看得見的怪物在 spawns 範圍遊走，碰到就進入戰鬥；戰鬥後跑走、30 秒後重生
  * - 只載入這張地圖用到的圖塊與角色圖
  * - v0.5 大地圖（邊長 3 倍）：背景可為 .webp；超過裝置最大貼圖尺寸時自動切塊；載入時顯示進度條；
@@ -805,7 +807,7 @@
       if (!this.petState) this.petState = J.PetFollow.create('down');
       var r = J.PetFollow.step(this.petState, {
         x: pet.x, y: pet.y, tx: this.petTarget.x, ty: this.petTarget.y,
-        delta: delta, speed: 0.085 * S * G().moveSpeed()
+        delta: delta, speed: J.PetFollow.speedFor(0.085 * S * G().moveSpeed(), this.petDist || 0, T)
       });
       pet.x = r.x; pet.y = r.y;
       if (r.moving) {
@@ -850,6 +852,7 @@
       this.pet = this.add.sprite(bx * T + T / 2, by * T + T, pk, 1).setOrigin(0.5, 1);
       this.petTarget = { x: this.pet.x, y: this.pet.y };
       this.petState = null;   // 換地圖時重設跟隨狀態（場景物件會沿用），從朝下站姿重新開始
+      this.petDist = 0;
 
       this.npcList().forEach(function (n) {
         var tk = J.Assets.texKey(n.sprite || 'npc_unknown');
@@ -1031,6 +1034,8 @@
         var occupied = function (x, y) {
           if (x === p.tx && y === p.ty) return true;
           if (p.moving && p.prev && x === p.prev.x && y === p.prev.y) return true;
+          // v1.0.6 夜班審查：主角斜走途中，兩個角落格也算佔用（動物不能走進主角正在切過的角）
+          if (p.moving && p.prev && p.prev.x !== p.tx && p.prev.y !== p.ty && ((x === p.tx && y === p.prev.y) || (x === p.prev.x && y === p.ty))) return true;
           return self.animals.some(function (o) { return o !== a && o.tx === x && o.ty === y; });
         };
         var ok = {};
@@ -1094,39 +1099,31 @@
       this.onPointer({ worldX: wp.x, worldY: wp.y });
     }
 
-    isAdjacent(x, y) { return Math.abs(x - this.p.tx) + Math.abs(y - this.p.ty) === 1; }
-
-    face(x, y) {
-      var dx = x - this.p.tx, dy = y - this.p.ty;
-      this.p.facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
-      this.player.anims.stop();
-      this.player.setFrame(this.idleFrame(this.heroKey, this.p.facing));
+    /** 相鄰：正交，或 v1.0.6 斜角（兩個正交鄰格至少一個可走，不能隔著牆角） */
+    isAdjacent(x, y) {
+      var self = this;
+      return J.Move8.adjacent(this.p.tx, this.p.ty, x, y, function (cx, cy) { return self.walkable(cx, cy); });
     }
 
-    /** 走到 (x,y)；target 不是 null 時走到它旁邊再互動。回傳是否找得到路 */
+    /** 面向 (x,y)。v1.0.6 斜角的對象：轉向橫向或縱向中較接近的那個（Move8.talkFacing） */
+    face(x, y) {
+      var self = this, p = this.p, dx = x - p.tx, dy = y - p.ty;
+      var diag = J.Move8.talkFacing(p.tx, p.ty, x, y, p.facing, function (cx, cy) { return self.walkable(cx, cy); });
+      p.facing = diag || (Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+      this.player.anims.stop();
+      this.player.setFrame(this.idleFrame(this.heroKey, p.facing));
+    }
+
+    /**
+     * 走到 (x,y)；target 不是 null 時走到它旁邊再互動。回傳是否找得到路。
+     * v1.0.6 尋路用 Pathfind 的 diag:true（可以斜走、不斜穿牆角）；目標格不能站時找 8 個鄰格（Move8.planWalk）
+     */
     walkTo(x, y, target) {
       var self = this, p = this.p;
       var w = function (cx, cy) { return self.walkable(cx, cy); };
-      var goal = { c: x, r: y };
-      if (target || !w(x, y)) {
-        var best = null, bestLen = Infinity;
-        [[0, 1], [0, -1], [1, 0], [-1, 0]].forEach(function (d) {
-          var cx = x + d[0], cy = y + d[1];
-          if (!w(cx, cy)) return;
-          var path = (cx === p.tx && cy === p.ty) ? [] : J.Pathfind.findPath(w, self.size.w, self.size.h, { c: p.tx, r: p.ty }, { c: cx, r: cy });
-          if (path && path.length < bestLen) { best = path; bestLen = path.length; }
-        });
-        if (!best && !target) {
-          var n = J.Pathfind.nearestWalkable(w, this.size.w, this.size.h, goal, { c: p.tx, r: p.ty });
-          if (n) best = J.Pathfind.findPath(w, this.size.w, this.size.h, { c: p.tx, r: p.ty }, n);
-        }
-        if (!best) return false;
-        p.path = best;
-      } else {
-        var path = J.Pathfind.findPath(w, this.size.w, this.size.h, { c: p.tx, r: p.ty }, goal);
-        if (!path) return false;
-        p.path = path;
-      }
+      var path = J.Move8.planWalk(w, this.size.w, this.size.h, { c: p.tx, r: p.ty }, x, y, !!target, J.Pathfind);
+      if (!path) return false;
+      p.path = path;
       p.pending = target ? { x: x, y: y, target: target } : null;
       if (!p.path.length && p.pending) this.arrive();
       return true;
@@ -1145,15 +1142,35 @@
       return { x: last.c, y: last.r };
     }
 
+    /** 能走而且沒有黃牛擋著（斜走檢查牆角時也算） */
+    freeAt(x, y) { return this.walkable(x, y) && !this.animalAt(x, y); }
+
+    /**
+     * 方向鍵／搖桿走一步。v1.0.6 可以斜走（Move8.resolveStep）：
+     * 不斜穿牆角；只有一邊能走就順著那邊滑；兩邊都不行就原地轉向不動
+     */
     tryStep(dir) {
-      var p = this.p, d = DIRS[dir];
-      p.facing = dir;
-      var nx = p.tx + d[0], ny = p.ty + d[1];
-      var an = this.animalAt(nx, ny);
-      if (an) this.bumpAnimal(an);   // v0.9.3 碰到黃牛：哞～，牠會走開
-      if (an || !this.walkable(nx, ny)) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, dir)); return false; }
-      this.beginStep(nx, ny);
+      var p = this.p, self = this;
+      var r = J.Move8.resolveStep(p.tx, p.ty, dir, function (x, y) { return self.freeAt(x, y); }, p.facing);
+      if (!r.dir) {
+        var an = this.blockingAnimal(p.tx, p.ty, dir);
+        if (an) this.bumpAnimal(an);   // v0.9.3 碰到黃牛：哞～，牠會走開
+        p.facing = J.Move8.facingFor(dir, p.facing);
+        this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, p.facing));
+        return false;
+      }
+      this.beginStep(r.x, r.y);
       return true;
+    }
+
+    /** 往 dir 走時擋路的黃牛（目標格；斜走時也看橫向、縱向那兩格） */
+    blockingAnimal(x, y, dir) {
+      var d = J.Move8.DIRS[dir];
+      if (!d) return null;
+      var cells = [[x + d[0], y + d[1]]];
+      if (d[0] && d[1]) cells.push([x + d[0], y], [x, y + d[1]]);
+      for (var i = 0; i < cells.length; i++) { var an = this.animalAt(cells[i][0], cells[i][1]); if (an) return an; }
+      return null;
     }
 
     beginStep(nx, ny) {
@@ -1162,11 +1179,15 @@
       this.stepCount = (this.stepCount || 0) + 1;
       if (this.stepCount % 2 === 0) J.Audio.play('footstep', J.Sfx ? J.Sfx.terrainOf(this.defAt(nx, ny).tile) : 'grass');
       var dx = nx - p.tx, dy = ny - p.ty;
-      p.facing = dx > 0 ? 'right' : dx < 0 ? 'left' : dy > 0 ? 'down' : 'up';
+      var dir = J.Move8.dirOf(dx, dy);
+      // v1.0.6 走路圖只有四方向：斜走面向橫向，原本就面向其中一個分量方向時不轉（不閃爍）
+      p.facing = J.Move8.facingFor(dir, p.facing);
       p.moving = true; p.t = 0;
       p.from = { x: p.tx * T + T / 2, y: p.ty * T + T };
       p.to = { x: nx * T + T / 2, y: ny * T + T };
-      p.stepMs = STEP_MS / G().moveSpeed();
+      // v1.0.6 斜走一步的時間是直走的 √2 倍（速度看起來一致）
+      p.stepMs = J.Move8.stepMs(STEP_MS, dir) / G().moveSpeed();
+      p.stepDir = dir;
       p.prev = { x: p.tx, y: p.ty };
       p.tx = nx; p.ty = ny;
       var key = this.player.texture.key + '-' + p.facing;
@@ -1174,6 +1195,8 @@
       var self = this;
       var spot = J.MapInfo.petSpot(function (x, y) { return self.walkable(x, y); }, this.size.w, this.size.h, { x: p.prev.x, y: p.prev.y }, { x: p.tx, y: p.ty }) || p.prev;
       this.petTarget = { x: spot.x * T + T / 2, y: spot.y * T + T };
+      // v1.0.6 斜走：這一步的距離可能是 √2 格，番薯仔等比例加快，一定在主角走完這一步前到達（不落後、不從半路切過牆角）
+      this.petDist = Math.sqrt(Math.pow(this.petTarget.x - this.pet.x, 2) + Math.pow(this.petTarget.y - this.pet.y, 2));
     }
 
     arrive() {
@@ -1216,20 +1239,13 @@
       return null;
     }
 
-    /** 面前或旁邊可以互動的東西 */
+    /**
+     * 面前或旁邊可以互動的東西：站的那格（車站）→ 面前那格 → 其他正交鄰格 →
+     * v1.0.6 斜角（兩個正交鄰格至少一個可走才算，不能隔著牆角說話；actionKey 會先轉向再對話）
+     */
     nearbyInteractable() {
-      var p = this.p, d = DIRS[p.facing];
-      var on = this.interactableAt(p.tx, p.ty);    // 站在車站格上
-      if (on) return { t: on, x: p.tx, y: p.ty };
-      var f = this.interactableAt(p.tx + d[0], p.ty + d[1]);
-      if (f) return { t: f, x: p.tx + d[0], y: p.ty + d[1] };
-      var dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
-      for (var i = 0; i < dirs.length; i++) {
-        var x = p.tx + dirs[i][0], y = p.ty + dirs[i][1];
-        var t = this.interactableAt(x, y);
-        if (t) return { t: t, x: x, y: y };
-      }
-      return null;
+      var p = this.p, self = this;
+      return J.Move8.nearby(p.tx, p.ty, p.facing, function (x, y) { return self.interactableAt(x, y); }, function (x, y) { return self.walkable(x, y); });
     }
 
     actionKey() {
@@ -1281,9 +1297,11 @@
         if (dir) { p.path = []; p.pending = null; this.tryStep(dir); }
         else if (p.path.length) {
           var n = p.path.shift();
-          var an2 = this.animalAt(n.c, n.r);
+          // v1.0.6 路徑可以斜走：走之前再檢查一次牆角（黃牛可能剛好走到橫向或縱向那一格）
+          var an2 = this.blockingAnimal(p.tx, p.ty, J.Move8.dirOf(n.c - p.tx, n.r - p.ty));
+          var selfMs = this;
           if (an2) { this.bumpAnimal(an2); p.path = []; }
-          else if (this.walkable(n.c, n.r)) this.beginStep(n.c, n.r); else p.path = [];
+          else if (J.Move8.canStep(p.tx, p.ty, n.c, n.r, function (x, y) { return selfMs.freeAt(x, y); })) this.beginStep(n.c, n.r); else p.path = [];
         } else if (this.player.anims.isPlaying) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, p.facing)); }
       }
       // 番薯仔跟在後面（防閃爍：方向有遲滯、短暫停頓不切站姿、站姿沿用目前方向、透明度平滑變化）

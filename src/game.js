@@ -468,10 +468,13 @@
     G.heldOrder = G.heldOrder.filter(function (x) { return x !== d; });
     if (on) G.heldOrder.push(d);
   };
+  /**
+   * 現在要往哪裡走：搖桿優先（8 方向）；鍵盤只按一個鍵＝那個方向，
+   * v1.0.6 同時按住一個垂直鍵和一個水平鍵＝斜走（例如 ↑＋→、W＋D；規則在 systems/move8.js）
+   */
   G.heldDir = function () {
     if (G.joy.dir) return G.joy.dir;
-    for (var i = G.heldOrder.length - 1; i >= 0; i--) if (G.held[G.heldOrder[i]]) return G.heldOrder[i];
-    return null;
+    return J.Move8.heldDir(G.held, G.heldOrder);
   };
   /** 移動速度倍率：搖桿推越遠走越快（0.7～1.25 倍）；鍵盤、點擊是 1 倍 */
   G.moveSpeed = function () {
