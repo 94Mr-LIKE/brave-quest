@@ -565,7 +565,7 @@ window.DIALOGS = {
   // 轉職的祝福由廟公說，一定要說「這是你自己努力得來的」（36 號 7.3）。
   D_TEMPLE_INTRO: [
     { who: "temple_keeper", emotion: "平靜", text: "這裡是金包里慈護宮，金山人都叫它「大廟」。",
-      taigi: { hanji: "這是金包里慈護宮，金山人攏叫伊「大廟」。", tailo: "Tse sī Kim-pau-lí Tsû-hōo-kiong, Kim-suann-lâng lóng kiò i “Tuā-biō”.", huayu: "這裡是金包里慈護宮，金山人都叫它「大廟」。" } },
+      taigi: { hanji: "這是金包里慈護宮，金山人攏叫伊「大廟」。", tailo: "Tse sī Kim-pau-lí Tsû-hōo-kiong, Kim-san-lâng lóng kiò i “Tuā-biō”.", huayu: "這裡是金包里慈護宮，金山人都叫它「大廟」。" } },
     { who: "temple_keeper", emotion: "平靜", text: "廟裡主要拜金面媽祖，已經有兩百多年了。",
       taigi: { hanji: "廟內主要拜金面媽祖，已經兩百外年矣。", tailo: "Biō lāi tsú-iàu pài Kim-bīn Má-tsóo, í-king nn̄g-pah guā nî--ah.", huayu: "廟裡主要拜金面媽祖，已經有兩百多年了。" } },
     { who: "temple_keeper", emotion: "神祕", text: "相傳二媽的神像從海上漂到野柳海岸，被漁民發現。",
