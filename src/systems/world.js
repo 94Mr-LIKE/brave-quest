@@ -206,6 +206,13 @@
     return null;
   }
 
+  /** v1.2（61 號 2.0）出口可以走嗎：有 requires（委託 id 或陣列）時，那些委託都完成才可以走；沒寫就一直可以走 */
+  function exitOpen(ex, state) {
+    if (!ex || !ex.requires) return true;
+    var qs = (state && state.quests) || {};
+    return (Array.isArray(ex.requires) ? ex.requires : [ex.requires]).every(function (id) { return !!(qs[id] && qs[id].status === 'done'); });
+  }
+
   /** 檢查資料彼此有沒有對上。回傳警告字串陣列 */
   function validate(data) {
     var warn = [];
@@ -220,6 +227,8 @@
       if (Object.keys(unknown).length) warn.push(id + '：圖例沒有的字元 ' + Object.keys(unknown).join(''));
       (m.exits || []).forEach(function (e) {
         if (!maps[e.to]) warn.push(id + '：出口通往不存在的地圖 ' + e.to);
+        if (e.requires && ![].concat(e.requires).every(function (r) { return data.quests[r]; })) warn.push(id + '：出口 (' + e.x + ',' + e.y + ') 的 requires 委託不存在');
+        if (e.requires_dialog && !data.dialogs[e.requires_dialog]) warn.push(id + '：出口 (' + e.x + ',' + e.y + ') 的 requires_dialog ' + e.requires_dialog + ' 不存在');
       });
       (m.npcs || []).forEach(function (n) {
         if (n.dialog && !data.dialogs[n.dialog]) warn.push(id + '：NPC ' + n.id + ' 的對話 ' + n.dialog + ' 不存在');
@@ -236,7 +245,7 @@
 
   function mapCoef(level) { return [1.0, 1.1, 1.2, 1.3, 1.5][Math.max(1, Math.min(5, level | 0)) - 1]; }
 
-  var World = { EFFECTS: EFFECTS, DAMAGE_EFFECTS: DAMAGE_EFFECTS, TIER_MULT: TIER_MULT, normalizeJobRules: normalizeJobRules, CORE_ITEMS: CORE_ITEMS, CORE_BASE: CORE_BASE, battleBg: battleBg, normalizeShops: normalizeShops, CORE_JOBS: CORE_JOBS, normalizeItems: normalizeItems, normalizeJobs: normalizeJobs, normalizeMonsters: normalizeMonsters, fromWindow: fromWindow, size: size, charAt: charAt, tileDef: tileDef, blockers: blockers, isWalkable: isWalkable, exitAt: exitAt, validate: validate, mapCoef: mapCoef };
+  var World = { EFFECTS: EFFECTS, DAMAGE_EFFECTS: DAMAGE_EFFECTS, TIER_MULT: TIER_MULT, normalizeJobRules: normalizeJobRules, CORE_ITEMS: CORE_ITEMS, CORE_BASE: CORE_BASE, battleBg: battleBg, normalizeShops: normalizeShops, CORE_JOBS: CORE_JOBS, normalizeItems: normalizeItems, normalizeJobs: normalizeJobs, normalizeMonsters: normalizeMonsters, fromWindow: fromWindow, size: size, charAt: charAt, tileDef: tileDef, blockers: blockers, isWalkable: isWalkable, exitAt: exitAt, exitOpen: exitOpen, validate: validate, mapCoef: mapCoef };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.World = World; }
   if (typeof module !== 'undefined') module.exports = World;
 })();

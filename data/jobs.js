@@ -173,13 +173,19 @@ window.JOB_RULES = {
   trial_dialogs: {
     temple: { locked: "D_TEMPLE_LOCKED", intro: "D_TRIAL_INTRO_TEMPLE", pass: "D_TRIAL_PASS_TEMPLE", fail: "D_TRIAL_FAIL_TEMPLE", again: "D_TRIAL_AGAIN_TEMPLE", lv1: "D_JOB_LV1_TEMPLE", back: "D_JOB_BACK_TEMPLE" },
     guild: { locked: "D_GUILD_IDLE", intro: "D_TRIAL_INTRO_GUILD", pass: "D_TRIAL_PASS_GUILD", fail: "D_TRIAL_FAIL_GUILD", again: "D_TRIAL_AGAIN_GUILD", lv1: "D_JOB_LV1_GUILD", back: "D_JOB_BACK_GUILD" },
+    // v1.3 台北章（62 號 4.5；劇本組草稿）：intro_place＝第一次和志工說話的介紹，bless＝轉職成功的祝福（志工說「這是你自己努力得來的」）
+    temple_ht: { locked: "D_TEMPLE_LOCKED_HT", intro: "D_TRIAL_INTRO_HT", pass: "D_TRIAL_PASS_HT", fail: "D_TRIAL_FAIL_HT", again: "D_TRIAL_AGAIN_HT", lv1: "D_JOB_LV1_HT", back: "D_JOB_BACK_HT", bless: "D_TEMPLE_BLESS_HT", intro_place: "D_TEMPLE_HT_INTRO" },
+    temple_zn: { locked: "D_TEMPLE_LOCKED_ZN", intro: "D_TRIAL_INTRO_ZN", pass: "D_TRIAL_PASS_ZN", fail: "D_TRIAL_FAIL_ZN", again: "D_TRIAL_AGAIN_ZN", lv1: "D_JOB_LV1_ZN", back: "D_JOB_BACK_ZN", bless: "D_TEMPLE_BLESS_ZN", intro_place: "D_TEMPLE_ZN_INTRO" },
     pet: { cheer: "D_TRIAL_CHEER", wrong: "D_TRIAL_WRONG", fail: "D_TRIAL_FAIL_PET", quit: "D_TRIAL_QUIT_PET" }
   },
   open_jobs: ["novice", "swordsman", "fighter", "mage", "priest", "dancer", "archer", "bard", "sailor", "shepherd", "jester", "tamer", "merchant"],
   // 48 號 1.5（E3-A）：轉職地點（規則完全一樣）。npc＝和他說話就打開轉職；statue＝站在神像前按 A
   places: [
     { id: "temple_jbl", map: "MT1", kind: "statue", name: "金包里慈護宮" },
-    { id: "guild_fc", map: "M10", kind: "npc", npc: "guild", name: "府城古城職業公會" }
+    { id: "guild_fc", map: "M10", kind: "npc", npc: "guild", name: "府城古城職業公會" },
+    // v1.3 台北章（62 號 4.5）：宮廟志工阿伯主持（不畫神像、不點香、不擲筊、不收費）；規則和慈護宮完全一樣
+    { id: "temple_ht", map: "M12", kind: "npc", npc: "temple_volunteer_ht", name: "行天宮" },
+    { id: "temple_zn", map: "M13", kind: "npc", npc: "temple_volunteer_zn", name: "指南宮" }
   ],
   growth: { hp: 8, mp: 2, atk: 2, def: 0.5 },   // 48 號 2.1：所有職業一樣
   floor_ratio: 0.5, transfer_step: 0.2,

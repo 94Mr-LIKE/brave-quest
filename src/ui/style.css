@@ -54,8 +54,8 @@ button, .btn {
 button:hover { background: #4a69c8; }
 button:active { transform: translateY(2px); box-shadow: 0 1px 0 #0b1236; }
 button:disabled { opacity: .45; cursor: not-allowed; }
-button.primary { background: #e0782e; border-color: #fff3d6; }
-button.primary:hover { background: #f08a3e; }
+button.primary { background: #b85a17; border-color: #fff3d6; }   /* v1.3 Lighthouse：橘底白字對比度 2.99 → 4.57（≥ 4.5），原本 #e0782e */
+button.primary:hover { background: #a84c12; }   /* v1.3 對比度：滑過時再深一階（白字 5.56），原本 #f08a3e 只有 2.6 */
 button.good { background: #2f8f4a; }
 button.ghost { background: transparent; }
 button[aria-pressed="true"], button.selected { background: #f2c14e; color: #2a1e22; border-color: #fff; }
@@ -194,7 +194,7 @@ body.modal-open #pad .bbtn { position: fixed; top: max(8px, env(safe-area-inset-
 .worldmap .stage img { display: block; height: calc(96vh - 170px); min-height: 280px; width: auto; max-width: 92vw; border-radius: 10px; }
 .worldmap .noimg-stage { width: 300px; height: 400px; }
 .worldmap .stage .noimg { padding: 18px; color: #e6eeff; }
-.worldmap .dot { position: absolute; transform: translate(-50%, -50%); width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 50%; font-size: 22px; background: #e0782e; }
+.worldmap .dot { position: absolute; transform: translate(-50%, -50%); width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 50%; font-size: 22px; background: #b85a17; }   /* v1.3 對比度：同 button.primary */
 .worldmap .dot.here { background: #2f8f4a; }
 .worldmap .dot-line { position: absolute; height: 2px; background: rgba(255, 255, 255, .85); transform-origin: 0 50%; pointer-events: none; box-shadow: 0 0 0 1px rgba(13, 21, 48, .6); }   /* v0.9.6 B04 推開的圓點連回真正的位置 */
 .worldmap .dot.locked { background: #6a6f8a; }
@@ -337,7 +337,7 @@ body.opening-on #pad, body.opening-on #hud, body.opening-on #prompt { visibility
 .feedback-panel .fb-text, .feedback-panel .fb-copy { width: 100%; box-sizing: border-box; font-size: 18px; }
 .feedback-panel .fb-check { align-items: flex-start; gap: 8px; margin: 10px 0; flex-wrap: nowrap; }
 .feedback-panel .fb-check input { width: 22px; height: 22px; flex: none; }
-.feedback-panel a.btn { display: inline-flex; align-items: center; text-decoration: none; background: #e0782e; border-color: #fff3d6; color: #fff; }
+.feedback-panel a.btn { display: inline-flex; align-items: center; text-decoration: none; background: #b85a17; border-color: #fff3d6; color: #fff; }   /* v1.3 對比度：同 button.primary */
 .feedback-panel .fb-preview { white-space: pre-wrap; font-size: 14px; max-height: 30vh; overflow: auto; background: rgba(0, 0, 0, .2); padding: 8px; border-radius: 6px; }
 
 /* v0.7.2 視窗開著時，視窗打開前的提示泡泡先藏起來（關掉視窗後再出現），不會蓋住視窗內容 */
@@ -362,7 +362,7 @@ body.portrait .worldmap .stage img { height: auto; max-height: 46vh; max-width: 
 /* 地名框放到 HUD 下面，不蓋住魔力數字 */
 .map-banner { top: calc(var(--hud-h, 88px) + 10px); }
 /* 提示泡泡放在小地圖下面，不疊在小地圖上 */
-#toasts { top: calc(var(--hud-h, 60px) + 130px); }
+#toasts { top: calc(var(--hud-h, 60px) + 150px); }   /* v1.3：小地圖有「建議等級」和「寶箱還剩」兩行字時約 152px 高，+130 會蓋到「寶箱還剩」 */
 /* B 鍵：對話、題目（不是面板）時藏起來；面板開著時放左下角（面板下方留空間），不再蓋住左上角的名字或關閉鈕 */
 body.modal-open:not(.panel-open) #pad .bbtn { display: none; }
 body.modal-open.panel-open #pad .bbtn { position: fixed; top: auto; right: auto; left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); width: 60px !important; height: 60px !important; }
@@ -402,3 +402,111 @@ body.modal-open .load-bar { display: none; }
 .shop-jobs .icon { width: 24px; height: 24px; }
 li.cant-use { opacity: .6; }
 .fx-note { color: #ffd34d; }
+
+/* ---------------- v1.1 第一段畫面品管（2026-10-24，試玩稽核截圖\v1.1_第一段\畫面品管審查.md 第 4–6、9–11 項）---------------- */
+/* 4. 手機直放戰鬥：戰鬥背景貼在怪物名牌下面（不再空一段 HUD 的高度）；狀態卡縮成一行放在訊息框上面、指令一排 4 個，整排固定在畫面底部，不疊在怪物上 */
+body.portrait.in-battle #game { padding-top: 92px; }
+body.portrait.in-battle .battle-ui { gap: 6px; }
+body.portrait.in-battle .battle-ui .status { min-width: 0; width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; padding: 4px 10px; font-size: 18px; }
+body.portrait.in-battle .battle-ui .status .bar { width: 70px; }
+body.portrait.in-battle .battle-ui .msg { min-width: 0; width: 100%; min-height: 60px; font-size: 20px; }
+body.portrait.in-battle .battle-ui .cmds { min-width: 0; width: 100%; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+body.portrait.in-battle .battle-ui .cmds button { padding: 8px 2px; font-size: 18px; white-space: nowrap; }
+/* 5. 手機橫放（矮螢幕）的數字題：數字鍵放在輸入框右邊、一排 7 個兩排排完；輸入框、鍵盤、確定鍵不用捲動就全部看得到 */
+@media (max-height: 460px) {
+  .quiz > .row button { padding: 2px 12px; min-height: 0; }
+  .quiz .scene { padding: 4px 10px; margin: 4px 0; line-height: 1.4; }
+  .quiz .stem { margin: 4px 0; }
+  .quiz p.small { margin: 2px 0; }
+  .ans-number { display: flex; align-items: flex-start; gap: 10px; }
+  .ans-number .row { flex: none; }
+  .ans-number .number-display { min-width: 130px; min-height: 46px; font-size: 28px; padding: 2px 12px; }
+  .ans-number .keypad { flex: 1; max-width: none; margin: 0; grid-template-columns: repeat(7, minmax(38px, 1fr)); gap: 6px; }
+  .ans-number .keypad button { min-height: 42px; font-size: 22px; padding: 0; grid-column: auto !important; }
+  .quiz-foot { padding: 2px 0 6px; }
+  .quiz-foot .row button { padding: 4px 12px; }
+}
+/* 6. 大橫幅（委託完成…）顯示時，提示泡泡先排隊（dom.js），橫幅結束才出現 */
+/*    矮螢幕（手機橫放）：泡泡放在狀態卡下面、小地圖左邊，不往下疊到「Ⓐ 和…說話」和 A 鍵 */
+@media (max-height: 460px) { #toasts { top: calc(var(--hud-h, 60px) + 6px); right: 150px; gap: 6px; } .toast { font-size: 19px; padding: 4px 12px; } }
+/*    窄的直放手機：一次一個泡泡，放在遊戲畫面（寬×9/16）下面、搖桿上面，不蓋住主角、搖桿、A／B 鍵 */
+@media (orientation: portrait) and (max-width: 680px) { #toasts { top: calc(var(--hud-h, 96px) + 56.25vw + 6px); right: 8px; } .toast { font-size: 18px; padding: 6px 12px; max-width: 94vw; } }
+body.banner-on #toasts .toast { visibility: hidden; }
+/* 9. 地名、地標橫幅不斷行（「竹子湖觀景／台」），太長時自動縮字 */
+.map-banner { white-space: nowrap; max-width: 96vw; font-size: clamp(18px, 6vw, 26px); }
+/* 10. 世界地圖「目前在這裡」的圓點：不套用不能按的半透明，綠色實心加白框 */
+.worldmap .dot.here, .worldmap .dot.here:disabled { opacity: 1; box-shadow: 0 0 0 3px #fff, 0 0 0 5px #2f8f4a; z-index: 2; }
+/* 11. 直放排序題：卡片排兩欄，不被底部的確定列蓋住 */
+@media (orientation: portrait) and (max-width: 680px) {
+  .ans-order .options { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ans-order .options button { min-height: 48px; padding: 8px 10px; }
+}
+/* v1.1 美人山眺望點：插圖貼在畫面上方、等比例縮小，下面留給對話框（三種畫面都不裁切） */
+.view-panel { position: fixed; top: max(6px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 6px; text-align: center; max-width: 96vw; }
+.view-panel img { display: block; width: auto; height: auto; max-width: calc(96vw - 12px); max-height: calc(100vh - 230px); min-height: 120px; border-radius: 6px; }
+.view-panel .view-caption { font-size: 18px; color: #ffd95a; margin-top: 2px; }
+@media (max-height: 460px) { .view-panel img { max-height: calc(100vh - 170px); } .view-panel .view-caption { display: none; } }
+
+/* ---------------- v1.1 第二段試玩 M2–M5（2026-10-24，試玩稽核截圖\v1.1_第二段\試玩報告.md）---------------- */
+/* M5 大橫幅寬度：以前 left:50% 的絕對定位只剩半個螢幕寬，直放時一行 2–3 個字；改成依內容寬度、最寬 92vw */
+.big-banner { width: max-content; max-width: min(92vw, 900px); }
+@media (orientation: portrait) and (max-width: 680px) { .big-banner { font-size: 26px; padding: 12px 18px; } }
+/* M5 直放手機：「Ⓐ 和○○說話」提示鈕放在搖桿、A／B 鍵上面（不被 B 鍵、搖桿蓋住）；提示泡泡改放在遊戲畫面上緣（狀態卡下面），讓出提示鈕的位置 */
+@media (orientation: portrait) and (max-width: 680px) {
+  #prompt { bottom: calc(max(18px, env(safe-area-inset-bottom)) + 168px); max-width: 94vw; }
+  #prompt button { white-space: nowrap; font-size: 20px; }
+  #toasts { top: calc(var(--hud-h, 96px) + 6px); }
+  /* 直放手機的四選一：提示句收起來、選項矮一點（答錯多一行回饋時第 4 個選項也不會被底部列蓋住） */
+  .quiz > p.small { display: none; }
+  .quiz .options button { min-height: 50px; padding: 8px 12px; }
+}
+/* M3、M4 手機橫放（矮螢幕）的選擇題、立志小考：選項排兩欄、字和間距縮小、提示句收起來，題目、選項、確定鍵一次看得到；小考的「再念一次／確定」那一列固定在底部 */
+@media (max-height: 460px) {
+  .quiz > p.small { display: none; }
+  .quiz-head { margin-bottom: 2px; }
+  .quiz .timer { margin: 2px 0 4px; }
+  .quiz .options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 4px 0; }
+  .quiz .options button { min-height: 40px; padding: 4px 10px; font-size: 19px; line-height: 1.3; }
+  .quiz .feedback { margin: 2px 0; }
+  .trial .trial-lamps { margin: 0 0 2px; font-size: 16px; gap: 8px; }
+  .quiz.trial > .row { position: sticky; bottom: -8px; background: var(--win-bg); padding: 4px 0 4px; margin: 4px -4px -4px; border-top: 2px solid rgba(255, 255, 255, .25); }
+  .quiz.trial > .row button { padding: 4px 12px; }
+}
+
+/* ---------------- v1.3 直放的 HUD（台北章截圖「手機直放390x844_16」：狀態卡每個字換行、佔掉上半個畫面、「背包」「設定」被切掉）---------------- */
+/* 直放（手機、平板）：狀態卡滿寬兩行（名字・等級・金幣／經驗值・體力・魔力，條子自動變長變短）；下面一排四個按鈕平分寬度，全部看得到；
+   小地圖改到 HUD 下面（遊戲畫面右上角）；提示泡泡回到遊戲畫面下面（HUD 變矮了，不會再碰到「Ⓐ」提示鈕）。窄的手機再把字縮小 */
+@media (orientation: portrait) {
+  #hud { flex-direction: column; align-items: stretch; gap: 4px; }
+  #hud .hud-card { flex-wrap: wrap; gap: 0 14px; line-height: 1.4; }
+  #hud .hud-card::after { content: ''; flex-basis: 100%; order: 2; }
+  #hud .hud-card .name, #hud .hud-card .lv, #hud .hud-card .coins { order: 1; white-space: nowrap; }
+  #hud .hud-card .name { max-width: 7em; overflow: hidden; text-overflow: ellipsis; }
+  #hud .hud-card .lv { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  #hud .hud-card .stat { order: 3; flex: 1 1 auto; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+  #hud .hud-card .stat .bar { flex: 1 1 40px; width: auto; min-width: 20px; }
+  #hud .hud-buttons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  #hud .hud-buttons button { min-width: 0; }
+  #hud .minimap { top: calc(100% + 4px); }
+  #toasts { top: calc(var(--hud-h, 96px) + 56.25vw + 6px); }
+}
+@media (orientation: portrait) and (max-width: 680px) {
+  #hud .hud-card { gap: 0 10px; padding: 3px 10px; font-size: 16px; border-width: 2px; }
+  #hud .hud-card .stat { gap: 3px; }
+  #hud .hud-card .stat .bar { flex-basis: 24px; height: 12px; }
+  #hud .hud-buttons { gap: 4px; }
+  #hud .hud-buttons button { min-height: 44px; padding: 2px; font-size: 17px; border-width: 2px; }
+  #hud .hud-buttons .badge { min-width: 20px; margin-left: 2px; padding: 0 4px; font-size: 15px; line-height: 20px; }
+  #hud .minimap canvas { max-height: 64px; width: auto; }
+}
+/* 手機橫放：小地圖再往下一點，不碰到四個按鈕的下緣 */
+@media (max-height: 460px) { #hud .minimap { top: 58px; } }
+
+/* ---------------- v1.3 候選版畫面審查必改（2026-10-26，試玩稽核截圖\v1.3_候選版\畫面審查報告.md）---------------- */
+/* 台北必改 1：主角在畫面上的位置跑進右上角小地圖的範圍時（地圖東緣的出口、雨雲王那場），小地圖變半透明、不擋點擊（MapScene.fadeMinimap）；離開就恢復。版面不變 */
+#hud .minimap { transition: opacity .2s; }
+#hud .minimap.mm-fade { opacity: .25; pointer-events: none; }
+/* 宜蘭必改 1：答題框還沒捲到底時，按鈕列上緣顯示「▼ 往下滑還有」（quiz.js），捲到底就消失 */
+.quiz-foot .scroll-more { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); margin-bottom: 4px; padding: 2px 14px; border-radius: 999px;
+  background: #f2c14e; color: #2a1e22; font-size: 18px; font-weight: bold; white-space: nowrap; pointer-events: none; box-shadow: 0 2px 0 #0b1236; z-index: 1; }
+.quiz-foot .scroll-more[hidden] { display: none; }

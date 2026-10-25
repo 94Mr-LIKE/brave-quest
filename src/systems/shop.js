@@ -58,6 +58,29 @@
     return r;
   }
 
+  /**
+   * v1.2（61 號 2.8，D23-A）泡溫泉：旅館有 inn.bath { price, label } 才有。回傳 { action: 'pay'｜'refuse'｜'none', price, short }
+   *   價錢＝inn.bath.price；沒寫時＝住宿的一半（進位到 5）。錢不夠就不能泡（金包里溫泉旅館的「免費住」不包含泡溫泉）
+   */
+  function bathPrice(inn) {
+    var b = inn && inn.bath;
+    if (!b) return null;
+    if (typeof b.price === 'number') return Math.max(0, b.price);
+    return Math.ceil(Math.max(0, Number(inn.price) || 0) / 2 / 5) * 5;
+  }
+  function bathStay(state, inn) {
+    var price = bathPrice(inn);
+    if (price === null) return { action: 'none', price: 0, short: 0 };
+    var short = shortfall(state, price);
+    return { action: short ? 'refuse' : 'pay', price: price, short: short };
+  }
+  /** 扣泡溫泉的錢（'pay' 才扣）。不碰 lastInn：泡溫泉不算住宿、不當累倒後回來的地方 */
+  function payBath(state, inn) {
+    var r = bathStay(state, inn);
+    if (r.action === 'pay') state.player.coins -= r.price;
+    return r;
+  }
+
   /** 回傳 {ok, reason?, item, short?} */
   function buy(state, id, items) {
     var it = items[id];
@@ -149,7 +172,7 @@
     return { ok: true, price: e.price, item: e.item };
   }
 
-  var Shop = { forOpenJobs: forOpenJobs, shortfall: shortfall, innStay: innStay, payInn: payInn, SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet,
+  var Shop = { forOpenJobs: forOpenJobs, shortfall: shortfall, innStay: innStay, payInn: payInn, bathPrice: bathPrice, bathStay: bathStay, payBath: payBath, SHOP_TYPES: SHOP_TYPES, catalog: catalog, buy: buy, feedPet: feedPet,
     SELL_RATE: SELL_RATE, EQUIP_RATE: EQUIP_RATE, ITEM_RATE: ITEM_RATE, isPrecious: isPrecious, questNeeds: questNeeds, sellPrice: sellPrice, startLeft: startLeft, sellList: sellList, sell: sell };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Shop = Shop; }
   if (typeof module !== 'undefined') module.exports = Shop;

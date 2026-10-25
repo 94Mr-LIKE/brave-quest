@@ -89,7 +89,8 @@
       var opened = !!state.chests[c];
       return { have: opened ? 1 : 0, need: 1, text: '打開寶箱' + (opened ? '（完成）' : '') };
     }
-    var subj = Array.isArray(q.subjects) && q.subjects.length ? '五科輪流' : (q.subject || '');
+    // v1.1：Q_LAMPS_3 只有國語、英語兩科 → 「國語、英語輪流」；五科的照舊「五科輪流」
+    var subj = Array.isArray(q.subjects) && q.subjects.length ? (q.subjects.length >= 5 ? '五科輪流' : q.subjects.join('、') + '輪流') : (q.subject || '');
     return { have: r.progress || 0, need: helpCount(q), text: '幫忙答對 ' + (r.progress || 0) + '/' + helpCount(q) + ' 題（' + subj + '）' };
   }
 
@@ -121,6 +122,7 @@
       if (state.stickers.indexOf(rw.light) < 0) state.stickers.push(rw.light);
     }
     state.quests[id] = { status: 'done', progress: (rec(state, id) || {}).progress || 0 };
+    if (id === 'Q_GNO_4' && state.legacyM05) state.legacyM05 = false;   // v1.3（62 號 5.4）地精鏈做完：舊紅樹林旗標關掉，之後照台北章的數值
     if (state.story.indexOf(id) < 0) state.story.push(id);
     return { ok: true, reward: { exp: rw.exp || 0, gold: rw.gold || 0, item: item, light: rw.light || null }, levels: levels };
   }
@@ -147,13 +149,41 @@
     return out;
   }
 
+  /**
+   * v1.1 第二段試玩建議 S8：收集委託（hunt）的掉落保底。運氣差時（掉落率 0.5 的小雨傘曾經 8 場只掉 1 把）不用一直打。
+   * 委託進行中、還沒收齊、打倒的是會掉這個收集品的怪物（頭目不算）：這場有掉 → 連續沒掉的次數歸零；
+   * 沒掉 → 次數 +1；已經連續 HUNT_PITY 場沒掉 → 這場一定掉（回傳要補給的道具 id）、次數歸零。
+   * 次數記在委託紀錄 state.quests[id].miss（完成委託時紀錄會換新，次數跟著清掉）。
+   * drops＝這場已經掉的道具 id（還沒放進背包）。回傳要補給的道具 id 陣列（通常是空的）。
+   */
+  var HUNT_PITY = 4;   // 連續 4 場沒掉，第 5 場一定掉
+  function huntPity(state, quests, mon, drops) {
+    var add = [];
+    if (!mon || mon.boss || !state || !state.quests) return add;
+    drops = drops || [];
+    Object.keys(quests).forEach(function (id) {
+      var q = quests[id], h = q && (q.kind || 'help') === 'hunt' ? huntInfo(q) : null;
+      if (!h || status(state, quests, id) !== 'active') return;
+      var item = String(h.item || '').replace(/^item_/, '');
+      var canDrop = (mon.drops || []).some(function (d) { return d && String(d.item || '').replace(/^item_/, '') === item; });
+      if (!item || !canDrop) return;
+      var r = rec(state, id);
+      var got = drops.filter(function (d) { return d === item; }).length + add.filter(function (d) { return d === item; }).length;
+      if (got > 0) { r.miss = 0; return; }
+      if (Character.count(state, item) >= (h.n || 1)) return;   // 已經收齊：不用保底
+      if ((r.miss || 0) >= HUNT_PITY) { add.push(item); r.miss = 0; return; }
+      r.miss = (r.miss || 0) + 1;
+    });
+    return add;
+  }
+
   /** 手帳用：進行中與已完成 */
   function journal(state, quests, data) {
     var active = [], done = [];
     Object.keys(quests).forEach(function (id) {
       var s = status(state, quests, id);
       var q = quests[id];
-      if (s === 'active') active.push({ id: id, title: q.title || id, map: q.map, kind: q.kind || 'help', goal: q.goal || '', next: q.log_next || '', objective: progress(state, quests, id, data).text, ready: canComplete(state, quests, id, data), side: /SIDE/.test(id) });
+      if (s === 'active') active.push({ id: id, title: q.title || id, map: q.map, kind: q.kind || 'help', goal: q.goal || '', next: q.log_next || '', objective: progress(state, quests, id, data).text, ready: canComplete(state, quests, id, data), side: q.side === true || /SIDE/.test(id) });
       else if (s === 'done') done.push({ id: id, title: q.title || id, map: q.map, next: q.log_next || '' });
     });
     return { active: active, done: done };
@@ -170,7 +200,7 @@
     return 'ask';
   }
 
-  var QuestLog = { serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked };
+  var QuestLog = { serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked, HUNT_PITY: HUNT_PITY, huntPity: huntPity };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.QuestLog = QuestLog; }
   if (typeof module !== 'undefined') module.exports = QuestLog;
 })();

@@ -64,14 +64,30 @@ window.ITEMS = {
   crystal:      { name: "回音水晶",   sprite: "item_crystal",      kind: "material", price: 0, desc: "對它說話，會小小聲地回答你。" },
   gear:         { name: "齒輪",       sprite: "item_gear",         kind: "material", price: 0, desc: "地精做機關用的齒輪。" },
   scroll:       { name: "告示卷軸",   sprite: "item_scroll",       kind: "material", price: 0, desc: "哥布林部落的告示碎片，拼起來就能讀。" },
-  key:          { name: "柵欄鑰匙",   sprite: "item_key",          kind: "material", price: 0, desc: "獸人營地柵欄的鑰匙。" }
+  key:          { name: "柵欄鑰匙",   sprite: "item_key",          kind: "material", price: 0, desc: "獸人營地柵欄的鑰匙。" },
+  // v1.1 第一章（59 號 3.4 節）：滴滴雨精的掉落、基隆港 Q_KL_1 的打獵目標。圖示 item_umbrella 是新圖（美術交件後登錄到 sprites.js）
+  umbrella:     { name: "迷路的小雨傘", sprite: "item_umbrella",   kind: "material", price: 0, desc: "被雨精帶走的小雨傘，傘骨上還有水珠。" },
+  // v1.2 第二章（61 號 3.3 節）：金棗彈彈的掉落（頭城礁溪 Q_YL_2 的打獵目標）；黏黏雨雲王的掉落（紀念品，不加數值、不能賣）
+  kumquat:      { name: "金棗",       sprite: "item_kumquat",      kind: "material", price: 0, desc: "圓圓的金色小果實，酸酸甜甜。" },
+  rainbow_piece: { name: "雨後彩虹片", sprite: "item_rainbow_piece", kind: "key", price: 0, precious: true, desc: "雨停後留下的一小片彩虹，亮亮的。" },
+  // v1.3 台北章（62 號 3.4 節）：焙籠火狸、炒炒烘茶機的掉落（坪林 Q_PL_2 的打獵目標）；鈴鈴鬧鐘兵的掉落（貓空 Q_MK_1 的打獵目標）
+  tea_leaf:     { name: "茶葉",       sprite: "item_tea_leaf",     kind: "material", price: 0, desc: "香香的茶葉，焙過之後更香。" },
+  ticket:       { name: "纜車票",     sprite: "item_ticket",       kind: "material", price: 0, desc: "被鬧鐘兵叼走的纜車票。" }
 };
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */
 window.SHOPS = {
   general: { name: "老街雜貨店",   items: ["herb", "snack", "eraser", "guide", "wood_sword", "leather"] },
   item:    { name: "山城市場道具攤",     items: ["herb", "snack", "eraser", "guide"] },
+  // v1.1 第一章（59 號 2.4 節）：基隆港廟口道具攤，品項同山城市場道具攤
+  item_keelung: { name: "廟口道具攤", items: ["herb", "snack", "eraser", "guide"] },
+  // v1.2 第二章（61 號 2.3）：頭城老街道具攤（M14 stall_yilan），品項同山城市場道具攤
+  item_yilan: { name: "老街道具攤", items: ["herb", "snack", "eraser", "guide"] },
   // v1.0 第一批：每個職業的專屬武器、職業防具都在山城（48 號模擬的設定）。沒開放的職業（JOB_RULES.open_jobs）的專屬武器，商店自動不列
   weapon:  { name: "山城武器鋪",     items: ["wood_sword", "iron_sword", "steel_sword", "gloves", "staff", "rod", "ribbon_fan", "bow", "harp", "anchor_axe", "whip", "clapper", "tamer_whip", "abacus_knife"] },
-  armor:   { name: "山城防具店",     items: ["leather", "cloak", "heavy_armor", "light_armor", "robe"] }
+  armor:   { name: "山城防具店",     items: ["leather", "cloak", "heavy_armor", "light_armor", "robe"] },
+  // v1.3 台北章（62 號 2.5【建議】品項同九份三家）：台北城的武器鋪、防具店、道具店（照 v1.2 頭城老街道具攤的做法另開 id，店名寫台北）
+  weapon_taipei: { name: "台北武器鋪", items: ["wood_sword", "iron_sword", "steel_sword", "gloves", "staff", "rod", "ribbon_fan", "bow", "harp", "anchor_axe", "whip", "clapper", "tamer_whip", "abacus_knife"] },
+  armor_taipei: { name: "台北防具店", items: ["leather", "cloak", "heavy_armor", "light_armor", "robe"] },
+  item_taipei: { name: "台北道具店", items: ["herb", "snack", "eraser", "guide"] }
 };

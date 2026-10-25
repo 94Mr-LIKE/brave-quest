@@ -101,6 +101,8 @@
     // v0.5：有「有關閉鈕的視窗」（.panel）開著時，右上角的提示泡泡移到畫面下方中央，不蓋住「關閉」按鈕
     document.body.classList.toggle('panel-open', stack.some(function (e) { return (e.modal || e.passMove) && e.content.classList && e.content.classList.contains('panel'); }));
     document.body.classList.toggle('pass-open', stack.some(function (e) { return e.passMove; }));
+    // v1.1 畫面品管 4：戰鬥畫面開著（直放時重新排版，見 style.css）
+    document.body.classList.toggle('in-battle', stack.some(function (e) { return !!(e.content.querySelector && e.content.querySelector('.battle-ui')); }));
   }
 
   function closeAll() { while (stack.length) stack[stack.length - 1].handle.close(true); }
@@ -129,11 +131,30 @@
    * 提示泡泡。v0.7.2：視窗開著時，「視窗打開前」出現的提示（例如「找頭上有！的人說話吧！」）先隱藏（.bg，見 style.css），
    * 關掉視窗後再顯示，至少再停 2 秒；視窗裡的操作產生的提示（例如「已複製」「金幣不夠」）照常顯示。
    */
+  /*
+   * v1.1 畫面品管 6：大橫幅（委託完成…）顯示時，新的提示泡泡先排隊、已經出現的先收回排隊，橫幅結束再依序出現；
+   * 矮螢幕（高度 460 以下，手機橫放）同時最多 2 個泡泡、窄的直放手機最多 1 個（放在遊戲畫面和搖桿中間），其他排隊；「下一步：」排在最前面。
+   */
+  var toastQueue = [], bannerCount = 0, TOAST_MAX_LOW = 2, TOAST_MAX_PORTRAIT = 1;
+  function lowScreen() { return (window.innerHeight || 999) <= 460; }
+  function narrowPortrait() { var w = window.innerWidth || 999, ht = window.innerHeight || 0; return w <= 680 && ht > w * 1.05; }
+  function toastMax() { return lowScreen() ? TOAST_MAX_LOW : narrowPortrait() ? TOAST_MAX_PORTRAIT : Infinity; }
+  function toastRoom() { return bannerCount === 0 && toasts.children.length < toastMax(); }
+  function pumpToasts() { while (toastQueue.length && toastRoom()) { var t = toastQueue.shift(); showToast(t.text, t.ms); } }
   function toast(text, ms) {
+    var item = { text: text, ms: ms };
+    if (!toastRoom() || toastQueue.length) {
+      if (/^下一步/.test(String(text))) toastQueue.unshift(item); else toastQueue.push(item);
+      pumpToasts();
+      return;
+    }
+    showToast(text, ms);
+  }
+  function showToast(text, ms) {
     var bg = !stack.some(function (e) { return e.modal; });
     var n = h('div.win.toast' + (bg ? '.bg' : ''), { text: text });
     toasts.appendChild(n);
-    var remove = function () { if (n.parentNode) n.parentNode.removeChild(n); };
+    var remove = function () { if (n.parentNode) { n.parentNode.removeChild(n); pumpToasts(); } };
     var waited = false;
     var tick = function () {
       if (!n.parentNode) return;
@@ -144,10 +165,27 @@
     setTimeout(tick, ms || 2600);
   }
 
+  var bannerQueue = [];
   function banner(text, cls) {
+    var big = !cls || cls === 'big-banner';
+    // v1.1 試玩 M2：大橫幅一次只顯示一個；前一個還在就排隊，前一個結束再出現（不會兩個框疊在一起）
+    if (big && bannerCount > 0) { bannerQueue.push(text); return; }
     var n = h('div.win.' + (cls || 'big-banner'), { text: text, 'aria-hidden': 'true' });
     document.getElementById('ui').appendChild(n);
-    setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 2700);
+    if (big) {
+      // 已經出現的泡泡先收回排隊（橫幅結束後重新顯示），新的也排隊
+      Array.prototype.slice.call(toasts.children).forEach(function (t) { t.parentNode.removeChild(t); toastQueue.push({ text: t.textContent, ms: 2600 }); });
+      bannerCount++; document.body.classList.add('banner-on');
+    }
+    setTimeout(function () {
+      if (n.parentNode) n.parentNode.removeChild(n);
+      if (big) {
+        bannerCount = Math.max(0, bannerCount - 1);
+        if (!bannerCount && bannerQueue.length) { banner(bannerQueue.shift()); return; }
+        if (!bannerCount) document.body.classList.remove('banner-on');
+        pumpToasts();
+      }
+    }, 2700);
     announce(text);
   }
 

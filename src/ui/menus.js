@@ -262,7 +262,7 @@
       var V = (window.VOICES && window.VOICES.monsters) || {};
       var grid = h('ul.list.book', { 'aria-label': '怪物名冊' });
       J.Bestiary.split(D.monsters, D.maps).all.forEach(function (id) {
-        var m = D.monsters[id], r = (st.bestiary || {})[id] || { seen: 0, defeated: 0 };
+        var m = J.Ch3Migrate ? J.Ch3Migrate.displayMonster(st, D.monsters[id]) : D.monsters[id], r = (st.bestiary || {})[id] || { seen: 0, defeated: 0 };   // v1.3 舊紅樹林旗標
         var known = r.seen > 0;
         var icon = h('span.icon.book-icon' + (known ? '' : '.unknown'), { html: J.Assets.domIcon(m.sprite, { size: 56, label: known ? m.name : '?', alt: '' }) });
         var where = J.Bestiary.habitats(id, D.maps);
@@ -363,6 +363,19 @@
     var st = G.state, name = (innInfo && innInfo.name) || '旅店';
     var stay = J.Shop.innStay(st, innInfo || {});
     G.lastInnStay = stay;
+    // v1.2（61 號 2.8）有泡溫泉的旅館（inn.bath）：先選「住一晚」或「泡溫泉」（住不起但泡得起也可以選）；選住一晚再走原本的流程
+    var bp = innInfo && innInfo.bath && !innInfo.__stayOnly ? J.Shop.bathStay(st, innInfo) : null;
+    if (bp && (stay.action !== 'refuse' || bp.action === 'pay')) {
+      return J.UI.choose('要在' + name + '住一晚，還是' + String(innInfo.bath.label || '♨️ 泡溫泉').replace(/^♨️\s*/, '') + '呢？你現在有 ' + st.player.coins + ' 金幣。', [
+        { value: 'stay', text: '🛏️ 住一晚（' + stay.price + ' 金幣）', primary: true },
+        { value: 'bath', text: (innInfo.bath.label || '♨️ 泡溫泉') + '（' + bp.price + ' 金幣）' }
+      ]).then(function (v) {
+        G.lastInnChoice = v;   // 測試用
+        if (v === 'stay') return inn(G, mapId, Object.assign({}, innInfo, { __stayOnly: true }), npcId);
+        if (v === 'bath') return bath(G, innInfo, npcId);
+        return false;
+      });
+    }
     if (stay.action === 'refuse') {
       return G.say(innInfo && innInfo.dialog_nocoin, [{ who: npcId || '__inn', text: '金幣不夠喔！可以回金包里的溫泉旅館休息，或去打幾隻怪物存錢。' }]).then(function () { return false; });
     }
@@ -382,6 +395,24 @@
       // 免費住：老闆先說請客的話（D_INN_FREE），再休息
       if (paid.action === 'free') return G.say(innInfo && innInfo.dialog_nocoin, [{ who: npcId || '__inn', text: '錢不夠也沒關係，這次讓你免費住一晚！' }]).then(go);
       return go();
+    });
+  }
+
+  /**
+   * v1.2（61 號 2.8）泡溫泉：扣錢（價錢＝住宿的一半，進位到 5）、體力和魔力回滿；不記成累倒後回來的地方（lastInn 不動）。
+   * 錢不夠不能泡（不給免費）。回傳 Promise：'bath'＝泡了（game.js 播泡湯的畫面）、false＝沒泡
+   */
+  function bath(G, innInfo, npcId) {
+    var st = G.state, label = String((innInfo && innInfo.bath && innInfo.bath.label) || '♨️ 泡溫泉').replace(/^♨️\s*/, '');
+    var b = J.Shop.bathStay(st, innInfo || {});
+    G.lastBath = b;   // 測試用
+    if (b.action !== 'pay') return G.say(null, [{ who: 'pet', text: '金幣不夠，不能' + label + '喔！去打幾隻怪物存錢吧。' }]).then(function () { return false; });
+    return G.say(innInfo.dialog_bath || null, [{ who: 'pet', text: label + '不算住宿喔！記得要有大人陪。' }]).then(function () {
+      G.lastBath = J.Shop.payBath(st, innInfo);
+      J.Character.rest(st, G.data);
+      J.UI.banner(label + '好舒服！體力和魔力都回滿了！');
+      G.save(); G.refreshHud();
+      return 'bath';
     });
   }
 
@@ -480,5 +511,5 @@
     return handle;
   }
 
-  window.JQ.Menus = { bag: bag, shop: shop, journal: journal, inn: inn, guild: guild, questList: questList };
+  window.JQ.Menus = { bag: bag, shop: shop, journal: journal, inn: inn, bath: bath, guild: guild, questList: questList };
 })();

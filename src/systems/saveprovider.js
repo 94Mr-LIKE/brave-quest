@@ -37,9 +37,21 @@
    * 不是 bq_save 或 bq_save:<欄位>，所以 list() 不會把它當成存檔欄位。
    */
   var BACKUP_KEY = Save.SAVE_KEY + '_v2_backup';
-  function backupKeyFor(slot) {
+  /**
+   * v1.1 第一章：v1.0.x（schema 3）存檔在 Ch1Migrate 升到 schema 4 之前的備份 key：bq_save_v3_backup（其他欄位 bq_save_v3_backup:<欄位>）。
+   * 規則同 v2 備份：只寫一次、不覆蓋、list() 不列。schema 3 以前的存檔照舊只寫 v2 備份（那份就是升級前的原檔）。
+   */
+  var BACKUP_V3_KEY = Save.SAVE_KEY + '_v3_backup';
+  /**
+   * v1.3 台北章（CTO 2026-10-25 裁定）：v1.1／v1.2（schema 4）存檔在 Ch3Migrate 升到 schema 5 之前的備份 key：bq_save_v4_backup（其他欄位 bq_save_v4_backup:<欄位>）。
+   * 規則同 v3 備份：只寫一次、不覆蓋、list() 不列。schema 3 的存檔照舊只寫 v3 備份（那份就是升級前的原檔）。
+   */
+  var BACKUP_V4_KEY = Save.SAVE_KEY + '_v4_backup';
+  /** which：省略＝v2 備份（v1.0.1 家長設定的還原按鈕）；'v3'＝v1.1 升級前備份 */
+  function backupKeyFor(slot, which) {
     slot = slot || DEFAULT_SLOT;
-    return slot === DEFAULT_SLOT ? BACKUP_KEY : BACKUP_KEY + ':' + slot;
+    var base = which === 'v4' ? BACKUP_V4_KEY : which === 'v3' ? BACKUP_V3_KEY : BACKUP_KEY;   // v1.3：'v4'＝v1.3 升級前備份
+    return slot === DEFAULT_SLOT ? base : base + ':' + slot;
   }
 
   function summary(slot, s) {
@@ -110,6 +122,10 @@
         // 升級前先備份原本的字串（只寫一次：已經有備份就不覆蓋；寫不進去也照樣讀）
         if (!(obj.version >= 3)) {
           try { if (st.getItem(backupKeyFor(slot)) === null) st.setItem(backupKeyFor(slot), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
+        } else if (obj.version === 3) {   // v1.1：Ch1Migrate（3 → 4）之前也備份一份
+          try { if (st.getItem(backupKeyFor(slot, 'v3')) === null) st.setItem(backupKeyFor(slot, 'v3'), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
+        } else if (obj.version === 4) {   // v1.3：Ch3Migrate（4 → 5）之前也備份一份
+          try { if (st.getItem(backupKeyFor(slot, 'v4')) === null) st.setItem(backupKeyFor(slot, 'v4'), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
         }
         return Save.migrate(obj);
       } catch (e) { return null; }   // 升級失敗：回傳 null，loadError 會說明原因；原本的存檔不動
@@ -123,18 +139,18 @@
     return Promise.resolve(Save.checkRaw(raw));
   };
   /** v1.0.1：有沒有「升級前（v0.9）」的備份（家長設定的還原按鈕用） */
-  LocalSaveProvider.prototype.hasBackup = function (slot) {
-    try { return Promise.resolve(this.storage.getItem(backupKeyFor(slot)) !== null); } catch (e) { return Promise.resolve(false); }
+  LocalSaveProvider.prototype.hasBackup = function (slot, which) {
+    try { return Promise.resolve(this.storage.getItem(backupKeyFor(slot, which)) !== null); } catch (e) { return Promise.resolve(false); }
   };
   /**
-   * v1.0.1：把升級前的備份放回存檔欄位（重新整理後會照常再升級一次）。備份本身留著，不刪。
+   * v1.0.1：把升級前的備份放回存檔欄位（重新整理後會照常再升級一次）。備份本身留著，不刪。which＝'v3' 時用 v1.1 升級前備份
    * 回傳 Promise<{ok}>；沒有備份或寫不進去回 {ok:false, reason}
    */
-  LocalSaveProvider.prototype.restoreBackup = function (slot) {
+  LocalSaveProvider.prototype.restoreBackup = function (slot, which) {
     var st = this.storage;
     return Promise.resolve((function () {
       var raw;
-      try { raw = st.getItem(backupKeyFor(slot)); } catch (e) { return { ok: false, reason: 'read' }; }
+      try { raw = st.getItem(backupKeyFor(slot, which)); } catch (e) { return { ok: false, reason: 'read' }; }
       if (raw === null) return { ok: false, reason: 'none' };
       try { st.setItem(keyFor(slot), raw); } catch (e) { return { ok: false, reason: 'write' }; }
       return { ok: true };
@@ -178,7 +194,7 @@
   CloudSaveProvider.prototype.list = notReady;
   CloudSaveProvider.prototype['delete'] = notReady;
 
-  var SaveProvider = { BACKUP_KEY: BACKUP_KEY, backupKeyFor: backupKeyFor, migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
+  var SaveProvider = { BACKUP_KEY: BACKUP_KEY, BACKUP_V3_KEY: BACKUP_V3_KEY, BACKUP_V4_KEY: BACKUP_V4_KEY, backupKeyFor: backupKeyFor, migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.SaveProvider = SaveProvider; }
   if (typeof module !== 'undefined') module.exports = SaveProvider;
 })();

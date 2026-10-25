@@ -27,18 +27,49 @@
 
   // ---------------------------------------------------------------- 瘦身（v0.9）
   var dictCache = null;
-  /** 題庫字典：題目 ID 與「科目|單元」各自排序後的序號，加上指紋 */
+  /**
+   * v1.1：題庫字典登記表 docs/data/qdict.js（window.QDICT，tools/qbank/update_qdict.js 產生，只加不改）。
+   * 瀏覽器由 index.html 載入；node 測試用 vm 在隔離的環境讀固定路徑的專案資料檔（不接外部輸入；瀏覽器不會走到這段）。
+   */
+  function registry() {
+    if (typeof window !== 'undefined' && window.QDICT) return window.QDICT;
+    if (!isNode) return null;
+    try {
+      var w = {};
+      require('vm').runInNewContext(require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'data', 'qdict.js'), 'utf8'), { window: w });
+      return w.QDICT || null;
+    } catch (e) { return null; }
+  }
+  /**
+   * 題庫字典：題目 ID 與「科目|單元」的序號，加上指紋。
+   * v1.1（題庫加題時舊存檔碼不掉「答對過的題目」）：題庫裡每一題都已經登記在 qdict.js 時，
+   *   序號＝v1.0.7 凍結的排序清單＋之後依加入順序接在後面的題目；指紋固定是 v1.0.7 那一份（和 v1.0.7、v0.9.6 存檔碼的 _d 相同）。
+   *   舊遊戲讀新存檔碼：v1.0.7 範圍內的序號一樣；後面新加的題目它不認得，就略過（不會讀錯）。
+   * 題庫裡有沒登記的題目（測試用的小題庫、還沒跑 update_qdict.js）：照舊用「目前題庫全部排序」和它的指紋。
+   */
   function dictFrom(questions) {
     var qs = questions || (typeof window !== 'undefined' && window.QUESTIONS) || [];
-    var sig = qs.length + ':' + (qs[0] && qs[0].id) + ':' + (qs[qs.length - 1] && qs[qs.length - 1].id);
+    var reg = registry();
+    var sig = qs.length + ':' + (qs[0] && qs[0].id) + ':' + (qs[qs.length - 1] && qs[qs.length - 1].id) + ':' + (reg ? reg.ids.length + (reg.ids_added || []).length : 0);
     if (dictCache && dictCache.sig === sig) return dictCache;
     var ids = [], units = {}, seen = {};
     qs.forEach(function (q) { if (q && q.id && !seen[q.id]) { seen[q.id] = 1; ids.push(String(q.id)); } if (q && q.subject) units[q.subject + '|' + q.unit] = 1; });
-    ids.sort(); var ul = Object.keys(units).sort();
+    var ul = Object.keys(units), hash, useReg = false;
+    var regIds = reg ? reg.ids.concat(reg.ids_added || []) : null, regUnits = reg ? reg.units.concat(reg.units_added || []) : null;
+    var inReg = function (list, k) { return list.indexOf(k) >= 0; };
+    var regIdSet = {};
+    if (regIds) regIds.forEach(function (k) { regIdSet[k] = 1; });
+    if (reg && ids.length && ids.every(function (k) { return regIdSet[k]; }) && ul.every(function (k) { return inReg(regUnits, k); })) {
+      ids = regIds.slice(); ul = regUnits.slice(); useReg = true;
+      hash = Save.fnv1a(reg.ids.join(',') + '#' + reg.units.join(','));
+    } else {
+      ids.sort(); ul.sort();
+      hash = ids.length ? Save.fnv1a(ids.join(',') + '#' + ul.join(',')) : '';
+    }
     var qi = {}, ui = {};
     ids.forEach(function (k, i) { qi[k] = i; });
     ul.forEach(function (k, i) { ui[k] = i; });
-    dictCache = { sig: sig, ids: ids, units: ul, qi: qi, ui: ui, hash: ids.length ? Save.fnv1a(ids.join(',') + '#' + ul.join(',')) : '' };
+    dictCache = { sig: sig, ids: ids, units: ul, qi: qi, ui: ui, hash: hash, registry: useReg };
     return dictCache;
   }
 
@@ -48,7 +79,9 @@
     firstTry: 'f', done: 'd', settings: 'G', player: 'P', quests: 'Q', chests: 'C', visited: 'V', playtime: 'T', daily: 'Y',
     battles: 'B', weapon: 'w', armor: 'a', createdAt: 'c', bestiaryClaims: 'K', stickers: 'X', titles: 'H', lights: 'l', lamps: 'o',
     // v1.0 第一批（48 號 F9）
-    jobs: 'J', floor: 'F', skillSlots: 'N', trial: 'R', trialLog: 'W', lastFailDate: 'x', passedAt: 'z', inProgress: 'i', tries: 'r', lastQ: 'g' };
+    jobs: 'J', floor: 'F', skillSlots: 'N', trial: 'R', trialLog: 'W', lastFailDate: 'x', passedAt: 'z', inProgress: 'i', tries: 'r', lastQ: 'g',
+    // v1.3 台北章（62 號 5.4）舊紅樹林旗標
+    legacyM05: 'y5' };
   var LONG = {};
   Object.keys(SHORT).forEach(function (k) { LONG['~' + SHORT[k]] = k; });
   function renameKeys(v, table) {

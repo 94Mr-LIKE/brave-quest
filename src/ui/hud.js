@@ -16,16 +16,17 @@
     promptEl = document.getElementById('prompt');
     padEl = document.getElementById('pad');
     refs.name = h('span.name');
-    refs.level = h('span');
+    refs.level = h('span.lv');
     refs.exp = bar('exp', '經驗值');
     refs.hp = bar('hp', '體力');
     refs.hpText = h('span');
     refs.mp = bar('mp', '魔力');
     refs.mpText = h('span');
-    refs.coins = h('span');
+    refs.coins = h('span.coins');
+    // v1.3 直放手機：class 給 style.css 排成兩行（名字・等級・金幣／經驗值・體力・魔力），橫放版面不變
     var card = h('div.win.hud-card', { 'aria-label': '冒險者狀態' }, [
-      refs.name, refs.level, h('span', {}, ['經驗值 ', refs.exp.el]),
-      h('span', {}, ['體力 ', refs.hp.el, ' ', refs.hpText]), h('span', {}, ['魔力 ', refs.mp.el, ' ', refs.mpText]), refs.coins
+      refs.name, refs.level, h('span.stat', {}, ['經驗值 ', refs.exp.el]),
+      h('span.stat', {}, ['體力 ', refs.hp.el, ' ', refs.hpText]), h('span.stat', {}, ['魔力 ', refs.mp.el, ' ', refs.mpText]), refs.coins
     ]);
     refs.questCount = h('span.badge', { 'aria-hidden': 'true' });
     refs.questBtn = h('button', { onclick: handlers.quests, 'aria-label': '任務列表' }, ['📜 任務', refs.questCount]);

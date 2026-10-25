@@ -20,7 +20,13 @@
    */
   function ask(o) {
     h = J.UI.h; esc = J.UI.esc;
-    var sess = o.session, q = sess.q, st = o.state;
+    var sess = o.session, st = o.state;
+    // v1.3 選擇題、多選題打亂選項（和立志小考同一套 JQ.Answer.shuffleOptions）：換掉 sess.q，
+    // 之後 Session.submit 判答案、刪去卡挑錯的選項、朗讀「第幾個」、debug.currentQuestion 都用同一份打亂後的題目。
+    // 存檔裡沒有任何「選了第幾個」的紀錄（只記題目 id、科目、單元、對錯、提示），所以存檔、存檔碼格式不變；
+    // 打亂用另一個亂數（不吃 sess.rng），出題順序和沒打亂時一樣（tests/v11_ch1.test.js「選項打亂④」）
+    sess.q = J.Answer.shuffleOptions(sess.q, Math.random);
+    var q = sess.q;
     var battle = o.mode === 'battle';
     var answer = { choice: null, multi: [], number: '', order: [] };
     var finished = false, locked = false;
@@ -59,16 +65,26 @@
     var footer = h('div.quiz-foot', {}, [feedback, actions]);
     var panel = h('div.win.quiz', {}, [head, timerBar, h('div.row', {}, [speakBtn, h('span.small.grow', { text: battle ? '答得越快傷害越高；在虛線前答對是會心一擊！' : '' })]),
       sceneEl, stemEl, tipEl, answerArea, hintBox, payRow, footer]);
+    // v1.3 畫面審查必改（宜蘭 1）：答題框可以捲、還沒捲到底時，在按鈕列上緣顯示「▼ 往下滑還有」，捲到底就消失（不影響捲動和倒數計時）
+    var moreHint = h('div.scroll-more', { 'aria-hidden': 'true', hidden: true, text: '▼ 往下滑還有' });
+    footer.insertBefore(moreHint, footer.firstChild);
+    function updateMore() { moreHint.hidden = !(panel.scrollHeight - panel.clientHeight - panel.scrollTop > 6); }
+    panel.addEventListener('scroll', updateMore, { passive: true });
+    window.addEventListener('resize', updateMore);
+    var moreObs = typeof ResizeObserver === 'function' ? new ResizeObserver(updateMore) : null;   // 回饋、提示多一行時也重算
     var handle = J.UI.open(panel, { label: '題目：' + q.stem, escClose: false });
+    if (moreObs) Array.prototype.forEach.call(panel.children, function (c) { moreObs.observe(c); });
 
     buildAnswer();
     refreshEraser();
+    setTimeout(updateMore, 0);
     if (battle && timer.limit > 0) { lastT = performance.now(); rafId = requestAnimationFrame(loop); }
     else if (battle) { lastT = performance.now(); rafId = requestAnimationFrame(loop); }
 
     // ---------- 題型
     function buildAnswer() {
       answerArea.innerHTML = '';
+      answerArea.className = 'ans-' + q.type;   // v1.1 畫面品管：矮螢幕數字題、直放排序題的版面（style.css）
       if (q.type === 'choice' || q.type === 'multi') {
         var box = h('div.options', { role: q.type === 'choice' ? 'radiogroup' : 'group', 'aria-label': '選項' });
         q.options.forEach(function (opt, i) {
@@ -269,7 +285,7 @@
       o.onDone({ correct: false, left: true });
     }
 
-    function close() { document.removeEventListener('keydown', onKeyDown); J.TTS.stop(); handle.close(true); }
+    function close() { document.removeEventListener('keydown', onKeyDown); window.removeEventListener('resize', updateMore); if (moreObs) moreObs.disconnect(); J.TTS.stop(); handle.close(true); }
 
     function refreshEraser() {
       if (!eraserBtn) return;

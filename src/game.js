@@ -165,6 +165,10 @@
     // v1.0 舊存檔升級（Save.migrate 留下的紀錄）：進地圖後說明一次
     // 紀錄要等孩子看完說明才清掉（看到一半關掉網頁，下次還會再播；夜班審查第 5 點）
     if (st.migratedV3) G.pendingMigrate = st.migratedV3;
+    // v1.1 第一章（59 號 5.1 第 4 點）：Ch1Migrate 幫舊存檔補了委託 → 進地圖後旁白說明一次（同樣看完才清）
+    if (st.migratedCh1) G.pendingMigrateCh1 = st.migratedCh1;
+    // v1.3 台北章（62 號 5.1 第 5 點）：Ch3Migrate 動過舊存檔 → 進地圖後旁白 D_MIGRATE_CH3 一次（看完才清）
+    if (st.migratedCh3) G.pendingMigrateCh3 = st.migratedCh3;
     G.applySettings(true);
     G.save(true);
     J.HUD.show(true);
@@ -401,16 +405,38 @@
       var introMap = scene.mapId;
       setTimeout(function () { if (G.mapScene === scene && scene.mapId === introMap && !scene.transitioning && !G.mapChanging && !G.blocked()) G.templeIntro(scene); }, 500);
     }
+    var migrateV3Done = null;   // v1.0 升級說明播完的時間點（第一章說明要接在它後面，不會兩段對話同時跳出來）
     if (G.pendingMigrate) {
       var mg = G.pendingMigrate; G.pendingMigrate = null;
       G.migrateShown = mg;   // 測試用
-      setTimeout(function () {
-        G.say('D_MIGRATE_V3', [{ who: 'narrator', text: '勇者大冒險更新了！頭目每個階段都要答對 2 題，才會換到下一個階段。' }]).then(function () {
-          if (mg.robe) return G.say(mg.robe.refund ? 'D_MIGRATE_ROBE_NOVICE' : 'D_MIGRATE_ROBE', [{ who: 'narrator', text: '法袍已經換成同樣價錢的防具。' }]);
-        }).then(function () {
-          if (G.state) { delete G.state.migratedV3; G.migrateDone = true; G.save(); }   // 看完了才清掉
-        });
-      }, 500);
+      migrateV3Done = new Promise(function (res) {
+        setTimeout(function () {
+          G.say('D_MIGRATE_V3', [{ who: 'narrator', text: '勇者大冒險更新了！頭目每個階段都要答對 2 題，才會換到下一個階段。' }]).then(function () {
+            if (mg.robe) return G.say(mg.robe.refund ? 'D_MIGRATE_ROBE_NOVICE' : 'D_MIGRATE_ROBE', [{ who: 'narrator', text: '法袍已經換成同樣價錢的防具。' }]);
+          }).then(function () {
+            if (G.state) { delete G.state.migratedV3; G.migrateDone = true; G.save(); }   // 看完了才清掉
+          }).then(res, res);
+        }, 500);
+      });
+    }
+    if (G.pendingMigrateCh1) {
+      var mc = G.pendingMigrateCh1; G.pendingMigrateCh1 = null;
+      G.migrateCh1Shown = mc;   // 測試用
+      migrateV3Done = (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {   // v1.3：記下來，台北章的說明接在後面
+        return G.say('D_MIGRATE_CH1', [{ who: 'narrator', text: '金包里附近多了新的地方：竹子湖、基隆港、金瓜石！' }]);
+      }).then(function () {
+        if (G.state) { delete G.state.migratedCh1; G.migrateCh1Done = true; G.save(); }   // 看完了才清掉
+      });
+    }
+    // v1.3 台北章（62 號 5.1 第 5 點）：紅樹林搬到北投旁邊的說明（接在前面的升級說明後面，不會兩段同時跳出來）
+    if (G.pendingMigrateCh3) {
+      var mc3 = G.pendingMigrateCh3; G.pendingMigrateCh3 = null;
+      G.migrateCh3Shown = mc3;   // 測試用
+      (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {
+        return G.say('D_MIGRATE_CH3', [{ who: 'narrator', text: '紅樹林搬到台北北投的旁邊了！以後也可以從北投走過去。' }]);
+      }).then(function () {
+        if (G.state) { delete G.state.migratedCh3; G.migrateCh3Done = true; G.save(); }   // 看完了才清掉
+      });
     }
     if (G.pendingTrialQuit && G.pendingTrialQuit.length) {
       var quit = G.pendingTrialQuit; G.pendingTrialQuit = null;
@@ -483,6 +509,12 @@
   };
 
   // ---------------------------------------------------------------- NPC 與委託
+  /** v1.3（62 號 4.5）JOB_RULES.places 裡 kind: 'npc' 的轉職地點（行天宮、指南宮的志工；不含職業公會）→ 地點；不是就 null */
+  function jobPlaceFor(npcId) {
+    var R = G.data.jobRules || {}, gid = R.change_npc || 'guild';
+    return (R.places || []).filter(function (p) { return p && p.kind === 'npc' && p.npc === npcId && p.npc !== gid; })[0] || null;
+  }
+  G.jobPlaceFor = jobPlaceFor;   // 測試用
   function npcRole(npc, map) {
     if (npc.virtual) return { role: 'inn', info: map.inn };
     if (map.inn && map.inn.npc === npc.id) return { role: 'inn', info: map.inn };
@@ -490,6 +522,8 @@
     var ex = (map.extra_shops || []).filter(function (s) { return s.npc === npc.id; })[0];
     if (ex) return { role: 'shop', info: ex };
     if (npc.id === ((G.data.jobRules && G.data.jobRules.change_npc) || 'guild')) return { role: 'guild' };
+    var jp = jobPlaceFor(npc.id);   // v1.3 行天宮、指南宮的志工阿伯
+    if (jp) return { role: 'jobplace', place: jp.id };
     if (npc.role === 'travel' || npc.travel) return { role: 'travel' };
     return { role: 'quest' };
   }
@@ -532,19 +566,50 @@
     var held = Object.keys(st.player.jobs || {}).some(function (j) { return j !== st.player.job; });
     G.jobPlaceLog = (G.jobPlaceLog || []).concat([place]);   // 測試用
     if (J.JobTrial.noviceLevel(st) < need && !held) {
-      return G.say(TD.locked || (place === 'guild' ? 'D_GUILD_IDLE' : 'D_TEMPLE_LOCKED'), [{ who: place === 'guild' ? 'guild' : 'temple_keeper', text: '見習冒險者到 ' + need + ' 級，就能來考立志小考喔。' }]);
+      return G.say(TD.locked || (place === 'guild' ? 'D_GUILD_IDLE' : 'D_TEMPLE_LOCKED'), [{ who: place === 'guild' ? 'guild' : place === 'temple' ? 'temple_keeper' : G.placeWho(place), text: '見習冒險者到 ' + need + ' 級，就能來考立志小考喔。' }]);
     }
-    var intro = place === 'guild' ? G.say(R.dialog_open || 'D_GUILD_JOB', []) : Promise.resolve();
+    // v1.1（59 號 7.1 節）見習還沒拿到英語之光（第一章章末頭目還沒打）：慈護宮多提醒一句，不擋轉職；府城公會不加
+    var hintCh1 = place === 'temple' && st.player.job === 'novice' && !(st.lights && st.lights['英語']);
+    if (hintCh1) G.templeHintLog = (G.templeHintLog || 0) + 1;   // 測試用
+    var intro = place === 'guild' ? G.say(R.dialog_open || 'D_GUILD_JOB', [])
+      : hintCh1 ? G.say('D_TEMPLE_HINT_CH1', [{ who: 'temple_keeper', text: '換了職業，等級會從 1 開始。' }, { who: 'temple_keeper', text: '也可以先讓漁港的大章魚清醒，再回來換職業喔。' }]) : Promise.resolve();   // 備用文字和 dialogs.js 的 D_TEMPLE_HINT_CH1 一致（用「清醒」）
     return intro.then(function () {
-      J.Menus.guild(G, { place: place, title: place === 'guild' ? '⚔️ 職業公會' : '✨ 慈護宮・轉職', label: place === 'guild' ? '職業公會' : '慈護宮轉職',
+      J.Menus.guild(G, { place: place, title: place === 'guild' ? '⚔️ 職業公會' : place === 'temple' ? '✨ 慈護宮・轉職' : '✨ ' + G.placeName(place) + '・轉職', label: place === 'guild' ? '職業公會' : place === 'temple' ? '慈護宮轉職' : G.placeName(place) + '轉職',
         onPick: function (jobId, kind) { G.jobPick(place, jobId, kind); } });
     });
+  };
+
+  /** v1.3（62 號 4.5）轉職地點的主持人（台詞的說話者）：公會導師、慈護宮廟公、宮廟志工阿伯 */
+  G.placeWho = function (place) {
+    if (place === 'guild') return 'guild';
+    if (place === 'temple') return 'temple_keeper';
+    var p = ((G.data.jobRules || {}).places || []).filter(function (x) { return x.id === place; })[0];
+    return (p && p.npc) || 'temple_keeper';
+  };
+  /** 轉職地點的名字（選單標題「✨ 行天宮・轉職」） */
+  G.placeName = function (place) {
+    if (place === 'temple') return '慈護宮';
+    var p = ((G.data.jobRules || {}).places || []).filter(function (x) { return x.id === place; })[0];
+    return (p && p.name) || '轉職';
+  };
+  /**
+   * v1.3（62 號 4.5）和行天宮、指南宮的志工阿伯說話：這次遊玩第一次先介紹宮廟（intro_place，只用 S32、S35 的事實），
+   * 再走和慈護宮一樣的轉職流程（G.jobPlace）。不畫神像、不讓神明說話、不點香、不擲筊、不收費。
+   */
+  G.templeVolunteer = function (npc, place) {
+    if (G.blocked()) return Promise.resolve();
+    var TD = (((G.data.jobRules || {}).trial_dialogs) || {})[place] || {};
+    G.placeIntroSeen = G.placeIntroSeen || {};
+    var first = !G.placeIntroSeen[place];
+    G.placeIntroSeen[place] = true;
+    G.templeVolunteerLog = (G.templeVolunteerLog || []).concat([place]);   // 測試用
+    return (first ? G.say(TD.intro_place || npc.dialog, []) : Promise.resolve()).then(function () { return G.jobPlace(place); });
   };
 
   /** 轉職清單上按了某個職業 */
   G.jobPick = function (place, jobId, kind) {
     var st = G.state, D = G.data, R = D.jobRules || {}, TD = (R.trial_dialogs || {})[place] || {}, PET = (R.trial_dialogs || {}).pet || {};
-    var who = place === 'guild' ? 'guild' : 'temple_keeper', name = D.jobs[jobId].name;
+    var who = place === 'guild' ? 'guild' : place === 'temple' ? 'temple_keeper' : G.placeWho(place), name = D.jobs[jobId].name;
     if (kind === 'back') return G.say(TD.back, [{ who: who, text: '以前當過「' + name + '」，免費換回去！' }]).then(function () { return G.doJobChange(place, jobId); });
     if (kind === 'change') return G.say(TD.lv1, [{ who: who, text: '換了職業，等級會從 1 開始，能力有保底，不用擔心。' }]).then(function () { return G.doJobChange(place, jobId); });
     var c = J.JobTrial.canStart(st, jobId, D, Date.now());
@@ -589,12 +654,29 @@
         if (sc && sc.blessFx && sc.p) sc.blessFx();
         setTimeout(function () {
           G.busy = false;
-          var p = place === 'temple' ? G.say(R.temple_bless || 'D_TEMPLE_BLESS', [{ who: 'narrator', text: '這是你自己努力得來的！' }])
+          var tdBless = ((R.trial_dialogs || {})[place] || {}).bless;   // v1.3 行天宮、指南宮：志工說「這是你自己努力得來的」
+          var p = place === 'temple' || tdBless ? G.say(tdBless || R.temple_bless || 'D_TEMPLE_BLESS', [{ who: 'narrator', text: '這是你自己努力得來的！' }])
             .then(function () { return G.say(R.temple_done || 'D_TEMPLE_JOB_DONE', [{ who: 'pet', text: '新職業也要五科一起加油喔！' }]); }) : Promise.resolve();
           p.then(function () { G.save(); resolve(r); });
         }, 1000);
       })();
     });
+  };
+
+  /**
+   * v1.1 眺望點（59 號 2.9.4 美人山）：上方跳出一張橫幅插圖（assets/ui/<image>.png，640×360，等比例縮到畫面裡），
+   * 下方播旁白（dialogs.js 的 dialog）；旁白播完插圖一起收起來。G.viewShown 測試用
+   */
+  G.viewpoint = function (v) {
+    if (G.blocked()) return Promise.resolve();
+    var file = J.Assets.art().ui[v.image];
+    var h = J.UI.h, panel = h('div.win.view-panel', {}, [
+      file ? h('img', { src: J.Assets.resolveUrl(file), alt: (v.label || '風景') + '：遠方山稜像一個人的側臉', width: 640, height: 360 }) : null,
+      h('div.view-caption', { text: v.label || '' })
+    ]);
+    var handle = J.UI.open(panel, { label: (v.label || '風景') + '的插圖', escClose: false });
+    G.viewShown = (G.viewShown || 0) + 1;
+    return G.say(v.dialog, [{ who: 'narrator', text: '遠方的山稜，看起來像一個人的側臉。' }]).then(function () { handle.close(true); });
   };
 
   /** v0.9.5 進廟（有神像的室內地圖）時廟公介紹：D_TEMPLE_INTRO */
@@ -635,10 +717,17 @@
       if (how === 'quest') r = { role: 'quest' };
     }
     if (opts.service) f = null;
-    if (r.role === 'inn') { G.say(J.MapInfo.innDialog(map, npc), [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }]).then(function () { J.Menus.inn(G, scene.mapId, r.info, npc.id).then(function (ok) { if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); }); return; }
+    if (r.role === 'inn') {
+      // v1.1 試玩建議 S1：金幣不夠、又不能免費住（refuse）→ 不先說「歡迎…好好休息」，直接說 *_NOCOIN（台詞不會前後矛盾）
+      var broke = J.Shop.innStay(st, r.info || {}).action === 'refuse';
+      G.innWelcomeSkipped = broke;   // 測試用
+      (broke ? Promise.resolve() : G.say(J.MapInfo.innDialog(map, npc), [{ who: npc.id, text: '歡迎！休息一下，體力就會全滿喔。' }])).then(function () { J.Menus.inn(G, scene.mapId, r.info, npc.id).then(function (ok) { if (ok === 'bath') G.innRest('♨️ 泡湯中……'); else if (ok) G.innRest().then(function () { G.say('D_INN_REST', []); }); }); });
+      return;
+    }
     if (r.role === 'shop') { G.say(npc.dialog, []).then(function () { J.Menus.shop(G, r.info.shop_id || 'general'); }); return; }
     if (r.role === 'travel') { G.say(npc.dialog, [{ who: npc.id, text: '要搭車去哪裡呢？' }]).then(function () { G.openWorldMap(); }); return; }
     if (r.role === 'guild') { G.jobPlace('guild'); return; }   // v1.0：和慈護宮同一套（立志小考）
+    if (r.role === 'jobplace') { G.templeVolunteer(npc, r.place); return; }   // v1.3 行天宮、指南宮（同一套）
     if (f && f.status === 'active') {
       var q = Q[f.id];
       if (J.QuestLog.canComplete(st, Q, f.id, G.data)) { G.completeQuest(f.id, scene); return; }
@@ -655,7 +744,10 @@
       G.say(q2.dialog_start, [{ who: npc.id, text: q2.goal || q2.title }]).then(function () {
         J.QuestLog.accept(st, Q, f.id);
         J.Audio.play('select');
-        J.UI.toast('接下委託：「' + q2.title + '」', 3500);
+        // v1.1 試玩建議 S7：答題委託（help）接下後馬上出題（題目框標題就是委託名稱）；不再跳「接下委託」泡泡——
+        // 泡泡會排在答題後面，等委託完成才冒出來，看起來像又接了一次
+        if ((q2.kind || 'help') !== 'help') J.UI.toast('接下委託：「' + q2.title + '」', 3500);
+        G.lastAccepted = f.id;   // 測試用
         G.save();
         scene.refreshMarkers();
         if ((q2.kind || 'help') === 'help') G.runHelp(f.id, npc, scene);
@@ -693,14 +785,37 @@
     return G.questDone(id, r, scene, st.player.level - lvl);
   };
 
-  /** 委託完成後的共同處理：結束對話、獎勵提示、光、點燈、每日任務、結局 */
+  /**
+   * v1.1（59 號 4.6 ①）委託完成時要點哪幾盞燈：Q_LAMPS 五盞全點；其他多科委託（第一章章末 Q_LAMPS_3：國語、英語）
+   * 只點 q.subjects 裡、這張地圖有燈的科目。修正前：任何多科委託在有燈的地圖完成，都會把五盞燈全部點亮。
+   */
+  G.lampsFor = function (id, q, scene) {
+    if (id === 'Q_LAMPS') return ['國語', '英語', '數學', '自然', '社會'];
+    if (!q || !Array.isArray(q.subjects) || !scene || !scene.map || !Array.isArray(scene.map.lamps)) return [];
+    return q.subjects.filter(function (s) { return scene.map.lamps.some(function (l) { return l.subject === s; }); });
+  };
+  var CHAPTER_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  /** v1.1（59 號 4.6 ②）章末委託（chapter_end）完成：橫幅「第一章 完成！」＋旁白 D_CH1_END */
+  G.chapterEnd = function (n) {
+    J.UI.banner('第' + (CHAPTER_NUM[n] || n) + '章 完成！');
+    return G.say('D_CH' + n + '_END', [{ who: 'narrator', text: '第' + (CHAPTER_NUM[n] || n) + '章完成！' }]).then(function () {
+      // v1.2（61 號 4.4）還沒轉職、見習已到出師等級：章末旁白多一句「要轉職的話，可以搭車回金包里的慈護宮」（D_CH2_JOB_HINT）
+      var hint = 'D_CH' + n + '_JOB_HINT';
+      if ((G.data.dialogs || {})[hint] && J.Character.needsJobHint(G.state, G.data)) { G.jobHintShown = hint; return G.say(hint, []); }
+    });
+  };
+
+  /** 委託完成後的共同處理：結束對話、獎勵提示、光、點燈、章末、每日任務、結局 */
   G.questDone = function (id, r, scene, levels) {
     var st = G.state, q = G.data.quests[id];
     J.Daily.record(st.daily, 'quest').forEach(function (t) { st.player.coins += t.reward; J.UI.toast('每日小任務完成：「' + t.text + '」金幣 +' + t.reward); });
-    if (id === 'Q_LAMPS' || (Array.isArray(q.subjects) && scene && scene.map.lamps)) {
-      ['國語', '英語', '數學', '自然', '社會'].forEach(function (s) { st.lamps[s] = true; });
-      if (scene) scene.updateLamps();
+    var lit = G.lampsFor(id, q, scene);
+    if (lit.length) {
+      lit.forEach(function (s) { st.lamps[s] = true; });
+      if (scene && scene.updateLamps) scene.updateLamps();
     }
+    // 章末：先記在存檔裡（看橫幅、旁白看到一半關掉也算完成這一章）
+    if (q.chapter_end && !(st.chapter >= q.chapter_end)) st.chapter = q.chapter_end;
     G.save();
     return G.say(q.dialog_end, []).then(function () {
       var parts = [];
@@ -714,6 +829,8 @@
         G.jingle('rare_item', null, 'lamp');
         return G.say('D_LIGHT_GET', [{ who: 'pet', text: '拿回了' + r.reward.light + '之光！' }]).then(function () { J.UI.banner('拿回了「' + r.reward.light + '之光」！'); });
       }
+    }).then(function () {
+      if (q.chapter_end) return G.chapterEnd(q.chapter_end);
     }).then(function () {
       if (q.log_next) J.UI.toast('下一步：' + q.log_next, 6000);
       if (scene && scene.refreshMarkers) scene.refreshMarkers();
@@ -868,7 +985,7 @@
   };
 
   G.startBattle = function (mob, scene) {
-    var map = scene.map, mon = mob.mon;
+    var map = scene.map, mon = J.Ch3Migrate ? J.Ch3Migrate.battleMonster(G.state, mob.mon, scene.mapId) : mob.mon;   // v1.3（62 號 5.4）舊紅樹林旗標
     J.UI.closePassMove();   // v0.9.3 開著放大地圖走路時遇到怪物：先把地圖關掉
     G.battleCtx = { mob: mob, mon: mon, mapId: scene.mapId, over: false };
     var bg = G.battleBgFor(mon, scene.mapId);
@@ -918,6 +1035,7 @@
     ctx.ui = J.UI.open(wrap, { modal: false, escClose: false, label: '戰鬥' });
     ctx.el = { top: top, status: status, msg: msg, cmds: cmds };
     G.brender();
+    setTimeout(G.onResize, 0);   // v1.1 畫面品管 4：直放戰鬥換了版面（body.in-battle），畫面重新對齊
   };
 
   G.brender = function () {
@@ -1182,6 +1300,10 @@
     ctx.reward = { exp: vr.exp, coins: vr.gold + ans.daily, monsterGold: vr.gold, daily: ans.daily, bond: bond };   // 測試用
     var drops = J.Battle.rollDrops(mon, null, bond, (s0.trait && s0.trait.drop) || 1);   // v1.0 弓箭手掉寶率 ×1.5
     for (var si = 0; si < ((ctx.b.fx && ctx.b.fx.steal) || 0); si++) { var got = J.Battle.stealItem(mon); if (got) drops.push(got); }   // 神奇口袋
+    // v1.1 試玩建議 S8：收集委託的掉落保底（連續 4 場沒掉，第 5 場一定掉；規則在 QuestLog.huntPity）
+    var pity = J.QuestLog.huntPity(st, G.data.quests, mon, drops);
+    pity.forEach(function (it) { drops.push(it); });
+    ctx.pity = pity;   // 測試用
     if (vt.mp > 0) st.player.mp = Math.min(s0.maxMp, st.player.mp + vt.mp);
     if (vt.friend) { st.bestiary[mon.id] = st.bestiary[mon.id] || {}; st.bestiary[mon.id].friend = true; }   // 怪物朋友卡（魔物大師，第一批只記資料）
     ctx.traits = vt;   // 測試用
@@ -1240,6 +1362,7 @@
     G.phaser.scene.stop('Battle');
     J.HUD.show(true);
     G.refreshHud();
+    setTimeout(G.onResize, 50);   // v1.1 畫面品管 4：離開直放戰鬥的版面，HUD 出現後重新量高度
     if (result === 'ko') {
       var to = J.Character.knockout(G.state, G.data, { map: 'M01', x: undefined, y: undefined });
       G.save();
@@ -1254,10 +1377,10 @@
   };
 
   /** 旅店休息：畫面慢慢變暗，播旅店短曲，播完才亮回來（沒有音樂時約 1.5 秒） */
-  G.innRest = function () {
+  G.innRest = function (label) {   // v1.2：泡溫泉時 label＝「♨️ 泡湯中……」
     return new Promise(function (resolve) {
       G.busy = true;
-      var veil = J.UI.h('div.inn-veil', { 'aria-hidden': 'true' }, [J.UI.h('div', { text: '💤 休息中……' })]);
+      var veil = J.UI.h('div.inn-veil', { 'aria-hidden': 'true' }, [J.UI.h('div', { text: label || '💤 休息中……' })]);
       document.getElementById('ui').appendChild(veil);
       setTimeout(function () { veil.classList.add('on'); }, 20);
       G.stopBgm(400);

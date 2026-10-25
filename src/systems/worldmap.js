@@ -4,15 +4,41 @@
  *   map_entry：地圖 ID（例 "M01"，下車位置用 region 的 tx, ty，沒有就用該地圖的 start），或 { map, x, y }
  *   x, y：在世界地圖圖片上的位置；0～1 之間當成比例，大於 1 當成圖片像素座標
  *   unlock_quest：完成這個委託才解鎖；null／空字串＝一開始就解鎖
+ *   unlock_visit：v1.1（59 號 2.7、4.6 節）去過這張地圖（state.visited[地圖 id]）才解鎖；可以是陣列。
+ *                 和 unlock_quest 同時存在時兩個都要成立
  */
 (function () {
   'use strict';
 
   function isUnlocked(region, state) {
-    var q = region.unlock_quest;
-    if (!q) return true;
-    var list = Array.isArray(q) ? q : [q];
-    return list.every(function (id) { return state.quests[id] && state.quests[id].status === 'done'; });
+    var q = region.unlock_quest, v = region.unlock_visit;
+    var qs = !q ? [] : Array.isArray(q) ? q : [q];
+    var vs = !v ? [] : Array.isArray(v) ? v : [v];
+    var quests = (state && state.quests) || {}, visited = (state && state.visited) || {};
+    return qs.every(function (id) { return quests[id] && quests[id].status === 'done'; }) &&
+      vs.every(function (m) { return visited[m] === true; });
+  }
+
+  /**
+   * v1.1 審查必改 1：還沒解鎖的地區要寫什麼（世界地圖清單、圓點的說明）。
+   * unlock_quest 先濾掉空值（null／''，舊寫法會變成「完成「null」才能去」）；有 state 時只列還沒完成的委託。
+   *   只有委託     → 完成「A」、「B」才能去
+   *   只有去過     → 先走路去過一次才能搭車
+   *   兩個都有     → 完成「A」，先走路去過一次才能搭車
+   * quests＝QUESTS（拿標題用）；回傳 ''＝沒有條件
+   */
+  function lockText(region, quests, state) {
+    var q = region.unlock_quest, v = region.unlock_visit;
+    var qs = (Array.isArray(q) ? q : [q]).filter(function (id) { return typeof id === 'string' && id; });
+    var vs = (Array.isArray(v) ? v : [v]).filter(function (id) { return typeof id === 'string' && id; });
+    if (state) {
+      var done = (state.quests) || {}, visited = state.visited || {};
+      qs = qs.filter(function (id) { return !(done[id] && done[id].status === 'done'); });
+      vs = vs.filter(function (m) { return visited[m] !== true; });
+    }
+    var need = qs.map(function (id) { var t = quests && quests[id]; return '「' + (t && t.title ? t.title : id) + '」'; }).join('、');
+    if (vs.length) return (need ? '完成' + need + '，' : '') + '先走路去過一次才能搭車';
+    return need ? '完成' + need + '才能去' : '';
   }
 
   /** 回傳 [{id, name, x, y, unlocked, here}] */
@@ -73,7 +99,7 @@
     return best;
   }
 
-  var WorldMap = { spreadDots: spreadDots, minGap: minGap, isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction };
+  var WorldMap = { lockText: lockText, spreadDots: spreadDots, minGap: minGap, isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.WorldMap = WorldMap; }
   if (typeof module !== 'undefined') module.exports = WorldMap;
 })();

@@ -17,17 +17,8 @@
 
   function h() { return J.UI.h.apply(null, arguments); }
 
-  /** 選擇題、多選題打亂選項（答案跟著換） */
-  function shuffled(q, rng) {
-    if (q.type !== 'choice' && q.type !== 'multi') return q;
-    var idx = q.options.map(function (_, i) { return i; });
-    for (var i = idx.length - 1; i > 0; i--) { var j = Math.floor(rng() * (i + 1)); var t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
-    var c = Object.assign({}, q);
-    c.options = idx.map(function (k) { return q.options[k]; });
-    var map = function (a) { return idx.indexOf(a); };
-    c.answer = Array.isArray(q.answer) ? q.answer.map(map) : map(q.answer);
-    return c;
-  }
+  /** 選擇題、多選題打亂選項（答案跟著換）。v1.3 抽成共用函式 JQ.Answer.shuffleOptions（quiz.js 也用） */
+  function shuffled(q, rng) { return J.Answer.shuffleOptions(q, rng); }
 
   function petLine(G, id, fallback, k) {
     var d = G.data.dialogs && G.data.dialogs[id];
@@ -83,7 +74,7 @@
         stage.innerHTML = ''; feedback.textContent = ''; feedback.className = 'feedback'; actions.innerHTML = '';
         if (q.scene) stage.appendChild(h('div.scene', { text: J.UI.fill(q.scene, st.player.name) }));
         stage.appendChild(h('div.stem', { id: 'trial-stem', text: J.UI.fill(q.stem, st.player.name) }));
-        var area = h('div', { 'aria-labelledby': 'trial-stem' });
+        var area = h('div', { 'aria-labelledby': 'trial-stem', class: 'ans-' + q.type });   // v1.1 試玩 M4：矮螢幕版面（style.css）
         stage.appendChild(area);
         build();
         var submitBtn = h('button.primary', { onclick: submit }, [q.type === 'multi' || q.type === 'order' ? '完成 ✓' : '確定 ✓']);

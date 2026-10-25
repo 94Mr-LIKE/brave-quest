@@ -73,6 +73,20 @@ window.VOICES = {
     inn_goblin:     { name: "石屋客棧老闆娘", gender: "f", age: "adult", stage: "中年", look: null,                pitch: 0.95, rate: 1.20, taigi: false, persona: "愛笑的哥布林，開口先「嘿嘿」，講話快快的。" },
     inn_moon:       { name: "帳篷營地老闆",   gender: "m", age: "adult", stage: "中年", look: null,                pitch: 0.80, rate: 0.94, taigi: true,  persona: "爽朗實在，講話不急不徐，很會照顧旅人。" },
     inn_fucheng:    { name: "府城老客棧老闆", gender: "m", age: "adult", stage: "中年", look: null,                pitch: 0.90, rate: 0.84, taigi: true,  persona: "客氣有禮，說話慢條斯理，帶一點古早味。" },   // 原 0.96（青年男範圍）
+    // ── v1.1 第一章（59 號 2.2–2.5）：新的人類 NPC 全部講台語、一律男性（35 號第九節）──
+    // 走路圖還沒畫好：look 先填預定的圖名，tools/voice/npc_looks.js 標 pending、replaces＝地圖暫用的舊圖；
+    // 攤販阿伯照 59 號第六節借 npc_uncle_market；旅店老闆是虛擬 NPC（同 inn_moon），look 為 null。
+    // pitch／rate：和同性別、同年齡的每個角色至少差 0.05（validate_world.js 檢查）；老年 rate ≤ 0.95。
+    seaweed_uncle:  { name: "撿海菜阿伯",     gender: "m", age: "elder", stage: "老年", look: "npc_seaweed_uncle", pitch: 0.82, rate: 0.75, taigi: true,  persona: "海邊長大的老人家，講話慢慢的，常提醒小孩海邊要注意安全。" },
+    park_ranger:    { name: "國家公園解說員", gender: "m", age: "adult", stage: "青年", look: "npc_park_ranger",   pitch: 0.94, rate: 1.22, taigi: true,  persona: "年輕有活力的解說員，講話清楚、節奏快，很在意遊客和動物的安全。" },
+    calla_farmer:   { name: "海芋農阿伯",     gender: "m", age: "elder", stage: "老年", look: "npc_calla_farmer",  pitch: 0.66, rate: 0.76, taigi: true,  persona: "種花種了一輩子，說起花田就笑咪咪，聲音低低的、很溫和。" },
+    rice_guide:     { name: "故事館解說員",   gender: "m", age: "adult", stage: "青年", look: "npc_rice_guide",    pitch: 0.99, rate: 0.88, taigi: true,  persona: "斯文、愛講故事，講到米的歷史會放慢速度。" },
+    harbor_uncle:   { name: "漁港阿伯",       gender: "m", age: "adult", stage: "中年", look: "npc_harbor_uncle",  pitch: 0.69, rate: 0.92, taigi: true,  persona: "雨港的漁夫，嗓門大、很熱心，講話直來直往。" },
+    stall_keeper:   { name: "廟口攤販阿伯",   gender: "m", age: "adult", stage: "中年", look: "npc_keelung_vendor", pitch: 0.82, rate: 1.10, taigi: true,  persona: "夜市攤販，招呼客人很有精神，算錢算得飛快。" },
+    old_miner:      { name: "老礦工阿伯",     gender: "m", age: "elder", stage: "老年", look: "npc_old_miner",     pitch: 0.58, rate: 0.78, taigi: true,  persona: "以前在礦山工作的老人家，聲音低沉沙啞，講話一字一句很穩。" },
+    museum_guide:   { name: "博物館解說員",   gender: "m", age: "adult", stage: "青年", look: "npc_museum_guide",  pitch: 0.89, rate: 0.76, taigi: true,  persona: "很有耐心的解說員，說明時一句一句慢慢講，讓人聽得清楚。" },
+    inn_keelung:    { name: "港邊旅店老闆",   gender: "m", age: "adult", stage: "中年", look: null,                pitch: 0.76, rate: 1.06, taigi: true,  persona: "港邊旅店的老闆，親切爽朗，喜歡聊下雨天。" },
+    inn_jinguashi:  { name: "宿舍旅店老闆",   gender: "m", age: "adult", stage: "中年", look: null,                pitch: 0.63, rate: 0.80, taigi: true,  persona: "安安靜靜的老闆，講話輕聲慢慢，讓人想好好睡一覺。" },
     // ── 旁白 ──
     narrator:       { name: "旁白",           gender: "f", age: "adult", stage: "中年", look: null,                pitch: 0.98, rate: 0.95, taigi: false, persona: "平穩溫和的說書人。" },
     // ── 會說話的頭目（戰鬥前後的台詞）── 圖沒有明顯性別特徵的頭目維持原設定（見 34 號報告）
@@ -81,7 +95,42 @@ window.VOICES = {
     mud_frog:       { name: "泥巴大蛙",       gender: "m", age: "adult", stage: "中年", look: "boss_frog",         pitch: 0.60, rate: 0.95, taigi: false, persona: "低沉、呱呱叫，數到一半就亂掉。" },
     noise_bat:      { name: "噪音蝙蝠王",     gender: "m", age: "teen",  stage: "青少年", look: "boss_bat",        pitch: 1.75, rate: 1.25, taigi: false, persona: "尖聲又吵，講話很急，靜下來後變得很溫和。" },
     angry_golem:    { name: "暴躁石像",       gender: "m", age: "adult", stage: "中年", look: "boss_golem",        pitch: 0.50, rate: 0.72, taigi: false, persona: "低沉又重，像石頭敲地，一句一頓。" },
-    fog_demon:      { name: "遺忘霧魔",       gender: "f", age: "adult", stage: "中年", look: "boss_fog",          pitch: 0.70, rate: 0.75, taigi: false, persona: "低低的、飄來飄去，像在耳邊說悄悄話。" }
+    fog_demon:      { name: "遺忘霧魔",       gender: "f", age: "adult", stage: "中年", look: "boss_fog",          pitch: 0.70, rate: 0.75, taigi: false, persona: "低低的、飄來飄去，像在耳邊說悄悄話。" },
+    mnb_goldjaw:    { name: "金脈鐵顎王",     gender: "m", age: "adult", stage: "中年", look: "boss_mnb_goldjaw",  pitch: 0.56, rate: 0.80, taigi: false, persona: "礦山巨獸，聲音像岩石和齒輪在摩擦，清醒後變得溫和緩慢。" },   // v1.1 支線頭目；圖是岩石齒輪的巨獸、沒有性別特徵
+    // v1.2 第二章：宜蘭（61 號；劇本語音組草稿；look 照美術交件：頭目 boss_wxb_raincloud、老街道具攤阿伯 npc_yilan_vendor）
+    trail_volunteer: { name: "步道志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_trail_volunteer", pitch: 0.74, rate: 0.74, taigi: true, persona: "爬了一輩子山的志工，講古蹟故事慢慢的、很有耐心。" },
+    kumquat_farmer: { name: "金棗農阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_kumquat_farmer", pitch: 0.9, rate: 0.88, taigi: true, persona: "種金棗的老農夫，愛笑，講話帶著鄉下的親切。" },
+    bus_driver: { name: "客運司機", gender: "m", age: "adult", stage: "中年", look: "npc_bus_driver", pitch: 0.8, rate: 0.84, taigi: true, persona: "開客運的司機，講話清楚、節奏穩，很注意乘客安全。" },
+    levee_uncle: { name: "海堤阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_levee_uncle", pitch: 0.55, rate: 0.86, taigi: true, persona: "每天在海堤散步看海的阿伯，聲音低沉、說話悠閒。" },
+    stall_yilan: { name: "老街道具攤阿伯", gender: "m", age: "adult", stage: "中年", look: "npc_yilan_vendor", pitch: 0.75, rate: 1.12, taigi: true, persona: "老街道具攤的老闆，嗓門大、招呼客人很熱情。" },
+    inn_jiaoxi: { name: "礁溪溫泉旅館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.01, taigi: true, persona: "溫泉旅館老闆，親切愛招呼，喜歡跟客人聊溫泉。" },
+    scallion_farmer: { name: "蔥農阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_scallion_farmer", pitch: 0.58, rate: 0.92, taigi: true, persona: "種蔥的老農夫，講話直爽、嗓門有點粗。" },
+    opera_actor: { name: "歌仔戲演員", gender: "m", age: "adult", stage: "青年", look: "npc_opera_actor", pitch: 1, rate: 1.2, taigi: true, persona: "年輕的歌仔戲演員，咬字清楚、講話有點像在唱。" },
+    inn_sanxing: { name: "三星民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.69, rate: 1.08, taigi: true, persona: "農村民宿老闆，說話溫和、慢慢的。" },
+    coldspring_keeper: { name: "冷泉管理員", gender: "m", age: "adult", stage: "中年", look: "npc_coldspring_keeper", pitch: 0.78, rate: 0.75, taigi: true, persona: "冷泉管理員，說明事情一板一眼，很重視安全。" },
+    sa_fisher: { name: "南方澳漁港阿伯", gender: "m", age: "adult", stage: "中年", look: "npc_sa_fisher", pitch: 0.74, rate: 1.19, taigi: true, persona: "南方澳的漁夫，豪爽、講話大聲，很愛自己的漁港。" },
+    inn_suao: { name: "冷泉旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.07, taigi: true, persona: "冷泉旅店老闆，講話輕快、讓人放鬆。" },
+    wxb_raincloud: { name: "黏黏雨雲王", gender: "m", age: "adult", stage: "中年", look: "boss_wxb_raincloud", pitch: 0.55, rate: 0.72, taigi: false, persona: "濕答答、慢吞吞，好像整個天空都黏在身上。" },
+    // v1.3 台北章（62 號；劇本語音組草稿；新 NPC 的走路圖都已交件，look 用正式圖；旅店老闆是虛擬店員 look null）
+    tea_farmer: { name: "茶農阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_tea_farmer", pitch: 0.74, rate: 0.68, taigi: true, persona: "坪林的老茶農，講話慢、愛說茶園的事。" },
+    gondola_staff: { name: "纜車站務員", gender: "m", age: "adult", stage: "青年", look: "npc_gondola_staff", pitch: 0.88, rate: 1.21, taigi: true, persona: "纜車站的年輕站務員，講話有精神、很注意安全。" },
+    tea_farmer_mk: { name: "鐵觀音茶農阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_tea_farmer_mk", pitch: 0.68, rate: 0.7, taigi: true, persona: "貓空種茶的老農夫，聲音沙沙的，很得意自己的茶。" },
+    temple_volunteer_zn: { name: "指南宮志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_temple_volunteer_zn", pitch: 0.8, rate: 0.69, taigi: true, persona: "指南宮廟埕的志工阿伯，和氣、說話慢慢的。" },
+    inn_maokong: { name: "茶館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.68, rate: 0.86, taigi: true, persona: "茶館老闆，說話輕鬆，愛請人喝茶。" },
+    dihua_shop: { name: "南北貨店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_dihua_shop", pitch: 0.68, rate: 1.14, taigi: true, persona: "大稻埕南北貨店老闆，算錢很快、嗓門大。" },
+    culture_guide: { name: "文史解說員", gender: "m", age: "adult", stage: "青年", look: "npc_culture_guide", pitch: 0.95, rate: 0.74, taigi: true, persona: "年輕的文史解說員，講古蹟很仔細。" },
+    traffic_volunteer: { name: "交通志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_traffic_volunteer", pitch: 0.74, rate: 0.62, taigi: true, persona: "路口的交通志工阿伯，聲音宏亮、很愛叮嚀安全。" },
+    temple_volunteer_ht: { name: "行天宮志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_temple_volunteer_ht", pitch: 0.88, rate: 0.76, taigi: true, persona: "行天宮廟埕的志工阿伯，客氣、說話清楚。" },
+    inn_taipei: { name: "城市旅館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.72, rate: 0.76, taigi: true, persona: "城市旅館老闆，說話俐落、很熱心。" },
+    smith_taipei: { name: "台北武器鋪老闆", gender: "m", age: "adult", stage: "青年", look: "npc_blacksmith_m", pitch: 0.94, rate: 1.28, taigi: true, persona: "台北武器鋪老闆，說話乾脆。" },
+    armor_taipei: { name: "台北防具店老闆", gender: "m", age: "adult", stage: "青年", look: "npc_shopkeeper", pitch: 0.94, rate: 0.68, taigi: true, persona: "台北防具店老闆，很關心客人的安全。" },
+    item_taipei: { name: "台北道具店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_uncle_market", pitch: 0.78, rate: 1.26, taigi: true, persona: "台北道具店老闆，招呼客人很熱情。" },
+    bt_museum_guide: { name: "溫泉博物館解說員", gender: "m", age: "adult", stage: "青年", look: "npc_bt_museum_guide", pitch: 1, rate: 1.26, taigi: true, persona: "溫泉博物館的解說員，說明時一句一句很清楚。" },
+    geo_ranger: { name: "地熱谷巡守員", gender: "m", age: "adult", stage: "中年", look: "npc_geo_ranger", pitch: 0.78, rate: 0.69, taigi: true, persona: "地熱谷的巡守員，講話嚴肅、一直提醒大家安全。" },
+    inn_beitou: { name: "北投溫泉旅館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.13, taigi: true, persona: "北投溫泉旅館老闆，親切愛招呼。" },
+    observatory_staff: { name: "觀景台服務員", gender: "m", age: "adult", stage: "青年", look: "npc_observatory_staff", pitch: 0.88, rate: 1.27, taigi: true, persona: "觀景台服務員，講話開朗、很會說數字。" },
+    village_guide: { name: "眷村故事館解說員", gender: "m", age: "adult", stage: "青年", look: "npc_village_guide", pitch: 0.88, rate: 0.7, taigi: true, persona: "眷村故事館的解說員，說故事溫溫的。" },
+    inn_xinyi: { name: "信義旅館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.68, rate: 1.2, taigi: true, persona: "信義的旅館老闆，說話輕快。" }
   },
 
   // 主角男女（目前沒有台詞，預留）
@@ -114,6 +163,35 @@ window.VOICES = {
     mud_frog:    { family: "frog",    size: "boss", mood: "迷糊", pitch_shift: -10, cry: "呱——嗚！" },
     noise_bat:   { family: "bat",     size: "boss", mood: "暴躁", pitch_shift: 10,  cry: "吱嘎嘎嘎！" },
     angry_golem: { family: "rock",    size: "boss", mood: "暴躁", pitch_shift: -12, cry: "咚！咚！" },
-    fog_demon:   { family: "spirit",  size: "boss", mood: "神祕", pitch_shift: -5,  cry: "呼嗚嗚……" }
+    fog_demon:   { family: "spirit",  size: "boss", mood: "神祕", pitch_shift: -5,  cry: "呼嗚嗚……" },
+    // v1.1 第一章新怪物（59 號 3.2）
+    wx_rain:     { family: "spirit",  size: "s",    mood: "迷糊", pitch_shift: 8,   cry: "滴答滴答～" },
+    mn_cart:     { family: "armor",   size: "m",    mood: "暴躁", pitch_shift: -4,  cry: "嘰嘎嘰嘎！" },
+    mn_ore:      { family: "rock",    size: "m",    mood: "暴躁", pitch_shift: -7,  cry: "咕隆咕隆！" },
+    mn_dust:     { family: "spirit",  size: "s",    mood: "頑皮", pitch_shift: 5,   cry: "咻咻咻～" },
+    mn_lamp:     { family: "spirit",  size: "s",    mood: "神祕", pitch_shift: 7,   cry: "嗡……嗡……" },
+    mn_drill:    { family: "beast",   size: "s",    mood: "頑皮", pitch_shift: 3,   cry: "嘰嘰嘰！" },
+    mn_timber:   { family: "beast",   size: "m",    mood: "迷糊", pitch_shift: -2,  cry: "沙沙沙……" },
+    mnb_goldjaw: { family: "rock",    size: "boss", mood: "暴躁", pitch_shift: -11, cry: "轟隆隆！" },
+    // v1.2 第二章新怪物（61 號 3.2）
+    ly_tigerwind: { family: "beast", size: "m", mood: "暴躁", pitch_shift: -3, cry: "呼嚕嚕！" },
+    ly_kumquat: { family: "slime", size: "s", mood: "頑皮", pitch_shift: 9, cry: "咚咚咚！" },
+    ly_scallion: { family: "plant", size: "m", mood: "暴躁", pitch_shift: -2, cry: "沙沙沙！" },
+    ly_bubble: { family: "spirit", size: "s", mood: "迷糊", pitch_shift: 6, cry: "啵啵啵～" },
+    ly_mackerel: { family: "aquatic", size: "m", mood: "頑皮", pitch_shift: 4, cry: "啪啪！" },
+    wxb_raincloud: { family: "spirit", size: "boss", mood: "迷糊", pitch_shift: -8, cry: "嘩啦啦……" },
+    // v1.3 台北章新怪物（62 號 3.2）
+    tea_mantis: { family: "beast", size: "s", mood: "暴躁", pitch_shift: 4, cry: "唰唰！" },
+    tea_moth: { family: "bird", size: "s", mood: "神祕", pitch_shift: 7, cry: "啪噠啪噠……" },
+    tea_basket: { family: "beast", size: "m", mood: "頑皮", pitch_shift: 2, cry: "呼嚕呼嚕！" },
+    an_magpie: { family: "bird", size: "m", mood: "頑皮", pitch_shift: 6, cry: "嘎嘎嘎！" },
+    mc_gondola: { family: "armor", size: "m", mood: "迷糊", pitch_shift: -3, cry: "喀噹喀噹……" },
+    mc_alarm: { family: "armor", size: "s", mood: "暴躁", pitch_shift: 8, cry: "鈴鈴鈴！" },
+    mc_roaster: { family: "armor", size: "m", mood: "暴躁", pitch_shift: -4, cry: "轟轟轟！" },
+    mc_signal: { family: "armor", size: "m", mood: "迷糊", pitch_shift: 3, cry: "嗶嗶嗶！" },
+    mc_vending: { family: "armor", size: "m", mood: "頑皮", pitch_shift: -2, cry: "咚咚！" },
+    gt_steam: { family: "beast", size: "m", mood: "暴躁", pitch_shift: -1, cry: "嘶嘶嘶！" },
+    gt_jade: { family: "spirit", size: "s", mood: "神祕", pitch_shift: 5, cry: "咕嘟咕嘟……" },
+    gt_sulfur: { family: "beast", size: "s", mood: "頑皮", pitch_shift: 9, cry: "刺刺！" }
   }
 };

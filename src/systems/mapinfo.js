@@ -59,8 +59,16 @@
 
   // ---------------------------------------------------------------- 建議等級（v0.9.3，37_現行版等級與怪物數值調整.md 第 3 節）
   /** maps.js 有 rec_level: [低, 高] 就用它；沒有時用這張表（金包里沒有野怪，不標） */
-  var REC_LEVEL = { M02: [1, 4], M03: [3, 6], M04: [5, 8], M09: [6, 9], M05: [9, 12], M06: [11, 14], M07: [12, 14], M08: [14, 17], M10: [16, 19], M11: [18, 20] };
+  // v1.1 第一章（59 號 2.6 節）：M06 11–14→5–8、M07 12–14→6–8、M09 6–9→9–10。新地圖 M46 4–6、M47 8–9、M48 10–11 等地圖交件後加（本表的地圖都要存在）
+  var REC_LEVEL = { M02: [1, 4], M03: [3, 6], M04: [5, 8], M09: [9, 10], M05: [13, 14], M06: [5, 8], M07: [6, 8], M08: [14, 17], M10: [16, 19], M11: [18, 20], M46: [4, 6], M47: [8, 9], M48: [10, 11], M49: [8, 9], M14: [9, 10], M50: [10, 11], M51: [11, 12], M52: [11, 12], M13: [12, 13], M53: [13, 14], M54: [12, 13] };   /* v1.3 台北章（62 號 2.8；M12 城裡不出怪不標；M05 紅樹林 9–12 → 13–14） */   /* v1.2 第二章（61 號 2.6：顯示轉職後的等級） */   // v1.1 地圖組：M46 竹子湖 4–6、M47 基隆港 8–9、M48 金瓜石 10–11（59 號 2.6）
+  /** v1.3（62 號 5.4）舊紅樹林旗標：v1.3 前就在做地精鏈的孩子，紅樹林照 v1.2 顯示 Lv9–12（瀏覽器裡才看得到存檔；node 測試直接測 Ch3Migrate.legacyRec） */
+  function legacyRec(map, mapId) {
+    var J3 = typeof window !== 'undefined' && window.JQ && window.JQ.Ch3Migrate, G3 = typeof window !== 'undefined' && window.JQ && window.JQ.Game;
+    return J3 && G3 && G3.state ? J3.legacyRec(G3.state, mapId || (map && map.id)) : null;
+  }
   function recLevel(map, mapId) {
+    var lg = legacyRec(map, mapId);
+    if (lg) return lg;
     var r = map && Array.isArray(map.rec_level) && map.rec_level.length === 2 ? map.rec_level : REC_LEVEL[mapId || (map && map.id)];
     return r ? [Number(r[0]), Number(r[1])] : null;
   }
@@ -161,10 +169,13 @@
     return TILESET_BGM[map && map.tileset] || 'field';
   }
 
-  /** 戰鬥 BGM：最終頭目 final（五科輪流或最高等級地圖的頭目）、頭目 boss、其他 battle */
+  /**
+   * 戰鬥 BGM：最終頭目 final（五科輪流或最高等級地圖的頭目）、頭目 boss、其他 battle
+   * v1.1：金脈鐵顎王是兩科（數學、自然）輪流的一般支線頭目，不算最終頭目（五科都有才算；也決定 game.js 的每日時間上限詢問）
+   */
   function battleBgm(mon, map) {
     if (!mon || !mon.boss) return 'battle';
-    if ((mon.subjects && mon.subjects.length > 1) || (map && map.level >= 5)) return 'final';
+    if ((mon.subjects && mon.subjects.length >= 5) || (map && map.level >= 5)) return 'final';
     return 'boss';
   }
 

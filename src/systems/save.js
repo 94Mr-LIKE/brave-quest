@@ -12,6 +12,8 @@
   var State = isNode ? require('./state.js') : window.JQ.State;
   var Bestiary = isNode ? require('./bestiary.js') : window.JQ.Bestiary;
   var JobMigrate = isNode ? require('./jobmigrate.js') : window.JQ.JobMigrate;
+  var Ch1Migrate = isNode ? require('./ch1migrate.js') : window.JQ.Ch1Migrate;
+  var Ch3Migrate = isNode ? require('./ch3migrate.js') : window.JQ.Ch3Migrate;
 
   var KEY_PREFIX = 'bq_';
   var SAVE_KEY = 'bq_save';
@@ -170,6 +172,10 @@
     if (s.version === 1) migrateV1toV2(s);
     // v1.0 第一批（48 號第 5 節）：v2 → v3 職業資料（等級換算、遷移保底、法袍換成同價防具）；要在補預設值之前
     if (JobMigrate.needs(s)) JobMigrate.migrate(s);
+    // v1.1 第一章（59 號第五節）：v3 → v4（九份算去過、補記 Q_LAMPS_3、幫接好 Q_MER_4）；只新增不刪除，也要在補預設值之前
+    if (Ch1Migrate.needs(s)) Ch1Migrate.migrate(s);
+    // v1.3 台北章（62 號第五節）：v4 → v5（紅樹林算去過、幫接好 Q_GNO_1、補記 Q_LAMPS_MATH、舊紅樹林旗標）；只新增不刪除，也要在補預設值之前
+    if (Ch3Migrate.needs(s)) Ch3Migrate.migrate(s);
     State.migrateAudio(s.settings);   // v0.9.3 語速：舊的預設 1 倍 → 新的預設「稍快」（要在補預設值之前）
     var defaults = State.createNewState(s.player && s.player.name, s.player && s.player.gender, s.createdAt || 0);
     State.fillDefaults(s, defaults);

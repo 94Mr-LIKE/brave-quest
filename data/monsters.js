@@ -56,6 +56,22 @@
  * 招潮蟹（fiddler_crab）依同文件第 5 節用紅樹林沼澤蛙那一列。配合 C1（打倒怪物才給經驗值和金幣）、C5（頭目第 2、3 階段傷害 ×1.2、×1.4）。
  * 頭目的 atk 是第 1 階段的值。上面舊的推導說明是 v0.2～v0.9.2 的數值，僅供參考。
  */
+/*
+ * v1.1 第一章（2026-10-20，59_v1.1第一章實作規格.md 第三節；F1 照【建議 A】＝沿用現行升級表與 37 號算法）：
+ *   - 新增 8 種：wx_rain、mn_cart、mn_ore、mn_dust、mn_lamp、mn_drill、mn_timber、頭目 mnb_goldjaw（3.2 節）。
+ *   - 調整 6 種（3.3 節）：crab、rock、bat、goblin（野柳／哥布林部落改成第二區 Lv5–8）、noise_bat（建議 Lv8、出題 1–3 星）、
+ *     fog_octopus（章末頭目建議 Lv10、gold 100）。名稱、科目、掉落、階段、對話、ref_mobs 不改。
+ *   - systems 測試 S11-1 逐格比對本檔與 59 號 3.2、3.3 節的表。
+ */
+/*
+ * v1.2 第二章（61_v1.2第二章宜蘭實作規格.md 3.2 節；wip_v12/v12_apply.js 套用）：新增 5 種蘭陽系小怪＋頭目黏黏雨雲王；舊怪物全部不改。
+ *   systems 測試 S12-1（tests/v12_ch2.test.js）逐格比對本檔與 61 號 3.2 節的表。
+ */
+/*
+ * v1.3 台北章（62_v1.3台北章實作規格.md 3.2、3.3 節；wip_v13/v13_apply.js 套用）：新增 12 種；紅樹林的泥泥怪、招潮蟹、泥巴大蛙照台北章重算，
+ *   legacy 欄位＝v1.2 上線的數值（舊紅樹林旗標 state.legacyM05：v1.3 前就在做地精鏈的孩子在 M05 照舊數值打到地精鏈完成，systems/ch3migrate.js）。
+ *   systems 測試 S13-1（tests/v13_ch3.test.js）逐格比對本檔與 62 號 3.2、3.3 節的表。
+ */
 window.MONSTERS = {
 
   // ── 地圖等級 1（M02 擎天草原）──
@@ -92,8 +108,8 @@ window.MONSTERS = {
     wake: "貓頭鷹清醒了，咕咕叫著飛回樹洞。"
   },
   crab: {
-    name: "港口螃蟹", sprite: "mon_crab", level: 2, hp: 220, atk: 17, subject: "英語", q_levels: [1, 2],
-    exp: 125, gold: 18, drops: [{ item: "snack", rate: 0.3 }], boss: false,
+    name: "港口螃蟹", sprite: "mon_crab", level: 2, hp: 50, atk: 11, subject: "英語", q_levels: [1, 2],
+    exp: 35, gold: 8, drops: [{ item: "snack", rate: 0.3 }], boss: false,
     desc: "住在海邊岩岸的螃蟹，霧讓牠聽不懂外國船員的話。",
     wake: "港口螃蟹清醒了，橫著走回沙灘。"
   },
@@ -104,10 +120,11 @@ window.MONSTERS = {
     wake: "搶食海鷗清醒了，把東西還給你，飛回海上。"
   },
 
-  // ── 地圖等級 3（M05 紅樹林濕地、M06 海蝕洞窟、M07 哥布林部落）──
+  // ── 地圖等級 3（M05 紅樹林濕地）；v1.1 起洞窟蝙蝠、石頭怪、頑皮哥布林（M06 海蝕洞窟、M07 哥布林部落）改成第二區、level 2 ──
   mudslime: {
-    name: "泥泥怪", sprite: "mon_mudslime", level: 3, hp: 200, atk: 16, subject: "數學", q_levels: [2, 3],
-    exp: 95, gold: 14, drops: [{ item: "gear", rate: 0.5 }], boss: false,
+    name: "泥泥怪", sprite: "mon_mudslime", level: 4, hp: 190, atk: 29, subject: "數學", q_levels: [2, 3],
+    exp: 80, gold: 20, drops: [{ item: "gear", rate: 0.5 }], boss: false,
+    legacy: { level: 3, hp: 200, atk: 16, exp: 95, gold: 14 },   // v1.3（62 號 3.3、5.4）紅樹林搬到台北章重算；legacy＝v1.2 數值（舊紅樹林旗標用）
     desc: "濕地泥灘上的泥巴團，迷糊時會把亮亮的齒輪吞進肚子。",
     wake: "泥泥怪清醒了，吐出齒輪，慢慢滑回泥灘裡。"
   },
@@ -121,28 +138,75 @@ window.MONSTERS = {
   // 數值照 37 號「數值請用紅樹林那一列」＝與沼澤蛙同一列；之後套用 37 號修改表時，請和 frog 一起改（210／17／110／16）。
   // 【美術需求｜佔位】還沒有招潮蟹的圖，先借用港口螃蟹的圖 mon_crab；招潮蟹圖完成後把 sprite 改成新圖的 id。
   fiddler_crab: {
-    name: "招潮蟹", sprite: "mon_fiddler_crab", level: 3, hp: 210, atk: 17, subject: "自然", q_levels: [2, 3],
-    exp: 110, gold: 16, drops: [{ item: "gear", rate: 0.3 }], boss: false,
+    name: "招潮蟹", sprite: "mon_fiddler_crab", level: 4, hp: 190, atk: 29, subject: "自然", q_levels: [2, 3],
+    exp: 80, gold: 20, drops: [{ item: "gear", rate: 0.3 }], boss: false,
+    legacy: { level: 3, hp: 210, atk: 17, exp: 110, gold: 16 },   // v1.3（62 號 3.3、5.4）
     desc: "紅樹林泥灘上揮著一隻大螯的小螃蟹，霧讓牠忘了潮水什麼時候會來。",
     wake: "招潮蟹清醒了，揮揮大螯，鑽回泥灘的小洞裡。"
   },
   bat: {
-    name: "洞窟蝙蝠", sprite: "mon_bat", level: 3, hp: 230, atk: 18, subject: "國語", q_levels: [2, 3],
-    exp: 140, gold: 20, drops: [{ item: "bat_wing", rate: 0.4 }], boss: false,
+    name: "洞窟蝙蝠", sprite: "mon_bat", level: 2, hp: 55, atk: 14, subject: "國語", q_levels: [1, 2],
+    exp: 45, gold: 10, drops: [{ item: "bat_wing", rate: 0.4 }], boss: false,
     desc: "倒掛在洞頂睡覺的蝙蝠，被霧吵醒後脾氣不太好。",
     wake: "洞窟蝙蝠清醒了，飛回洞頂繼續睡覺。"
   },
   rock: {
-    name: "石頭怪", sprite: "mon_rock", level: 3, hp: 230, atk: 18, subject: "數學", q_levels: [2, 3],
-    exp: 125, gold: 18, drops: [{ item: "crystal", rate: 0.4 }], boss: false,
+    name: "石頭怪", sprite: "mon_rock", level: 2, hp: 55, atk: 13, subject: "數學", q_levels: [1, 2],
+    exp: 40, gold: 9, drops: [{ item: "crystal", rate: 0.4 }], boss: false,
     desc: "會走路的石頭，身上常常黏著亮晶晶的水晶。",
     wake: "石頭怪清醒了，滾到角落安靜地休息。"
   },
   goblin: {
-    name: "頑皮哥布林", sprite: "mon_goblin", level: 3, hp: 240, atk: 18, subject: "國語", q_levels: [2, 3],
-    exp: 140, gold: 20, drops: [{ item: "scroll", rate: 0.5 }], boss: false,
+    name: "頑皮哥布林", sprite: "mon_goblin", level: 2, hp: 60, atk: 14, subject: "國語", q_levels: [1, 2],
+    exp: 45, gold: 10, drops: [{ item: "scroll", rate: 0.5 }], boss: false,
     desc: "被霧弄迷糊的哥布林，把部落的告示撕下來當玩具。",
     wake: "頑皮哥布林清醒了，不好意思地跑回部落。"
+  },
+
+  // ── v1.1 第一章新怪（59 號 3.2 節）：基隆港（M47）滴滴雨精；九份東側（M09）、金瓜石（M48）礦坑系 ──
+  // level＝圖鑑顯示的地圖等級；掉落只新增 umbrella（迷路的小雨傘），其他借既有道具、不用齒輪（Q_GNO_3 的打獵目標）
+  wx_rain: {
+    name: "滴滴雨精", sprite: "mon_wx_rain", level: 2, hp: 70, atk: 16, subject: "自然", q_levels: [1, 2],
+    exp: 50, gold: 11, drops: [{ item: "umbrella", rate: 0.5 }], boss: false,
+    desc: "一顆會走路的大雨滴，撐著葉子當傘。霧讓牠忘了雨要下在哪裡。",
+    wake: "滴滴雨精清醒了，變成小雨滴回到雲裡。"
+  },
+  mn_cart: {
+    name: "鏽輪礦車獸", sprite: "mon_mn_cart", level: 3, hp: 90, atk: 16, subject: "數學", q_levels: [1, 2],
+    exp: 45, gold: 11, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "生鏽的小礦車，被霧弄得到處亂衝。",
+    wake: "鏽輪礦車獸清醒了，喀啦喀啦開回軌道上停好。"
+  },
+  mn_ore: {
+    name: "金脈岩甲獸", sprite: "mon_mn_ore", level: 3, hp: 90, atk: 16, subject: "自然", q_levels: [1, 2],
+    exp: 50, gold: 12, drops: [{ item: "crystal", rate: 0.4 }], boss: false,
+    desc: "背上長著礦石的岩石野獸，霧讓牠以為大家都要搶牠的石頭。",
+    wake: "金脈岩甲獸清醒了，縮起來變回一顆安靜的大石頭。"
+  },
+  // 戰鬥畫面變暗一回合＝純演出，不影響答題時間
+  mn_dust: {
+    name: "礦塵旋風", sprite: "mon_mn_dust", level: 3, hp: 90, atk: 16, subject: "自然", q_levels: [1, 2],
+    exp: 50, gold: 12, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "捲著碎石的小旋風，霧讓牠停不下來。",
+    wake: "礦塵旋風清醒了，慢慢散成一陣微風。"
+  },
+  mn_lamp: {
+    name: "坑道螢燈", sprite: "mon_mn_lamp", level: 3, hp: 95, atk: 17, subject: "自然", q_levels: [1, 2],
+    exp: 50, gold: 12, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "一盞飄在空中的舊頭燈，霧讓它一下亮一下暗。",
+    wake: "坑道螢燈清醒了，穩穩地亮著，飄回坑道的掛鉤上。"
+  },
+  mn_drill: {
+    name: "鑿岩穿山獸", sprite: "mon_mn_drill", level: 3, hp: 95, atk: 17, subject: "數學", q_levels: [1, 2],
+    exp: 50, gold: 12, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "尾巴像鑽頭的穿山獸，被霧弄得到處鑽洞。",
+    wake: "鑿岩穿山獸清醒了，鑽回自己的小洞睡覺。"
+  },
+  mn_timber: {
+    name: "坑木百足", sprite: "mon_mn_timber", level: 3, hp: 95, atk: 18, subject: "國語", q_levels: [1, 2],
+    exp: 60, gold: 14, drops: [{ item: "herb", rate: 0.4 }], boss: false,
+    desc: "舊坑木變成的長長蟲，霧讓牠忘了要撐住坑道。",
+    wake: "坑木百足清醒了，乖乖地趴回坑道邊。"
   },
 
   // ── 地圖等級 4（M08 月世界泥岩丘、M10 府城古城、M11 古城塔頂）──
@@ -175,24 +239,26 @@ window.MONSTERS = {
     wake: "神木清醒了，枝頭冒出新的綠芽。"
   },
   fog_octopus: {
-    name: "迷霧章魚", sprite: "boss_octopus", level: 2, hp: 550, atk: 13, subject: "英語", q_levels: [2, 4],
-    exp: 790, gold: 60, drops: [{ item: "snack", rate: 1 }], boss: true,
+    name: "迷霧章魚", sprite: "boss_octopus", level: 2, hp: 540, atk: 16, subject: "英語", q_levels: [2, 4],
+    exp: 410, gold: 100, drops: [{ item: "snack", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["crab", "seagull"],
     dialog_before: "D_BOSS_OCTO_A", dialog_after: "D_BOSS_OCTO_B",
+    battle_bg: "harbor",   // v1.1 試玩建議 S2：章魚在磺火漁港木橋盡頭，戰鬥背景用漁港（M01 地圖的 battle_bg 是 grass）
     desc: "從遠海漂來的大章魚，擋在漁港碼頭。只聽得懂英文，一直打瞌睡。",
     wake: "迷霧章魚清醒了，揮揮觸手游回大海。"
   },
   mud_frog: {
-    name: "泥巴大蛙", sprite: "boss_frog", level: 3, hp: 750, atk: 16, subject: "數學", q_levels: [2, 4],
-    exp: 1010, gold: 100, drops: [{ item: "gear", rate: 1 }], boss: true,
+    name: "泥巴大蛙", sprite: "boss_frog", level: 4, hp: 860, atk: 27, subject: "數學", q_levels: [2, 4],
+    exp: 470, gold: 150, drops: [{ item: "gear", rate: 1 }], boss: true,
+    legacy: { level: 3, hp: 750, atk: 16, exp: 1010, gold: 100 },   // v1.3（62 號 3.3、5.4）建議 PL 17／轉職 Lv14
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["mudslime", "frog"],
     dialog_before: "D_BOSS_FROG_A", dialog_after: "D_BOSS_FROG_B",
     desc: "紅樹林濕地最大的青蛙，霧讓牠數字全亂掉，一直亂丟泥巴。",
     wake: "泥巴大蛙清醒了，呱呱笑著跳回池塘。"
   },
   noise_bat: {
-    name: "噪音蝙蝠王", sprite: "boss_bat", level: 3, hp: 840, atk: 17, subject: "國語", q_levels: [2, 4],
-    exp: 1270, gold: 100, drops: [{ item: "bat_wing", rate: 1 }], boss: true,
+    name: "噪音蝙蝠王", sprite: "boss_bat", level: 2, hp: 310, atk: 14, subject: "國語", q_levels: [1, 3],
+    exp: 300, gold: 100, drops: [{ item: "bat_wing", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["bat", "rock", "goblin"],
     dialog_before: "D_BOSS_BAT_A", dialog_after: "D_BOSS_BAT_B",
     desc: "蝙蝠們的老大，霧讓牠的叫聲變得好吵，大家都看不下書。",
@@ -214,5 +280,134 @@ window.MONSTERS = {
     dialog_before: "D_BOSS_FOG_A", dialog_after: "D_BOSS_FOG_B",
     desc: "讓大家忘記知識的大霧。五道光一起照它，它就會散開。",
     wake: "遺忘霧魔被五道光照亮，變成溫暖的晨光散開了。"
+  },
+  // v1.1 第一章支線頭目（59 號 3.2 節）：金瓜石坑道最深處，只在 Q_JGS_3 進行中出現；建議 Lv10
+  mnb_goldjaw: {
+    name: "金脈鐵顎王", sprite: "boss_mnb_goldjaw", level: 3, hp: 540, atk: 16, subject: "混合",
+    subjects: ["數學", "自然"], q_levels: [2, 4],
+    exp: 350, gold: 150, drops: [{ item: "crystal", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["mn_cart", "mn_ore", "mn_drill"],
+    dialog_before: "D_BOSS_GOLDJAW_A", dialog_after: "D_BOSS_GOLDJAW_B",
+    desc: "由齒輪、鋼索和大岩石組成的礦山巨獸。霧讓它以為整座山的金子都要被搶走。",
+    wake: "金脈鐵顎王清醒了，胸口的金光變得暖暖的，慢慢沉回坑道深處。"
+  },
+
+  // ── v1.2 第二章新怪（61 號 3.2 節）：草嶺古道（M49）與宜蘭（M14、M50、M51）的「蘭陽系」小怪、頭目黏黏雨雲王（M51 堤防盡頭）──
+  // 數值：現行經濟、37 號公式，參考主角＝轉職後的代表職業（61 號 3.1）；小怪出題 2–3 星、頭目 2–4 星。礦塵旋風（mn_dust）數值不改，草嶺古道入口也出現
+  ly_tigerwind: {
+    name: "虎紋霧獸", sprite: "mon_ly_tigerwind", level: 3, hp: 145, atk: 21, subject: "國語", q_levels: [2, 3],
+    exp: 45, gold: 11, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "草嶺的霧聚成的小獸，霧讓牠忘了要讓路給走古道的人。",
+    wake: "虎紋霧獸清醒了，化成一陣風吹過山坡。"
+  },
+  ly_kumquat: {
+    name: "金棗彈彈", sprite: "mon_ly_kumquat", level: 3, hp: 150, atk: 23, subject: "數學", q_levels: [2, 3],
+    exp: 50, gold: 12, drops: [{ item: "kumquat", rate: 0.5 }], boss: false,
+    desc: "被霧弄迷糊的金棗，一直跳來跳去不肯回到樹上。",
+    wake: "金棗彈彈清醒了，咚的一聲跳回金棗樹。"
+  },
+  ly_scallion: {
+    name: "蔥稈草甲獸", sprite: "mon_ly_scallion", level: 3, hp: 160, atk: 24, subject: "自然", q_levels: [2, 3],
+    exp: 60, gold: 14, drops: [{ item: "herb", rate: 0.4 }], boss: false,
+    desc: "穿著稻草盔甲的蔥田小獸，霧讓牠以為大家都要來拔蔥。",
+    wake: "蔥稈草甲獸清醒了，乖乖躺回田裡曬稻草。"
+  },
+  ly_bubble: {
+    name: "冷泉氣泡精", sprite: "mon_ly_bubble", level: 3, hp: 165, atk: 25, subject: "自然", q_levels: [2, 3],
+    exp: 60, gold: 14, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "冷泉裡冒出來的小水精，霧讓牠一直冒泡停不下來。",
+    wake: "冷泉氣泡精清醒了，咕嚕咕嚕回到冷泉池。"
+  },
+  ly_mackerel: {
+    name: "鯖鯖跳刀魚", sprite: "mon_ly_mackerel", level: 3, hp: 170, atk: 26, subject: "英語", q_levels: [2, 3],
+    exp: 60, gold: 14, drops: [{ item: "snack", rate: 0.4 }], boss: false,
+    desc: "漁港邊跳上岸的大魚，霧讓牠忘了回海裡的路。",
+    wake: "鯖鯖跳刀魚清醒了，撲通一聲游回大海。"
+  },
+  // v1.2 第二章章末頭目（61 號 3.2 節）：南方澳漁港堤防盡頭，只在 Q_YL_5 進行中出現；建議轉職 Lv11 以上（PL 14）。掉落雨後彩虹片（紀念品）
+  wxb_raincloud: {
+    name: "黏黏雨雲王", sprite: "boss_wxb_raincloud", level: 3, hp: 760, atk: 23, subject: "自然", q_levels: [2, 4],
+    exp: 400, gold: 150, drops: [{ item: "rainbow_piece", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["ly_bubble", "ly_mackerel"],
+    dialog_before: "D_BOSS_RAINCLOUD_A", dialog_after: "D_BOSS_RAINCLOUD_B",
+    battle_bg: "harbor",   // 協調員裁定 2026-10-25：在南方澳防波堤，戰鬥背景用漁港（M51 地圖是 coldspring）
+    desc: "一朵黏住不走的大雨雲。",
+    wake: "黏黏雨雲王清醒了，下完最後一陣小雨，讓出藍天。"
+  },
+
+  // ── v1.3 台北章新怪（62 號 3.2 節）：茶山系（M52 坪林）、動物系與機械系（M13 貓空、M54 信義，機械系從桃竹提前）、地熱系（M53 北投；硫晶刺蝟在 M03 硫磺谷）──
+  // 數值：現行經濟、37 號公式，參考主角＝轉職後代表職業（62 號 3.1）；小怪出題 2–3 星；硫晶刺蝟用 59 號見習公式。27 號的戰鬥演出（閃避、畫面變白、停一回合）只做演出、不改數值（還沒做）
+  // 安全提醒（62 號 3.2，S197／27 號）：地熱系打倒後說「地熱谷、噴氣孔的水很燙……不能碰」；閃閃紅綠燈說「過馬路要看燈號」
+  tea_mantis: {
+    name: "茶芽螳螂", sprite: "mon_tea_mantis", level: 4, hp: 170, atk: 26, subject: "自然", q_levels: [2, 3],
+    exp: 60, gold: 16, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "嫩綠色的螳螂，前腳像兩片鋸齒茶葉，被霧弄得亂揮亂舞。",
+    wake: "茶芽螳螂清醒了，收起茶葉前腳，躲回茶樹叢裡。"
+  },
+  tea_moth: {
+    name: "霧茶夜蛾", sprite: "mon_tea_moth", level: 4, hp: 175, atk: 26, subject: "自然", q_levels: [2, 3],
+    exp: 60, gold: 16, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "翅膀像捲起來的乾茶葉的大蛾，一拍翅膀就灑出霧粉。",
+    wake: "霧茶夜蛾清醒了，輕輕飛回山坡的茶園。"
+  },
+  tea_basket: {
+    name: "焙籠火狸", sprite: "mon_tea_basket", level: 4, hp: 180, atk: 28, subject: "社會", q_levels: [2, 3],
+    exp: 70, gold: 18, drops: [{ item: "tea_leaf", rate: 0.5 }], boss: false,
+    desc: "背著烘茶竹籠的狸，眼睛像炭火，被霧弄得搶走茶葉。",
+    wake: "焙籠火狸清醒了，把茶葉還給你，跑回茶園。"
+  },
+  an_magpie: {
+    name: "藍尾鵲鵲", sprite: "mon_an_magpie", level: 4, hp: 180, atk: 28, subject: "英語", q_levels: [2, 3],
+    exp: 70, gold: 18, drops: [{ item: "feather", rate: 0.3 }], boss: false,
+    desc: "寶藍色身體、長長藍尾巴的圓滾滾小鳥，霧讓牠一直搶先啄人。",
+    wake: "藍尾鵲鵲清醒了，拖著長尾巴飛回樹梢。"
+  },
+  mc_gondola: {
+    name: "搖搖纜車廂", sprite: "mon_mc_gondola", level: 4, hp: 185, atk: 28, subject: "自然", q_levels: [2, 3],
+    exp: 70, gold: 18, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "貓空的淡綠色小纜車廂，霧讓它在空中搖來搖去停不下來。",
+    wake: "搖搖纜車廂清醒了，穩穩地回到纜線上。"
+  },
+  mc_alarm: {
+    name: "鈴鈴鬧鐘兵", sprite: "mon_mc_alarm", level: 4, hp: 185, atk: 28, subject: "數學", q_levels: [2, 3],
+    exp: 70, gold: 18, drops: [{ item: "ticket", rate: 0.5 }], boss: false,
+    desc: "紅色的雙鈴鬧鐘，霧讓它亂響，還叼走了纜車票。",
+    wake: "鈴鈴鬧鐘兵清醒了，把時間調回正確的時刻。"
+  },
+  mc_roaster: {
+    name: "炒炒烘茶機", sprite: "mon_mc_roaster", level: 4, hp: 190, atk: 29, subject: "自然", q_levels: [2, 3],
+    exp: 80, gold: 20, drops: [{ item: "tea_leaf", rate: 0.3 }], boss: false,
+    desc: "圓肚子的銅色烘茶機，頭頂一直冒白煙，眼睛很睏。",
+    wake: "炒炒烘茶機清醒了，茶香飄滿整座山。"
+  },
+  mc_signal: {
+    name: "閃閃紅綠燈", sprite: "mon_mc_signal", level: 4, hp: 185, atk: 28, subject: "社會", q_levels: [2, 3],
+    exp: 70, gold: 18, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "圓滾滾的小紅綠燈，霧讓它的燈號亂閃。",
+    wake: "閃閃紅綠燈清醒了，紅黃綠又照順序亮起來。過馬路要看燈號喔！"
+  },
+  mc_vending: {
+    name: "咚咚販賣機", sprite: "mon_mc_vending", level: 4, hp: 190, atk: 29, subject: "英語", q_levels: [2, 3],
+    exp: 80, gold: 20, drops: [{ item: "snack", rate: 0.4 }], boss: false,
+    desc: "淡藍色的販賣機，霧讓它一直咚咚地丟出飲料。",
+    wake: "咚咚販賣機清醒了，乖乖站回原來的地方。"
+  },
+  gt_steam: {
+    name: "噴氣嘶嘶蛇", sprite: "mon_gt_steam", level: 4, hp: 190, atk: 29, subject: "自然", q_levels: [2, 3],
+    exp: 80, gold: 20, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "從地面裂縫鑽出來的白色蒸氣蛇，一張口就嘶嘶叫。",
+    wake: "噴氣嘶嘶蛇清醒了，鑽回地面的裂縫裡。地熱谷、噴氣孔的水很燙、腐蝕性很強，不能碰！"
+  },
+  gt_jade: {
+    name: "青磺水靈", sprite: "mon_gt_jade", level: 4, hp: 190, atk: 29, subject: "自然", q_levels: [2, 3],
+    exp: 80, gold: 20, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "地熱谷裡淡綠色的水團精靈，頭上一直冒熱氣。",
+    wake: "青磺水靈清醒了，流回地熱谷。地熱谷、噴氣孔的水很燙、腐蝕性很強，不能碰！"
+  },
+  gt_sulfur: {
+    name: "硫晶刺蝟", sprite: "mon_gt_sulfur", level: 2, hp: 40, atk: 10, subject: "自然", q_levels: [1, 2],
+    exp: 30, gold: 6, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "背上長滿淡黃色晶刺的刺蝟，生氣時晶刺會冒白煙。",
+    wake: "硫晶刺蝟清醒了，縮成一團滾回草叢。地熱谷、噴氣孔的水很燙、腐蝕性很強，不能碰！"
   }
 };

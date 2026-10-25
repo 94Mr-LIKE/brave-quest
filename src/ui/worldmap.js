@@ -2,7 +2,7 @@
  * 台灣世界地圖畫面（站到車站格、或和車站 NPC 說話時打開）
  * 圖：window.WORLD.image；沒寫時用 assets/ui/world_taiwan.png（art_manifest.js 有列出時）。
  * 地圖上用「編號圓點」標出各地區（避免地名太近時互相蓋住），旁邊列出同樣編號的地區按鈕。
- * 已解鎖的地區可以前往；沒解鎖的顯示鎖頭並說明要先完成哪個委託。
+ * 已解鎖的地區可以前往；沒解鎖的顯示鎖頭並說明要先完成哪個委託（v1.1：或要先走路去過一次，unlock_visit）。
  */
 (function () {
   'use strict';
@@ -21,14 +21,14 @@
     var panel = h('div.win.worldmap', {}, [
       h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']),
       h('h2', { text: '🗺️ ' + (W.title || '世界地圖') }),
-      h('p.small', { text: '選一個想去的地方。🔒 的地方要先完成委託才能去。' }),
+      h('p.small', { text: '選一個想去的地方。🔒 的地方要先完成委託，或先走路去過一次，才能搭車去。' }),
       h('div.wm-body', {}, [stage, side])
     ]);
     handle = J.UI.open(panel, { label: '世界地圖' });
 
+    // v1.1 審查必改 1：文字規則移到 systems/worldmap.js 的 lockText（支援 unlock_visit、濾掉空的 unlock_quest，node 測得到）
     function lockedText(r) {
-      var ids = Array.isArray(r.raw.unlock_quest) ? r.raw.unlock_quest : [r.raw.unlock_quest];
-      return '完成' + ids.map(function (id) { var q = G.data.quests[id]; return '「' + (q ? q.title : id) + '」'; }).join('、') + '才能去';
+      return J.WorldMap.lockText(r.raw, G.data.quests, st) || '還不能去';
     }
 
     function go(r) {

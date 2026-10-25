@@ -88,6 +88,8 @@
       if (map.station && map.station.shelter && A.has('obj_bus_shelter')) A.queue(this, 'obj_bus_shelter');
       // v0.9.5 廟內的媽祖神像（MT1）：美術的 obj_mazu_statue 還沒到時用暫代圖（色塊＋字）
       if (map.statue) A.queue(this, map.statue.sprite || J.MapInfo.STATUE_SPRITE, '媽祖');
+      // v1.1 路牌（59 號 2.8；地圖物件，不是 NPC）：美術 obj_road_sign（32×48，底部置中）；沒有圖時用程式畫的木牌
+      if ((map.roadsigns || []).length && A.has('obj_road_sign')) A.queue(this, 'obj_road_sign');
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
@@ -135,6 +137,7 @@
       this.blocked = J.World.blockers(map);
       this.npcList().forEach(function (n) { self.blocked[n.x + ',' + n.y] = true; });
       (map.lamps || []).forEach(function (l) { self.blocked[l.x + ',' + l.y] = true; });
+      (map.roadsigns || []).forEach(function (r) { self.blocked[r.x + ',' + r.y] = true; });   // v1.1 路牌（格子本來就是 K）
 
       this.hasBg = !!(this.bgFile && this.textures.exists('map:' + this.bgFile));
       // file:// 模式（雙擊 index.html）沒有打包大地圖背景：改用格子備援圖塊，並提示用網址開啟（每次開遊戲只提示一次）
@@ -435,6 +438,17 @@
       var self = this, g = G(), st = g.state;
       var stn = this.map.station;
       this.station = stn || null;
+      // v1.1 眺望點（59 號 2.9.4 美人山）：可以走的格子，放一支程式畫的望遠鏡；站上去或站在旁邊按 A，跳出插圖＋旁白
+      this.viewpoints = (this.map.viewpoints || []).map(function (v) {
+        var img = self.add.image(v.x * T + T / 2, (v.y + 1) * T - 2, self.viewpointTexture()).setOrigin(0.5, 1).setDepth((v.y + 1) * T - 2);
+        return { data: v, img: img };
+      });
+      // v1.1 路牌：靜態圖（不浮動、沒有「！」），腳底貼在格子下緣；站在旁邊按 A 播 roadsigns[].dialog
+      this.roadsigns = (this.map.roadsigns || []).map(function (r) {
+        var key = self.hasArt('obj_road_sign') ? J.Assets.texKey('obj_road_sign') : self.roadSignTexture();
+        var img = self.add.image(r.x * T + T / 2, (r.y + 1) * T, key).setOrigin(0.5, 1).setDepth((r.y + 1) * T - 1);
+        return { data: r, img: img };
+      });
       this.stationSign = null;
       // v0.9.5（老闆 2026-10-11 在金包里說「車站也沒有」：背景上的站牌看不出來）：每個車站都畫程式站牌，站牌上方寫站名。
       // （v0.9.3 的 drawSign:false 已經從 maps.js 拿掉；舊資料若還有 drawSign:false 仍照舊不畫）
@@ -522,6 +536,35 @@
 
     /** sprites.js 有這張圖、而且真的載入成功（不是佔位圖） */
     hasArt(key) { return J.Assets.has(key) && this.textures.exists(J.Assets.texKey(key)) && !J.Assets.isPlaceholder(this, key); }
+
+    /** v1.1 眺望點的小望遠鏡（程式畫，24×30，底部置中）：三腳架＋鏡筒 */
+    viewpointTexture() {
+      var key = 'ui:viewpoint';
+      if (this.textures.exists(key)) return key;
+      var c = document.createElement('canvas'); c.width = 24; c.height = 30;
+      var x = c.getContext('2d');
+      x.strokeStyle = '#4a2e14'; x.lineWidth = 2;
+      x.beginPath(); x.moveTo(12, 14); x.lineTo(5, 29); x.moveTo(12, 14); x.lineTo(19, 29); x.moveTo(12, 14); x.lineTo(12, 29); x.stroke();
+      x.save(); x.translate(12, 11); x.rotate(-0.35);
+      x.fillStyle = '#c9a227'; x.fillRect(-10, -3, 18, 6); x.fillStyle = '#7a5a10'; x.fillRect(6, -4, 4, 8); x.fillStyle = '#e8d27a'; x.fillRect(-10, -3, 3, 6);
+      x.restore();
+      this.textures.addCanvas(key, c);
+      return key;
+    }
+
+    /** v1.1 路牌的備援圖（美術 obj_road_sign 沒載入時）：32×48 木樁＋橫木牌，底部置中 */
+    roadSignTexture() {
+      var key = 'ui:roadsign';
+      if (this.textures.exists(key)) return key;
+      var c = document.createElement('canvas'); c.width = 32; c.height = 48;
+      var x = c.getContext('2d');
+      x.fillStyle = '#6b4423'; x.fillRect(14, 18, 4, 30);
+      x.fillStyle = '#a0703c'; x.fillRect(3, 6, 26, 15);
+      x.strokeStyle = '#4a2e14'; x.lineWidth = 2; x.strokeRect(4, 7, 24, 13);
+      x.fillStyle = '#4a2e14'; x.fillRect(8, 11, 16, 2); x.fillRect(8, 15, 12, 2);
+      this.textures.addCanvas(key, c);
+      return key;
+    }
 
     // ---------------------------------------------------------------- 招牌（商店、旅店門口上方）
     buildSigns() {
@@ -1204,6 +1247,8 @@
       g.state.location = { map: this.mapId, x: p.tx, y: p.ty };
       this.checkLandmark();
       var ex = J.World.exitAt(this.map, p.tx, p.ty);
+      // v1.2（61 號 2.0）出口 requires：委託還沒完成時不換圖，退回上一格、播 requires_dialog（番薯仔說明）
+      if (ex && !J.World.exitOpen(ex, g.state)) { p.path = []; p.pending = null; this.exitLocked(ex); return true; }
       if (ex) { p.path = []; p.pending = null; this.goExit(ex); return true; }
       if (!p.path.length && p.pending) {
         var pend = p.pending; p.pending = null;
@@ -1225,6 +1270,20 @@
       this.cameras.main.once('camerafadeoutcomplete', function () { G().changeMap(ex.to, ex.tx, ex.ty, self.p.facing); });
     }
 
+    /** v1.2 鎖著的出口（exit.requires 還沒完成）：主角退回上一格（不停在出口上），番薯仔說明 requires_dialog */
+    exitLocked(ex) {
+      var p = this.p, g = G();
+      var back = p.prev && (p.prev.x !== p.tx || p.prev.y !== p.ty) && this.walkable(p.prev.x, p.prev.y) && !J.World.exitAt(this.map, p.prev.x, p.prev.y) ? p.prev : null;
+      if (back) {
+        p.tx = back.x; p.ty = back.y;
+        this.player.setPosition(p.tx * T + T / 2, p.ty * T + T);
+        g.state.location = { map: this.mapId, x: p.tx, y: p.ty };
+      }
+      this.player.anims.stop();
+      g.exitLockedLog = (g.exitLockedLog || []).concat([ex.requires]);   // 測試用
+      g.say(ex.requires_dialog || null, [{ who: 'pet', text: '這條路現在還不能走喔。' }]);
+    }
+
     // ---------------------------------------------------------------- 互動
     interactableAt(x, y) {
       var i;
@@ -1232,6 +1291,8 @@
       for (i = 0; i < this.chests.length; i++) if (this.chests[i].data.x === x && this.chests[i].data.y === y) return { kind: 'chest', chest: this.chests[i].data };
       for (i = 0; i < this.lamps.length; i++) if (this.lamps[i].data.x === x && this.lamps[i].data.y === y) return { kind: 'lamp', lamp: this.lamps[i].data };
       if (this.station && this.station.x === x && this.station.y === y) return { kind: 'station', station: this.station };
+      for (i = 0; i < (this.roadsigns || []).length; i++) if (this.roadsigns[i].data.x === x && this.roadsigns[i].data.y === y) return { kind: 'roadsign', sign: this.roadsigns[i].data };
+      for (i = 0; i < (this.viewpoints || []).length; i++) if (this.viewpoints[i].data.x === x && this.viewpoints[i].data.y === y) return { kind: 'viewpoint', view: this.viewpoints[i].data };
       var sh = J.MapInfo.shrineAt(this.map, x, y);   // v0.9.5 媽祖神像、供桌
       if (sh) return { kind: 'shrine', spot: sh };
       var an = this.animalAt(x, y);
@@ -1265,6 +1326,8 @@
       else if (t.kind === 'lamp') g.inspectLamp(t.lamp, this);
       else if (t.kind === 'station') g.useStation(t.station, this);
       else if (t.kind === 'shrine') g.shrineJob(this);
+      else if (t.kind === 'roadsign') g.say(t.sign.dialog, [{ who: 'pet', text: '這裡的路還不能走喔。' }]);   // v1.1 路牌：番薯仔念牌子（華語）
+      else if (t.kind === 'viewpoint') g.viewpoint(t.view);   // v1.1 美人山眺望點
       else if (t.kind === 'animal') { t.animal.nextMove = Math.max(t.animal.nextMove, this.time.now + 2500); g.animalTalk(t.animal.spec); }   // 說話時先站著不動
     }
 
@@ -1274,6 +1337,8 @@
       if (t.kind === 'chest') return G().state.chests[t.chest.id] ? '看看寶箱' : '打開寶箱';
       if (t.kind === 'station') return '在' + (t.station.name || '車站') + '搭車';
       if (t.kind === 'shrine') return '在神像前轉職';
+      if (t.kind === 'roadsign') return '看看路牌';
+      if (t.kind === 'viewpoint') return '看看' + (t.view.label || '風景');
       return '看看' + t.lamp.subject + '燈';
     }
 
@@ -1309,7 +1374,7 @@
       this.updateGhost();
 
       this.shrineCamera();
-      if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); }
+      if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); this.fadeMinimap(); }
       this.wanderMonsters(time);
       if (!g.busy) this.wanderAnimals(time);
       this.syncDepths();
@@ -1320,6 +1385,24 @@
         if (near) J.HUD.prompt(this.promptText(near.t), function () { self.face(near.x, near.y); self.interact(near.t); });
         else J.HUD.prompt(null);
       } else if (p.moving || J.UI.isOpen()) J.HUD.prompt(null);
+    }
+
+    /**
+     * v1.3 候選版畫面審查必改 1（2026-10-26）：主角走到地圖右緣時，鏡頭貼邊、主角被推到畫面最右邊，正好在右上角小地圖底下（手機最明顯）。
+     * 每 150ms（和 cull 一起）算主角在螢幕上的範圍（腳底往上約 1.6 格、左右各 0.6 格），和小地圖重疊就加 .mm-fade（style.css：半透明、不擋點擊），離開就拿掉。
+     * 只改透明度，版面不動；電腦版一樣適用（小地圖比較小，很少碰到）。
+     */
+    fadeMinimap() {
+      var mm = typeof document !== 'undefined' && document.querySelector('#hud .minimap');
+      if (!mm || !this.player || !this.sys || !this.sys.game || !this.sys.game.canvas) return;
+      var cv = this.sys.game.canvas.getBoundingClientRect(), wv = this.cameras.main.worldView;
+      if (!cv.width || !wv.width || !wv.height) return;
+      var sx = cv.width / wv.width, sy = cv.height / wv.height;
+      var px = cv.left + (this.player.x - wv.x) * sx, py = cv.top + (this.player.y - wv.y) * sy;
+      var r = mm.getBoundingClientRect(), hw = T * 0.6 * sx, ht = T * 1.6 * sy;
+      var hit = !!r.width && px + hw > r.left && px - hw < r.right && py > r.top && py - ht < r.bottom;
+      if (hit !== mm.classList.contains('mm-fade')) mm.classList.toggle('mm-fade', hit);
+      return hit;
     }
 
     syncDepths() {

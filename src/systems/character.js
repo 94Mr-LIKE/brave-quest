@@ -314,7 +314,15 @@
       better: gearValue(it) > (cur ? gearValue(data.items[cur]) : 0) };
   }
 
-  var Character = { FAM_NAME: FAM_NAME, famNames: famNames, equipFams: equipFams, GROWTH: GROWTH, baseStats: baseStats, ensureJobs: ensureJobs, jobLevel: jobLevel, mastered: mastered, usable: usable, usableJobs: usableJobs, isOpen: isOpen, gearValue: gearValue, autoEquip: autoEquip, learnedSkills: learnedSkills, slotSkills: slotSkills, setSkillSlots: setSkillSlots, compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
+  /** v1.2（61 號 4.4）章末要不要提醒轉職：還沒轉職過（只當過見習）、見習已到出師等級（10 級） */
+  function needsJobHint(state, data) {
+    var p = state && state.player;
+    if (!p || (p.job || 'novice') !== 'novice') return false;
+    if (Object.keys(p.jobs || {}).some(function (id) { return id !== 'novice' && p.jobs[id] && p.jobs[id].lv > 0; })) return false;
+    return jobLevel(state, 'novice') >= masterLevel(data, jobOf(data, 'novice'));
+  }
+
+  var Character = { FAM_NAME: FAM_NAME, famNames: famNames, equipFams: equipFams, GROWTH: GROWTH, baseStats: baseStats, ensureJobs: ensureJobs, jobLevel: jobLevel, needsJobHint: needsJobHint, mastered: mastered, usable: usable, usableJobs: usableJobs, isOpen: isOpen, gearValue: gearValue, autoEquip: autoEquip, learnedSkills: learnedSkills, slotSkills: slotSkills, setSkillSlots: setSkillSlots, compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Character = Character; }
   if (typeof module !== 'undefined') module.exports = Character;
 })();

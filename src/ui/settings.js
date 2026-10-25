@@ -245,7 +245,7 @@
 
       // v0.7.2 關於本遊戲
       body.appendChild(h('h3', { text: 'ℹ️ 關於本遊戲' }));
-      body.appendChild(h('p.small', { text: J.CONFIG.GAME_TITLE + '　版本：' + (window.JQ_VERSION || '開發版') }));
+      body.appendChild(h('p.small', { text: J.CONFIG.GAME_TITLE + '　版本：' + (window.JQ_VERSION || '開發版') + (J.CONFIG.VERSION_LABEL ? '（' + J.CONFIG.VERSION_LABEL + '）' : '') }));
       body.appendChild(h('p.small.author-line', {}, ['聯絡作者：', h('a.author-mail', { href: 'mailto:' + J.Feedback.EMAIL, text: J.Feedback.EMAIL })]));
     }
     render();

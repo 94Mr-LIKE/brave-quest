@@ -1,4 +1,4 @@
-/* 遊戲狀態（存檔內容）的結構定義與建立 — schema v3（v1.0 第一批：職業分開記等級、保底、技能欄、立志小考） */
+/* 遊戲狀態（存檔內容）的結構定義與建立 — schema v4（v1.0 第一批 v3：職業分開記等級、保底、技能欄、立志小考；v1.1 第一章 v4：chapter，舊存檔由 Ch1Migrate 補記） */
 (function () {
   'use strict';
   var isNode = typeof module !== 'undefined' && typeof require === 'function';
@@ -6,7 +6,7 @@
   var Daily = isNode ? require('./daily.js') : window.JQ.Daily;
   var Playtime = isNode ? require('./playtime.js') : window.JQ.Playtime;
 
-  var SCHEMA_VERSION = 3;   // v1.0 第一批（48 號 F9）：player.jobs、player.floor、player.skillSlots、trial
+  var SCHEMA_VERSION = 5;   // v1.3 台北章（62 號第五節）v5：legacyM05＋Ch3Migrate；   // v1.0 第一批（48 號 F9）v3：player.jobs、player.floor、player.skillSlots、trial；v1.1 第一章（59 號第五節）v4：chapter＋Ch1Migrate
   var SUBJECTS = ['國語', '英語', '數學', '自然', '社會'];
   var NAME_MAX = 8;
   var ANSWER_TIME_MODES = ['relaxed', 'standard', 'off'];
@@ -115,6 +115,8 @@
         // v0.9.3（老闆 2026-10-10）：語速預設「稍快」（舊的 1 倍 × 1.15）；音樂、語音音量改成 小／中／大，預設都是「中」；可以選語音（'' = 依角色自動挑）
         voiceSpeed: AUDIO.SPEED_DEFAULT, voiceVol: 'mid', musicVol: 'mid', voiceName: '',
         reduceMotion: 'auto' },   // v1.0 技能特效：'auto' 跟裝置的 prefers-reduced-motion、'on' 只顯示數字、'off' 一律播放
+      chapter: 0,                 // v1.1 完成到第幾章（Q_LAMPS_3 chapter_end: 1 → 1；之後章節用）
+      legacyM05: false,           // v1.3 舊紅樹林旗標（62 號 5.4；只有 Ch3Migrate 會設成 true，Q_GNO_4 完成時關掉）
       ending: false
     };
   }
