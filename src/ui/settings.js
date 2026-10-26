@@ -247,6 +247,27 @@
       body.appendChild(h('h3', { text: 'ℹ️ 關於本遊戲' }));
       body.appendChild(h('p.small', { text: J.CONFIG.GAME_TITLE + '　版本：' + (window.JQ_VERSION || '開發版') + (J.CONFIG.VERSION_LABEL ? '（' + J.CONFIG.VERSION_LABEL + '）' : '') }));
       body.appendChild(h('p.small.author-line', {}, ['聯絡作者：', h('a.author-mail', { href: 'mailto:' + J.Feedback.EMAIL, text: J.Feedback.EMAIL })]));
+      // v1.3.1 測試模式（大人試玩各地用）：按下才輸入密碼；只存在這台裝置（localStorage），不寫進存檔、不放進存檔碼；瀏覽器沒有 crypto.subtle 時不顯示
+      if (J.TestMode && J.TestMode.supported(window)) {
+        body.appendChild(h('h3', { text: '🧪 測試模式（大人試玩用）' }));
+        if (J.TestMode.on()) {
+          body.appendChild(h('p.small', { text: '測試模式開著：世界地圖每個地區都能搭車、出口不擋。只在這台裝置，不會存進存檔或存檔碼。' }));
+          body.appendChild(h('div.row', {}, [h('button.testmode-off', { onclick: function () { J.TestMode.disable(); J.TestMode.badge(document); J.UI.toast('測試模式已關掉'); render(); } }, ['關掉測試模式'])]));
+        } else {
+          var tmRow = h('div.row', {}), tmMsg = h('p.small.testmode-msg', { text: '' });
+          tmRow.appendChild(h('button.testmode-open', { onclick: function () {
+            while (tmRow.firstChild) tmRow.removeChild(tmRow.firstChild);
+            var pw = h('input.testmode-pass', { type: 'password', autocomplete: 'off', 'aria-label': '測試模式密碼' });
+            var go = function () { J.TestMode.enable(pw.value).then(function (ok) { pw.value = ''; if (!ok) { tmMsg.textContent = '密碼不對。'; return; } J.TestMode.badge(document); J.UI.toast('測試模式已開啟'); render(); }); };
+            pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+            tmRow.appendChild(pw);
+            tmRow.appendChild(h('button.primary.testmode-on', { onclick: go }, ['確定']));
+            pw.focus();
+          } }, ['🧪 測試模式']));
+          body.appendChild(tmRow);
+          body.appendChild(tmMsg);
+        }
+      }
     }
     render();
   }

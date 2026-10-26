@@ -415,6 +415,7 @@
         this.textures.addCanvas('ui:station', sc);
       }
       bubble('ui:ready', '#7be08a', '?');
+      bubble('ui:proverb', '#7fc8ff', '?');   // v1.3.1 可以玩諺語挑錯的阿伯（藍色）
       if (!this.textures.exists('ui:spark')) {
         var c = document.createElement('canvas'); c.width = 4; c.height = 4;
         var g = c.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(1, 0, 2, 4); g.fillRect(0, 1, 4, 2);
@@ -915,7 +916,7 @@
         var m = g.npcMarker(n.data);
         n.markOn = !!m;
         n.mark.setVisible(!!m && n.inView !== false);
-        if (m) n.mark.setTexture(m === 'ready' ? 'ui:ready' : 'ui:bang');
+        if (m) n.mark.setTexture(m === 'ready' ? 'ui:ready' : m === 'proverb' ? 'ui:proverb' : 'ui:bang');
       });
     }
 
@@ -1541,7 +1542,7 @@
         walk: function (x, y) { return self.walkable(x, y); },
         player: { x: this.p.tx, y: this.p.ty },
         // v0.9.5 mark：有委託可以接（'new'）或可以回報（'ready'）→ 小地圖、放大地圖畫「！」（和頭頂的記號同一個判斷 G.npcMarker）
-        npcs: this.npcs.filter(function (n) { return !n.data.virtual; }).map(function (n) { var mk = g.npcMarker(n.data); return { id: n.data.id, name: g.speaker(n.data.id).name, x: n.data.x, y: n.data.y, mark: mk ? (mk === 'ready' ? 'ready' : 'new') : null }; }),
+        npcs: this.npcs.filter(function (n) { return !n.data.virtual; }).map(function (n) { var mk = g.npcMarker(n.data); return { id: n.data.id, name: g.speaker(n.data.id).name, x: n.data.x, y: n.data.y, mark: mk ? (mk === 'ready' || mk === 'proverb' ? mk : 'new') : null }; }),
         exits: (this.map.exits || []).map(function (e) { return { x: e.x, y: e.y, to: e.to, name: (g.data.maps[e.to] || {}).name || e.to }; }),
         shops: (this.signs || []).map(function (s) { return { kind: s.spot.kind, text: s.spot.text, x: s.spot.npcX, y: s.spot.npcY }; }),
         station: this.station ? { x: this.station.x, y: this.station.y, name: this.station.name } : null,

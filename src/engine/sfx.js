@@ -32,6 +32,8 @@
   var GUESS = [
     // v1.1 第一章的 8 種新怪物（和 voices.js 的設定一致；沒有 voices.js 時也用既有的叫聲組合）：
     //   雨精、礦塵旋風、坑道螢燈＝精靈；礦車獸＝盔甲（金屬）；岩甲獸、金脈鐵顎王＝岩石；穿山獸、坑木百足＝野獸
+    // v1.4 桃竹章（和 voices.js 一致）：豆干盾甲獸、木屑雕紋獸＝野獸；雷咚咚、咻咻風精、米粉飄飄獸＝精靈；圓圓掃地機、霧閘機將＝盔甲
+    [/^ty_tofu$|^ty_carve$/, 'beast'], [/^wx_thunder$|^wx_wind$|^hc_noodle$/, 'spirit'], [/^mc_vacuum$|^mb_floodgate$/, 'armor'],
     // v1.3 台北章（和 voices.js 一致）：茶芽螳螂、焙籠火狸、噴氣嘶嘶蛇、硫晶刺蝟＝野獸；霧茶夜蛾、藍尾鵲鵲＝鳥；機械系＝盔甲；青磺水靈＝精靈
     [/^tea_mantis$|^tea_basket$|^gt_steam$|^gt_sulfur$/, 'beast'], [/^tea_moth$|^an_magpie$/, 'bird'], [/^mc_gondola$|^mc_alarm$|^mc_roaster$|^mc_signal$|^mc_vending$/, 'armor'], [/^gt_jade$/, 'spirit'],
     // v1.2 第二章（和 voices.js 一致）：虎紋霧獸＝野獸、金棗彈彈＝史萊姆、蔥稈草甲獸＝植物、冷泉氣泡精與黏黏雨雲王＝精靈、鯖鯖跳刀魚＝水生

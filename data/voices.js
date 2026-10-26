@@ -130,7 +130,16 @@ window.VOICES = {
     inn_beitou: { name: "北投溫泉旅館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.13, taigi: true, persona: "北投溫泉旅館老闆，親切愛招呼。" },
     observatory_staff: { name: "觀景台服務員", gender: "m", age: "adult", stage: "青年", look: "npc_observatory_staff", pitch: 0.88, rate: 1.27, taigi: true, persona: "觀景台服務員，講話開朗、很會說數字。" },
     village_guide: { name: "眷村故事館解說員", gender: "m", age: "adult", stage: "青年", look: "npc_village_guide", pitch: 0.88, rate: 0.7, taigi: true, persona: "眷村故事館的解說員，說故事溫溫的。" },
-    inn_xinyi: { name: "信義旅館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.68, rate: 1.2, taigi: true, persona: "信義的旅館老闆，說話輕快。" }
+    inn_xinyi: { name: "信義旅館老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.68, rate: 1.2, taigi: true, persona: "信義的旅館老闆，說話輕快。" },
+    // v1.4 桃竹章（63 號；劇本語音組草稿）：男性聲音快排不下，tofu_shop、wood_artisan、noodle_master、inn_daxi、inn_hsinchu 共用既有角色的聲音（voice_share）；旅店老闆是虛擬店員 look null
+    reservoir_keeper: { name: "水庫管理員", gender: "m", age: "adult", stage: "中年", look: "npc_reservoir_keeper", pitch: 0.6, rate: 0.66, taigi: true, persona: "石門水庫的管理員，講話穩重、很注意安全。" },
+    hc_guide: { name: "文史解說員", gender: "m", age: "adult", stage: "青年", look: "npc_hc_guide", pitch: 1, rate: 0.62, taigi: true, persona: "年輕的文史解說員，講古蹟很仔細。" },
+    tofu_shop: { name: "豆干店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_tofu_shop", pitch: 0.8, rate: 1.2, taigi: true, persona: "大溪老街豆干店老闆，嗓門大、愛招呼人。", voice_share: "item_keeper" },
+    wood_artisan: { name: "木藝職人", gender: "m", age: "elder", stage: "老年", look: "npc_wood_artisan", pitch: 0.58, rate: 0.78, taigi: true, persona: "做木工幾十年的老師傅，講話慢、很仔細。", voice_share: "old_miner" },
+    noodle_master: { name: "米粉師傅", gender: "m", age: "elder", stage: "老年", look: "npc_noodle_master", pitch: 0.9, rate: 0.88, taigi: true, persona: "曬米粉的老師傅，聲音宏亮，最懂風。", voice_share: "kumquat_farmer" },
+    inn_daxi: { name: "老街旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.07, taigi: true, persona: "老街旅店老闆，親切。", voice_share: "inn_suao" },
+    inn_hsinchu: { name: "新竹旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.01, taigi: true, persona: "新竹旅店老闆，說話輕快。", voice_share: "inn_jiaoxi" },
+    mb_floodgate: { name: "霧閘機將", gender: "m", age: "adult", stage: "中年", look: "boss_mb_floodgate", rate: 0.8, taigi: false, persona: "低沉、像機器喀啦喀啦的聲音，清醒後變得平穩。", pitch: 0.5 }
   },
 
   // 主角男女（目前沒有台詞，預留）
@@ -192,6 +201,14 @@ window.VOICES = {
     mc_vending: { family: "armor", size: "m", mood: "頑皮", pitch_shift: -2, cry: "咚咚！" },
     gt_steam: { family: "beast", size: "m", mood: "暴躁", pitch_shift: -1, cry: "嘶嘶嘶！" },
     gt_jade: { family: "spirit", size: "s", mood: "神祕", pitch_shift: 5, cry: "咕嘟咕嘟……" },
-    gt_sulfur: { family: "beast", size: "s", mood: "頑皮", pitch_shift: 9, cry: "刺刺！" }
+    gt_sulfur: { family: "beast", size: "s", mood: "頑皮", pitch_shift: 9, cry: "刺刺！" },
+    // v1.4 桃竹章新怪物（63 號 3.2）
+    ty_tofu: { family: "beast", size: "s", mood: "暴躁", pitch_shift: 2, cry: "咚！咚！" },
+    ty_carve: { family: "beast", size: "s", mood: "頑皮", pitch_shift: 5, cry: "喀喀喀！" },
+    wx_thunder: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 6, cry: "咚咚！轟——" },
+    wx_wind: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 8, cry: "咻——咻——" },
+    mc_vacuum: { family: "armor", size: "s", mood: "迷糊", pitch_shift: 3, cry: "嗡嗡嗡……" },
+    hc_noodle: { family: "spirit", size: "m", mood: "神祕", pitch_shift: 4, cry: "呼嚕呼嚕……" },
+    mb_floodgate: { family: "armor", size: "boss", mood: "暴躁", pitch_shift: -8, cry: "喀啦喀啦——！" }
   }
 };

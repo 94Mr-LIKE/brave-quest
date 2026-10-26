@@ -11,7 +11,7 @@
   var SHOP_COLOR = { weapon: '#e0603a', armor: '#3b8fd6', item: '#2f8f4a', general: '#d0a020', inn: '#a15ad8' };
   var SHOP_SHORT = { weapon: '武', armor: '防', item: '道', general: '雜', inn: '旅' };
   // v0.9.6（47 號 B07）小地圖的委託記號：顏色、符號和頭頂的泡泡（MapScene.makeUiTextures 的 ui:bang、ui:ready）一樣
-  var MARKS = { 'new': { color: '#ffd34d', sym: '!' }, ready: { color: '#7be08a', sym: '?' } };
+  var MARKS = { 'new': { color: '#ffd34d', sym: '!' }, ready: { color: '#7be08a', sym: '?' }, proverb: { color: '#7fc8ff', sym: '?' } };   // v1.3.1 可以挑錯（藍色）
   var LOCAL_W = 40, LOCAL_H = 25;   // 大地圖時小地圖顯示的範圍（格）
   var box = null, canvas = null, caption = null, levelCap = null, timer = 0, gridCache = {}, bigHandle = null;
   /** 「寶箱：還剩 N 個」（這張地圖還沒打開的寶箱數；沒有寶箱的地圖不顯示） */
@@ -242,7 +242,7 @@
     info.npcs.forEach(function (n) {
       // v0.9.5 有委託可以接／回報的人，名單上也加「！」
       npcList.appendChild(h('li', {}, [h('button', { onclick: function () { blink = { x: n.x, y: n.y, until: Date.now() + 2000 }; sc.flashAt(n.x, n.y); } },
-        ['📍 ' + n.name + (n.mark ? (n.mark === 'ready' ? '（？可以回報）' : '（！有委託）') : '')])]));
+        ['📍 ' + n.name + (n.mark ? (n.mark === 'ready' ? '（？可以回報）' : n.mark === 'proverb' ? '（？可以挑錯）' : '（！有委託）') : '')])]));
     });
     (info.places || []).forEach(function (pl) { npcList.appendChild(h('li.mm-place', {}, [h('span', { text: '🏯 ' + pl.name })])); });
     info.shops.forEach(function (s) { npcList.appendChild(h('li', {}, [h('span', { text: '🏠 ' + s.text + '（' + (SHOP_SHORT[s.kind] || '') + '）' })])); });

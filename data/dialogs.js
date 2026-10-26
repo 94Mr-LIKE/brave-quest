@@ -21,6 +21,8 @@
  * who：NPC id（對應 maps.js）、怪物 id（對應 monsters.js）、"hero"（主角）、"pet"（番薯仔）、"narrator"（旁白）。
  */
 window.SPEAKERS = {
+  // v1.4 桃竹章（63 號；劇本語音組草稿 wip_v14_draft/dialogs_taoyuan.js）
+  reservoir_keeper: "水庫管理員", tofu_shop: "豆干店老闆", wood_artisan: "木藝職人", inn_daxi: "老街旅店老闆", noodle_master: "米粉師傅", hc_guide: "文史解說員", inn_hsinchu: "新竹旅店老闆", mb_floodgate: "霧閘機將",
   // v1.3 台北章（62 號；劇本語音組草稿 wip_v13_draft/dialogs_taipei.js）
   tea_farmer: "茶農阿伯", gondola_staff: "纜車站務員", tea_farmer_mk: "鐵觀音茶農阿伯", temple_volunteer_zn: "指南宮志工阿伯", inn_maokong: "茶館老闆", dihua_shop: "南北貨店老闆", culture_guide: "文史解說員", traffic_volunteer: "交通志工阿伯", temple_volunteer_ht: "行天宮志工阿伯", inn_taipei: "城市旅館老闆", smith_taipei: "台北武器鋪老闆", armor_taipei: "台北防具店老闆", item_taipei: "台北道具店老闆", bt_museum_guide: "溫泉博物館解說員", geo_ranger: "地熱谷巡守員", inn_beitou: "北投溫泉旅館老闆", observatory_staff: "觀景台服務員", village_guide: "眷村故事館解說員", inn_xinyi: "信義旅館老闆",
   // v1.2 第二章：宜蘭（61 號；劇本語音組草稿 wip_v12_draft/dialogs_yilan.js）
@@ -643,7 +645,7 @@ window.DIALOGS = {
     { who: "temple_keeper", emotion: "平靜", text: "這次還沒過，沒關係。",
       taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
     { who: "temple_keeper", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。",
-      taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, bîn-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+      taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
     { who: "temple_keeper", emotion: "開心", text: "當見習冒險者，一樣能打倒魔王喔！",
       taigi: { hanji: "做見習冒險者，仝款會當拍贏魔王喔！", tailo: "Tsò kiàn-si̍p mōo-hiám-tsiá, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "當見習冒險者，一樣能打倒魔王喔！" } }
   ],
@@ -651,17 +653,17 @@ window.DIALOGS = {
     { who: "guild", emotion: "平靜", text: "這次還沒過，沒關係。",
       taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
     { who: "guild", emotion: "平靜", text: "把答錯的單元多練習，明天再來考。",
-      taigi: { hanji: "共毋著的單元加練習，明仔載閣來考。", tailo: "Kā m̄-tio̍h ê tan-guân ke liān-si̍p, bîn-á-tsài koh lâi khó.", huayu: "把答錯的單元多練習，明天再來考。" } },
+      taigi: { hanji: "共毋著的單元加練習，明仔載閣來考。", tailo: "Kā m̄-tio̍h ê tan-guân ke liān-si̍p, miâ-á-tsài koh lâi khó.", huayu: "把答錯的單元多練習，明天再來考。" } },
     { who: "guild", emotion: "開心", text: "當見習冒險者也能打倒魔王，不用煩惱！",
       taigi: { hanji: "做見習冒險者嘛會當拍贏魔王，免煩惱！", tailo: "Tsò kiàn-si̍p mōo-hiám-tsiá mā ē-tàng phah-iânn môo-ông, bián huân-ló!", huayu: "當見習冒險者也能打倒魔王，不用煩惱！" } }
   ],
   D_TRIAL_AGAIN_TEMPLE: [
     { who: "temple_keeper", emotion: "平靜", text: "今天已經考一次了，明天再來喔。",
-      taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
+      taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, miâ-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
   ],
   D_TRIAL_AGAIN_GUILD: [
     { who: "guild", emotion: "平靜", text: "今天已經考一次了，明天再來喔。",
-      taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
+      taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, miâ-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
   ],
   D_JOB_LV1_TEMPLE: [
     { who: "temple_keeper", emotion: "平靜", text: "換了職業，等級會從 1 開始。",
@@ -726,7 +728,7 @@ window.DIALOGS = {
   ],
   D_SHOP_IDLE: [
     { who: "shopkeeper", text: "歡迎光臨！藥草、卡片、木劍都有喔。",
-      taigi: { hanji: "歡迎光臨！藥草、卡片、柴劍攏有喔。", tailo: "Huan-gîng kong-lîm! Io̍h-tsháu, khah-phìnn, tshâ-kiàm lóng ū--ooh.", huayu: "歡迎光臨！藥草、卡片、木劍都有喔。" } },
+      taigi: { hanji: "歡迎光臨！藥草、卡片、柴劍攏有喔。", tailo: "Huan-gîng kong-lîng! Io̍h-tsháu, khah-phìnn, tshâ-kiàm lóng ū--ooh.", huayu: "歡迎光臨！藥草、卡片、木劍都有喔。" } },
     { who: "shopkeeper", text: "老街的小吃很好吃喔！",
       taigi: { hanji: "舊街的點心真好食喔！", tailo: "Kū-ke ê tiám-sim tsin hó-tsia̍h--ooh!", huayu: "老街的小吃很好吃喔！" } }
   ],
@@ -776,7 +778,7 @@ window.DIALOGS = {
   ],
   D_PORT_INN_IDLE: [
     { who: "innkeeper_port", text: "歡迎來我們民宿，好好休息。",
-      taigi: { hanji: "歡迎來阮民宿，好好仔歇睏。", tailo: "Huan-gîng lâi guán bîn-siok, hó-hó-á hioh-khùn.", huayu: "歡迎來我們民宿，好好休息。" } }
+      taigi: { hanji: "歡迎來阮民宿，好好仔歇睏。", tailo: "Huan-gîng lâi guán bîn-sok, hó-hó-á hioh-khùn.", huayu: "歡迎來我們民宿，好好休息。" } }
   ],
   D_TARO_IDLE: [
     { who: "taro_seller", text: "芋圓軟軟彈彈，吃了有精神！",
@@ -807,7 +809,7 @@ window.DIALOGS = {
   // 地精、哥布林是奇幻種族，照 CTO 裁定講華語（不加 taigi）。
   D_INN_SHENMU: [
     { who: "inn_shenmu", emotion: "開心", text: "歡迎來樹屋住！聽著森林的聲音，好好睡一覺。",
-      taigi: { hanji: "歡迎來樹仔頂的厝蹛！聽森林的聲，好好仔睏一暝。", tailo: "Huan-gîng lâi tshiū-á-tíng ê tshù tuà! Thiann sim-lîm ê siann, hó-hó-á khùn tsi̍t mê.", huayu: "歡迎來樹屋住！聽著森林的聲音，好好睡一覺。" } }
+      taigi: { hanji: "歡迎來樹仔頂的厝蹛！聽樹林的聲，好好仔睏一暝。", tailo: "Huan-gîng lâi tshiū-á-tíng ê tshù tuà! Thiann tshiū-nâ ê siann, hó-hó-á khùn tsi̍t mê.", huayu: "歡迎來樹屋住！聽著森林的聲音，好好睡一覺。" } }
   ],
   D_INN_MANGROVE: [
     { who: "inn_mangrove", emotion: "開心", text: "歡迎來地精旅舍！今晚聽著潮水聲休息吧。" }
@@ -821,7 +823,7 @@ window.DIALOGS = {
   ],
   D_INN_FUCHENG: [
     { who: "inn_fucheng", emotion: "開心", text: "歡迎光臨府城老客棧，讓你一夜好眠。",
-      taigi: { hanji: "歡迎光臨府城的古早客棧，予你一暝睏甲真好勢。", tailo: "Huan-gîng kong-lîm Hú-siânn ê kóo-tsá kheh-tsàn, hōo lí tsi̍t mê khùn kah tsin hó-sè.", huayu: "歡迎光臨府城老客棧，讓你一夜好眠。" } }
+      taigi: { hanji: "歡迎光臨府城的古早客棧，予你一暝睏甲真好勢。", tailo: "Huan-gîng kong-lîng Hú-siânn ê kóo-tsá kheh-tsàn, hōo lí tsi̍t mê khùn kah tsin hó-sè.", huayu: "歡迎光臨府城老客棧，讓你一夜好眠。" } }
   ],
 
   // ═════════════ 旅店：金幣不夠（v0.9.4 D23）═════════════
@@ -982,7 +984,7 @@ window.DIALOGS = {
     { who: "harbor_uncle", emotion: "擔心", text: "怪物把大家的雨傘拿走了。",
       taigi: { hanji: "怪物共逐家的雨傘提走矣。", tailo: "Kuài-bu̍t kā ta̍k-ke ê hōo-suànn the̍h-tsáu--ah.", huayu: "怪物把大家的雨傘拿走了。" } },
     { who: "harbor_uncle", emotion: "平靜", text: "讓怪物清醒，把 3 把雨傘找回來。",
-      taigi: { hanji: "予怪物清醒，共三支雨傘揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshénn, kā sann ki hōo-suànn tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 把雨傘找回來。" } },
+      taigi: { hanji: "予怪物清醒，共三支雨傘揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshínn, kā sann ki hōo-suànn tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 把雨傘找回來。" } },
     { who: "pet", emotion: "驚訝", text: "是滴滴雨精！讓牠們清醒，就會掉雨傘。" }
   ],
   D_KL_1B: [
@@ -1081,7 +1083,7 @@ window.DIALOGS = {
     { who: "old_miner", emotion: "擔心", text: "有一隻好大的怪物，被霧弄迷糊了。",
       taigi: { hanji: "有一隻真大的怪物，予霧舞甲霧嗄嗄。", tailo: "Ū tsi̍t tsiah tsin tuā ê kuài-bu̍t, hōo bū bú kah bū-sà-sà.", huayu: "有一隻好大的怪物，被霧弄迷糊了。" } },
     { who: "old_miner", emotion: "平靜", text: "你可以去讓它清醒嗎？要小心喔。",
-      taigi: { hanji: "你會使去予伊清醒無？愛細膩喔。", tailo: "Lí ē-sái khì hōo i tshing-tshénn--bô? Ài sè-jī--ooh.", huayu: "你可以去讓它清醒嗎？要小心喔。" } },
+      taigi: { hanji: "你會使去予伊清醒無？愛細膩喔。", tailo: "Lí ē-sái khì hōo i tshing-tshínn--bô? Ài sè-jī--ooh.", huayu: "你可以去讓它清醒嗎？要小心喔。" } },
     { who: "pet", emotion: "平靜", text: "頭目戰不能逃跑，先去旅店休息吧！" }
   ],
   D_JGS_3B: [
@@ -1131,7 +1133,7 @@ window.DIALOGS = {
     { who: "temple_keeper", emotion: "平靜", text: "換了職業，等級會從 1 開始。",
       taigi: { hanji: "換職業了後，等級會對一級開始。", tailo: "Uānn tsit-gia̍p liáu-āu, tíng-kip ē tuì tsi̍t kip khai-sí.", huayu: "換了職業，等級會從 1 開始。" } },
     { who: "temple_keeper", emotion: "平靜", text: "也可以先讓漁港的大章魚清醒，再回來換職業喔。",
-      taigi: { hanji: "嘛會使先予漁港的大石距清醒，才閣轉來換職業喔。", tailo: "Mā ē-sái sing hōo hî-káng ê tuā tsio̍h-kī tshing-tshénn, tsiah-koh tńg-lâi uānn tsit-gia̍p--ooh.", huayu: "也可以先讓漁港的大章魚清醒，再回來換職業喔。" } }
+      taigi: { hanji: "嘛會使先予漁港的大石距清醒，才閣轉來換職業喔。", tailo: "Mā ē-sái sing hōo hî-káng ê tuā tsio̍h-kī tshing-tshínn, tsiah-koh tńg-lâi uānn tsit-gia̍p--ooh.", huayu: "也可以先讓漁港的大章魚清醒，再回來換職業喔。" } }
   ],
   D_MEIREN_VIEW: [
     { who: "narrator", emotion: "平靜", text: "往七星山的方向看，山稜一路連到跳石。" },
@@ -1163,7 +1165,7 @@ window.DIALOGS = {
     { who: "trail_volunteer", emotion: "平靜", text: "很久以前，有一位官員經過這裡，遇到大風雨。",
       taigi: { hanji: "真久以前，有一位官員行過遮，拄著大風雨。", tailo: "Tsin kú í-tsîng, ū tsi̍t uī kuann-uân kiânn-kuè tsia, tú-tio̍h tuā hong-ú.", huayu: "很久以前，有一位官員經過這裡，遇到大風雨。" } },
     { who: "trail_volunteer", emotion: "平靜", text: "所以刻了「虎」字，取「風從虎」的意思。",
-      taigi: { hanji: "所以刻一个「虎」字，意思是「風從虎」。", tailo: "Sóo-í khik tsi̍t ê “hóo” jī, ì-sù sī “hong tsiông hóo”.", huayu: "所以刻了「虎」字，取「風從虎」的意思。" } },
+      taigi: { hanji: "所以刻一个「虎」字，意思是「風從虎」。", tailo: "Sóo-í khik tsi̍t ê “hóo” jī, ì-sù sī “hong tsông hóo”.", huayu: "所以刻了「虎」字，取「風從虎」的意思。" } },
     { who: "trail_volunteer", emotion: "擔心", text: "霧讓大家看不懂碑上的字，幫我想 3 題好嗎？",
       taigi: { hanji: "霧予逐家看無碑頂的字，共我想三題，好無？", tailo: "Bū hōo ta̍k-ke khuànn-bô pi tíng ê jī, kā guá siūnn sann tê, hó--bô?", huayu: "霧讓大家看不懂碑上的字，幫我想 3 題好嗎？" } }
   ],
@@ -1204,7 +1206,7 @@ window.DIALOGS = {
     { who: "kumquat_farmer", emotion: "擔心", text: "金棗變的怪物被霧弄迷糊，一直跳來跳去。",
       taigi: { hanji: "金棗變的怪物予霧舞甲霧嗄嗄，一直跳來跳去。", tailo: "Kim-tsó piàn ê kuài-bu̍t hōo bū bú kah bū-sà-sà, it-ti̍t thiàu lâi thiàu khì.", huayu: "金棗變的怪物被霧弄迷糊，一直跳來跳去。" } },
     { who: "kumquat_farmer", emotion: "平靜", text: "讓怪物清醒，把 3 顆金棗找回來。",
-      taigi: { hanji: "予怪物清醒，共三粒金棗揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshénn, kā sann lia̍p kim-tsó tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 顆金棗找回來。" } },
+      taigi: { hanji: "予怪物清醒，共三粒金棗揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshínn, kā sann lia̍p kim-tsó tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 顆金棗找回來。" } },
     { who: "pet", emotion: "驚訝", text: "是金棗彈彈！讓牠們清醒，就會掉金棗。" }
   ],
   D_YL_2B: [
@@ -1213,7 +1215,7 @@ window.DIALOGS = {
     { who: "kumquat_farmer", emotion: "開心", text: "這些金幣和藥草送你。",
       taigi: { hanji: "這寡金幣佮藥草送你。", tailo: "Tsit-kuá kim-pè kah io̍h-tsháu sàng lí.", huayu: "這些金幣和藥草送你。" } },
     { who: "kumquat_farmer", emotion: "平靜", text: "往南走到三星，種蔥的阿伯也在找人幫忙。",
-      taigi: { hanji: "向南爿行到三星，種蔥的阿伯嘛咧揣人鬥相共。", tailo: "Ǹg lâm-pîng kiânn kàu Sam-sing, tsìng tshang ê a-peh mā teh tshuē lâng tàu-sann-kāng.", huayu: "往南走到三星，種蔥的阿伯也在找人幫忙。" } }
+      taigi: { hanji: "向南爿行到三星，種蔥的阿伯嘛咧揣人鬥相共。", tailo: "Ǹg lâm-pîng kiânn kàu Sann-tshenn, tsìng tshang ê a-peh mā teh tshuē lâng tàu-sann-kāng.", huayu: "往南走到三星，種蔥的阿伯也在找人幫忙。" } }
   ],
   D_KUMQUAT_IDLE: [
     { who: "kumquat_farmer", text: "礁溪有用溫泉種的空心菜喔。",
@@ -1229,7 +1231,7 @@ window.DIALOGS = {
       taigi: { hanji: "我駛客運，定定經過一條真長的磅空。", tailo: "Guá sái kheh-ūn, tiānn-tiānn king-kuè tsi̍t tiâu tsin tn̂g ê pōng-khang.", huayu: "我開客運，常常經過一條很長的隧道。" } },
     { who: "pet", emotion: "開心", text: "是雪山隧道吧！" },
     { who: "bus_driver", emotion: "平靜", text: "隧道在坪林和頭城中間，有 12.9 公里長。",
-      taigi: { hanji: "磅空佇坪林佮頭城中間，有十二點九公里長。", tailo: "Pōng-khang tī Pînn-nâ kah Thâu-siânn tiong-kan, ū tsa̍p-jī tiám káu kong-lí tn̂g.", huayu: "隧道在坪林和頭城中間，有 12.9 公里長。" } },
+      taigi: { hanji: "磅空佇坪林佮頭城中間，有十二點九公里長。", tailo: "Pōng-khang tī Phîng-lîm kah Thâu-siânn tiong-kan, ū tsa̍p-jī tiám káu kong-lí tn̂g.", huayu: "隧道在坪林和頭城中間，有 12.9 公里長。" } },
     { who: "bus_driver", emotion: "平靜", text: "民國 95 年就通車了。",
       taigi: { hanji: "民國九十五年就通車矣。", tailo: "Bîn-kok káu-tsa̍p-gōo nî tō thong-tshia--ah.", huayu: "民國 95 年就通車了。" } },
     { who: "bus_driver", emotion: "擔心", text: "霧讓大家忘了路怎麼走，幫我想 2 題好嗎？",
@@ -1286,7 +1288,7 @@ window.DIALOGS = {
   ],
   D_INN_JIAOXI_BATH: [
     { who: "inn_jiaoxi", emotion: "開心", text: "泡溫泉 10 枚金幣，泡完就有精神了。",
-      taigi: { hanji: "浸溫泉十个金幣，浸了就有元氣矣。", tailo: "Tsìm un-tsuânn tsa̍p ê kim-pè, tsìm liáu tō ū guân-khì--ah.", huayu: "泡溫泉 10 枚金幣，泡完就有精神了。" } },
+      taigi: { hanji: "浸溫泉十箍，浸了就真精神矣。", tailo: "Tsìm un-tsuânn tsa̍p khoo, tsìm liáu tō tsin tsing-sîn--ah.", huayu: "泡溫泉 10 枚金幣，泡完就有精神了。" } },
     { who: "pet", emotion: "平靜", text: "泡溫泉不算住宿喔！記得要有大人陪。" }
   ],
   D_YL_3_LOCK: [
@@ -1296,7 +1298,7 @@ window.DIALOGS = {
   ],
   D_YL_3A: [
     { who: "scallion_farmer", emotion: "開心", text: "歡迎來三星！這裡的蔥很有名喔。",
-      taigi: { hanji: "歡迎來三星！遮的蔥真出名喔。", tailo: "Huan-gîng lâi Sam-sing! Tsia ê tshang tsin tshut-miâ--ooh.", huayu: "歡迎來三星！這裡的蔥很有名喔。" } },
+      taigi: { hanji: "歡迎來三星！遮的蔥真出名喔。", tailo: "Huan-gîng lâi Sann-tshenn! Tsia ê tshang tsin tshut-miâ--ooh.", huayu: "歡迎來三星！這裡的蔥很有名喔。" } },
     { who: "scallion_farmer", emotion: "平靜", text: "我們把稻草鋪在蔥田上，用稻草種蔥。",
       taigi: { hanji: "阮共稻草鋪佇蔥仔田頂，用稻草種蔥。", tailo: "Guán kā tiū-tsháu phoo tī tshang-á-tshân tíng, īng tiū-tsháu tsìng tshang.", huayu: "我們把稻草鋪在蔥田上，用稻草種蔥。" } },
     { who: "scallion_farmer", emotion: "擔心", text: "要收成了，可是霧讓我算不清楚。",
@@ -1306,13 +1308,13 @@ window.DIALOGS = {
   ],
   D_YL_3B: [
     { who: "scallion_farmer", emotion: "開心", text: "綁好了！三星蔥的蔥白又長又香。",
-      taigi: { hanji: "縛好矣！三星蔥的蔥白閣長閣芳。", tailo: "Pa̍k hó--ah! Sam-sing-tshang ê tshang-pe̍h koh tn̂g koh phang.", huayu: "綁好了！三星蔥的蔥白又長又香。" } },
+      taigi: { hanji: "縛好矣！三星蔥的蔥白閣長閣芳。", tailo: "Pa̍k hó--ah! Sann-tshenn-tshang ê tshang-pe̍h koh tn̂g koh phang.", huayu: "綁好了！三星蔥的蔥白又長又香。" } },
     { who: "scallion_farmer", emotion: "平靜", text: "再往南走，就到蘇澳了。",
       taigi: { hanji: "閣向南爿行，就到蘇澳矣。", tailo: "Koh ǹg lâm-pîng kiânn, tō kàu Soo-ò--ah.", huayu: "再往南走，就到蘇澳了。" } }
   ],
   D_SCALLION_IDLE: [
     { who: "scallion_farmer", text: "南邊那條大溪，就是蘭陽溪。",
-      taigi: { hanji: "南爿彼條大溪，就是蘭陽溪。", tailo: "Lâm-pîng hit tiâu tuā-khe, tō-sī Lân-iâng-khe.", huayu: "南邊那條大溪，就是蘭陽溪。" } }
+      taigi: { hanji: "南爿彼條大溪，就是蘭陽溪。", tailo: "Lâm-pîng hit tiâu tuā-khe, tō-sī Lân-iông-khe.", huayu: "南邊那條大溪，就是蘭陽溪。" } }
   ],
   D_YL_OPERA_LOCK: [
     { who: "opera_actor", emotion: "平靜", text: "先去北邊的山路幫志工阿伯的忙，再來找我。",
@@ -1323,7 +1325,7 @@ window.DIALOGS = {
     { who: "opera_actor", emotion: "開心", text: "宜蘭是歌仔戲的故鄉，你知道嗎？",
       taigi: { hanji: "宜蘭是歌仔戲的故鄉，你敢知影？", tailo: "Gî-lân sī kua-á-hì ê kòo-hiong, lí kám tsai-iánn?", huayu: "宜蘭是歌仔戲的故鄉，你知道嗎？" } },
     { who: "opera_actor", emotion: "平靜", text: "書上有寫，歌仔戲是從宜蘭員山開始的。",
-      taigi: { hanji: "冊頂有寫，歌仔戲是對宜蘭員山開始的。", tailo: "Tsheh tíng ū siá, kua-á-hì sī tuì Gî-lân Înn-suann khai-sí--ê.", huayu: "書上有寫，歌仔戲是從宜蘭員山開始的。" } },
+      taigi: { hanji: "冊頂有寫，歌仔戲是對宜蘭員山開始的。", tailo: "Tsheh tíng ū siá, kua-á-hì sī tuì Gî-lân Guân-suann khai-sí--ê.", huayu: "書上有寫，歌仔戲是從宜蘭員山開始的。" } },
     { who: "opera_actor", emotion: "擔心", text: "霧讓我忘了台詞，幫我想 3 題好嗎？",
       taigi: { hanji: "霧予我袂記得台詞，共我想三題，好無？", tailo: "Bū hōo guá bē-kì-tit tâi-sû, kā guá siūnn sann tê, hó--bô?", huayu: "霧讓我忘了台詞，幫我想 3 題好嗎？" } }
   ],
@@ -1339,7 +1341,7 @@ window.DIALOGS = {
   ],
   D_INN_SANXING: [
     { who: "inn_sanxing", emotion: "開心", text: "歡迎來我們的民宿！田邊很安靜，好好休息。",
-      taigi: { hanji: "歡迎來阮的民宿！田園真恬靜，好好仔歇睏。", tailo: "Huan-gîng lâi guán ê bîn-siok! Tshân-hn̂g tsin tiām-tsīng, hó-hó-á hioh-khùn.", huayu: "歡迎來我們的民宿！田邊很安靜，好好休息。" } }
+      taigi: { hanji: "歡迎來阮的民宿！田園真恬靜，好好仔歇睏。", tailo: "Huan-gîng lâi guán ê bîn-sok! Tshân-hn̂g tsin tiām-tsīng, hó-hó-á hioh-khùn.", huayu: "歡迎來我們的民宿！田邊很安靜，好好休息。" } }
   ],
   D_INN_SANXING_NOCOIN: [
     { who: "inn_sanxing", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。",
@@ -1383,12 +1385,12 @@ window.DIALOGS = {
   ],
   D_INN_SUAO_BATH: [
     { who: "inn_suao", emotion: "開心", text: "泡冷泉 10 枚金幣，泡完就有精神了。",
-      taigi: { hanji: "浸冷泉十个金幣，浸了就有元氣矣。", tailo: "Tsìm líng-tsuânn tsa̍p ê kim-pè, tsìm liáu tō ū guân-khì--ah.", huayu: "泡冷泉 10 枚金幣，泡完就有精神了。" } },
+      taigi: { hanji: "浸冷泉十箍，浸了就真精神矣。", tailo: "Tsìm líng-tsuânn tsa̍p khoo, tsìm liáu tō tsin tsing-sîn--ah.", huayu: "泡冷泉 10 枚金幣，泡完就有精神了。" } },
     { who: "pet", emotion: "平靜", text: "泡冷泉不算住宿喔！記得要有大人陪。" }
   ],
   D_INN_JINBAOLI_BATH: [
     { who: "innkeeper", emotion: "開心", text: "泡溫泉 5 枚金幣，泡完就有精神了。",
-      taigi: { hanji: "浸溫泉五个金幣，浸了就有元氣矣。", tailo: "Tsìm un-tsuânn gōo ê kim-pè, tsìm liáu tō ū guân-khì--ah.", huayu: "泡溫泉 5 枚金幣，泡完就有精神了。" } },
+      taigi: { hanji: "浸溫泉五箍，浸了就真精神矣。", tailo: "Tsìm un-tsuânn gōo khoo, tsìm liáu tō tsin tsing-sîn--ah.", huayu: "泡溫泉 5 枚金幣，泡完就有精神了。" } },
     { who: "pet", emotion: "平靜", text: "泡溫泉不算住宿喔！記得要有大人陪。" }
   ],
   D_YL_FISH_LOCK: [
@@ -1401,7 +1403,7 @@ window.DIALOGS = {
       taigi: { hanji: "阮遮的花飛真出名喔！", tailo: "Guán tsia ê hue-hui tsin tshut-miâ--ooh!", huayu: "我們這裡的鯖魚很有名喔！" } },
     { who: "pet", emotion: "開心", text: "南方澳的鯖魚！聽說還有鯖魚節呢！" },
     { who: "sa_fisher", emotion: "平靜", text: "這裡辦鯖魚節，已經辦二十多年了。",
-      taigi: { hanji: "遮辦花飛節，已經辦二十外年矣。", tailo: "Tsia pān hue-hui-tseh, í-king pān jī-tsa̍p guā nî--ah.", huayu: "這裡辦鯖魚節，已經辦二十多年了。" } },
+      taigi: { hanji: "遮辦花飛節，已經二十外年矣。", tailo: "Tsia pān hue-hui-tsiat, í-king jī-tsa̍p guā nî--ah.", huayu: "這裡辦鯖魚節，已經辦二十多年了。" } },
     { who: "sa_fisher", emotion: "擔心", text: "魚太多了，霧讓我算不清楚。",
       taigi: { hanji: "魚傷濟矣，霧予我算袂清楚。", tailo: "Hî siunn tsē--ah, bū hōo guá sǹg bē tshing-tshó.", huayu: "魚太多了，霧讓我算不清楚。" } },
     { who: "sa_fisher", emotion: "平靜", text: "幫阿伯數魚、分魚箱，答對 3 題好嗎？",
@@ -1424,7 +1426,7 @@ window.DIALOGS = {
     { who: "sa_fisher", emotion: "擔心", text: "一直下雨，漁船都不能出海。",
       taigi: { hanji: "一直落雨，漁船攏袂當出海。", tailo: "It-ti̍t lo̍h-hōo, hî-tsûn lóng bē-tàng tshut-hái.", huayu: "一直下雨，漁船都不能出海。" } },
     { who: "sa_fisher", emotion: "平靜", text: "你可以去讓它清醒嗎？要小心喔。",
-      taigi: { hanji: "你會使去予伊清醒無？愛細膩喔。", tailo: "Lí ē-sái khì hōo i tshing-tshénn--bô? Ài sè-jī--ooh.", huayu: "你可以去讓它清醒嗎？要小心喔。" } },
+      taigi: { hanji: "你會使去予伊清醒無？愛細膩喔。", tailo: "Lí ē-sái khì hōo i tshing-tshínn--bô? Ài sè-jī--ooh.", huayu: "你可以去讓它清醒嗎？要小心喔。" } },
     { who: "pet", emotion: "平靜", text: "頭目戰不能逃跑，先去旅店休息吧！" }
   ],
   D_YL_5B: [
@@ -1465,7 +1467,7 @@ window.DIALOGS = {
     { who: "pet", emotion: "平靜", text: "南方澳的漁港阿伯，好像需要幫忙！" }
   ],
   D_PL_1A: [
-    { who: "tea_farmer", emotion: "開心", text: "歡迎來坪林！這裡四面都是山。", taigi: { hanji: "歡迎來坪林！遮四面攏是山。", tailo: "Huan-gîng lâi Pînn-nâ! Tsia sì-bīn lóng sī suann.", huayu: "歡迎來坪林！這裡四面都是山。" } },
+    { who: "tea_farmer", emotion: "開心", text: "歡迎來坪林！這裡四面都是山。", taigi: { hanji: "歡迎來坪林！遮四面攏是山。", tailo: "Huan-gîng lâi Phîng-lîm! Tsia sì-bīn lóng sī suann.", huayu: "歡迎來坪林！這裡四面都是山。" } },
     { who: "tea_farmer", emotion: "平靜", text: "這裡種很多茶，大家叫這裡「包種茶鄉」。", taigi: { hanji: "遮種真濟茶，人攏叫遮「包種茶鄉」。", tailo: "Tsia tsìng tsin tsē tê, lâng lóng kiò tsia “pau-tsióng-tê hiong”.", huayu: "這裡種很多茶，大家叫這裡「包種茶鄉」。" } },
     { who: "tea_farmer", emotion: "平靜", text: "這裡十個人裡面，有八個是種茶的。", taigi: { hanji: "遮十个人內底，有八个是種茶的。", tailo: "Tsia tsa̍p ê lâng lāi-té, ū peh ê sī tsìng tê--ê.", huayu: "這裡十個人裡面，有八個是種茶的。" } },
     { who: "tea_farmer", emotion: "擔心", text: "霧讓我忘了怎麼照顧茶樹，幫我想 3 題好嗎？", taigi: { hanji: "霧予我袂記得按怎顧茶欉，共我想三題，好無？", tailo: "Bū hōo guá bē-kì-tit án-tsuánn kòo tê-tsâng, kā guá siūnn sann tê, hó--bô?", huayu: "霧讓我忘了怎麼照顧茶樹，幫我想 3 題好嗎？" } }
@@ -1475,8 +1477,8 @@ window.DIALOGS = {
     { who: "tea_farmer", emotion: "擔心", text: "可是茶寮旁邊的怪物，把茶葉搶走了！", taigi: { hanji: "毋過茶寮邊仔的怪物，共茶葉搶走矣！", tailo: "M̄-koh tê-liâu pinn--á ê kuài-bu̍t, kā tê-hio̍h tshiúnn-tsáu--ah!", huayu: "可是茶寮旁邊的怪物，把茶葉搶走了！" } }
   ],
   D_PL_2A: [
-    { who: "tea_farmer", emotion: "擔心", text: "那隻怪物背著竹籠，被霧弄迷糊了。", taigi: { hanji: "彼隻怪物揹竹籠，予霧舞甲霧嗄嗄。", tailo: "Hit tsiah kuài-bu̍t phāinn tik-láng, hōo bū bú kah bū-sà-sà.", huayu: "那隻怪物背著竹籠，被霧弄迷糊了。" } },
-    { who: "tea_farmer", emotion: "平靜", text: "讓怪物清醒，把 3 包茶葉找回來。", taigi: { hanji: "予怪物清醒，共三包茶葉揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshénn, kā sann pau tê-hio̍h tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 包茶葉找回來。" } },
+    { who: "tea_farmer", emotion: "擔心", text: "那隻怪物背著竹籠，被霧弄迷糊了。", taigi: { hanji: "彼个怪物揹著竹籠仔，予霧舞甲霧嗄嗄。", tailo: "Hit ê kuài-bu̍t phāinn-tio̍h tik-láng-á, hōo bū bú kah bū-sà-sà.", huayu: "那隻怪物背著竹籠，被霧弄迷糊了。" } },
+    { who: "tea_farmer", emotion: "平靜", text: "讓怪物清醒，把 3 包茶葉找回來。", taigi: { hanji: "予怪物清醒，共三包茶葉揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshínn, kā sann pau tê-hio̍h tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 包茶葉找回來。" } },
     { who: "pet", emotion: "驚訝", text: "是焙籠火狸！讓牠們清醒，就會掉茶葉。" }
   ],
   D_PL_2B: [
@@ -1495,7 +1497,7 @@ window.DIALOGS = {
   D_MK_1A: [
     { who: "gondola_staff", emotion: "擔心", text: "糟了，車票都被怪物叼走了！", taigi: { hanji: "害矣，車票攏予怪物咬去矣！", tailo: "Hāi--ah, tshia-phiò lóng hōo kuài-bu̍t kā--khì--ah!", huayu: "糟了，車票都被怪物叼走了！" } },
     { who: "gondola_staff", emotion: "擔心", text: "茶園步道的時鐘怪物，被霧弄迷糊了。", taigi: { hanji: "茶園步道的時鐘怪物，予霧舞甲霧嗄嗄。", tailo: "Tê-hn̂g pōo-tō ê sî-tsing kuài-bu̍t, hōo bū bú kah bū-sà-sà.", huayu: "茶園步道的時鐘怪物，被霧弄迷糊了。" } },
-    { who: "gondola_staff", emotion: "平靜", text: "讓怪物清醒，把 3 張車票找回來。", taigi: { hanji: "予怪物清醒，共三張車票揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshénn, kā sann tiunn tshia-phiò tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 張車票找回來。" } },
+    { who: "gondola_staff", emotion: "平靜", text: "讓怪物清醒，把 3 張車票找回來。", taigi: { hanji: "予怪物清醒，共三張車票揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshínn, kā sann tiunn tshia-phiò tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 張車票找回來。" } },
     { who: "pet", emotion: "驚訝", text: "是鈴鈴鬧鐘兵！讓牠們清醒，就會掉纜車票。" }
   ],
   D_MK_1B: [
@@ -1530,7 +1532,7 @@ window.DIALOGS = {
   D_TEMPLE_HT_INTRO: [
     { who: "temple_volunteer_ht", emotion: "平靜", text: "這裡是行天宮，歡迎你來。", taigi: { hanji: "這是行天宮，歡迎你來。", tailo: "Tse sī Hîng-thian-kiong, huan-gîng lí lâi.", huayu: "這裡是行天宮，歡迎你來。" } },
     { who: "temple_volunteer_ht", emotion: "平靜", text: "行天宮不燒金紙，也沒有功德箱。", taigi: { hanji: "行天宮無燒金紙，嘛無功德箱。", tailo: "Hîng-thian-kiong bô sio kim-tsuá, mā bô kong-tik-siunn.", huayu: "行天宮不燒金紙，也沒有功德箱。" } },
-    { who: "temple_volunteer_ht", emotion: "平靜", text: "大香爐和供桌拿掉了，大家雙手合十就好。", taigi: { hanji: "大香爐佮神桌提掉矣，逐家雙手合掌就好。", tailo: "Tuā hiunn-lôo kah sîn-toh the̍h-tiāu--ah, ta̍k-ke siang-tshiú ha̍p-tsióng tō hó.", huayu: "大香爐和供桌拿掉了，大家雙手合十就好。" } }
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "大香爐和供桌拿掉了，大家雙手合十就好。", taigi: { hanji: "大香爐佮尪架桌提掉矣，逐家雙手合掌就好。", tailo: "Tuā hiunn-lôo kah ang-kè-toh the̍h-tiāu--ah, ta̍k-ke siang-tshiú ha̍p-tsióng tō hó.", huayu: "大香爐和供桌拿掉了，大家雙手合十就好。" } }
   ],
   D_TPC_1_LOCK: [
     { who: "dihua_shop", emotion: "平靜", text: "先去南邊幫種茶的阿伯，再來找我。", taigi: { hanji: "先去南爿共種茶的阿伯鬥相共，才閣來揣我。", tailo: "Sing khì lâm-pîng kā tsìng tê ê a-peh tàu-sann-kāng, tsiah-koh lâi tshuē guá.", huayu: "先去南邊幫種茶的阿伯，再來找我。" } },
@@ -1685,7 +1687,7 @@ window.DIALOGS = {
     { who: "inn_beitou", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" } }
   ],
   D_INN_BEITOU_BATH: [
-    { who: "inn_beitou", emotion: "開心", text: "泡溫泉 10 枚金幣，泡完就有精神了。", taigi: { hanji: "浸溫泉十个金幣，浸了就有元氣矣。", tailo: "Tsìm un-tsuânn tsa̍p ê kim-pè, tsìm liáu tō ū guân-khì--ah.", huayu: "泡溫泉 10 枚金幣，泡完就有精神了。" } },
+    { who: "inn_beitou", emotion: "開心", text: "泡溫泉 10 枚金幣，泡完就有精神了。", taigi: { hanji: "浸溫泉十箍，浸了就真精神矣。", tailo: "Tsìm un-tsuânn tsa̍p khoo, tsìm liáu tō tsin tsing-sîn--ah.", huayu: "泡溫泉 10 枚金幣，泡完就有精神了。" } },
     { who: "pet", emotion: "平靜", text: "泡溫泉不算住宿喔！記得要有大人陪。" }
   ],
   D_INN_XINYI: [
@@ -1728,11 +1730,11 @@ window.DIALOGS = {
   ],
   D_TRIAL_FAIL_HT: [
     { who: "temple_volunteer_ht", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
-    { who: "temple_volunteer_ht", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, bîn-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
     { who: "temple_volunteer_ht", emotion: "開心", text: "當見習冒險者，一樣能打倒魔王喔！", taigi: { hanji: "做見習冒險者，仝款會當拍贏魔王喔！", tailo: "Tsò kiàn-si̍p mōo-hiám-tsiá, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "當見習冒險者，一樣能打倒魔王喔！" } }
   ],
   D_TRIAL_AGAIN_HT: [
-    { who: "temple_volunteer_ht", emotion: "平靜", text: "今天已經考一次了，明天再來喔。", taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "今天已經考一次了，明天再來喔。", taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, miâ-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
   ],
   D_JOB_LV1_HT: [
     { who: "temple_volunteer_ht", emotion: "平靜", text: "換了職業，等級會從 1 開始。", taigi: { hanji: "換職業了後，等級會對一級開始。", tailo: "Uānn tsit-gia̍p liáu-āu, tíng-kip ē tuì tsi̍t kip khai-sí.", huayu: "換了職業，等級會從 1 開始。" } },
@@ -1756,11 +1758,11 @@ window.DIALOGS = {
   ],
   D_TRIAL_FAIL_ZN: [
     { who: "temple_volunteer_zn", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
-    { who: "temple_volunteer_zn", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, bîn-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
     { who: "temple_volunteer_zn", emotion: "開心", text: "當見習冒險者，一樣能打倒魔王喔！", taigi: { hanji: "做見習冒險者，仝款會當拍贏魔王喔！", tailo: "Tsò kiàn-si̍p mōo-hiám-tsiá, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "當見習冒險者，一樣能打倒魔王喔！" } }
   ],
   D_TRIAL_AGAIN_ZN: [
-    { who: "temple_volunteer_zn", emotion: "平靜", text: "今天已經考一次了，明天再來喔。", taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, bîn-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "今天已經考一次了，明天再來喔。", taigi: { hanji: "今仔日已經考一擺矣，明仔載才閣來喔。", tailo: "Kin-á-ji̍t í-king khó tsi̍t pái--ah, miâ-á-tsài tsiah koh lâi--ooh.", huayu: "今天已經考一次了，明天再來喔。" } }
   ],
   D_JOB_LV1_ZN: [
     { who: "temple_volunteer_zn", emotion: "平靜", text: "換了職業，等級會從 1 開始。", taigi: { hanji: "換職業了後，等級會對一級開始。", tailo: "Uānn tsit-gia̍p liáu-āu, tíng-kip ē tuì tsi̍t kip khai-sí.", huayu: "換了職業，等級會從 1 開始。" } },
@@ -1771,4 +1773,273 @@ window.DIALOGS = {
     { who: "temple_volunteer_zn", emotion: "平靜", text: "等級也會和以前一樣喔。", taigi: { hanji: "等級嘛會佮以早仝款喔。", tailo: "Tíng-kip mā ē kah í-tsá kāng-khuán--ooh.", huayu: "等級也會和以前一樣喔。" } }
   ],
   // ═════════════ v1.3 台北章 END ═════════════
+
+  // ═════════════ v1.3.1 台語氣象諺語（劇本語音組 2026-10-25；wip_v131_draft/dialogs_proverbs.js，v131_apply.js 併入）═════════════
+  D_PV_01: [
+    { who: "levee_uncle", emotion: "平靜", text: "龜山戴上黑帽子，雨馬上就下來。",
+      taigi: { hanji: "龜山戴烏帽，連鞭雨著落。", tailo: "Ku-suann tì oo-bō, nā-mi̍h hōo tio̍h lo̍h.", huayu: "龜山戴上黑帽子，雨馬上就下來。" } },
+    { who: "pet", emotion: "平靜", text: "雲蓋住龜山島的山頂，老一輩就說快下雨了。" },
+    { who: "pet", emotion: "平靜", text: "這是民間說法，天氣還是要看氣象預報喔！" }
+  ],
+  D_PV_02: [
+    { who: "trail_volunteer", emotion: "擔心", text: "米缸沒米了，也不可以去三貂角。",
+      taigi: { hanji: "米甕仔無米，三貂角嘛毋通去。", tailo: "Bí-àng-á bô bí, Sam-tiau-kak mā m̄-thang khì.", huayu: "米缸沒米了，也不可以去三貂角。" } },
+    { who: "pet", emotion: "平靜", text: "冬天東北季風很強，去海邊要特別小心。" },
+    { who: "pet", emotion: "平靜", text: "去海邊前，要先看氣象署的提醒喔！" }
+  ],
+  D_PV_03: [
+    { who: "bt_museum_guide", emotion: "平靜", text: "淡水這種天氣，雨傘靠在門邊。",
+      taigi: { hanji: "淡水這號天，雨傘倚門邊。", tailo: "Tām-tsuí tsit-lō thinn, hōo-suànn uá mn̂g-pinn.", huayu: "淡水這種天氣，雨傘靠在門邊。" } },
+    { who: "pet", emotion: "平靜", text: "老一輩說淡水常常下雨，雨傘放門邊隨時拿。" },
+    { who: "pet", emotion: "平靜", text: "這是民間說法，天氣還是要看氣象預報喔！" }
+  ],
+  D_PV_04: [
+    { who: "scallion_farmer", emotion: "平靜", text: "西北雨下不過田埂。",
+      taigi: { hanji: "西北雨，落袂過田岸。", tailo: "Sai-pak-hōo, lo̍h bē kuè tshân-huānn.", huayu: "西北雨下不過田埂。" } },
+    { who: "pet", emotion: "平靜", text: "夏天午後的雷陣雨，來得快、去得也快。" }
+  ],
+  D_PV_05: [
+    { who: "tea_farmer", emotion: "平靜", text: "春天就像小孩子的臉。",
+      taigi: { hanji: "春天，囡仔面。", tailo: "Tshun-thinn, gín-á bīn.", huayu: "春天就像小孩子的臉。" } },
+    { who: "pet", emotion: "平靜", text: "春天天氣變來變去，一下晴天、一下下雨。" }
+  ],
+  D_PV_06: [
+    { who: "calla_farmer", emotion: "平靜", text: "霧罩著散不開，戴斗笠、披蓑衣。",
+      taigi: { hanji: "罩雺罩袂開，戴笠披棕蓑。", tailo: "Tà-bông tà bē khui, tì le̍h phi tsang-sui.", huayu: "霧罩著散不開，戴斗笠、披蓑衣。" } },
+    { who: "pet", emotion: "平靜", text: "老一輩說霧久久不散，就快下雨了。" },
+    { who: "pet", emotion: "平靜", text: "這是民間說法，天氣還是要看氣象預報喔！" }
+  ],
+  D_PV_07: [
+    { who: "potato_seller", emotion: "平靜", text: "螞蟻搬家跑走，大雨快要來了。",
+      taigi: { hanji: "狗蟻搬徙走，大雨欲來到。", tailo: "Káu-hiā puann-suá tsáu, tuā-hōo beh lâi kàu.", huayu: "螞蟻搬家跑走，大雨快要來了。" } },
+    { who: "pet", emotion: "平靜", text: "老一輩說螞蟻搬家，就快下大雨了。" },
+    { who: "pet", emotion: "平靜", text: "這是民間說法，天氣還是要看氣象預報喔！" }
+  ],
+  D_PV_08: [
+    { who: "temple_keeper", emotion: "平靜", text: "大道公的風，媽祖婆的雨。",
+      taigi: { hanji: "大道公風，媽祖婆雨。", tailo: "Tāi-tō-kong hong, Má-tsóo-pô hōo.", huayu: "大道公的風，媽祖婆的雨。" } },
+    { who: "pet", emotion: "平靜", text: "傳說大道公生日會颳風，媽祖生日會下雨。" },
+    { who: "pet", emotion: "平靜", text: "這是民間傳說，不是天氣預報喔！" }
+  ],
+  D_PV_09: [
+    { who: "dihua_shop", emotion: "平靜", text: "還沒吃端午節的粽子，舊冬衣捨不得收。",
+      taigi: { hanji: "未食五日節粽，破裘毋甘放。", tailo: "Buē tsia̍h Gōo-ji̍t-tseh tsàng, phuà hiû m̄-kam pàng.", huayu: "還沒吃端午節的粽子，舊冬衣捨不得收。" } },
+    { who: "pet", emotion: "平靜", text: "端午節以前，天氣還可能變涼，冬衣先別收。" },
+    { who: "pet", emotion: "平靜", text: "這是民間說法，天氣還是要看氣象預報喔！" }
+  ],
+  D_PV_10: [
+    { who: "harbor_uncle", emotion: "擔心", text: "九月的颱風，沒有人知道。",
+      taigi: { hanji: "九月颱，無人知。", tailo: "Káu-gue̍h thai, bô lâng tsai.", huayu: "九月的颱風，沒有人知道。" } },
+    { who: "pet", emotion: "平靜", text: "農曆九月以後，很難從天空看出颱風要來。" }
+  ],
+  D_PVQ_1_ASK: [
+    { who: "scallion_farmer", emotion: "開心", text: "阿伯故意說錯，你找找看哪裡錯了。",
+      taigi: { hanji: "阿伯故意講毋著，你揣看覓佗位毋著。", tailo: "A-peh kòo-ì kóng m̄-tio̍h, lí tshuē khuànn-māi tó-uī m̄-tio̍h.", huayu: "阿伯故意說錯，你找找看哪裡錯了。" } },
+    { who: "scallion_farmer", emotion: "開心", text: "西北雨下不過田埂，所以會下一整天。",
+      taigi: { hanji: "西北雨落袂過田岸，所以會落規工。", tailo: "Sai-pak-hōo lo̍h bē kuè tshân-huānn, sóo-í ē lo̍h kui-kang.", huayu: "西北雨下不過田埂，所以會下一整天。" } }
+  ],
+  D_PVQ_1_RIGHT: [
+    { who: "pet", emotion: "開心", text: "答對了！西北雨來得快、去得也快，不會下一整天。" },
+    { who: "scallion_farmer", emotion: "開心", text: "對啦，西北雨下一下就停了。",
+      taigi: { hanji: "著啦，西北雨落一下就停矣。", tailo: "Tio̍h--lah, sai-pak-hōo lo̍h tsi̍t-ē tō thîng--ah.", huayu: "對啦，西北雨下一下就停了。" } }
+  ],
+  D_PVQ_1_WRONG: [
+    { who: "pet", emotion: "擔心", text: "再想想，西北雨是下很久，還是一下就停？" }
+  ],
+  D_PVQ_2_ASK: [
+    { who: "potato_seller", emotion: "開心", text: "阿伯故意說錯，你找找看哪裡錯了。",
+      taigi: { hanji: "阿伯故意講毋著，你揣看覓佗位毋著。", tailo: "A-peh kòo-ì kóng m̄-tio̍h, lí tshuē khuànn-māi tó-uī m̄-tio̍h.", huayu: "阿伯故意說錯，你找找看哪裡錯了。" } },
+    { who: "potato_seller", emotion: "開心", text: "螞蟻搬家跑走，一定會下大雨，這是科學！",
+      taigi: { hanji: "狗蟻搬徙走，一定會落大雨，這是科學！", tailo: "Káu-hiā puann-suá tsáu, it-tīng ē lo̍h tuā-hōo, tse sī kho-ha̍k!", huayu: "螞蟻搬家跑走，一定會下大雨，這是科學！" } }
+  ],
+  D_PVQ_2_RIGHT: [
+    { who: "pet", emotion: "開心", text: "答對了！這是民間說法，螞蟻搬家不一定會下雨。" },
+    { who: "potato_seller", emotion: "開心", text: "對啦，想知道會不會下雨，要看天氣預報。",
+      taigi: { hanji: "著啦，欲知影會落雨無，愛看天氣預報。", tailo: "Tio̍h--lah, beh tsai-iánn ē lo̍h-hōo--bô, ài khuànn thinn-khì ī-pò.", huayu: "對啦，想知道會不會下雨，要看天氣預報。" } }
+  ],
+  D_PVQ_2_WRONG: [
+    { who: "pet", emotion: "擔心", text: "再想想，民間說法可以說成「一定」和「科學」嗎？" }
+  ],
+  D_PVQ_3_ASK: [
+    { who: "levee_uncle", emotion: "開心", text: "阿伯故意說錯，你找找看哪裡錯了。",
+      taigi: { hanji: "阿伯故意講毋著，你揣看覓佗位毋著。", tailo: "A-peh kòo-ì kóng m̄-tio̍h, lí tshuē khuànn-māi tó-uī m̄-tio̍h.", huayu: "阿伯故意說錯，你找找看哪裡錯了。" } },
+    { who: "levee_uncle", emotion: "開心", text: "龜山戴上黑帽子，臺北雨馬上就下來。",
+      taigi: { hanji: "龜山戴烏帽，臺北連鞭雨著落。", tailo: "Ku-suann tì oo-bō, Tâi-pak nā-mi̍h hōo tio̍h lo̍h.", huayu: "龜山戴上黑帽子，臺北雨馬上就下來。" } }
+  ],
+  D_PVQ_3_RIGHT: [
+    { who: "pet", emotion: "開心", text: "答對了！龜山島在宜蘭外海，這句說的是宜蘭的天氣。" },
+    { who: "levee_uncle", emotion: "開心", text: "對啦，龜山戴帽，說的是宜蘭的天氣。",
+      taigi: { hanji: "著啦，龜山戴帽，講的是宜蘭的天。", tailo: "Tio̍h--lah, Ku-suann tì bō, kóng ê sī Gî-lân ê thinn.", huayu: "對啦，龜山戴帽，說的是宜蘭的天氣。" } }
+  ],
+  D_PVQ_3_WRONG: [
+    { who: "pet", emotion: "擔心", text: "再想想，龜山島在哪裡？是在臺北嗎？" }
+  ],
+  D_PVQ_4_ASK: [
+    { who: "temple_keeper", emotion: "開心", text: "阿伯故意說錯，你找找看哪裡錯了。",
+      taigi: { hanji: "阿伯故意講毋著，你揣看覓佗位毋著。", tailo: "A-peh kòo-ì kóng m̄-tio̍h, lí tshuē khuànn-māi tó-uī m̄-tio̍h.", huayu: "阿伯故意說錯，你找找看哪裡錯了。" } },
+    { who: "temple_keeper", emotion: "開心", text: "大道公的風，媽祖婆的雨，這是天氣預報說的！",
+      taigi: { hanji: "大道公風，媽祖婆雨，這是天氣預報講的！", tailo: "Tāi-tō-kong hong, Má-tsóo-pô hōo, tse sī thinn-khì ī-pò kóng--ê!", huayu: "大道公的風，媽祖婆的雨，這是天氣預報說的！" } }
+  ],
+  D_PVQ_4_RIGHT: [
+    { who: "pet", emotion: "開心", text: "答對了！這是民間傳說故事，不是天氣預報。" },
+    { who: "temple_keeper", emotion: "開心", text: "對啦，這是民間的傳說。",
+      taigi: { hanji: "著啦，這是民間的傳說。", tailo: "Tio̍h--lah, tse sī bîn-kan ê thuân-suat.", huayu: "對啦，這是民間的傳說。" } }
+  ],
+  D_PVQ_4_WRONG: [
+    { who: "pet", emotion: "擔心", text: "再想想，神明的故事是天氣預報嗎？" }
+  ],
+  D_PVQ_5_ASK: [
+    { who: "harbor_uncle", emotion: "開心", text: "阿伯故意說錯，你找找看哪裡錯了。",
+      taigi: { hanji: "阿伯故意講毋著，你揣看覓佗位毋著。", tailo: "A-peh kòo-ì kóng m̄-tio̍h, lí tshuē khuànn-māi tó-uī m̄-tio̍h.", huayu: "阿伯故意說錯，你找找看哪裡錯了。" } },
+    { who: "harbor_uncle", emotion: "開心", text: "九月的颱風沒人知道，所以九月都不會有颱風。",
+      taigi: { hanji: "九月颱，無人知，所以九月攏袂有風颱。", tailo: "Káu-gue̍h thai, bô lâng tsai, sóo-í káu-gue̍h lóng bē ū hong-thai.", huayu: "九月的颱風沒人知道，所以九月都不會有颱風。" } }
+  ],
+  D_PVQ_5_RIGHT: [
+    { who: "pet", emotion: "開心", text: "答對了！意思是很難事先看出來，不是不會來。" },
+    { who: "harbor_uncle", emotion: "開心", text: "對啦，九月也會有颱風，要小心。",
+      taigi: { hanji: "著啦，九月嘛會有風颱，愛細膩。", tailo: "Tio̍h--lah, káu-gue̍h mā ē ū hong-thai, ài sè-jī.", huayu: "對啦，九月也會有颱風，要小心。" } }
+  ],
+  D_PVQ_5_WRONG: [
+    { who: "pet", emotion: "擔心", text: "再想想，「沒人知道」是不會來，還是很難看出來？" }
+  ],
+
+  // ═════════════ v1.4 桃竹章（63 號 4.3 節；劇本語音組草稿 wip_v14_draft/dialogs_taoyuan.js，v14_apply.js 每次重跑都整段重建）BEGIN ═════════════
+  D_EXIT_LOCK_CH3: [
+    { who: "pet", emotion: "平靜", text: "要先完成台北章，才能走這條路喔！" },
+    { who: "pet", emotion: "平靜", text: "先回金包里，把數學燈點亮吧！" }
+  ],
+  D_SIGN_MIAOLI: [
+    { who: "pet", emotion: "平靜", text: "往苗栗的路，要等之後開放才能走。" }
+  ],
+  D_CH4_END: [
+    { who: "narrator", emotion: "開心", text: "桃園・新竹完成！" },
+    { who: "pet", emotion: "開心", text: "拿到北之曙光碎片了！還有三片在別的地方。" }
+  ],
+  D_TY_JOB_HINT: [
+    { who: "narrator", emotion: "平靜", text: "要轉職的話，可以搭車去慈護宮、行天宮或指南宮。" }
+  ],
+  D_TY_1A: [
+    { who: "reservoir_keeper", emotion: "開心", text: "歡迎來水庫！這裡把大漢溪的水擋起來。", taigi: { hanji: "歡迎來水庫！遮共大漢溪的水擋起來。", tailo: "Huan-gîng lâi tsuí-khòo! Tsia kā Tāi-hàn-khe ê tsuí tòng khí-lâi.", huayu: "歡迎來水庫！這裡把大漢溪的水擋起來。" } },
+    { who: "pet", emotion: "開心", text: "這裡是石門水庫，1964 年蓋好的喔！" },
+    { who: "reservoir_keeper", emotion: "平靜", text: "水庫能讓大家用水，還能發電、防大水。", taigi: { hanji: "水庫會使予逐家用水，閣會使發電、防大水。", tailo: "Tsuí-khòo ē-sái hōo ta̍k-ke īng tsuí, koh ē-sái huat-tiān, hông tuā-tsuí.", huayu: "水庫能讓大家用水，還能發電、防大水。" } },
+    { who: "reservoir_keeper", emotion: "擔心", text: "霧讓我忘了水的變化，幫我想 3 題好嗎？", taigi: { hanji: "霧予我袂記得水的變化，共我想三題，好無？", tailo: "Bū hōo guá bē-kì-tit tsuí ê piàn-huà, kā guá siūnn sann tê, hó--bô?", huayu: "霧讓我忘了水的變化，幫我想 3 題好嗎？" } }
+  ],
+  D_TY_1B: [
+    { who: "reservoir_keeper", emotion: "開心", text: "想起來了！謝謝你幫忙。", taigi: { hanji: "想起來矣！多謝你鬥相共。", tailo: "Siūnn khí-lâi--ah! To-siā lí tàu-sann-kāng.", huayu: "想起來了！謝謝你幫忙。" } },
+    { who: "reservoir_keeper", emotion: "開心", text: "送你 160 枚金幣，謝謝你！", taigi: { hanji: "送你一百六个金幣，多謝你！", tailo: "Sàng lí tsi̍t-pah-la̍k ê kim-pè, to-siā--lí!", huayu: "送你 160 枚金幣，謝謝你！" } }
+  ],
+  D_TY_2A: [
+    { who: "reservoir_keeper", emotion: "平靜", text: "這裡的水，要送到桃園、新北市和新竹的湖口。", taigi: { hanji: "遮的水，愛送去桃園、新北市佮新竹的湖口。", tailo: "Tsia ê tsuí, ài sàng khì Thô-hn̂g, Sin-pak-tshī kah Sin-tik ê Ôo-kháu.", huayu: "這裡的水，要送到桃園、新北市和新竹的湖口。" } },
+    { who: "reservoir_keeper", emotion: "擔心", text: "霧讓我算不清楚水量，幫我算 3 題好嗎？", taigi: { hanji: "霧予我算袂清楚水量，共我算三題，好無？", tailo: "Bū hōo guá sǹg bē tshing-tshó tsuí-liōng, kā guá sǹg sann tê, hó--bô?", huayu: "霧讓我算不清楚水量，幫我算 3 題好嗎？" } }
+  ],
+  D_TY_2B: [
+    { who: "reservoir_keeper", emotion: "開心", text: "算好了！水量剛剛好。", taigi: { hanji: "算好矣！水量拄仔好。", tailo: "Sǹg hó--ah! Tsuí-liōng tú-á-hó.", huayu: "算好了！水量剛剛好。" } },
+    { who: "reservoir_keeper", emotion: "開心", text: "送你 160 枚金幣，謝謝你！", taigi: { hanji: "送你一百六个金幣，多謝你！", tailo: "Sàng lí tsi̍t-pah-la̍k ê kim-pè, to-siā--lí!", huayu: "送你 160 枚金幣，謝謝你！" } },
+    { who: "reservoir_keeper", emotion: "擔心", text: "新竹的風亂吹，好像跟水庫的霧有關係。", taigi: { hanji: "新竹的風亂吹，敢若佮水庫的霧有關係。", tailo: "Sin-tik ê hong luān tshue, kánn-ná kah tsuí-khòo ê bū ū kuan-hē.", huayu: "新竹的風亂吹，好像跟水庫的霧有關係。" } },
+    { who: "pet", emotion: "平靜", text: "往西南走，就會到新竹！" }
+  ],
+  D_TY_5_LOCK: [
+    { who: "reservoir_keeper", emotion: "平靜", text: "先去新竹幫米粉師傅，再來找我。", taigi: { hanji: "先去新竹共米粉師傅鬥相共，才閣來揣我。", tailo: "Sing khì Sin-tik kā bí-hún sai-hū tàu-sann-kāng, tsiah-koh lâi tshuē guá.", huayu: "先去新竹幫米粉師傅，再來找我。" } },
+    { who: "pet", emotion: "平靜", text: "新竹的米粉師傅，好像需要幫忙！" }
+  ],
+  D_TY_5A: [
+    { who: "reservoir_keeper", emotion: "擔心", text: "壩頂有一隻機器將軍，把水門關起來了！", taigi: { hanji: "壩頂有一隻機器將軍，共水門關起來矣！", tailo: "Pà-tíng ū tsi̍t tsiah ki-khì tsiong-kun, kā tsuí-mn̂g kuainn khí-lâi--ah!", huayu: "壩頂有一隻機器將軍，把水門關起來了！" } },
+    { who: "reservoir_keeper", emotion: "平靜", text: "這座壩是用土和石頭堆的，很堅固。", taigi: { hanji: "這座壩是用塗佮石頭疊的，真勇。", tailo: "Tsit tsō pà sī īng thôo kah tsio̍h-thâu tha̍h--ê, tsin ióng.", huayu: "這座壩是用土和石頭堆的，很堅固。" } },
+    { who: "reservoir_keeper", emotion: "平靜", text: "去壩頂讓它清醒，把水門打開！", taigi: { hanji: "去壩頂予伊清醒，共水門開開！", tailo: "Khì pà-tíng hōo i tshing-tshínn, kā tsuí-mn̂g khui--khui!", huayu: "去壩頂讓它清醒，把水門打開！" } },
+    { who: "pet", emotion: "驚訝", text: "要小心，那是北邊的霧將！" }
+  ],
+  D_TY_5B: [
+    { who: "reservoir_keeper", emotion: "開心", text: "水門打開了！謝謝你，勇者！", taigi: { hanji: "水門開開矣！多謝你，勇者！", tailo: "Tsuí-mn̂g khui--khui--ah! To-siā lí, ióng-tsiá!", huayu: "水門打開了！謝謝你，勇者！" } },
+    { who: "reservoir_keeper", emotion: "開心", text: "送你 250 枚金幣，謝謝你！", taigi: { hanji: "送你兩百五个金幣，多謝你！", tailo: "Sàng lí nn̄g-pah-gōo ê kim-pè, to-siā--lí!", huayu: "送你 250 枚金幣，謝謝你！" } }
+  ],
+  D_BOSS_FLOODGATE_A: [
+    { who: "mb_floodgate", emotion: "生氣", text: "喀啦喀啦……水門關上！誰也別想過去！" },
+    { who: "pet", emotion: "驚訝", text: "是霧閘機將！答對題目，把它胸口的霧吹散！" }
+  ],
+  D_BOSS_FLOODGATE_B: [
+    { who: "mb_floodgate", emotion: "平靜", text: "齒輪……不卡了。水門打開，讓清水流向田野吧。" }
+  ],
+  D_RESERVOIR_IDLE: [
+    { who: "reservoir_keeper", emotion: "平靜", text: "水庫邊很危險，不要靠太近。", taigi: { hanji: "水庫邊仔真危險，毋通傷倚。", tailo: "Tsuí-khòo pinn--á tsin guî-hiám, m̄-thang siunn uá.", huayu: "水庫邊很危險，不要靠太近。" } }
+  ],
+  D_TY_3A: [
+    { who: "tofu_shop", emotion: "開心", text: "歡迎來大溪老街！我們的豆干最有名。", taigi: { hanji: "歡迎來大溪的舊街！阮的豆干上出名。", tailo: "Huan-gîng lâi Tāi-khe ê kū-ke! Guán ê tāu-kuann siōng tshut-miâ.", huayu: "歡迎來大溪老街！我們的豆干最有名。" } },
+    { who: "tofu_shop", emotion: "平靜", text: "現滷的豆干，是大家來老街一定要吃的。", taigi: { hanji: "現滷的豆干，逐家來舊街一定愛食。", tailo: "Hiān lóo ê tāu-kuann, ta̍k-ke lâi kū-ke it-tīng ài tsia̍h.", huayu: "現滷的豆干，是大家來老街一定要吃的。" } },
+    { who: "tofu_shop", emotion: "擔心", text: "霧讓我把帳算錯了，幫我算 3 題好嗎？", taigi: { hanji: "霧予我共數算毋著矣，共我算三題，好無？", tailo: "Bū hōo guá kā siàu sǹg m̄-tio̍h--ah, kā guá sǹg sann tê, hó--bô?", huayu: "霧讓我把帳算錯了，幫我算 3 題好嗎？" } }
+  ],
+  D_TY_3B: [
+    { who: "tofu_shop", emotion: "開心", text: "算對了！謝謝你。", taigi: { hanji: "算著矣！多謝你。", tailo: "Sǹg tio̍h--ah! To-siā--lí.", huayu: "算對了！謝謝你。" } },
+    { who: "tofu_shop", emotion: "開心", text: "送你 120 枚金幣，謝謝你！", taigi: { hanji: "送你一百二个金幣，多謝你！", tailo: "Sàng lí tsi̍t-pah-jī ê kim-pè, to-siā--lí!", huayu: "送你 120 枚金幣，謝謝你！" } },
+    { who: "tofu_shop", emotion: "開心", text: "這個點心送你，餓了就吃。", taigi: { hanji: "這个點心送你，枵就食。", tailo: "Tsit ê tiám-sim sàng lí, iau tō tsia̍h.", huayu: "這個點心送你，餓了就吃。" } }
+  ],
+  D_TOFU_IDLE: [
+    { who: "tofu_shop", emotion: "開心", text: "豆干要趁熱吃，比較香。", taigi: { hanji: "豆干愛趁燒食，較芳。", tailo: "Tāu-kuann ài thàn sio tsia̍h, khah phang.", huayu: "豆干要趁熱吃，比較香。" } }
+  ],
+  D_TY_4A: [
+    { who: "wood_artisan", emotion: "平靜", text: "我是做木工的，桌子椅子都是一刀一刀做的。", taigi: { hanji: "我是做木工的，桌仔椅仔攏是一刀一刀做的。", tailo: "Guá sī tsò ba̍k-kang--ê, toh-á í-á lóng sī tsi̍t to tsi̍t to tsò--ê.", huayu: "我是做木工的，桌子椅子都是一刀一刀做的。" } },
+    { who: "wood_artisan", emotion: "平靜", text: "大溪有一間博物館，每個月都會教大家做木工。", taigi: { hanji: "大溪有一間博物館，逐個月攏會教人做木工。", tailo: "Tāi-khe ū tsi̍t king phok-bu̍t-kuán, ta̍k kò gue̍h lóng ē kà lâng tsò ba̍k-kang.", huayu: "大溪有一間博物館，每個月都會教大家做木工。" } },
+    { who: "wood_artisan", emotion: "擔心", text: "霧讓我忘了做木工的工作，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得做木工的工課，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit tsò ba̍k-kang ê khang-khuè, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了做木工的工作，幫我想 2 題好嗎？" } }
+  ],
+  D_TY_4B: [
+    { who: "wood_artisan", emotion: "開心", text: "對了！木頭要慢慢磨，才會漂亮。", taigi: { hanji: "著矣！柴頭愛沓沓仔磨，才會媠。", tailo: "Tio̍h--ah! Tshâ-thâu ài ta̍uh-ta̍uh-á buâ, tsiah ē suí.", huayu: "對了！木頭要慢慢磨，才會漂亮。" } },
+    { who: "wood_artisan", emotion: "開心", text: "送你 110 枚金幣，謝謝你！", taigi: { hanji: "送你一百一个金幣，多謝你！", tailo: "Sàng lí tsi̍t-pah-it ê kim-pè, to-siā--lí!", huayu: "送你 110 枚金幣，謝謝你！" } }
+  ],
+  D_WOOD_IDLE: [
+    { who: "wood_artisan", emotion: "平靜", text: "做木工要小心，刀子不能亂玩。", taigi: { hanji: "做木工愛細膩，刀仔毋通亂耍。", tailo: "Tsò ba̍k-kang ài sè-jī, to-á m̄-thang luān sńg.", huayu: "做木工要小心，刀子不能亂玩。" } }
+  ],
+  D_INN_DAXI: [
+    { who: "inn_daxi", emotion: "開心", text: "歡迎來大溪的老街旅店！好好休息喔。", taigi: { hanji: "歡迎來大溪的舊街旅社！好好仔歇睏喔。", tailo: "Huan-gîng lâi Tāi-khe ê kū-ke lí-siā! Hó-hó-á hioh-khùn--ooh.", huayu: "歡迎來大溪的老街旅店！好好休息喔。" } }
+  ],
+  D_INN_DAXI_NOCOIN: [
+    { who: "inn_daxi", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" } }
+  ],
+  D_HC_1_LOCK: [
+    { who: "noodle_master", emotion: "平靜", text: "先去水庫幫管理員，再來找我。", taigi: { hanji: "先去水庫共管理員鬥相共，才閣來揣我。", tailo: "Sing khì tsuí-khòo kā kuán-lí-uân tàu-sann-kāng, tsiah-koh lâi tshuē guá.", huayu: "先去水庫幫管理員，再來找我。" } },
+    { who: "pet", emotion: "平靜", text: "石門水庫的管理員，好像需要幫忙！" }
+  ],
+  D_HC_1A: [
+    { who: "noodle_master", emotion: "開心", text: "歡迎來新竹！這裡風很大。", taigi: { hanji: "歡迎來新竹！遮的風真透。", tailo: "Huan-gîng lâi Sin-tik! Tsia ê hong tsin thàu.", huayu: "歡迎來新竹！這裡風很大。" } },
+    { who: "pet", emotion: "平靜", text: "這裡叫「風城」，因為地形的關係，風特別大。" },
+    { who: "noodle_master", emotion: "平靜", text: "新竹米粉好吃，就是靠這陣風。", taigi: { hanji: "新竹米粉好食，就是靠這陣風。", tailo: "Sin-tik bí-hún hó-tsia̍h, tō sī khò tsit tsūn hong.", huayu: "新竹米粉好吃，就是靠這陣風。" } },
+    { who: "noodle_master", emotion: "平靜", text: "風強、雨少，米粉才曬得乾。", taigi: { hanji: "風透、雨少，米粉才曝會焦。", tailo: "Hong thàu, hōo tsió, bí-hún tsiah pha̍k ē ta.", huayu: "風強、雨少，米粉才曬得乾。" } },
+    { who: "noodle_master", emotion: "擔心", text: "現在風亂吹，幫我想 3 題好嗎？", taigi: { hanji: "這馬風亂吹，共我想三題，好無？", tailo: "Tsit-má hong luān tshue, kā guá siūnn sann tê, hó--bô?", huayu: "現在風亂吹，幫我想 3 題好嗎？" } }
+  ],
+  D_HC_1B: [
+    { who: "noodle_master", emotion: "開心", text: "想起來了！謝謝你幫忙。", taigi: { hanji: "想起來矣！多謝你鬥相共。", tailo: "Siūnn khí-lâi--ah! To-siā lí tàu-sann-kāng.", huayu: "想起來了！謝謝你幫忙。" } },
+    { who: "noodle_master", emotion: "開心", text: "送你 170 枚金幣，謝謝你！", taigi: { hanji: "送你一百七个金幣，多謝你！", tailo: "Sàng lí tsi̍t-pah-tshit ê kim-pè, to-siā--lí!", huayu: "送你 170 枚金幣，謝謝你！" } },
+    { who: "noodle_master", emotion: "擔心", text: "可是外面的怪物，把風車葉片吹走了！", taigi: { hanji: "毋過外口的怪物，共風車葉仔吹走矣！", tailo: "M̄-koh guā-kháu ê kuài-bu̍t, kā hong-tshia hio̍h-á tshue tsáu--ah!", huayu: "可是外面的怪物，把風車葉片吹走了！" } }
+  ],
+  D_HC_2A: [
+    { who: "noodle_master", emotion: "平靜", text: "讓怪物清醒，把 3 片風車葉片找回來。", taigi: { hanji: "予怪物清醒，共三片風車葉仔揣轉來。", tailo: "Hōo kuài-bu̍t tshing-tshínn, kā sann phìnn hong-tshia hio̍h-á tshuē tńg--lâi.", huayu: "讓怪物清醒，把 3 片風車葉片找回來。" } },
+    { who: "pet", emotion: "平靜", text: "是咻咻風精！牠們在曬場外面的空地。" }
+  ],
+  D_HC_2B: [
+    { who: "noodle_master", emotion: "開心", text: "風車又會轉了，謝謝你！", taigi: { hanji: "風車閣會踅矣，多謝你！", tailo: "Hong-tshia koh ē se̍h--ah, to-siā--lí!", huayu: "風車又會轉了，謝謝你！" } },
+    { who: "noodle_master", emotion: "開心", text: "這些金幣和藥草送你。", taigi: { hanji: "這寡金幣佮藥草送你。", tailo: "Tsit-kuá kim-pè kah io̍h-tsháu sàng lí.", huayu: "這些金幣和藥草送你。" } },
+    { who: "noodle_master", emotion: "擔心", text: "亂風是從水庫那邊吹來的！回去找管理員。", taigi: { hanji: "亂風是對水庫遐吹過來的！轉去揣管理員。", tailo: "Luān hong sī tuì tsuí-khòo hia tshue--kuè-lâi--ê! Tńg-khì tshuē kuán-lí-uân.", huayu: "亂風是從水庫那邊吹來的！回去找管理員。" } }
+  ],
+  D_NOODLE_IDLE: [
+    { who: "noodle_master", emotion: "平靜", text: "十月到一月的風，最適合曬米粉。", taigi: { hanji: "十月到一月的風，上適合曝米粉。", tailo: "Tsa̍p-gue̍h kàu it-gue̍h ê hong, siōng sik-ha̍p pha̍k bí-hún.", huayu: "十月到一月的風，最適合曬米粉。" } }
+  ],
+  D_HC_3A: [
+    { who: "hc_guide", emotion: "開心", text: "這座城門，以前是竹塹城的東門。", taigi: { hanji: "這座城門，以早是竹塹城的東門。", tailo: "Tsit tsō siânn-mn̂g, í-tsá sī Tik-tshàm-siânn ê Tang-mn̂g.", huayu: "這座城門，以前是竹塹城的東門。" } },
+    { who: "pet", emotion: "開心", text: "它叫迎曦門，是竹塹城唯一留下來的城門喔！" },
+    { who: "hc_guide", emotion: "平靜", text: "城門有兩層樓，下面是一條一條石頭疊的。", taigi: { hanji: "城門有兩層樓，下跤是一條一條石頭疊的。", tailo: "Siânn-mn̂g ū nn̄g tsân lâu, ē-kha sī tsi̍t tiâu tsi̍t tiâu tsio̍h-thâu tha̍h--ê.", huayu: "城門有兩層樓，下面是一條一條石頭疊的。" } },
+    { who: "hc_guide", emotion: "平靜", text: "以前的城牆拆掉了，只留下這座東門。", taigi: { hanji: "以早的城牆拆掉矣，干焦留這座東門。", tailo: "Í-tsá ê siânn-tshiûnn thiah-tiāu--ah, kan-na lâu tsit tsō Tang-mn̂g.", huayu: "以前的城牆拆掉了，只留下這座東門。" } },
+    { who: "hc_guide", emotion: "擔心", text: "霧讓我忘了城門的故事，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得城門的故事，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit siânn-mn̂g ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了城門的故事，幫我想 2 題好嗎？" } }
+  ],
+  D_HC_3B: [
+    { who: "hc_guide", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "hc_guide", emotion: "開心", text: "送你 110 枚金幣，謝謝你！", taigi: { hanji: "送你一百一个金幣，多謝你！", tailo: "Sàng lí tsi̍t-pah-it ê kim-pè, to-siā--lí!", huayu: "送你 110 枚金幣，謝謝你！" } }
+  ],
+  D_HCGUIDE_IDLE: [
+    { who: "hc_guide", emotion: "平靜", text: "城門下面可以走過去，去看看吧。", taigi: { hanji: "城門下跤會使行過去，去看覓。", tailo: "Siânn-mn̂g ē-kha ē-sái kiânn--kuè-khì, khì khuànn-māi.", huayu: "城門下面可以走過去，去看看吧。" } }
+  ],
+  D_INN_HSINCHU: [
+    { who: "inn_hsinchu", emotion: "開心", text: "歡迎來新竹！風很大，進來休息吧。", taigi: { hanji: "歡迎來新竹！風真透，入來歇睏。", tailo: "Huan-gîng lâi Sin-tik! Hong tsin thàu, ji̍p-lâi hioh-khùn.", huayu: "歡迎來新竹！風很大，進來休息吧。" } }
+  ],
+  D_INN_HSINCHU_NOCOIN: [
+    { who: "inn_hsinchu", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" } }
+  ],
+  // ═════════════ v1.4 桃竹章 END ═════════════
 };

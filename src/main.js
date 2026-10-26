@@ -3,7 +3,7 @@
   'use strict';
   function start() {
     window.JQ.Assets.preparePack().then(function () {
-      try { window.JQ.Game.boot(); }
+      try { window.JQ.Game.boot(); if (window.JQ.TestMode) window.JQ.TestMode.badge(document); }   // v1.3.1 測試模式開著時左上角的標籤
       catch (e) {
         console.error(e);
         var p = document.createElement('p');

@@ -409,5 +409,54 @@ window.MONSTERS = {
     exp: 30, gold: 6, drops: [{ item: "herb", rate: 0.3 }], boss: false,
     desc: "背上長滿淡黃色晶刺的刺蝟，生氣時晶刺會冒白煙。",
     wake: "硫晶刺蝟清醒了，縮成一團滾回草叢。地熱谷、噴氣孔的水很燙、腐蝕性很強，不能碰！"
+  },
+
+  // ── v1.4 桃竹章新怪（63 號 3.2 節）：桃竹系（豆干盾甲獸、木屑雕紋獸、米粉飄飄獸）、風雲系（雷咚咚、咻咻風精）、機械系（圓圓掃地機）、北霧將霧閘機將（M15 壩頂）──
+  // 數值：現行經濟、37 號公式，參考主角＝轉職後代表職業（63 號 3.1，PL 17–21）；小怪出題 2–3 星、頭目 2–4 星。desc／wake＝劇本組（wip_v14_draft/dialogs_taoyuan.js）
+  // 雷咚咚的閃光要柔和（27 號；技能特效每秒最多閃 3 次的規則照樣）；霧閘機將的演出（關水門、放水花、齒輪露出）只是演出、還沒做
+  ty_tofu: {
+    name: "豆干盾甲獸", sprite: "mon_ty_tofu", level: 4, hp: 200, atk: 31, subject: "數學", q_levels: [2, 3],
+    exp: 90, gold: 25, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "被霧弄迷糊的豆干小獸，把老街擋住不讓人過。",
+    wake: "豆干盾甲獸清醒了，乖乖排回滷鍋旁邊。"
+  },
+  ty_carve: {
+    name: "木屑雕紋獸", sprite: "mon_ty_carve", level: 4, hp: 200, atk: 32, subject: "國語", q_levels: [2, 3],
+    exp: 90, gold: 25, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "工坊裡跑出來的木雕小獸，霧讓牠忘了自己是作品。",
+    wake: "木屑雕紋獸清醒了，跳回工坊的木架上。"
+  },
+  wx_thunder: {
+    name: "雷咚咚", sprite: "mon_wx_thunder", level: 4, hp: 210, atk: 32, subject: "自然", q_levels: [2, 3],
+    exp: 100, gold: 25, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "肚子綁著小鼓的灰紫色小雲，被霧弄得一直亂打鼓。",
+    wake: "雷咚咚清醒了，抱著小鼓飄回天上。"
+  },
+  wx_wind: {
+    name: "咻咻風精", sprite: "mon_wx_wind", level: 4, hp: 220, atk: 34, subject: "自然", q_levels: [2, 3],
+    exp: 100, gold: 25, drops: [{ item: "pinwheel", rate: 0.5 }], boss: false,
+    desc: "像捲捲圍巾的淡綠色風，霧讓它到處亂吹。",
+    wake: "咻咻風精清醒了，輕輕吹著米粉架飄走了。"
+  },
+  mc_vacuum: {
+    name: "圓圓掃地機", sprite: "mon_mc_vacuum", level: 4, hp: 220, atk: 34, subject: "數學", q_levels: [2, 3],
+    exp: 105, gold: 30, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "扁扁圓圓的掃地機器人，霧讓它一直繞圈圈。",
+    wake: "圓圓掃地機清醒了，乖乖回到充電座。"
+  },
+  hc_noodle: {
+    name: "米粉飄飄獸", sprite: "mon_hc_noodle", level: 4, hp: 220, atk: 35, subject: "英語", q_levels: [2, 3],
+    exp: 105, gold: 30, drops: [{ item: "snack", rate: 0.4 }], boss: false,
+    desc: "曬場上的米粉被亂風吹成一團，變成了小怪獸。",
+    wake: "米粉飄飄獸清醒了，整整齊齊掛回曬架。"
+  },
+  mb_floodgate: {
+    name: "霧閘機將", sprite: "boss_mb_floodgate", level: 4, hp: 1000, atk: 32, subject: "混合",
+    subjects: ["自然", "數學"], q_levels: [2, 4],
+    exp: 710, gold: 200, drops: [{ item: "dawn_shard_n", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["ty_tofu", "wx_thunder"],
+    dialog_before: "D_BOSS_FLOODGATE_A", dialog_after: "D_BOSS_FLOODGATE_B",
+    desc: "大水門機器人，胸口的大齒輪被灰霧包住，把水門關起來了。",
+    wake: "霧閘機將清醒了，水門打開，清水流向田野。"
   }
 };

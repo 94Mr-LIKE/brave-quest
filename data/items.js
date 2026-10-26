@@ -72,7 +72,10 @@ window.ITEMS = {
   rainbow_piece: { name: "雨後彩虹片", sprite: "item_rainbow_piece", kind: "key", price: 0, precious: true, desc: "雨停後留下的一小片彩虹，亮亮的。" },
   // v1.3 台北章（62 號 3.4 節）：焙籠火狸、炒炒烘茶機的掉落（坪林 Q_PL_2 的打獵目標）；鈴鈴鬧鐘兵的掉落（貓空 Q_MK_1 的打獵目標）
   tea_leaf:     { name: "茶葉",       sprite: "item_tea_leaf",     kind: "material", price: 0, desc: "香香的茶葉，焙過之後更香。" },
-  ticket:       { name: "纜車票",     sprite: "item_ticket",       kind: "material", price: 0, desc: "被鬧鐘兵叼走的纜車票。" }
+  ticket:       { name: "纜車票",     sprite: "item_ticket",       kind: "material", price: 0, desc: "被鬧鐘兵叼走的纜車票。" },
+  // v1.4 桃竹章（63 號 3.3 節）：咻咻風精的掉落（新竹 Q_HC_2 的打獵目標）；北霧將的珍貴道具（冒險手帳顯示「曙光碎片 1／4」，其他三片之後的章節才有）
+  pinwheel:     { name: "風車葉片",     sprite: "item_pinwheel",     kind: "material", price: 0, desc: "被風精吹走的風車葉片。" },
+  dawn_shard_n: { name: "北之曙光碎片", sprite: "item_dawn_shard_n", kind: "key", price: 0, precious: true, desc: "北霧將清醒後交出的一小片曙光，暖暖的。" }
 };
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */

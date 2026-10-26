@@ -43,6 +43,12 @@ window.ART = {
   "M14": {
    "bg": "bg_M14.webp"
   },
+  "M15": {
+   "bg": "bg_M15.webp"
+  },
+  "M16": {
+   "bg": "bg_M16.webp"
+  },
   "M46": {
    "bg": "bg_M46.webp"
   },

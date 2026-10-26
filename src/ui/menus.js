@@ -237,7 +237,7 @@
     var body = h('div');
     var tabs = h('div.tabs', { role: 'tablist' });
     var handle;
-    [['quests', '委託'], ['book', '怪物名冊'], ['lights', '五道光'], ['study', '學習紀錄'], ['daily', '每日小任務']].forEach(function (t) {
+    [['quests', '委託'], ['book', '怪物名冊'], ['proverbs', '諺語'], ['lights', '五道光'], ['study', '學習紀錄'], ['daily', '每日小任務']].forEach(function (t) {
       tabs.appendChild(h('button', { role: 'tab', 'data-tab': t[0], onclick: function () { tab = t[0]; render(); } }, [t[1]]));
     });
     var panel = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']), h('h2', { text: '📔 冒險手帳' }), tabs, body]);
@@ -284,6 +284,27 @@
         body.appendChild(row);
       }
     }
+    // ---------- v1.3.1 台語氣象諺語：收集到幾句；每句的台語（漢字、台羅）、華語、番薯仔的解釋、民間說法／傳說標記、挑錯關卡的進度
+    function renderProverbs() {
+      var PVL = window.PROVERBS || [], PQL = window.PROVERB_QUIZ || [], n = J.Proverbs.progress(st, PVL, PQL);
+      body.appendChild(h('p', { text: '收集到 ' + n.got + '／' + n.total + ' 句台語諺語・挑錯 ' + n.solved + '／' + n.quizzes + ' 關。和各地的阿伯說話就能收集。' }));
+      var ul = h('ul.list.proverbs', { 'aria-label': '台語諺語' });
+      PVL.forEach(function (p) {
+        var mp = (D.maps[p.map] || {}).name || p.map, who = G.speaker(p.npc).name;
+        if (!J.Proverbs.has(st, p.id)) { ul.appendChild(h('li', {}, [h('div.what', {}, [h('b', { text: '？？？' }), h('div.small', { text: '聽說「' + mp + '」的' + who + '知道一句和天氣有關的話。' })])])); return; }
+        var q = J.Proverbs.quizOf(p.id, PQL), kind = p.kind === '經驗' ? '' : '【' + J.Proverbs.kindLabel(p.kind) + '】';
+        ul.appendChild(h('li', {}, [h('div.what', {}, [
+          h('b', { text: p.hanji, lang: 'nan-Hant-TW' }),
+          kind ? h('div.small.pv-kind', { text: kind }) : h('span'),
+          h('div.small', { text: p.tailo }),
+          h('div', { text: '華語：' + p.huayu }),
+          h('div.small', { text: '番薯仔：' + J.Proverbs.explain(p, D.dialogs) }),
+          h('div.small', { text: mp + '・' + who + (q ? (J.Proverbs.solved(st, q.id) ? '・挑錯 ✅' : '・挑錯：再找' + who + '說話') : '') })
+        ])]));
+      });
+      body.appendChild(ul);
+      body.appendChild(h('p.small', { text: '民間說法、民間傳說是老一輩流傳的話，不是天氣預報；要知道天氣，請看氣象預報。' }));
+    }
     function claim(id) {
       var r = J.Bestiary.claim(st, D.monsters, id, D.maps);
       if (!r.ok) return;
@@ -325,11 +346,16 @@
         var l2 = h('div.lights', { 'aria-label': '點亮的燈' });
         SUBJECTS.forEach(function (s) { l2.appendChild(h('span' + (st.lamps[s] ? '.on' : ''), { text: (st.lamps[s] ? '🏮 ' : '・ ') + s + '燈' })); });
         body.appendChild(h('h3', { text: G.lampMapName() + '的知識燈' })); body.appendChild(l2);
+        // v1.4 桃竹章（63 號 4.3）：曙光碎片（打倒各地區的霧將拿到；有一片以上才顯示）
+        var ds = J.QuestLog.dawnShards ? J.QuestLog.dawnShards(st, D.items) : { have: 0, total: 4 };
+        if (ds.have) { body.appendChild(h('h3', { text: '曙光碎片' })); body.appendChild(h('div.lights.dawn-shards', {}, [h('span.on', { text: '✧ 曙光碎片 ' + ds.have + '／' + ds.total })])); }
         var bosses = Object.keys(st.bosses).filter(function (k) { return st.bosses[k]; });
         var bk = (st.stickers || []).filter(function (x) { return J.Bestiary.STICKER_NAME[x]; });
         if (bk.length) { body.appendChild(h('h3', { text: '貼紙' })); body.appendChild(h('div.lights', {}, bk.map(function (x) { return h('span.on', { text: '⭐ ' + J.Bestiary.STICKER_NAME[x] }); }))); }
         body.appendChild(h('h3', { text: '清醒過來的頭目' }));
         body.appendChild(h('p', { text: bosses.length ? bosses.map(function (b) { return (D.monsters[b] || {}).name || b; }).join('、') : '還沒有。' }));
+      } else if (tab === 'proverbs') {
+        renderProverbs();
       } else if (tab === 'book') {
         renderBook();
       } else if (tab === 'study') {

@@ -309,7 +309,7 @@ window.QUESTS = {
   Q_LAMPS_MATH: {
     title: "點亮數學燈", giver: "chief", map: "M01", kind: "help",
     goal: "搭車回金包里，在海風公園的數學燈前答對 1 題，把燈點亮。",
-    log_next: "台北章完成！三盞燈亮了。",
+    log_next: "台北章完成！三盞燈亮了。台北城往西，就是桃園石門水庫。",
     subject: "混合", subjects: ["數學"], units: [], count: 1, level_range: [1, 2],
     hunt: null, requires: ["Q_GNO_4"], requires_lights: ["數學"], reward: { exp: 0, gold: 150, item: "guide", light: null }, chapter_end: 3,
     dialog_start: "D_LAMPS_MATH_A", dialog_end: "D_LAMPS_MATH_B", dialog_locked: "D_CHIEF_IDLE"
@@ -513,6 +513,75 @@ window.QUESTS = {
     subject: "社會", units: ["第四單元 生活與工作的轉變"], count: 2, level_range: [1, 3],
     hunt: null, requires: ["Q_YL_5"], reward: { exp: 0, gold: 100, item: null, light: null },
     dialog_start: "D_XY_2A", dialog_end: "D_XY_2B", dialog_locked: "D_XY_2_LOCK"
+  },
+  // ═════════════════════ v1.4 桃竹章：石門水庫・大溪、新竹風城（63 號 4.1、4.2 節）═════════════════════
+  // 主線：（台北章 Q_LAMPS_MATH）→ Q_TY_1 → Q_TY_2 → 新竹 Q_HC_1 → Q_HC_2（打獵）→ 回石門水庫 Q_TY_5 北霧將（chapter_end: 4，北之曙光碎片）
+  // 支線：Q_TY_3、Q_TY_4、Q_HC_3（前置都是 Q_LAMPS_MATH）
+  Q_TY_1: {
+    title: "水庫的水", giver: "reservoir_keeper", map: "M15", kind: "help",
+    goal: "從台北城往西走到石門水庫，聽管理員介紹水庫：答對 3 題自然。",
+    log_next: "管理員要你幫忙算水量。",
+    subject: "自然", units: ["二、千變萬化的水"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_LAMPS_MATH"], reward: { exp: 0, gold: 160, item: null, light: null },
+    dialog_start: "D_TY_1A", dialog_end: "D_TY_1B"
+  },
+  Q_TY_2: {
+    title: "水量算一算", giver: "reservoir_keeper", map: "M15", kind: "help",
+    goal: "幫管理員算下游需要多少水：答對 3 題數學。",
+    log_next: "管理員說：新竹的風亂吹，好像跟水庫的霧有關。往西南走到新竹。",
+    subject: "數學", units: ["2 公升與毫升", "8 乘與除"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_TY_1"], reward: { exp: 0, gold: 160, item: null, light: null },
+    dialog_start: "D_TY_2A", dialog_end: "D_TY_2B"
+  },
+  Q_HC_1: {
+    title: "米粉曬不乾", giver: "noodle_master", map: "M16", kind: "help",
+    goal: "往西南走到新竹，幫米粉師傅看風向：答對 3 題自然。",
+    log_next: "曬場外的咻咻風精把風車葉片吹走了。",
+    subject: "自然", units: ["三、風與空氣"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_TY_2"], reward: { exp: 0, gold: 170, item: null, light: null },
+    dialog_start: "D_HC_1A", dialog_end: "D_HC_1B", dialog_locked: "D_HC_1_LOCK"
+  },
+  Q_HC_2: {
+    title: "亂吹的咻咻風精", giver: "noodle_master", map: "M16", kind: "hunt",
+    goal: "讓曬場外的咻咻風精清醒，找回 3 片風車葉片。",
+    log_next: "師傅說：亂風是從石門水庫那邊吹來的！回水庫找管理員。",
+    subject: "自然", units: [], count: null, level_range: [2, 3],
+    hunt: { item: "pinwheel", n: 3, monster: "wx_wind", map: "M16" },
+    requires: ["Q_HC_1"], reward: { exp: 0, gold: 170, item: "herb", light: null },
+    dialog_start: "D_HC_2A", dialog_end: "D_HC_2B"
+  },
+  Q_TY_5: {
+    title: "北霧將：霧閘機將", giver: "reservoir_keeper", map: "M15", kind: "boss",
+    goal: "回石門水庫，到大壩壩頂讓霧閘機將清醒，打開水門。",
+    log_next: "桃園・新竹完成！拿到北之曙光碎片（1／4）。",
+    subject: "混合", subjects: ["自然", "數學"], units: ["一、植物大發現", "二、磁鐵好好玩", "三、風與空氣", "四、奇妙的溶解", "一、快樂小農夫", "二、千變萬化的水", "三、天氣停看聽", "四、動物王國", "1 10000以內的數", "2 10000以內的加減", "3 毫米與數線", "4 乘法", "5 角與形狀", "6 除法", "7 公斤與公克", "8 分數", "9 列表與規律", "1 除法", "2 公升與毫升", "3 分數與加減", "4 圓", "5 兩步驟應用問題", "6 一位小數", "7 時間", "8 乘與除", "9 面積"], count: null, level_range: [2, 4],
+    boss: "mb_floodgate", boss_map: "M15",
+    hunt: null, requires: ["Q_HC_2"], reward: { exp: 0, gold: 250, item: null, light: null }, chapter_end: 4,
+    dialog_start: "D_TY_5A", dialog_end: "D_TY_5B", dialog_locked: "D_TY_5_LOCK"
+  },
+  Q_TY_3: {
+    title: "豆干店的帳", giver: "tofu_shop", map: "M15", kind: "help", side: true,
+    goal: "幫大溪老街的豆干店老闆算帳：答對 3 題數學。",
+    log_next: "老闆說：大溪老街的豆乾最有名。",
+    subject: "數學", units: ["5 兩步驟應用問題", "2 10000以內的加減"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_LAMPS_MATH"], reward: { exp: 0, gold: 120, item: "snack", light: null },
+    dialog_start: "D_TY_3A", dialog_end: "D_TY_3B"
+  },
+  Q_TY_4: {
+    title: "木藝工坊", giver: "wood_artisan", map: "M15", kind: "help", side: true,
+    goal: "聽木藝職人說做木工的工作：答對 2 題社會。",
+    log_next: "職人說：木頭要慢慢磨，才會漂亮。",
+    subject: "社會", units: ["第三單元 生活中的各行各業"], count: 2, level_range: [1, 3],
+    hunt: null, requires: ["Q_LAMPS_MATH"], reward: { exp: 0, gold: 110, item: null, light: null },
+    dialog_start: "D_TY_4A", dialog_end: "D_TY_4B"
+  },
+  Q_HC_3: {
+    title: "迎曦門", giver: "hc_guide", map: "M16", kind: "help", side: true,
+    goal: "聽解說員說迎曦門的故事：答對 2 題社會。",
+    log_next: "迎曦門是竹塹城唯一留下來的城門。",
+    subject: "社會", units: ["第一單元 我居住的地方"], count: 2, level_range: [1, 3],
+    hunt: null, requires: ["Q_LAMPS_MATH"], reward: { exp: 0, gold: 110, item: null, light: null },
+    dialog_start: "D_HC_3A", dialog_end: "D_HC_3B"
   },
   // ═════════════════════ 村民委託（支線，散佈各圖）═════════════════════
   Q_SIDE_BOOK: {

@@ -119,6 +119,8 @@
     if (!s.daily.tasks.every(function (t) { return isObj(t) && Array.isArray(t.seen); })) { s.daily.tasks = []; s.daily.date = ''; }
     ['location', 'lastInn'].forEach(function (k) { if (s[k] !== null && !(isObj(s[k]) && typeof s[k].map === 'string')) s[k] = null; });
     if (s.pendingVariant !== null && !isObj(s.pendingVariant)) s.pendingVariant = null;
+    dropBadEntries(s.proverbs.got, function (v) { return v === true; });   // v1.3.1 台語氣象諺語
+    dropBadEntries(s.proverbs.quiz, function (v) { return v === true; });
     repairJobs(s);
     return s;
   }

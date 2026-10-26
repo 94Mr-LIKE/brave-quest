@@ -177,6 +177,17 @@
     return add;
   }
 
+  /**
+   * v1.4 桃竹章（63 號 4.3）冒險手帳「曙光碎片 ○／4」：數背包裡 dawn_shard_* 的珍貴道具（北、中、南、東四片；v1.4 只有北之曙光碎片）。
+   * items＝ITEMS（只數 precious 的 key 道具；沒傳 items 時看 id）。回傳 { have, total }
+   */
+  var DAWN_SHARDS_TOTAL = 4;
+  function dawnShards(state, items) {
+    var inv = (state && state.inventory) || {};
+    var have = Object.keys(inv).filter(function (k) { return /^dawn_shard_/.test(k) && inv[k] > 0 && (!items || !items[k] || items[k].precious); }).length;
+    return { have: have, total: DAWN_SHARDS_TOTAL };
+  }
+
   /** 手帳用：進行中與已完成 */
   function journal(state, quests, data) {
     var active = [], done = [];
@@ -200,7 +211,7 @@
     return 'ask';
   }
 
-  var QuestLog = { serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked, HUNT_PITY: HUNT_PITY, huntPity: huntPity };
+  var QuestLog = { dawnShards: dawnShards, DAWN_SHARDS_TOTAL: DAWN_SHARDS_TOTAL, serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked, HUNT_PITY: HUNT_PITY, huntPity: huntPity };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.QuestLog = QuestLog; }
   if (typeof module !== 'undefined') module.exports = QuestLog;
 })();

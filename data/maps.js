@@ -11,7 +11,7 @@
  *   '.' 地面   ',' 花草/裝飾地面   '=' 路/石板/月台   '%' 淺泥/淺灘/沙   'D' 門   'B' 橋/木棧道   'S' 樓梯   'c' 地毯（以上可走）
  *   'T' 樹/柱   '#' 牆/岩壁/城牆/泥岩脊   '~' 水   'H' 房屋牆   'R' 屋頂   'F' 柵欄   '*' 灌木/岩石   'K' 大型擺設（以上擋路）
  *
- * v0.5 大地圖：M01、M02、M03、M04、M05、M06、M07、M08、M09、M10、M11、M46、M47、M48、M49、M14、M50、M51、M52、M13、M12、M53、M54 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42、M46 84×48、M47 96×57、M48 90×54、M49 84×48、M14 96×57、M50 90×54、M51 96×57、M52 84×48、M13 90×60、M12 96×60、M53 96×57、M54 84×54），
+ * v0.5 大地圖：M01、M02、M03、M04、M05、M06、M07、M08、M09、M10、M11、M46、M47、M48、M49、M14、M50、M51、M52、M13、M12、M53、M54、M15、M16 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42、M46 84×48、M47 96×57、M48 90×54、M49 84×48、M14 96×57、M50 90×54、M51 96×57、M52 84×48、M13 90×60、M12 96×60、M53 96×57、M54 84×54、M15 90×57、M16 90×54），
  *   格子依 GPT 背景逐格重描（來源 tools/bigmaps/<ID>.txt／.json，背景 docs/assets/maps/bg_<ID>.webp）。
  *
  * 地區之間：
@@ -2199,9 +2199,9 @@ window.MAPS = {
       "~~~~~##*T*............**HHHHHHHHHHHHH***.......==TTTTTHHHHHHHHHH==HHHHHHHHHH=HHHHHHHHHHHTT=TTTTT",
       "~~~~~##*T*UU.*........**HHHHHHHHHHHHH**........==.TTTTHHHHHHHHHH==HHHHHHHHHH=HHHHHHHHHHHTT=TTTTT",
       "~~~~~##*****..........**HHHHHHHHHHHHH*...*.....==............................................TTT",
-      "~~~~~##========================================================================================T",
-      "~~~~~##=K=======================================================================================",
-      "~~~~~##=========================================================================================",
+      "#######========================================================================================T",
+      "================================================================================================",
+      "================================================================================================",
       "~~~~~##========================================================================================T",
       "~~~~~##====URRRRRRRRRRURRRRRRRRRRRRUURRRRRRRRRU==UURRRRRRRRRRUURRRRRRRRRRRRUURRRRRRRRRRRRRUUUUUT",
       "~~~~~##====TRRRRRRRRRRTRRRRRRRRRRRRTTRRRRRRRRRT==TTRRRRRRRRRRTTRRRRRRRRRRRRTTRRRRRRRRRRRRRTTTTTT",
@@ -2246,7 +2246,9 @@ window.MAPS = {
       { x: 47, y: 59, to: "M13", tx: 44, ty: 1 },
       { x: 48, y: 59, to: "M13", tx: 45, ty: 1 },
       { x: 95, y: 30, to: "M54", tx: 1, ty: 25 },
-      { x: 95, y: 31, to: "M54", tx: 1, ty: 26 }
+      { x: 95, y: 31, to: "M54", tx: 1, ty: 26 },
+      { x: 0, y: 30, to: "M15", tx: 88, ty: 28, requires: "Q_LAMPS_MATH", requires_dialog: "D_EXIT_LOCK_CH3" },
+      { x: 0, y: 31, to: "M15", tx: 88, ty: 29, requires: "Q_LAMPS_MATH", requires_dialog: "D_EXIT_LOCK_CH3" }
     ],
     npcs: [
       { id: "temple_volunteer_ht", x: 71, y: 13, sprite: "npc_temple_volunteer_ht", dialog: "D_TEMPLE_HT_INTRO", quest: null, quests: [] },
@@ -2256,9 +2258,6 @@ window.MAPS = {
       { id: "smith_taipei", x: 59, y: 28, sprite: "npc_blacksmith_m", dialog: "D_SMITH_TAIPEI_IDLE", quest: null, quests: [] },
       { id: "armor_taipei", x: 70, y: 28, sprite: "npc_shopkeeper", dialog: "D_ARMOR_TAIPEI_IDLE", quest: null, quests: [] },
       { id: "item_taipei", x: 82, y: 28, sprite: "npc_uncle_market", dialog: "D_ITEM_TAIPEI_IDLE", quest: null, quests: [] }
-    ],
-    roadsigns: [
-      { id: "sign_taoyuan", x: 8, y: 30, dialog: "D_SIGN_TAOYUAN" }
     ],
     chests: [
       { id: "C_M12_1", x: 8, y: 4, subject: "數學", level: 3, reward: { gold: 60, item: null } },
@@ -2467,6 +2466,206 @@ window.MAPS = {
       { monster: "mc_vending", count: 2, area: [58, 30, 15, 12] }
     ],
     inn: { x: 22, y: 49, npc: null, price: 20, name: "信義城市旅館", sign: "旅館", dialog: "D_INN_XINYI", dialog_nocoin: "D_INN_XINYI_NOCOIN" },
+    shop: null
+  },
+
+  // ───────────────────────────── M15 石門水庫・大溪（v1.4 新增；來源 tools/bigmaps/M15.txt／.json）─────────────────────────────
+  M15: {
+    name: "石門水庫・大溪", type: "field", level: 4, bgm: "field", battle_bg: "reservoir", tileset: "field",
+    real_ref: "桃園市石門水庫（T1、T2）與大溪老街（T3 牌樓、T4 豆干）、大溪木藝生態博物館（T5）",
+    art_note: "北半部水庫湖面；一道弧形土石大壩橫過中間（壩頂步道 2 格寬、湖側一排水門、石塊坡面、溢洪道上有小橋、右岸山脊的排洪隧道口只是裝飾）；壩下溪谷公園有小溪與木橋；東半部大溪老街：北排巴洛克石雕牌樓店面（含豆干店、旅店）、南排紅磚牌樓住家，南邊木藝工坊。背景 tools/bigmaps/M15_bg.webp（GPT 分四塊；溢洪道小橋是局部補畫 M15_sp_fixed.png）。",
+    grid: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==T~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==U~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTT..==T~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTUU==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==U~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==T~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==U~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==T~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==T~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==T~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TKKTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TKKTTTTTTTTTTTTTTTTT",
+      "TTTTTT==.KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK==TTTTTTTTT..TTTTTT",
+      "TTTTTT===FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFKKFFFFFFFFFFF=T.............TTTT",
+      "TTTTTT===================================================================.........U.U.TTTT",
+      "TTTTTT===================================================================........TTTTTTTTT",
+      "TTTTTTSS##################################################~~~#########==UUU.......TTTTTTTT",
+      "TTTTTTSS##################################################~~~#########==TTTTT.....TTTTTTTT",
+      "TTTTTTSS##################################################~~~#########==TTTTT..TUUTTTTTTTT",
+      "TTTTTTSS##################################################~~~#########==TTTTTTTTTTTTTTTTTT",
+      "TTTTTTSS##################################################~~~#============================",
+      "TTTTTT==................................T.....TT..........~~~T============================",
+      "TTTTT.==TUUUTT........................UUT.......U..U......~~~TRRRRRRRRRRRRRRRRRRRRRRRRRRRT",
+      "TTTTTU==.TTT..T.....T.................TTT.....TTUUUTT.....~~~TRRRRRRRRRRRRRRRRRRRRRRRRRRRT",
+      "TTTTTT==...............................TT.......TTT....TTTTTTTRRRRRRRRRRRRRRRRRRRRRRRRRRRT",
+      "TTTT.===================================================U===UTHHHHHHHHHHHHHHHHHHHHHHHHHHHT",
+      "TTTTU========================================================THHHHHHHHHHHHHHHHHHHHHHHHHHHT",
+      "TTTTT.........................==...................UU==TTT===THHDHHHHHHHHHHHHHHDHHHHHHHHHT",
+      "TTTT..........................==............UUU....TT====================================T",
+      "TTTTU.........................==............TTT......====================================T",
+      "TTTTTUU..U..........UU........==.U..........TTTU.UUU.UU=UUUU.URRRRRRRRRRRRRRRRRRRRRRRRRRRT",
+      "TTTTTT~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTRRRRRRRRRRRRRRRRRRRRRRRRRRRT",
+      "TTTTTT~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTRRRRRRRRRRRRRRRRRRRRRRRRRRRT",
+      "TTTTTT~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTHHHHHHHHHHHHHHHHHHHHHHHHHHHT",
+      "TTTTTT~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTHHHHHHHHHHHHHHHHHHHHHHHHHHHT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT.==.TTTT..T=TT..................RRRRRRRTTTTTTTTTTTTTTTTTTTTTT",
+      "================================...................UUU.......RRRRRRRTTTTTTTTTTTTTTTTTTTTTT",
+      "================================...................TTT.......RRRRRRRTTTTTTTTTTTTTTTTTTTTTT",
+      "TUU............U..............==...................TTT....UU.HHHHHHHTTTTTTTTTTTTTTTTTTTTTT",
+      "TTT...TT.....UUUU.............==......UU............T.....**.HHDHHHHTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTUU........TTTTT............==.....UUU.T.........UUU....**........TTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTT.U.......................==.....TTTT..........TTT...............TTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTT....................T..==..............T....TTTUUU............TTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTUUU............U..U....==...............UUU..TTTTTUUUUU.U..U..TTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTUUU...UTUU.UTUUTUUU.==.UUUUUUUUUUU.UUTTTU..TTTTTTTTTTTUUTUUTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTUUUTTTTTTTTTTTTTU==UTTTTTTTTTTTTTTTTTTUUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    start: { x: 25, y: 33 },
+    station: { x: 24, y: 33, name: "石門水庫站", shelter: { x: 21, y: 30 } },
+    landmarks: [
+      { name: "石門水庫", area: [9, 2, 61, 18] },
+      { name: "石門水庫大壩", area: [8, 20, 63, 9] },
+      { name: "大溪老街", area: [56, 28, 34, 15] },
+      { name: "木藝工坊", area: [60, 43, 9, 7] }
+    ],
+    exits: [
+      { x: 89, y: 28, to: "M12", tx: 1, ty: 30 },
+      { x: 89, y: 29, to: "M12", tx: 1, ty: 31 },
+      { x: 0, y: 44, to: "M16", tx: 88, ty: 19 },
+      { x: 0, y: 45, to: "M16", tx: 88, ty: 20 }
+    ],
+    npcs: [
+      { id: "reservoir_keeper", x: 36, y: 32, sprite: "npc_reservoir_keeper", dialog: "D_RESERVOIR_IDLE", quest: "Q_TY_1", quests: ["Q_TY_1", "Q_TY_2", "Q_TY_5"] },
+      { id: "tofu_shop", x: 66, y: 36, sprite: "npc_tofu_shop", dialog: "D_TOFU_IDLE", quest: "Q_TY_3", quests: ["Q_TY_3"] },
+      { id: "wood_artisan", x: 60, y: 48, sprite: "npc_wood_artisan", dialog: "D_WOOD_IDLE", quest: "Q_TY_4", quests: ["Q_TY_4"] }
+    ],
+    chests: [
+      { id: "C_M15_1", x: 6, y: 4, subject: "數學", level: 3, reward: { gold: 60, item: null } },
+      { id: "C_M15_2", x: 62, y: 28, subject: "數學", level: 3, reward: { gold: 60, item: "herb" } },
+      { id: "C_M15_3", x: 40, y: 50, subject: "數學", level: 3, reward: { gold: 60, item: null } },
+      { id: "C_M15_4", x: 2, y: 46, subject: "數學", level: 3, reward: { gold: 60, item: "guide" } },
+      { id: "C_M15_5", x: 67, y: 49, subject: "數學", level: 3, reward: { gold: 60, item: "eraser" } },
+      { id: "C_M15_6", x: 88, y: 37, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+    ],
+    spawns: [
+      { monster: "ty_tofu", count: 3, area: [32, 29, 14, 9] },
+      { monster: "ty_carve", count: 2, area: [44, 43, 16, 8] },
+      { monster: "wx_thunder", count: 3, area: [3, 3, 6, 19] },
+      { monster: "ty_tofu", count: 2, area: [8, 46, 20, 7] },
+      { monster: "mb_floodgate", count: 1, area: [40, 22, 1, 1], boss: true, quest: "Q_TY_5" }
+    ],
+    inn: { x: 80, y: 36, npc: null, price: 25, name: "大溪老街旅店", sign: "旅店", dialog: "D_INN_DAXI", dialog_nocoin: "D_INN_DAXI_NOCOIN" },
+    shop: null
+  },
+
+  // ───────────────────────────── M16 新竹風城（v1.4 新增；來源 tools/bigmaps/M16.txt／.json）─────────────────────────────
+  M16: {
+    name: "新竹風城", type: "town", level: 4, bgm: "field", battle_bg: "windcity", tileset: "field",
+    real_ref: "新竹市（迎曦門、新竹米粉、風城；63 號 2.3、2.5.2，來源 T6–T9）",
+    art_note: "三面丘陵、只有西邊面海的平原城市，風很大（草、樹梢、店門布條、曬著的米粉都往右下飄）。市區中央的石板圓環上是迎曦門：花崗石條砌的城座（中間拱形門洞）、上層紅柱柱廊、歇山重檐翹脊屋頂，周圍沒有城牆（T6：1902 年已拆）。西北是紅磚街屋與城市旅店；東北是市區外圍公園；東南是米粉曬場（三排木曬架掛白色米粉）與米粉工寮；南邊小溪上一座石橋，往南的路盡頭是路牌（往苗栗）。v1.4 新增，背景 tools/bigmaps/M16_bg.webp（GPT 分四塊延續法＋最小誤差接縫拼接）。",
+    grid: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~~~~**TTTTTTTTTTTTTTTTTTT.TT.TTTTTTTTTTTTTTTTTTTT.TTTTTTT..TTT...TTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~~~~**TTTTTTTTTTTTTTTTTTT....TTTTTTTTTTTTTTTTTTTT.......T..TTTT......TTTTTTTT...TTTTTTTTTT",
+      "~~~~**TTRRRRRRRR==RRRRRRRR......TTTTTTTTTTTTTTTTTU.T.....T...TTT..T......TTTTT..TTTTTTTTTT",
+      "~~~~**TTRRRRRRRR==RRRRRRRRUU..T...T.TTTTTTTTTTTTTU....U......TTT..........TT.......TTTTTTT",
+      "~~~~**TTRRRRRRRR==RRRRRRRRTTT.......TTTTT..TTT..TTT..UTU......TT...UU.....TT.........TTTTT",
+      "~~~~**TTHHHHHHHH==HHHHHHHHT.===========...TTTT.......TTUU..........UTU....TTT....TT..TTTTT",
+      "~~~~**TTHHHHHHHH==HHHHHHHHT=============...TTTU........TT..........T.TT.........TTTT.TTTTT",
+      "~~~~**TTHHHHHHHH==HHHHHHHH==...........==....TTT..T........T......T.....T........TTT.TTTTT",
+      "~~~~**T=====================TRRRRRRRRTU==TT...========================================TTTT",
+      "~~~~**T=====================.RRRRRRRR.T==.....========================================TTTT",
+      "~~~~**TURRRRRRRR==RRRRRRRR==.RRRRRRRR..==.........................U..................UTTTT",
+      "~~~~**TTRRRRRRRR==RRRRRRRR==.RRRRRRRR..==.........UU.............TTU............UU..TTTTTT",
+      "~~~~**TTRRRRRRRR==RRRRRRRR==.HHHHHHHHH.==....TU..TTT..............TUT........T.TTT...TTTTT",
+      "~~~~**TTHHHHHHHH==HHHHHHHH==.HHHHHHHHH.==.....UU..T.U.....TU.......T.....UU......TU..TTTTT",
+      "~~~~**TTHHHHHHHH==HHHHHHHH==UHHH=HHHHHU==.TT..TT...UT.....TUU...........TTT......TT...TTTT",
+      "~~~~**TTHHHHHHHH==HHHHHHHH==THHH=HHHHHT==.........TT...T...TTT...........TTT..........TTTT",
+      "~~~~**TTHHHHHHHH==HHHHHHHH==.HHH=HHHHH.==................T..........T...............TT.TTT",
+      "~~~~**T=====================T.T.===.TTT===================================================",
+      "~~~~**T=====================....===....================================================.U=",
+      "~~~~**TUUU................===============..........URRRRRRRRR.U......................UUUTT",
+      "~~~~**TTUUT...............==============...UU.....TTRRRRRRRRRUTTT....T.......T......TTTTTT",
+      "~~~~**TTTT......................===.......TTU.....TTRRRRRRRRRTTTT......T..T.T..T.....TTTTT",
+      "~~~~**TT.................T......===.........TUT..T..HHHHHHHHHTTTT.T...........T....T.TTTTT",
+      "~~~~**TTU.................T.....===..........T....T.KKKKHHHHHK======================.TTTTT",
+      "~~~~**TTTU............U.........===...T.T.......T...=================================TTTTT",
+      "~~~~**TTRRRRRRRR.RRRRRRRRR......===..U.....T........=KKKKKKKKKKKK====KKKKKKKKKKKKK===.TTTT",
+      "~~~~**TTRRRRRRRR.RRRRRRRRR......===.UTU.....UU......=KKKKKKKKKKKK====KKKKKKKKKKKKK===..TTT",
+      "~~~~**TTRRRRRRRRURRRRRRRRRU.....===.TTT.U..UTUU..T..=================================.TTTT",
+      "~~~~**TTHHHHHHHHUHHHHHHHHHTTTT..===..TTTT..TTTUT...T=KKKKKKKKKKKK====KKKKKKKKKKKKK===..TTT",
+      "~~~~**TTHHHHHHHHTHHHHHHHHHT.....===...........T.....=KKKKKKKKKKKK====KKKKKKKKKKKKK===..TTT",
+      "~~~~**TTHHHHHHHH.HHHHHHHHHT.TT..===.....TT......T...=================================.TTTT",
+      "~~~~**TTHHHHHHHH.HHHHHHHHHT.....===.........T.......=KKKKKKKKKKKK====KKKKKKKKKKKKK===..TTT",
+      "~~~~**TT========================================...T=KKKKKKKKKKKK====KKKKKKKKKKKKK===.TTTT",
+      "~~~~**TT========================================....=================================.TTTT",
+      "~~~~**TT..T....U................===..........U...T.....................................TTT",
+      "~~~~**TTU.....TT................===.TTT.....UTT.......T......U...T..T.....TT.U..T.UUUUUTTT",
+      "~~~~**TTTUT...TTU.......TT...T..===.........TTT............TTU........TT....TT....TTUTTTTT",
+      "~~~~**TTTT.....TT...T...........===TT.T..T...TTT.T..........TTU.....T.........TT...TTTTTTT",
+      "~~~~**TTT..U..........U.....U...===..U............UU..UUU.....TUU......U.........U.TTTTTTT",
+      "~~~~**TT~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTT",
+      "~~~~**TT~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTT",
+      "~~~~**TT~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTT",
+      "~~~~**TTTTT..T...T.....TT.......===T.T.....T.TTTT...T..T.....TTTT.T.....TT.T.....T...TTTTT",
+      "~~~~**TTTTTU....................===......UU...TTT..........T...T......T...............TTTT",
+      "~~~~**TTTTTT........UUT.T.....T.===.....TTT.......UU.....T...TTT........TT.UU....T...TTTTT",
+      "~~~~**TTTTTTTT.....TTU.....TTT..===......TT......TTUU........TTTU...T.....TTTU........TTTT",
+      "~~~~**TTTTTTTT.......TUU......T.===.......UTT..U..TTT...T......TT.T........TTT.T..TUUU.TTT",
+      "~~~~**TTTTTTT..UUU....TT..UU....=K=U..UU..TTTTTTU..TT....U..............U...TTU....TTTUTTT",
+      "TTTTTTTTTTTTTUUTTTUUUUTTUUTTUUUUUTUTUUTTUUTTTTTTTUUUTUUUUTUUUUUUUUUUUUUUTUUUUTTUUUUTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    start: { x: 15, y: 22 },
+    station: { x: 14, y: 22, name: "新竹站", shelter: { x: 16, y: 21 } },
+    landmarks: [
+      { name: "迎曦門", area: [26, 7, 15, 16] },
+      { name: "新竹市區", area: [6, 3, 20, 32] },
+      { name: "米粉曬場", area: [52, 21, 34, 15] },
+      { name: "溪邊平原", area: [6, 36, 82, 14] }
+    ],
+    exits: [
+      { x: 89, y: 19, to: "M15", tx: 1, ty: 44 },
+      { x: 89, y: 20, to: "M15", tx: 1, ty: 45 }
+    ],
+    npcs: [
+      { id: "noodle_master", x: 63, y: 26, sprite: "npc_noodle_master", dialog: "D_NOODLE_IDLE", quest: "Q_HC_1", quests: ["Q_HC_1", "Q_HC_2"] },
+      { id: "hc_guide", x: 36, y: 20, sprite: "npc_hc_guide", dialog: "D_HCGUIDE_IDLE", quest: "Q_HC_3", quests: ["Q_HC_3"] }
+    ],
+    roadsigns: [
+      { id: "sign_miaoli", x: 33, y: 49, dialog: "D_SIGN_MIAOLI" }
+    ],
+    chests: [
+      { id: "C_M16_1", x: 28, y: 2, subject: "數學", level: 3, reward: { gold: 60, item: null } },
+      { id: "C_M16_2", x: 83, y: 6, subject: "數學", level: 3, reward: { gold: 60, item: "herb" } },
+      { id: "C_M16_3", x: 85, y: 29, subject: "數學", level: 3, reward: { gold: 60, item: null } },
+      { id: "C_M16_4", x: 10, y: 24, subject: "數學", level: 3, reward: { gold: 60, item: "snack" } },
+      { id: "C_M16_5", x: 13, y: 45, subject: "數學", level: 3, reward: { gold: 60, item: "guide" } },
+      { id: "C_M16_6", x: 84, y: 46, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+    ],
+    spawns: [
+      { monster: "wx_wind", count: 3, area: [50, 35, 36, 6] },
+      { monster: "mc_vacuum", count: 2, area: [44, 3, 42, 16] },
+      { monster: "hc_noodle", count: 3, area: [42, 22, 10, 14] },
+      { monster: "wx_wind", count: 2, area: [36, 44, 48, 6] }
+    ],
+    inn: { x: 12, y: 19, npc: null, price: 30, name: "新竹城市旅店", sign: "旅店", dialog: "D_INN_HSINCHU", dialog_nocoin: "D_INN_HSINCHU_NOCOIN" },
     shop: null
   }
 };

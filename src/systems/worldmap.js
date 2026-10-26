@@ -11,6 +11,8 @@
   'use strict';
 
   function isUnlocked(region, state) {
+    var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (typeof window === 'undefined' && typeof require === 'function' ? require('./testmode.js') : null);   // v1.3.1 測試模式（大人試玩）：全部解鎖
+    if (TM && TM.on()) return true;
     var q = region.unlock_quest, v = region.unlock_visit;
     var qs = !q ? [] : Array.isArray(q) ? q : [q];
     var vs = !v ? [] : Array.isArray(v) ? v : [v];

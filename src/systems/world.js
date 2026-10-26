@@ -209,6 +209,8 @@
   /** v1.2（61 號 2.0）出口可以走嗎：有 requires（委託 id 或陣列）時，那些委託都完成才可以走；沒寫就一直可以走 */
   function exitOpen(ex, state) {
     if (!ex || !ex.requires) return true;
+    var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (typeof window === 'undefined' && typeof require === 'function' ? require('./testmode.js') : null);   // v1.3.1 測試模式（大人試玩）：不擋
+    if (TM && TM.on()) return true;
     var qs = (state && state.quests) || {};
     return (Array.isArray(ex.requires) ? ex.requires : [ex.requires]).every(function (id) { return !!(qs[id] && qs[id].status === 'done'); });
   }

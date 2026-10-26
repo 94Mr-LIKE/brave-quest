@@ -531,6 +531,14 @@
 
   /** NPC 頭上的記號：'bang'（有新委託）、'ready'（可以回報）、null */
   G.npcMarker = function (npc) {
+    var m = questMarker(npc);
+    // v1.3.1 可以挑錯的阿伯（收集到諺語、還沒答對、沒有委託要處理、不是旅店商店）：藍色「?」
+    if (m || npc.virtual || !J.Proverbs || !G.mapScene || npcRole(npc, G.mapScene.map).role !== 'quest') return m;
+    var f = J.QuestLog.forNpc(G.state, G.data.quests, npc.id, questIds(npc));
+    if (f && (f.status === 'available' || f.status === 'active')) return null;
+    return J.Proverbs.quizFor(G.state, npc.id, G.mapScene.mapId, window.PROVERB_QUIZ) ? 'proverb' : null;
+  };
+  function questMarker(npc) {
     if (npc.virtual) return null;
     var f = J.QuestLog.forNpc(G.state, G.data.quests, npc.id, questIds(npc));
     if (!f) return null;
@@ -692,6 +700,45 @@
    */
   G.serviceChoice = function (role, f, canComplete) { return J.QuestLog.serviceChoice(role, f, canComplete); };
 
+  /** v1.3.1 阿伯說諺語：記成收集到 → 播 D_PV_xx → 提示泡泡（收集進度、可以挑錯）；有委託要處理（f）就接著原本的對話 */
+  G.proverbSay = function (pv, npc, scene, f, opts) {
+    var st = G.state;
+    J.Proverbs.collect(st, pv.id);
+    G.save();
+    G.lastProverb = pv.id;   // 測試用
+    if (scene && scene.refreshMarkers) scene.refreshMarkers();   // 頭上換成藍色「?」（可以挑錯）
+    return G.say(pv.dialog, []).then(function () {
+      var n = J.Proverbs.progress(st, window.PROVERBS, window.PROVERB_QUIZ);
+      J.UI.toast('收集到台語諺語（' + n.got + '／' + n.total + '）：冒險手帳「諺語」可以再看' + (J.Proverbs.quizOf(pv.id, window.PROVERB_QUIZ) ? '；再找阿伯說話可以玩「挑錯」' : ''), 6000);
+      if (f) G.talkTo(npc, scene, Object.assign({}, opts, { proverbDone: true }));
+    });
+  };
+  /**
+   * v1.3.1 挑錯關卡：阿伯故意說錯（ask）→ 選錯的那一句（選項和一般答題一樣用 JQ.Answer.shuffleOptions 打亂；答錯再選時順序不變）
+   * → 答對播 right、記成答對、第一次答對金幣 +20（每關只給一次）；答錯播 wrong（提示）再選一次；按「等一下」先離開
+   */
+  G.proverbQuiz = function (q, npc, scene) {
+    var st = G.state, D = G.data.dialogs || {};
+    var sq = J.Proverbs.quizQuestion(q, J.Answer && J.Answer.shuffleOptions, G.proverbRng || Math.random);
+    G.lastProverbQuiz = { id: q.id, picks: [], options: sq.options.slice(), answer: sq.answer };   // 測試用
+    function pick() {
+      return J.UI.choose('阿伯說：「' + J.Proverbs.claim(q, D) + '」哪一句說錯了？', sq.options.map(function (t, i) { return { value: i, text: t }; })).then(function (v) {
+        if (v === null || v === undefined) { J.UI.toast('想好了再來找阿伯挑錯吧！', 3500); return false; }
+        G.lastProverbQuiz.picks.push(v);
+        if (!J.Proverbs.check(sq, v)) return G.say(q.wrong, []).then(pick);
+        var got = J.Proverbs.solve(st, q.id);
+        G.save(); G.refreshHud();
+        if (scene && scene.refreshMarkers) scene.refreshMarkers();
+        return G.say(q.right, []).then(function () {
+          var n = J.Proverbs.progress(st, window.PROVERBS, window.PROVERB_QUIZ);
+          J.UI.banner('挑錯成功！' + (got.first ? '金幣 +' + got.gold : '') + '（' + n.solved + '／' + n.quizzes + '）');
+          return true;
+        });
+      });
+    }
+    return G.say(q.ask, []).then(pick);
+  };
+
   G.talkTo = function (npc, scene, opts) {
     if (G.blocked()) return;
     opts = opts || {};
@@ -699,6 +746,19 @@
     var r = npcRole(npc, map);
     var ids = questIds(npc);
     var f = ids.length ? J.QuestLog.forNpc(st, Q, npc.id, ids) : null;
+    // v1.3.1 台語氣象諺語：第一次和這位阿伯說話，先說諺語（記成收集到；有委託要處理就接著原本的對話）；
+    //   收集到以後、他沒有委託要處理時，出挑錯關卡（阿伯故意說錯，孩子挑出錯的那一句）
+    if (J.Proverbs && !opts.service && !opts.quest && !opts.proverbDone) {
+      var pv = J.Proverbs.pendingFor(st, npc.id, scene.mapId, window.PROVERBS);
+      var pq = !pv && r.role === 'quest' && !(f && (f.status === 'available' || f.status === 'active')) && J.Proverbs.quizFor(st, npc.id, scene.mapId, window.PROVERB_QUIZ);
+      // 慈護宮廟公（Proverbs.ownFirst）：先播他原本的台詞（慈護宮介紹），同一次說話再接諺語／挑錯（2026-10-26 裁定：介紹一定優先）
+      if ((pv || pq) && !f && J.Proverbs.ownFirst(npc.id)) {
+        G.say(npc.dialog, [{ who: npc.id, text: '你好呀，' + st.player.name + '！' }]).then(function () { if (pv) G.proverbSay(pv, npc, scene, null, opts); else G.proverbQuiz(pq, npc, scene); });
+        return;
+      }
+      if (pv) { G.proverbSay(pv, npc, scene, f, opts); return; }
+      if (pq) { G.proverbQuiz(pq, npc, scene); return; }
+    }
     // 旅店、商店老闆如果也有委託：可以回報就先回報，不然讓孩子選（v0.9.6 B02：委託沒做完也能住宿、買東西）
     if (f && r.role !== 'quest' && !opts.service) {
       var how = opts.quest ? 'quest' : G.serviceChoice(r.role, f, f.status === 'active' && J.QuestLog.canComplete(st, Q, f.id, G.data));

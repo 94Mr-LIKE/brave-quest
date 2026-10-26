@@ -52,6 +52,8 @@ window.WORLD = {
     { id: "R_MAOKONG", name: "木柵・貓空", real_ref: "臺北市文山區木柵、貓空（指南宮）", map_entry: "M13", tx: 63, ty: 25, x: 0.8, y: 0.1, unlock_quest: null, unlock_visit: "M13" },
     { id: "R_TAIPEI", name: "台北城", real_ref: "臺北市（行天宮、北門、大稻埕迪化街）", map_entry: "M12", tx: 16, ty: 29, x: 0.76, y: 0.07, unlock_quest: null, unlock_visit: "M12" },
     { id: "R_BEITOU", name: "北投・關渡", real_ref: "臺北市北投區（北投溫泉博物館、地熱谷）", map_entry: "M53", tx: 47, ty: 25, x: 0.75, y: 0.05, unlock_quest: null, unlock_visit: "M53" },
-    { id: "R_XINYI", name: "信義", real_ref: "臺北市信義區（臺北101、四四南村、象山）", map_entry: "M54", tx: 7, ty: 25, x: 0.78, y: 0.08, unlock_quest: null, unlock_visit: "M54" }
+    { id: "R_XINYI", name: "信義", real_ref: "臺北市信義區（臺北101、四四南村、象山）", map_entry: "M54", tx: 7, ty: 25, x: 0.78, y: 0.08, unlock_quest: null, unlock_visit: "M54" },
+    { id: "R_SHIMEN", name: "石門水庫・大溪", real_ref: "桃園市石門水庫、大溪老街", map_entry: "M15", tx: 25, ty: 33, x: 0.62, y: 0.14, unlock_quest: null, unlock_visit: "M15" },
+    { id: "R_HSINCHU", name: "新竹風城", real_ref: "新竹市（迎曦門、新竹米粉）", map_entry: "M16", tx: 15, ty: 22, x: 0.49, y: 0.14, unlock_quest: null, unlock_visit: "M16" }
   ]
 };

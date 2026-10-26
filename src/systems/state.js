@@ -116,6 +116,7 @@
         voiceSpeed: AUDIO.SPEED_DEFAULT, voiceVol: 'mid', musicVol: 'mid', voiceName: '',
         reduceMotion: 'auto' },   // v1.0 技能特效：'auto' 跟裝置的 prefers-reduced-motion、'on' 只顯示數字、'off' 一律播放
       chapter: 0,                 // v1.1 完成到第幾章（Q_LAMPS_3 chapter_end: 1 → 1；之後章節用）
+      proverbs: { got: {}, quiz: {} },   // v1.3.1 台語氣象諺語：收集到的諺語、答對的挑錯關卡（一般欄位，不升 schema）
       legacyM05: false,           // v1.3 舊紅樹林旗標（62 號 5.4；只有 Ch3Migrate 會設成 true，Q_GNO_4 完成時關掉）
       ending: false
     };
@@ -126,7 +127,7 @@
    * 根因（審查 F-06）：inventory 的預設是 {herb:2, eraser:1, guide:1, snack:1}，而 removeItem 用完時會刪掉該鍵，
    * 以前逐鍵補預設值會讓用完的道具在讀檔後「長回來」。
    */
-  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered', 'qhist', 'bestiary', 'bestiaryClaims', 'mapDims', 'startItems', 'player.jobs', 'player.floor', 'trial'];
+  var DICT_KEYS = ['inventory', 'quests', 'chests', 'bosses', 'visited', 'answered', 'qhist', 'bestiary', 'bestiaryClaims', 'mapDims', 'startItems', 'player.jobs', 'player.floor', 'trial', 'proverbs.got', 'proverbs.quiz'];
 
   /** 以預設值補齊缺漏欄位（舊存檔、匯入存檔用），不覆蓋已有的值；字典型欄位只在整個不存在時才補 */
   function fillDefaults(target, defaults, path) {
