@@ -25,7 +25,7 @@
     var item = rw.item ? String(rw.item).replace(/^item_/, '') : null;
     if (item) Character.addItem(state, item, rw.n || 1);
     // v2.0 新經濟（67 號第二節第 7 項、69 號附錄 A1）：寶箱算進「委託＋寶箱」的經驗值預算，經驗值也發出去（用法同委託完成時的 Exp.addExp）
-    var exp = Number(rw.exp) > 0 ? Math.floor(Number(rw.exp)) : 0, levels = exp ? Exp.addExp(state.player, exp) : 0;
+    var exp = Number(rw.exp) > 0 ? Math.floor(Number(rw.exp)) : 0, levels = exp ? Exp.addExp(state.player, exp, data) : 0;
     var done = QuestLog.onChestOpened(state, quests || {}, chest.id, data);
     var res = { ok: true, gold: gold, item: item, quests: done };
     if (exp) { res.exp = exp; res.levels = levels; }

@@ -532,3 +532,8 @@ jq-nb { white-space: nowrap; }
 
 /* v2.0（老闆 2026-10-26）洞窟、迷宮不給小地圖：minimap.js 設 hidden（.minimap 本來是 display: flex，要蓋過去） */
 #hud .minimap[hidden] { display: none !important; }
+
+/* v2.1 中級職業（69 號 5.2）：轉職清單的中級標題列、沒開放／配方不夠是灰色、配方進度 */
+.job-list li.tier-head { display: block; border-top: 2px solid #ffd34d; padding-top: 6px; }
+.job-list li.inter-locked { opacity: 0.6; }
+.job-list .recipe { color: #ffd34d; }

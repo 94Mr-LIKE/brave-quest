@@ -12,6 +12,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 34,
   "frameH": 50
  },
+ "heroM_battle_master": {
+  "file": "assets/chars/heroM_battle_master.png",
+  "type": "walk",
+  "frameW": 30,
+  "frameH": 50
+ },
  "heroM_dancer": {
   "file": "assets/chars/heroM_dancer.png",
   "type": "walk",
@@ -36,10 +42,22 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 29,
   "frameH": 50
  },
+ "heroM_magic_knight": {
+  "file": "assets/chars/heroM_magic_knight.png",
+  "type": "walk",
+  "frameW": 32,
+  "frameH": 50
+ },
  "heroM_merchant": {
   "file": "assets/chars/heroM_merchant.png",
   "type": "walk",
   "frameW": 30,
+  "frameH": 50
+ },
+ "heroM_monster_hunter": {
+  "file": "assets/chars/heroM_monster_hunter.png",
+  "type": "walk",
+  "frameW": 35,
   "frameH": 50
  },
  "heroM_novice": {
@@ -48,10 +66,34 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 27,
   "frameH": 50
  },
+ "heroM_paladin": {
+  "file": "assets/chars/heroM_paladin.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 50
+ },
+ "heroM_pirate": {
+  "file": "assets/chars/heroM_pirate.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50
+ },
  "heroM_priest": {
   "file": "assets/chars/heroM_priest.png",
   "type": "walk",
   "frameW": 29,
+  "frameH": 50
+ },
+ "heroM_ranger": {
+  "file": "assets/chars/heroM_ranger.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50
+ },
+ "heroM_sage": {
+  "file": "assets/chars/heroM_sage.png",
+  "type": "walk",
+  "frameW": 35,
   "frameH": 50
  },
  "heroM_sailor": {
@@ -64,6 +106,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/chars/heroM_shepherd.png",
   "type": "walk",
   "frameW": 34,
+  "frameH": 50
+ },
+ "heroM_superstar": {
+  "file": "assets/chars/heroM_superstar.png",
+  "type": "walk",
+  "frameW": 31,
   "frameH": 50
  },
  "heroM_swordsman": {
@@ -90,6 +138,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 32,
   "frameH": 50
  },
+ "hero_battle_master": {
+  "file": "assets/chars/hero_battle_master.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50
+ },
  "hero_dancer": {
   "file": "assets/chars/hero_dancer.png",
   "type": "walk",
@@ -114,10 +168,22 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 37,
   "frameH": 50
  },
+ "hero_magic_knight": {
+  "file": "assets/chars/hero_magic_knight.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50
+ },
  "hero_merchant": {
   "file": "assets/chars/hero_merchant.png",
   "type": "walk",
   "frameW": 33,
+  "frameH": 50
+ },
+ "hero_monster_hunter": {
+  "file": "assets/chars/hero_monster_hunter.png",
+  "type": "walk",
+  "frameW": 39,
   "frameH": 50
  },
  "hero_novice": {
@@ -126,10 +192,34 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 33,
   "frameH": 50
  },
+ "hero_paladin": {
+  "file": "assets/chars/hero_paladin.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50
+ },
+ "hero_pirate": {
+  "file": "assets/chars/hero_pirate.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50
+ },
  "hero_priest": {
   "file": "assets/chars/hero_priest.png",
   "type": "walk",
   "frameW": 35,
+  "frameH": 50
+ },
+ "hero_ranger": {
+  "file": "assets/chars/hero_ranger.png",
+  "type": "walk",
+  "frameW": 39,
+  "frameH": 50
+ },
+ "hero_sage": {
+  "file": "assets/chars/hero_sage.png",
+  "type": "walk",
+  "frameW": 37,
   "frameH": 50
  },
  "hero_sailor": {
@@ -140,6 +230,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
  },
  "hero_shepherd": {
   "file": "assets/chars/hero_shepherd.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50
+ },
+ "hero_superstar": {
+  "file": "assets/chars/hero_superstar.png",
   "type": "walk",
   "frameW": 35,
   "frameH": 50

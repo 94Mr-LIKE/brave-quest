@@ -642,10 +642,22 @@
     }).then(function () { return G.jobPlace(place); });
   };
 
+  /**
+   * v2.1 中級職業（2 轉）的台詞：trial_dialogs 裡有「○○2」（例：intro2＝D_TRIAL2_INTRO_TEMPLE，劇本組 dialogs_trial2.js）就換成 2 轉的，沒有就照 1 轉的；
+   * 開場 intro 沒有 2 轉台詞時是 null（jobPick 改說華語備用句，不念 1 轉的「答對 16 題」）
+   */
+  G.trial2 = function (o) {
+    var r = {};
+    Object.keys(o || {}).forEach(function (k) { if (!/2$/.test(k)) r[k] = o[k + '2'] || o[k]; });
+    r.intro = (o || {}).intro2 || null;
+    return r;
+  };
+
   /** 轉職清單上按了某個職業 */
   G.jobPick = function (place, jobId, kind) {
     var st = G.state, D = G.data, R = D.jobRules || {}, TD = (R.trial_dialogs || {})[place] || {}, PET = (R.trial_dialogs || {}).pet || {};
     var who = place === 'guild' ? 'guild' : place === 'temple' ? 'temple_keeper' : G.placeWho(place), name = D.jobs[jobId].name;
+    if (D.jobs[jobId].tier === 'inter') { TD = G.trial2(TD); PET = G.trial2(PET); }   // v2.1：2 轉台詞（有就用，沒有照 1 轉；開場另有備用句）
     if (kind === 'back') return G.say(TD.back, [{ who: who, text: '以前當過「' + name + '」，免費換回去！' }]).then(function () { return G.doJobChange(place, jobId); });
     if (kind === 'change') return G.say(TD.lv1, [{ who: who, text: '換了職業，等級會從 1 開始，能力有保底，不用擔心。' }]).then(function () { return G.doJobChange(place, jobId); });
     var c = J.JobTrial.canStart(st, jobId, D, Date.now());
@@ -654,7 +666,15 @@
       if (c.reason === 'time') return G.say(null, [{ who: 'pet', text: '今天只剩 ' + c.minutes + ' 分鐘，考不完的。明天精神飽滿再來考吧！' }]);
       return Promise.resolve();
     }
-    return G.say(TD.intro, [{ who: who, text: '立志小考有 20 題，答對 16 題就通過。' }]).then(function () {
+    // v2.1（69 號 5.2）中級職業＝2 轉：20 題答對 18 題、時間 50%、2–3 星、三上加三下。宮廟的開場台詞寫的是 1 轉的「16 題」：
+    //   劇本組的 2 轉開場（trial_dialogs 的 intro2，G.trial2 已經換進 TD.intro）有就用；沒有（TD.intro＝null）才說下面的備用句（只有華語）
+    var TR2 = D.jobs[jobId].tier === 'inter' ? J.JobTrial.rules(D, jobId) : null;
+    //   備用句＝劇本組 D_TRIAL2_INTRO_* 的華語（2026-11-01 dialogs_trial2.js；台詞 id 缺了說的話也一樣）
+    var intro = TR2 ? G.say(TD.intro, [{ who: who, text: '想當中級職業，也要先考立志小考喔。' }, { who: who, text: '總共 20 題，五科每科 4 題，答對 ' + TR2.pass + ' 題才過關。' },
+      { who: who, text: '題目比較難，每題的時間也比較短喔。' }, { who: who, text: '題目會念給你聽，念完才開始算時間。' }, { who: who, text: '提示和卡片不能用；中途離開也算考一次。' },
+      { who: 'pet', text: '題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！' }])
+      : G.say(TD.intro, [{ who: who, text: '立志小考有 20 題，答對 16 題就通過。' }]);
+    return intro.then(function () {
       return J.TrialUI.run(G, jobId, place);
     }).then(function (res) {
       G.lastTrial = res;   // 測試用
@@ -1202,8 +1222,8 @@
     var skill = kind === 'skill' ? (sk || s.skill) : null;
     if (skill && !J.Battle.canUseSkill(b, skill, st.player.mp).ok) return;
     // 職業技能出拿手科目的題目、一律算拿手 ×1.5（CTO Q12，和模擬一致）；見習的技能出怪物的科目
-    var subject = skill && skill.subject ? skill.subject : G.bsubject();
-    var favored = skill && skill.subject ? true : subject === s.favored;
+    var subject = skill && skill.subjects && skill.subjects.length ? skill.subjects[ctx.qn % skill.subjects.length] : (skill && skill.subject ? skill.subject : G.bsubject());
+    var favored = skill && skill.subject ? true : J.Battle.isFavored(subject, s.favored);
     var bossMult = b.boss ? C.BOSS_DAMAGE_MULT : 1;
     var estL4 = Math.round(J.Battle.damage({ atk: s.atk, level: 4, elapsedMs: 0, limitMs: 90000, favored: favored, favoredMult: s.favoredMult, bossMult: bossMult }).damage * ((s.trait && s.trait.power) || 1) * (s.dmgMult || 1));
     var force = J.Battle.needsFinalL4(b, estL4) ? 4 : undefined;
@@ -1211,8 +1231,11 @@
     if (!q) { G.bmsg('「' + subject + '」的題目還在準備中……'); return; }
     ctx.qn++;
     G.bcommands(false);
-    // 影子步、鼓舞之歌：接下來幾題的時間條變長（每出一題用掉一次）
-    var timerMs = J.Battle.timeLimitMs(q.level, st.settings.answerTime, s.timeMult * (b.timeBuff || 1) * J.Battle.nextTimeMult(b));
+    // 每題只消耗一次增益；刪除索引給既有選項介面，讀屏標記留給 UI 接線。
+    var questionFx = J.Battle.prepareQuestion(b, q, { timerOff: J.Battle.timerOff(st.settings.answerTime), erased: ctx.sess.erased });
+    ctx.sess.erased = questionFx.erased;
+    ctx.sess.optionLabels = questionFx.optionLabels;
+    var timerMs = J.Battle.timeLimitMs(q.level, st.settings.answerTime, s.timeMult * (b.timeBuff || 1) * questionFx.timeMult);
     b.timeBuff = 1;
     J.Quiz.ask({
       session: ctx.sess, mode: 'battle', state: st, timerMs: timerMs,
@@ -1229,27 +1252,27 @@
     if (!r.correct) {
       J.Session.abandon(ctx.sess);
       // v0.9.6（45 號 F5）答題時間「關閉」時，弓箭手的特色改成：每場戰鬥可以閃過一次答錯後的攻擊
-      if (J.Battle.dodgeOnWrong(b, st.settings.answerTime, s.timeMult)) {
+      if (!(b.fx && b.fx.shield > 0) && J.Battle.dodgeOnWrong(b, st.settings.answerTime, s.timeMult)) {
         ctx.dodged = (ctx.dodged || 0) + 1;   // 測試用
         G.bmsg('沒打中……但是弓箭手身手敏捷，閃過了這次攻擊！（每場戰鬥一次）');
         setTimeout(function () { G.bcommands(true); }, 700);
         return;
       }
       G.bmsg(r.timeout ? '時間到！這一擊沒打出去……' : '沒打中……');
-      setTimeout(G.bmonsterTurn, 700);
+      setTimeout(function () { G.bmonsterTurn(true); }, 700);
       return;
     }
-    // v1.0（48 號 2.6、2.7、F6）：17 種技能效果；多段攻擊一次呼叫 Battle.hit；回復、增益答對也算頭目的一題
-    var favored = skill && skill.subject ? true : q.subject === s.favored;
+    // 技能效果由規則系統結算；多段攻擊只呼叫一次 Battle.hit，回復與增益答對也算頭目的一題。
+    var favored = skill && skill.subject ? true : J.Battle.isFavored(q.subject, s.favored);
     var use = null, opt = { hits: 1, mult: 1, noCrit: false, sureCrit: false }, pre = [];
     if (skill) {
       st.player.mp = Math.max(0, st.player.mp - (skill.mp || 0));   // 答對才扣魔力
-      use = J.Battle.useSkill(b, skill, { maxHp: s.maxHp, timerOff: J.Battle.timerOff(st.settings.answerTime), trait: s.trait });
+      use = J.Battle.useSkill(b, skill, { maxHp: s.maxHp, maxMp: s.maxMp, timerOff: J.Battle.timerOff(st.settings.answerTime), trait: s.trait });
       ctx.lastSkill = { id: skill.id, eff: use.eff, attack: use.attack, counted: !!use.counted, heal: use.heal || 0 };   // 測試用
       ctx.skillLog = (ctx.skillLog || []).concat([skill.id]);
       G.bmsg(G.skillIcon(skill) + ' ' + skill.name + '！');
       if (!use.attack) {
-        if (use.heal) st.player.hp = Math.min(s.maxHp, st.player.hp + use.heal);
+        J.Battle.recoverSkill(st, use, s.maxHp, s.maxMp);
         G.skillFx(skill, use, function () {
           G.brender(); G.refreshHud();
           G.bmsg(G.skillText(skill, use));
@@ -1267,6 +1290,8 @@
     if (at.buffs.indexOf('charge') >= 0) pre.push('蓄滿力氣的一擊！');
     if (at.buffs.indexOf('up') >= 0) pre.push('力量湧上來了！');
     var hr = J.Battle.hit(b, at.total);
+    // 聖光拳先結算攻擊，再回復體力；即使這一擊打倒怪物也照常回復。
+    J.Battle.recoverSkill(st, use, s.maxHp, s.maxMp);
     ctx.lastAttack = { total: at.total, parts: at.parts, dealt: hr.dealt, hits: opt.hits, crit: at.crit, skill: skill ? skill.id : null };   // 測試用
     // 畫面一下一下播：被頭目門檻吃掉時，照比例縮小每一下
     var shown = at.parts.slice();
@@ -1309,6 +1334,10 @@
     var mon = G.battleCtx.mon, a = skill.arg || {}, n = skill.name + '！';
     switch (use.eff) {
       case 'heal': return n + '體力回復了 ' + use.heal + ' 點。';
+      case 'heal_mp': return n + '回復體力和魔力了！';
+      case 'heal_guard': return n + '體力全滿！接下來三次被打都減半。';
+      case 'shield': return n + '接下來答錯兩次，都不會受傷。';
+      case 'assist': return n + '下一題會幫你刪掉一個錯選項。有計時的題目，時間也會變長！';
       case 'revive': return n + '這場累倒時，會馬上站起來。';
       case 'guard': return n + '接下來被打 ' + (a.t || 1) + ' 次，傷害變成一半。';
       case 'weaken': return n + mon.name + '變沒力氣了（' + (a.t || 1) + ' 次）。';
@@ -1320,13 +1349,13 @@
     }
   };
 
-  G.bmonsterTurn = function () {
+  G.bmonsterTurn = function (wrong) {
     var ctx = G.battleCtx, mon = ctx.mon, s = G.stats(), st = G.state;
     // v1.0：停止、閃過、逗笑、減弱、防護、劍士被打 ×0.9（48 號 2.5、F5）；頭目每進一個階段傷害 +20%（v0.9.3）
-    var t = J.Battle.monsterTurn(ctx.b, mon, { def: s.def, trait: s.trait });
+    var t = J.Battle.monsterTurn(ctx.b, mon, { def: s.def, trait: s.trait, wrong: wrong === true });
     ctx.lastHit = { dmg: t.damage, mult: t.mult, skipped: t.skipped };   // 測試用
     if (t.skipped) {
-      G.bmsg(t.skipped === 'stun' ? mon.name + '麻麻的，動不了！' : t.skipped === 'evade' ? '輕巧一轉，閃過了' + mon.name + '的攻擊！' : mon.name + '笑到忘了攻擊！');
+      G.bmsg(t.skipped === 'shield' ? '守護之盾擋住了，這次沒有受傷！' : t.skipped === 'stun' ? mon.name + '麻麻的，動不了！' : t.skipped === 'evade' ? '輕巧一轉，閃過了' + mon.name + '的攻擊！' : mon.name + '笑到忘了攻擊！');
       setTimeout(function () { G.bcommands(true); }, 700);
       return;
     }
@@ -1387,7 +1416,7 @@
     var vr = J.Battle.victoryReward(mon, G.coef(ctx.mapId), bond, vt.goldMult);
     // v0.9.3 C1：經驗值和金幣只在打倒怪物時給（怪物的 exp×地圖係數×親密度、gold）；戰鬥中答對不給
     var ans = J.Session.settleBattle(ctx.sess);   // 只有這場完成的每日小任務金幣、舊存檔的暫存經驗值
-    J.Exp.addExp(st.player, vr.exp);
+    J.Exp.addExp(st.player, vr.exp, G.data);
     st.player.coins += vr.gold;
     ctx.reward = { exp: vr.exp, coins: vr.gold + ans.daily, monsterGold: vr.gold, daily: ans.daily, bond: bond };   // 測試用
     var drops = J.Battle.rollDrops(mon, null, bond, (s0.trait && s0.trait.drop) || 1);   // v1.0 弓箭手掉寶率 ×1.5

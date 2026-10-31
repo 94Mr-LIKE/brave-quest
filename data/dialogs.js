@@ -2516,4 +2516,110 @@ window.DIALOGS = {
     { who: "volunteer_wd", emotion: "平靜", text: "等級也會和以前一樣喔。", taigi: { hanji: "等級嘛會佮以早仝款喔。", tailo: "Tíng-kip mā ē kah í-tsá kāng-khuán--ooh.", huayu: "等級也會和以前一樣喔。" } }
   ],
   // ═════════════ v2.0 中部 END ═════════════
+  // ═════════════ v2.1 2 轉台詞（劇本組草稿 wip_v20_draft/dialogs_trial2.js；v21_apply.js 每次重跑都整段重建）BEGIN ═════════════
+  D_TRIAL2_INTRO_TEMPLE: [
+    { who: "temple_keeper", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "temple_keeper", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "temple_keeper", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "temple_keeper", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。", taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
+    { who: "temple_keeper", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_TEMPLE: [
+    { who: "temple_keeper", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "temple_keeper", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "temple_keeper", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  D_TRIAL2_INTRO_GUILD: [
+    { who: "guild", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "guild", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "guild", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "guild", emotion: "平靜", text: "題目念完，才開始算時間，慢慢聽清楚。", taigi: { hanji: "題目念了，才開始算時間，慢慢仔聽予清楚。", tailo: "Tê-bo̍k liām liáu, tsiah khai-sí sǹg sî-kan, bān-bān-á thiann hōo tshing-tshó.", huayu: "題目念完，才開始算時間，慢慢聽清楚。" } },
+    { who: "guild", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_GUILD: [
+    { who: "guild", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "guild", emotion: "平靜", text: "把答錯的單元多練習，明天再來考。", taigi: { hanji: "共毋著的單元加練習，明仔載閣來考。", tailo: "Kā m̄-tio̍h ê tan-guân ke liān-si̍p, miâ-á-tsài koh lâi khó.", huayu: "把答錯的單元多練習，明天再來考。" } },
+    { who: "guild", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  D_TRIAL2_INTRO_HT: [
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。", taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_HT: [
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "temple_volunteer_ht", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "temple_volunteer_ht", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  D_TRIAL2_INTRO_ZN: [
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。", taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_ZN: [
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "temple_volunteer_zn", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "temple_volunteer_zn", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  D_TRIAL2_INTRO_ZL: [
+    { who: "volunteer_zl", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "volunteer_zl", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "volunteer_zl", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "volunteer_zl", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。", taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
+    { who: "volunteer_zl", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_ZL: [
+    { who: "volunteer_zl", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "volunteer_zl", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "volunteer_zl", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  D_TRIAL2_INTRO_LK: [
+    { who: "volunteer_lk", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "volunteer_lk", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "volunteer_lk", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "volunteer_lk", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。", taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
+    { who: "volunteer_lk", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_LK: [
+    { who: "volunteer_lk", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "volunteer_lk", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "volunteer_lk", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  D_TRIAL2_INTRO_CT: [
+    { who: "volunteer_ct", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "volunteer_ct", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "volunteer_ct", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "volunteer_ct", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。", taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
+    { who: "volunteer_ct", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_CT: [
+    { who: "volunteer_ct", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "volunteer_ct", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "volunteer_ct", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  D_TRIAL2_INTRO_WD: [
+    { who: "volunteer_wd", emotion: "平靜", text: "想當中級職業，也要先考立志小考喔。", taigi: { hanji: "欲做中級職業，嘛愛先考立志小考喔。", tailo: "Beh tsò tiong-kip tsit-gia̍p, mā ài sing khó li̍p-tsì sió-khó--ooh.", huayu: "想當中級職業，也要先考立志小考喔。" } },
+    { who: "volunteer_wd", emotion: "平靜", text: "總共 20 題，五科每科 4 題，答對 18 題才過關。", taigi: { hanji: "攏總二十題，五科逐科四題，回答著十八題才過關。", tailo: "Lóng-tsóng jī-tsa̍p tê, gōo kho ta̍k kho sì tê, huê-tap tio̍h tsa̍p-peh tê tsiah kuè-kuan.", huayu: "總共 20 題，五科每科 4 題，答對 18 題才過關。" } },
+    { who: "volunteer_wd", emotion: "平靜", text: "題目比較難，每題的時間也比較短喔。", taigi: { hanji: "題目較僫，逐題的時間嘛較短喔。", tailo: "Tê-bo̍k khah oh, ta̍k tê ê sî-kan mā khah té--ooh.", huayu: "題目比較難，每題的時間也比較短喔。" } },
+    { who: "volunteer_wd", emotion: "平靜", text: "題目會念給你聽，念完才開始算時間。", taigi: { hanji: "題目會念予你聽，念了才開始算時間。", tailo: "Tê-bo̍k ē liām hōo lí thiann, liām liáu tsiah khai-sí sǹg sî-kan.", huayu: "題目會念給你聽，念完才開始算時間。" } },
+    { who: "volunteer_wd", emotion: "平靜", text: "提示和卡片不能用；中途離開也算考一次。", taigi: { hanji: "提示佮卡片袂使用；中途離開，嘛算考一擺。", tailo: "Thê-sī kah khah-phìnn bē-sái īng; tiong-tôo lī-khui, mā sǹg khó tsi̍t pái.", huayu: "提示和卡片不能用；中途離開也算考一次。" } },
+    { who: "pet", emotion: "開心", text: "題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！" }
+  ],
+  D_TRIAL2_FAIL_WD: [
+    { who: "volunteer_wd", emotion: "平靜", text: "這次還沒過，沒關係。", taigi: { hanji: "這擺猶未過關，無要緊。", tailo: "Tsit pái iáu-buē kuè-kuan, bô iàu-kín.", huayu: "這次還沒過，沒關係。" } },
+    { who: "volunteer_wd", emotion: "平靜", text: "答錯的單元回去多練習，明天可以再來考。", taigi: { hanji: "毋著的單元轉去加練習，明仔載會使閣來考。", tailo: "M̄-tio̍h ê tan-guân tńg-khì ke liān-si̍p, miâ-á-tsài ē-sái koh lâi khó.", huayu: "答錯的單元回去多練習，明天可以再來考。" } },
+    { who: "volunteer_wd", emotion: "開心", text: "用現在的職業，一樣能打倒魔王喔！", taigi: { hanji: "用這馬的職業，仝款會當拍贏魔王喔！", tailo: "Īng tsit-má ê tsit-gia̍p, kāng-khuán ē-tàng phah-iânn môo-ông--ooh!", huayu: "用現在的職業，一樣能打倒魔王喔！" } }
+  ],
+  // ═════════════ v2.1 2 轉台詞 END ═════════════
 };

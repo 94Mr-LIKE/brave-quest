@@ -1571,5 +1571,197 @@ window.SPRITES = {
   "type": "single",
   "frameW": 161,
   "frameH": 160
+ },
+ "hero_battle_master": {
+  "file": "assets/chars/hero_battle_master.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_battle_master": {
+  "file": "assets/chars/heroM_battle_master.png",
+  "type": "walk",
+  "frameW": 30,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_magic_knight": {
+  "file": "assets/chars/hero_magic_knight.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_magic_knight": {
+  "file": "assets/chars/heroM_magic_knight.png",
+  "type": "walk",
+  "frameW": 32,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_sage": {
+  "file": "assets/chars/hero_sage.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_sage": {
+  "file": "assets/chars/heroM_sage.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_paladin": {
+  "file": "assets/chars/hero_paladin.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_paladin": {
+  "file": "assets/chars/heroM_paladin.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_superstar": {
+  "file": "assets/chars/hero_superstar.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_superstar": {
+  "file": "assets/chars/heroM_superstar.png",
+  "type": "walk",
+  "frameW": 31,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_monster_hunter": {
+  "file": "assets/chars/hero_monster_hunter.png",
+  "type": "walk",
+  "frameW": 39,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_monster_hunter": {
+  "file": "assets/chars/heroM_monster_hunter.png",
+  "type": "walk",
+  "frameW": 35,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_pirate": {
+  "file": "assets/chars/hero_pirate.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_pirate": {
+  "file": "assets/chars/heroM_pirate.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_ranger": {
+  "file": "assets/chars/hero_ranger.png",
+  "type": "walk",
+  "frameW": 39,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_ranger": {
+  "file": "assets/chars/heroM_ranger.png",
+  "type": "walk",
+  "frameW": 37,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
  }
 };

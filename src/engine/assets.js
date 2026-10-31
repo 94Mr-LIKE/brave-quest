@@ -78,6 +78,9 @@
   function heroKey(gender, job) {
     job = job || 'novice';
     var chain = gender === 'm' ? ['heroM_' + job, 'hero_' + job, 'heroM_novice', 'hero_novice'] : ['hero_' + job, 'hero_novice'];
+    // v2.1 中級職業：自己的走路圖還沒畫好時，先借 jobs.js 的 look（例：戰鬥大師借武鬥家），再退回見習
+    var jd = typeof window !== 'undefined' && window.JOBS && window.JOBS[job], look = jd && jd.look;
+    if (look) chain.splice(gender === 'm' ? 2 : 1, 0, gender === 'm' ? 'heroM_' + look : 'hero_' + look);
     for (var i = 0; i < chain.length; i++) if (has(chain[i])) return chain[i];
     return chain[0];
   }

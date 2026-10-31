@@ -113,7 +113,7 @@
     }
     var rw = q.reward || {};
     var levels = 0;
-    if (rw.exp > 0) levels = Exp.addExp(state.player, rw.exp);
+    if (rw.exp > 0) levels = Exp.addExp(state.player, rw.exp, data);   // v2.1：升級需求照目前職業的職階（data＝遊戲資料）
     if (rw.gold > 0) state.player.coins += rw.gold;
     var item = rw.item ? String(rw.item).replace(/^item_/, '') : null;
     if (item) Character.addItem(state, item, rw.item_n || 1);

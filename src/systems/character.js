@@ -14,7 +14,7 @@
   function rules(data) { return (data && data.jobRules) || {}; }
   function growth(data) { return Object.assign({}, GROWTH, rules(data).growth || {}); }
   function masterLevel(data, job) {
-    var m = Object.assign({ novice: JOB_LEVEL, basic: 30 }, rules(data).master_level || {});
+    var m = Object.assign({ novice: JOB_LEVEL, basic: 30, inter: 50 }, rules(data).master_level || {});
     return m[(job && job.tier) || 'basic'] || 30;
   }
   function jobOf(data, id) { return (data && data.jobs && data.jobs[id]) || { id: id, tier: id === 'novice' ? 'novice' : 'basic', mods: { hp: 1, mp: 1, atk: 1, def: 1 }, trait: {}, wf: [], af: [], skills: [], bonus: 1 }; }
@@ -203,25 +203,39 @@
   }
 
   // ---- 職業（48 號 2.4）
-  /** 開放了沒（JOB_RULES.open_jobs；E2-B 先開 5 個＋見習） */
-  function isOpen(data, jobId) {
+  /** 初級看 open_jobs；中級由存檔的職階旗標開放，缺少旗標一律關閉。 */
+  function isOpen(data, jobId, state) {
+    if (jobOf(data, jobId).tier === 'inter') return !!(state && state.tierOpen && state.tierOpen.inter === true);
     var open = rules(data).open_jobs;
     return jobId === 'novice' || !Array.isArray(open) || open.indexOf(jobId) >= 0;
+  }
+  /** 中級配方逐項檢查；目前職業以 player.level 為準。回傳缺少的職業及等級。 */
+  function recipeStatus(state, jobId, data) {
+    var job = jobOf(data, jobId);
+    if (job.tier !== 'inter') return { ok: true };
+    var recipe = job.recipe || {}, ids = Object.keys(recipe), missing = [];
+    ids.forEach(function (id) {
+      var need = Number(recipe[id]);
+      if (!(need >= 30) || !(data.jobs[id] && data.jobs[id].tier === 'basic') || jobLevel(state, id) < need) missing.push({ job: id, need: need || 30 });
+    });
+    return ids.length && !missing.length ? { ok: true } : { ok: false, reason: 'recipe', need: 30, missing: missing };
   }
   /**
    * 能不能轉成 jobId。回傳 { ok, reason, need, back }：
    *   back＝以前當過（換回去免費、不用考、恢復原本的等級）；
-   *   reason：unknown、same、closed（還沒開放）、level（見習還沒到出師等級）、trial（要先通過立志小考）
+   *   reason：unknown、same、closed（還沒開放）、recipe（配方未達成）、level（見習未出師）、trial（尚未通過小考）
    */
   function canChangeJob(state, jobId, data) {
     var j = data.jobs[jobId], p = state.player;
     if (!j) return { ok: false, reason: 'unknown' };
     if (p.job === jobId) return { ok: false, reason: 'same' };
-    if (!isOpen(data, jobId)) return { ok: false, reason: 'closed' };
+    if (!isOpen(data, jobId, state)) return { ok: false, reason: 'closed' };
+    var recipe = recipeStatus(state, jobId, data);
+    if (!recipe.ok) return recipe;
     var held = jobId === 'novice' || !!(p.jobs && p.jobs[jobId]);
     if (held) return { ok: true, back: true };
     var need = masterLevel(data, jobOf(data, 'novice'));
-    if (jobLevel(state, 'novice') < need) return { ok: false, reason: 'level', need: need };
+    if (j.tier !== 'inter' && jobLevel(state, 'novice') < need) return { ok: false, reason: 'level', need: need };
     var tr = state.trial && state.trial[jobId];
     if (!(tr && tr.passedAt)) return { ok: false, reason: 'trial' };
     return { ok: true, back: false };
@@ -323,6 +337,7 @@
   }
 
   var Character = { FAM_NAME: FAM_NAME, famNames: famNames, equipFams: equipFams, GROWTH: GROWTH, baseStats: baseStats, ensureJobs: ensureJobs, jobLevel: jobLevel, needsJobHint: needsJobHint, mastered: mastered, usable: usable, usableJobs: usableJobs, isOpen: isOpen, gearValue: gearValue, autoEquip: autoEquip, learnedSkills: learnedSkills, slotSkills: slotSkills, setSkillSlots: setSkillSlots, compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
+  Character.recipeStatus = recipeStatus;   // v2.1 中級職業的配方進度
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Character = Character; }
   if (typeof module !== 'undefined') module.exports = Character;
 })();

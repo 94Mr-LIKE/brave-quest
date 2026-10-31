@@ -45,17 +45,28 @@
     }
     return gained;
   }
-  /** tier 不給＝×1.0（見習、初級；v2.1 中級職業要傳 tier） */
+  /**
+   * v2.1 中級職業：目前職業的職階。tier 可以是職階字串（'inter'），或遊戲資料（{ jobs }：看 player.job 的 tier）；
+   * 不給＝看瀏覽器載入的 window.JOBS（node 測試要明確傳）。都找不到＝null（×1.0）
+   */
+  function tierOf(player, tier) {
+    if (typeof tier === 'string') return tier;
+    var jobs = (tier && tier.jobs) || (typeof window !== 'undefined' && window.JOBS) || null;
+    var j = jobs && player && player.job ? jobs[player.job] : null;
+    return (j && j.tier) || null;
+  }
+  /** 加經驗值：升級需求照目前職業的職階（見習、初級 ×1.0；中級 ×1.25） */
   function addExp(player, amount, tier) {
-    return addExpWith(player, amount, function (lv) { return expToNext(lv, tier); });
+    var t = tierOf(player, tier);
+    return addExpWith(player, amount, function (lv) { return expToNext(lv, t); });
   }
 
   /** 0~1 的進度比例（給 經驗值 條用） */
   function progress(player, tier) {
-    return Math.min(1, player.exp / expToNext(player.level, tier));
+    return Math.min(1, player.exp / expToNext(player.level, tierOf(player, tier)));
   }
 
-  var Exp = { MAX_LEVEL: MAX_LEVEL, TABLE: TABLE, TIER: TIER, expToNext: expToNext, oldExpToNext: oldExpToNext, cumulative: cumulative, addExp: addExp, addExpWith: addExpWith, progress: progress };
+  var Exp = { MAX_LEVEL: MAX_LEVEL, TABLE: TABLE, TIER: TIER, expToNext: expToNext, oldExpToNext: oldExpToNext, cumulative: cumulative, addExp: addExp, addExpWith: addExpWith, progress: progress, tierOf: tierOf };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Exp = Exp; }
   if (typeof module !== 'undefined') module.exports = Exp;
 })();

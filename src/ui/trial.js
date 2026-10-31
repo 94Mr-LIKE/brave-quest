@@ -1,7 +1,7 @@
 /*
  * v1.0 第一批（48 號 v2 第 4 節、F7）：立志小考的畫面
  *
- * - 20 題（JQ.JobTrial.pick），每題時間＝標準 × 75%，和家長的「答題時間」設定無關。
+ * - 20 題（JQ.JobTrial.pick），每題時間＝標準 × 75%（v2.1 中級 2 轉 × 50%，規則看 JobTrial.rules(data, jobId)），和家長的「答題時間」設定無關。
  * - 語音讀題一律開啟（家長關掉語音也照念），念題目、英語朗讀時倒數停住；裝置沒有語音時，題目顯示 3 秒後才開始倒數，
  *   並提示「這台裝置沒有語音，請家長幫忙念題目」（CTO Q4）。
  * - 不能用提示、刪去卡、引導卡；倒數不用紅字；答錯說「沒關係，記下來就好」；每 5 題番薯仔打氣；每考完一科亮一盞小燈。
@@ -30,8 +30,8 @@
   function run(G, jobId, place) {
     var st = G.state, D = G.data, JT = J.JobTrial, now = Date.now();
     var rec = (st.trial && st.trial[jobId]) || {};
-    var qs = JT.pick(st, G.questions, D, { lastQ: rec.lastQ || [], exclude: function (q) { return J.Chests && J.Chests.isChestQuestion(q); } });
-    if (qs.length < JT.total(JT.rules(D))) return Promise.resolve(null);
+    var qs = JT.pick(st, G.questions, D, { jobId: jobId, lastQ: rec.lastQ || [], exclude: function (q) { return J.Chests && J.Chests.isChestQuestion(q); } });
+    if (qs.length < JT.total(JT.rules(D, jobId))) return Promise.resolve(null);
     var rng = Math.random;
     qs = qs.map(function (q) { return shuffled(q, rng); });
     JT.begin(st, jobId, qs.map(function (q) { return q.id; }), now);
@@ -42,7 +42,7 @@
     var voiceOk = !!(J.TTS.available && J.TTS.available());
     var job = D.jobs[jobId];
     var answers = [];
-    var R = JT.rules(D), per = JT.total(R) / JT.SUBJECTS.length;
+    var R = JT.rules(D, jobId), per = JT.total(R) / JT.SUBJECTS.length;
 
     return new Promise(function (resolve) {
       var lamps = h('div.trial-lamps', { 'aria-label': '每科的小燈' }, JT.SUBJECTS.map(function (s) { return h('span.lamp', { 'data-subject': s, text: '○ ' + s }); }));
@@ -66,7 +66,7 @@
       function ask(q) {
         var answer = { choice: null, multi: [], number: '', order: [] };
         var finished = false, startAt = 0, elapsed = 0, lastT = 0, rafId = 0;
-        var limit = JT.timeLimitMs(q.level, D);
+        var limit = JT.timeLimitMs(q.level, D, jobId);   // v2.1：2 轉 × 50%
         G.inTrial.n = i;
         G.inTrial.q = { id: q.id, level: q.level, limit: limit };
         G.inTrial.cur = q;   // 測試用（debug.currentQuestion）

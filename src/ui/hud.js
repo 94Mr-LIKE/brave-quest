@@ -156,8 +156,8 @@
     refs.questCount.hidden = !n;
     refs.questBtn.setAttribute('aria-label', '任務列表（進行中 ' + n + ' 個）');
     refs.level.textContent = '等級 ' + p.level + '・' + (s.jobName || '');
-    setBar(refs.exp, p.exp, J.Exp.expToNext(p.level));
-    refs.exp.el.title = p.exp + ' / ' + J.Exp.expToNext(p.level);
+    setBar(refs.exp, p.exp, J.Exp.expToNext(p.level, s.tier));
+    refs.exp.el.title = p.exp + ' / ' + J.Exp.expToNext(p.level, s.tier);
     setBar(refs.hp, p.hp, s.maxHp);
     refs.hpText.textContent = p.hp + '/' + s.maxHp;
     setBar(refs.mp, p.mp, s.maxMp);

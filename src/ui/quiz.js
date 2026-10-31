@@ -91,7 +91,7 @@
           var erased = sess.erased.indexOf(i) >= 0;
           var b = h('button', {
             'aria-pressed': q.type === 'choice' ? String(answer.choice === i) : String(answer.multi.indexOf(i) >= 0),
-            disabled: erased, class: erased ? 'erased' : null,
+            disabled: erased, class: erased ? 'erased' : null, 'aria-label': erased ? (i + 1) + '. ' + opt + '（已刪除）' : null,   // v2.1（69 號 6.4）讀屏念「已刪除」
             onclick: function () { pick(i); }
           }, [(i + 1) + '. ' + opt]);
           if (erased) b.className = 'erased';

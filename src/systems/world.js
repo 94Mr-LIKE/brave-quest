@@ -21,10 +21,10 @@
   var CORE_JOBS = {
     novice: { name: '見習冒險者', tier: 'novice', mods: { hp: 1, mp: 1, atk: 1, def: 1 }, fav: null, bonus: 1, trait: {}, wf: [], af: [], skills: [] }
   };
-  // 48 號 2.6：17 種效果代碼（26 號 5.3 的子集）
-  var EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet', 'random', 'heal', 'guard', 'revive', 'stun', 'weaken', 'atk_up', 'charge', 'time_up'];
-  var DAMAGE_EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet'];
-  var TIER_MULT = { novice: 0.9, basic: 1.0 };
+  // 初級效果加上 v2.1 中級的五種效果。
+  var EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet', 'random', 'heal', 'guard', 'revive', 'stun', 'weaken', 'atk_up', 'charge', 'time_up', 'assist', 'heal_guard', 'shield', 'hit_heal', 'heal_mp'];
+  var DAMAGE_EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet', 'hit_heal'];
+  var TIER_MULT = { novice: 0.9, basic: 1.0, inter: 1.25 };
 
   // 戰鬥背景別名：maps.js 的 battle_bg → 實際的背景圖
   var BG_ALIASES = { grass: 'grass', field: 'grass', forest: 'forest', swamp: 'swamp', cave: 'cave', town: 'town', castle: 'castle', rock: 'rock', harbor: 'harbor', castle_top: 'castle_top', volcano: 'volcano', badlands: 'badlands', rock_hill: 'rock' };
@@ -77,10 +77,11 @@
   /** 技能（48 號 F1）：補上所屬職業、職階係數、科目（＝所屬職業的拿手科目；見習沒有拿手，用怪物的科目） */
   function normalizeSkill(sk, jobId, job) {
     var tier = job.tier || 'basic';
+    var subjects = Array.isArray(job.fav) ? job.fav.slice() : (job.fav ? [job.fav] : []);
     return {
       id: sk.id, job: jobId, lv: Number(sk.lv || 1), name: sk.name || sk.id, eff: sk.eff, arg: Object.assign({}, sk.arg || {}),
       mp: Number(sk.mp || 0), desc: sk.desc || '', fx: Object.assign({ type: 'strike', color: '#FFFFFF', ms: 600 }, sk.fx || {}),
-      tier: tier, tierMult: TIER_MULT[tier] || 1, subject: job.fav || null, fav: !!job.fav,
+      tier: tier, tierMult: TIER_MULT[tier] || 1, subject: subjects[0] || null, subjects: subjects, fav: !!subjects.length,
       damage: DAMAGE_EFFECTS.indexOf(sk.eff) >= 0 || sk.eff === 'random'
     };
   }
@@ -95,6 +96,7 @@
         id: id, name: j.name || id, tier: j.tier || (id === 'novice' ? 'novice' : 'basic'), mods: mods,
         fav: j.fav || null, favored: j.fav || null, bonus: Number(j.bonus || (j.fav ? 1.5 : 1)),
         trait: Object.assign({}, j.trait || {}), wf: (j.wf || []).slice(), af: (j.af || []).slice(),
+        recipe: Object.assign({}, j.recipe || {}), look: j.look || null,   // v2.1：look＝還沒有走路圖時借哪個初級職業的圖
         time_mult: Number((j.trait && j.trait.time) || 1),
         sprite_f: j.sprite_f || ('hero_' + id), sprite_m: j.sprite_m || ('heroM_' + id), desc: j.desc || ''
       };
@@ -127,7 +129,8 @@
   /** JOB_RULES（48 號 F1）：沒寫的欄位用規格的預設值 */
   var DEFAULT_RULES = {
     open_jobs: ['novice'], places: [], growth: { hp: 8, mp: 2, atk: 2, def: 0.5 }, floor_ratio: 0.5, transfer_step: 0.2,
-    master_level: { novice: 10, basic: 30 }, tier_mult: TIER_MULT, skill_slots: 4,
+    master_level: { novice: 10, basic: 30, inter: 50 }, tier_mult: TIER_MULT, skill_slots: 4,
+    exp_mult: { novice: 1, basic: 1, inter: 1.25 }, trial_by_tier: { inter: { pass: 18, per_subject: { 2: 2, 3: 2 }, time_ratio: 0.5, term: ['三上', '三下'] } },
     trial: { pass: 16, per_subject: { 1: 2, 2: 2 }, time_ratio: 0.75, term: '三上', min_minutes_left: 15 },
     change_npc: 'guild', unlock_level: 10
   };
@@ -135,6 +138,9 @@
     var out = Object.assign({}, DEFAULT_RULES, r || {});
     out.growth = Object.assign({}, DEFAULT_RULES.growth, (r && r.growth) || {});
     out.master_level = Object.assign({}, DEFAULT_RULES.master_level, (r && r.master_level) || {});
+    out.exp_mult = Object.assign({}, DEFAULT_RULES.exp_mult, (r && r.exp_mult) || {});
+    out.tier_mult = Object.assign({}, TIER_MULT, (r && r.tier_mult) || {});
+    out.trial_by_tier = Object.assign({}, DEFAULT_RULES.trial_by_tier, (r && r.trial_by_tier) || {});
     out.trial = Object.assign({}, DEFAULT_RULES.trial, (r && r.trial) || {});
     if (out.open_jobs.indexOf('novice') < 0) out.open_jobs = ['novice'].concat(out.open_jobs);
     out.unlock_level = out.master_level.novice;   // 舊程式讀的「幾級可以轉職」＝見習出師等級

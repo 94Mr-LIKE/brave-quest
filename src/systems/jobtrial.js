@@ -6,6 +6,7 @@
  * - 每科依序挑：沒出過 → 做錯過 → 做對過；同一場不重複 variant_group；重考時和上次重複的每科最多 1 題。
  * - 時間：標準時間 × 75%（1 星 22.5 秒、2 星 30 秒）；不受家長的「答題時間」設定影響。語音讀題、英語朗讀時不計時（畫面負責）。
  * - 答對 16 題以上及格；沒通過要隔天（台灣時間跨日，Daily.dateKey）才能再考，整場重考。
+ * - v2.1 中級二轉：配方職業全部 Lv30 且職階已開放；同樣 20 題，改為每科 2 星 2 題＋3 星 2 題、三上加三下、18 題及格、時間 50%（2 星 20 秒、3 星 30 秒）。
  * - 開始時先存 inProgress；中途關掉＝考過一次、沒通過（讀檔時 recover）。
  * - 今天剩不到 15 分鐘不能開始；考試中不會被每日上限打斷（畫面負責）。
  * - 獎勵：稱號「立志的＋職業名」＋護身符「職業名＋的護身符」（珍貴道具，不能賣），不加能力、不給經驗值和金幣；記進家長報表。
@@ -18,18 +19,24 @@
   var isNode = typeof module !== 'undefined' && typeof require === 'function';
   var Daily = isNode ? require('./daily.js') : window.JQ.Daily;
   var Playtime = isNode ? require('./playtime.js') : window.JQ.Playtime;
+  var Character = isNode ? require('./character.js') : window.JQ.Character;
   var SUBJECTS = ['國語', '英語', '數學', '自然', '社會'];
   var TIME_SEC = { 1: 30, 2: 40, 3: 60, 4: 90 };
   var DEFAULT = { pass: 16, per_subject: { 1: 2, 2: 2 }, time_ratio: 0.75, term: '三上', min_minutes_left: 15, cheer_every: 5 };
   var LOG_MAX = 30;
 
-  function rules(data) { return Object.assign({}, DEFAULT, (data && data.jobRules && data.jobRules.trial) || {}); }
+  /** 傳入目標職業時，二轉只覆寫及格題數與計時比例，其餘沿用原流程。 */
+  function rules(data, jobId) {
+    var jr = (data && data.jobRules) || {}, job = data && data.jobs && data.jobs[jobId];
+    var tier = job && job.tier, extra = tier === 'inter' ? { pass: 18, per_subject: { 2: 2, 3: 2 }, time_ratio: 0.5, term: ['三上', '三下'] } : {};   // v2.1（26 號 3.4）
+    return Object.assign({}, DEFAULT, jr.trial || {}, extra, (jr.trial_by_tier && jr.trial_by_tier[tier]) || {});
+  }
   function total(R) { var n = 0; Object.keys(R.per_subject).forEach(function (k) { n += Number(R.per_subject[k]) || 0; }); return n * SUBJECTS.length; }
   function rec(state, jobId) { state.trial = state.trial || {}; return state.trial[jobId] || null; }
   function ensure(state, jobId) { state.trial = state.trial || {}; return (state.trial[jobId] = state.trial[jobId] || { lastFailDate: '', tries: 0, lastQ: [], inProgress: null, passedAt: 0 }); }
 
-  /** 每題的時間（毫秒）：標準時間 × 75%，和家長設定無關 */
-  function timeLimitMs(level, data) { return Math.round((TIME_SEC[level] || 30) * 1000 * rules(data).time_ratio); }
+  /** 每題時間：一轉標準 ×75%、二轉 ×50%，和家長設定無關。 */
+  function timeLimitMs(level, data, jobId) { return Math.round((TIME_SEC[level] || 30) * 1000 * rules(data, jobId).time_ratio); }
 
   /** 見習的等級（目前是見習就看 player.level） */
   function noviceLevel(state) {
@@ -44,14 +51,16 @@
    *           today（今天已經考過沒通過，明天再來）、time（今天剩不到 15 分鐘）
    */
   function canStart(state, jobId, data, now) {
-    var R = rules(data), JR = (data && data.jobRules) || {};
+    var R = rules(data, jobId), JR = (data && data.jobRules) || {};
     if (!data || !data.jobs || !data.jobs[jobId] || jobId === 'novice') return { ok: false, reason: 'unknown' };
-    if (Array.isArray(JR.open_jobs) && JR.open_jobs.indexOf(jobId) < 0) return { ok: false, reason: 'closed' };
+    if (!Character.isOpen(data, jobId, state)) return { ok: false, reason: 'closed' };
+    var recipe = Character.recipeStatus(state, jobId, data);
+    if (!recipe.ok) return recipe;
     if (state.player.jobs && state.player.jobs[jobId]) return { ok: false, reason: 'held' };
     var r = rec(state, jobId);
     if (r && r.passedAt) return { ok: false, reason: 'passed' };
     var need = (JR.master_level && JR.master_level.novice) || JR.unlock_level || 10;
-    if (noviceLevel(state) < need) return { ok: false, reason: 'level', need: need };
+    if (data.jobs[jobId].tier !== 'inter' && noviceLevel(state) < need) return { ok: false, reason: 'level', need: need };
     if (r && r.lastFailDate && r.lastFailDate === Daily.dateKey(now)) return { ok: false, reason: 'today' };
     var left = state.playtime ? Playtime.remainingMin(state.playtime, state.settings, now) : Infinity;
     if (left < R.min_minutes_left) return { ok: false, reason: 'time', minutes: left };
@@ -68,7 +77,7 @@
    */
   function pick(state, questions, data, opts) {
     opts = opts || {};
-    var R = rules(data), rng = opts.rng || Math.random;
+    var R = rules(data, opts.jobId), rng = opts.rng || Math.random;
     var answered = opts.answered || state.answered || {}, qhist = opts.qhist || state.qhist || {};
     var last = {}; (opts.lastQ || []).forEach(function (id) { last[id] = 1; });
     var seenVG = {}, out = [];
@@ -79,7 +88,7 @@
       levels.forEach(function (lv) {
         var want = Number(R.per_subject[lv]) || 0;
         var cands = (questions || []).filter(function (q) {
-          return q && q.subject === s && Number(q.level) === lv && (!R.term || q.term === R.term) && !(opts.exclude && opts.exclude(q));
+          return q && q.subject === s && Number(q.level) === lv && (!R.term || (Array.isArray(R.term) ? R.term.indexOf(q.term) >= 0 : q.term === R.term)) && !(opts.exclude && opts.exclude(q));
         });
         shuffle(cands, rng);
         var rank = function (q) { return answered[q.id] ? 2 : (asked[q.id] ? 1 : 0); };
@@ -128,9 +137,10 @@
    * 通過：passedAt、稱號、護身符（珍貴道具）；沒通過：lastFailDate＝今天。都記進家長報表（state.trialLog）。
    */
   function finish(state, jobId, answers, now, data) {
-    var R = rules(data), r = ensure(state, jobId);
+    var R = rules(data, jobId), r = ensure(state, jobId);
     var correct = (answers || []).filter(function (a) { return a && a.correct; }).length;
-    var pass = correct >= R.pass;
+    var inter = data && data.jobs && data.jobs[jobId] && data.jobs[jobId].tier === 'inter';
+    var pass = correct >= R.pass && (!inter || (answers || []).length === total(R));
     var units = [];
     (answers || []).forEach(function (a) { if (a && !a.correct) { var u = (a.subject ? a.subject + '：' : '') + (a.unit || '（沒有單元名稱）'); if (units.indexOf(u) < 0) units.push(u); } });
     r.inProgress = null;
