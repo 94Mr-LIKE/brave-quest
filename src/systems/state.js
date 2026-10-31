@@ -6,7 +6,7 @@
   var Daily = isNode ? require('./daily.js') : window.JQ.Daily;
   var Playtime = isNode ? require('./playtime.js') : window.JQ.Playtime;
 
-  var SCHEMA_VERSION = 5;   // v1.3 台北章（62 號第五節）v5：legacyM05＋Ch3Migrate；   // v1.0 第一批（48 號 F9）v3：player.jobs、player.floor、player.skillSlots、trial；v1.1 第一章（59 號第五節）v4：chapter＋Ch1Migrate
+  var SCHEMA_VERSION = 6;   // v2.0 新經濟（67 號第五節）v6：升級表、經驗值換算＋EconMigrate；   // v1.3 台北章（62 號第五節）v5：legacyM05＋Ch3Migrate；   // v1.0 第一批（48 號 F9）v3：player.jobs、player.floor、player.skillSlots、trial；v1.1 第一章（59 號第五節）v4：chapter＋Ch1Migrate
   var SUBJECTS = ['國語', '英語', '數學', '自然', '社會'];
   var NAME_MAX = 8;
   var ANSWER_TIME_MODES = ['relaxed', 'standard', 'off'];
@@ -118,6 +118,7 @@
       chapter: 0,                 // v1.1 完成到第幾章（Q_LAMPS_3 chapter_end: 1 → 1；之後章節用）
       proverbs: { got: {}, quiz: {} },   // v1.3.1 台語氣象諺語：收集到的諺語、答對的挑錯關卡（一般欄位，不升 schema）
       legacyM05: false,           // v1.3 舊紅樹林旗標（62 號 5.4；只有 Ch3Migrate 會設成 true，Q_GNO_4 完成時關掉）
+      tierOpen: { inter: false },  // v2.0 中部（69 號 5.1）：到過大甲鎮瀾宮＝中級職業開放（第一次和鎮瀾宮志工說話時設定；不升 schema）
       ending: false
     };
   }

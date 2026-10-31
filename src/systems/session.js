@@ -7,6 +7,7 @@
  *   mode 'free' （v0.2）     ：戰鬥、寶箱、村民委託共用；由呼叫端決定答對後做什麼
  * 其他選項：
  *   expMult   經驗值 乘數（地圖等級係數）
+ *   noPay     true＝答對不給經驗值和金幣（v2.0 新經濟：委託、寶箱；完成時一次給委託獎勵）
  *   filter    function(q) → 是否可出（例：委託限定單元、level 範圍）
  *   noRepeat  true = 同一個 session 內同一題不出兩次（戰鬥：同一隻怪同一場戰鬥）
  */
@@ -26,6 +27,7 @@
     return {
       state: state, questions: questions, subject: subject, rng: opts.rng || Math.random,
       mode: mode, expMult: opts.expMult || 1, filter: opts.filter || null, noRepeat: !!opts.noRepeat,
+      noPay: !!opts.noPay,   // v2.0 新經濟（67 號第二節第 5 項）
       // v0.9.3（老闆 2026-10-10 C1）戰鬥：答對、攻擊都不給經驗值和金幣，打倒怪物時才給（怪物的經驗值、金幣，見 game.js bvictory）；
       // 逃跑、累倒都不給。forgone＝這場答對「本來會拿到」的數字（只給測試看）。
       // 每日小任務的金幣等戰鬥結束才給：記在存檔 player.pendingDaily，由 settleBattle（戰鬥結束）或 settlePlayerExp（讀檔時）結算
@@ -128,6 +130,9 @@
       question: scaled, wrongCount: sess.wrongCount, hintsUsed: sess.hintsUsed,
       alreadyCorrect: !!st.answered[q.id], pendingVariant: sess.isVariant ? st.pendingVariant : null
     });
+    if (sess.noPay) {   // v2.0 新經濟（67 號第二節第 5 項）：委託、寶箱答題不給經驗值和金幣；變化題（ADR-005）照樣出，但不再補回經驗值
+      reward.exp = 0; reward.coins = 0; reward.bonusPaid = 0; reward.variantBonus = 0; reward.noPay = true;
+    }
     if (sess.isVariant) st.pendingVariant = null;
     if (reward.needVariant) st.pendingVariant = J.Rewards.makePending(q, reward.variantBonus);
     var levels = 0;

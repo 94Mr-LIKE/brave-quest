@@ -139,7 +139,32 @@ window.VOICES = {
     noodle_master: { name: "米粉師傅", gender: "m", age: "elder", stage: "老年", look: "npc_noodle_master", pitch: 0.9, rate: 0.88, taigi: true, persona: "曬米粉的老師傅，聲音宏亮，最懂風。", voice_share: "kumquat_farmer" },
     inn_daxi: { name: "老街旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.07, taigi: true, persona: "老街旅店老闆，親切。", voice_share: "inn_suao" },
     inn_hsinchu: { name: "新竹旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.01, taigi: true, persona: "新竹旅店老闆，說話輕快。", voice_share: "inn_jiaoxi" },
-    mb_floodgate: { name: "霧閘機將", gender: "m", age: "adult", stage: "中年", look: "boss_mb_floodgate", rate: 0.8, taigi: false, persona: "低沉、像機器喀啦喀啦的聲音，清醒後變得平穩。", pitch: 0.5 }
+    mb_floodgate: { name: "霧閘機將", gender: "m", age: "adult", stage: "中年", look: "boss_mb_floodgate", rate: 0.8, taigi: false, persona: "低沉、像機器喀啦喀啦的聲音，清醒後變得平穩。", pitch: 0.5 },
+    // v2.0 中部（69 號；劇本語音組草稿；新 NPC 的走路圖都已交件，look 用正式圖；旅店老闆是虛擬店員 look null；頭目 look＝戰鬥圖）
+    old_stationmaster: { name: "老站長", gender: "m", age: "elder", stage: "老年", look: "npc_old_stationmaster", pitch: 0.9, rate: 0.94, taigi: true, persona: "老站長，講話親切（v2.0 中部）。" },
+    conservation_guide: { name: "保育志工", gender: "m", age: "adult", stage: "青年", look: "npc_conservation_guide", pitch: 0.94, rate: 0.62, taigi: true, persona: "保育志工，講話親切（v2.0 中部）。" },
+    wood_carver: { name: "木雕師傅", gender: "m", age: "adult", stage: "中年", look: "npc_wood_carver", pitch: 0.72, rate: 0.7, taigi: true, persona: "木雕師傅，講話親切（v2.0 中部）。" },
+    berry_farmer: { name: "草莓農", gender: "m", age: "adult", stage: "中年", look: "npc_berry_farmer", pitch: 0.72, rate: 1.26, taigi: true, persona: "草莓農，講話親切（v2.0 中部）。" },
+    inn_sanyi: { name: "山城民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.78, rate: 0.63, taigi: true, persona: "山城民宿老闆，講話親切（v2.0 中部）。" },
+    rush_weaver: { name: "藺草工坊阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_rush_weaver", pitch: 0.68, rate: 0.64, taigi: true, persona: "藺草工坊阿伯，講話親切（v2.0 中部）。" },
+    volunteer_zl: { name: "鎮瀾宮志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_volunteer_zl", pitch: 0.62, rate: 0.7, taigi: true, persona: "鎮瀾宮志工阿伯，講話親切（v2.0 中部）。" },
+    pastry_shop: { name: "大甲糕餅店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_pastry_shop", pitch: 0.66, rate: 0.74, taigi: true, persona: "大甲糕餅店老闆，講話親切（v2.0 中部）。" },
+    inn_dajia: { name: "小鎮旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.19, taigi: true, persona: "小鎮旅店老闆，講話親切（v2.0 中部）。" },
+    lk_guide: { name: "老街導覽員", gender: "m", age: "adult", stage: "青年", look: "npc_lk_guide", pitch: 1, rate: 0.68, taigi: true, persona: "老街導覽員，講話親切（v2.0 中部）。" },
+    umbrella_shop: { name: "傘店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_umbrella_shop", pitch: 0.83, rate: 0.75, taigi: true, persona: "傘店老闆，講話親切（v2.0 中部）。" },
+    volunteer_lk: { name: "天后宮志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_volunteer_lk", pitch: 0.86, rate: 0.69, taigi: true, persona: "天后宮志工阿伯，講話親切（v2.0 中部）。" },
+    pastry_lk: { name: "鹿港糕餅店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_pastry_lk", pitch: 0.84, rate: 0.64, taigi: true, persona: "鹿港糕餅店老闆，講話親切（v2.0 中部）。" },
+    inn_lukang: { name: "老街客棧老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.66, rate: 1.26, taigi: true, persona: "老街客棧老闆，講話親切（v2.0 中部）。" },
+    temple_elder: { name: "廟口阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_temple_elder", pitch: 0.62, rate: 0.64, taigi: true, persona: "廟口阿伯，講話親切（v2.0 中部）。" },
+    float_master: { name: "藝閣師傅", gender: "m", age: "adult", stage: "中年", look: "npc_float_master", pitch: 0.72, rate: 0.64, taigi: true, persona: "藝閣師傅，講話親切（v2.0 中部）。" },
+    grocer_bg: { name: "雜貨店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_grocer_bg", pitch: 0.66, rate: 0.68, taigi: true, persona: "雜貨店老闆，講話親切（v2.0 中部）。" },
+    volunteer_ct: { name: "朝天宮志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_volunteer_ct", pitch: 0.86, rate: 0.63, taigi: true, persona: "朝天宮志工阿伯，講話親切（v2.0 中部）。" },
+    volunteer_wd: { name: "武德宮志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_volunteer_wd", pitch: 0.56, rate: 0.64, taigi: true, persona: "武德宮志工阿伯，講話親切（v2.0 中部）。" },
+    oil_shop: { name: "麻油行老闆", gender: "m", age: "elder", stage: "老年", look: "npc_oil_shop", pitch: 0.69, rate: 0.95, taigi: true, persona: "麻油行老闆，講話親切（v2.0 中部）。" },
+    inn_beigang: { name: "鎮上旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.66, rate: 0.62, taigi: true, persona: "鎮上旅店老闆，講話親切（v2.0 中部）。" },
+    mb_train: { name: "迷路火車頭", gender: "m", age: "adult", stage: "中年", look: "boss_mb_train", rate: 1.1, taigi: false, persona: "急急忙忙、像蒸汽一樣噗噗喘，清醒後慢下來。", pitch: 0.5 },
+    mb_lantern: { name: "燈籠霧將", gender: "m", age: "adult", stage: "中年", look: "boss_mb_lantern", rate: 0.74, taigi: false, persona: "低低的、飄忽的聲音，清醒後變得溫暖。", pitch: 0.6 },
+    leopardcat_cub: { name: "石虎寶寶", gender: "m", age: "child", stage: "小孩", look: "npc_leopardcat_cub", pitch: 1.7, rate: 1.2, taigi: false, persona: "不說話的石虎寶寶，只會輕輕「喵～」一聲（v2.0 友善 NPC，69 號 3.4）。" }
   },
 
   // 主角男女（目前沒有台詞，預留）
@@ -209,6 +234,18 @@ window.VOICES = {
     wx_wind: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 8, cry: "咻——咻——" },
     mc_vacuum: { family: "armor", size: "s", mood: "迷糊", pitch_shift: 3, cry: "嗡嗡嗡……" },
     hc_noodle: { family: "spirit", size: "m", mood: "神祕", pitch_shift: 4, cry: "呼嚕呼嚕……" },
-    mb_floodgate: { family: "armor", size: "boss", mood: "暴躁", pitch_shift: -8, cry: "喀啦喀啦——！" }
+    mb_floodgate: { family: "armor", size: "boss", mood: "暴躁", pitch_shift: -8, cry: "喀啦喀啦——！" },
+    // v2.0 中部新怪物（69 號 3.2）
+    ml_signal: { family: "armor", size: "m", mood: "暴躁", pitch_shift: -2, cry: "喀噹喀噹！" },
+    ml_berry: { family: "plant", size: "s", mood: "頑皮", pitch_shift: 8, cry: "刺刺刺！" },
+    an_egret: { family: "bird", size: "m", mood: "神祕", pitch_shift: 5, cry: "嘎——嘎——" },
+    dj_rush: { family: "plant", size: "s", mood: "頑皮", pitch_shift: 6, cry: "沙沙沙！" },
+    dj_taro: { family: "slime", size: "m", mood: "迷糊", pitch_shift: -3, cry: "咕咚咕咚……" },
+    gh_umbrella: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 7, cry: "啪啦啪啦！" },
+    gh_geta: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 4, cry: "喀喀！喀喀！" },
+    gh_lantern: { family: "spirit", size: "s", mood: "神祕", pitch_shift: 6, cry: "呼……呼……" },
+    gh_civet: { family: "beast", size: "m", mood: "頑皮", pitch_shift: 3, cry: "吱吱！" },
+    mb_train: { family: "armor", size: "boss", mood: "暴躁", pitch_shift: -9, cry: "嘟嘟——！" },
+    mb_lantern: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -6, cry: "呼嗚嗚……" }
   }
 };

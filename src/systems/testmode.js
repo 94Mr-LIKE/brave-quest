@@ -53,7 +53,8 @@
       el.id = 'testmode-badge';
       el.setAttribute('aria-label', '測試模式開著');
       el.textContent = '測試模式';
-      el.style.cssText = 'position:fixed;left:4px;top:2px;z-index:99999;pointer-events:none;font-size:11px;line-height:1.4;padding:0 5px;border-radius:4px;background:rgba(200,40,40,.85);color:#fff;font-weight:bold';
+      // v1.4.1（交接第三節第 8 點）：top:2px 在手機直放時蓋到 HUD 的名字 → 放在 HUD 下面（--hud-h＝HUD 高度，game.js layoutMode 量的；還沒量時當 0）
+      el.style.cssText = 'position:fixed;left:4px;top:calc(var(--hud-h, 0px) + 4px);z-index:99999;pointer-events:none;font-size:11px;line-height:1.4;padding:0 5px;border-radius:4px;background:rgba(200,40,40,.85);color:#fff;font-weight:bold';
       doc.body.appendChild(el);
     }
     return el;

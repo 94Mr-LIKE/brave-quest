@@ -193,6 +193,10 @@
       box = h('button.minimap', { onclick: function () { if (bigHandle) { bigHandle.close(); return; } if (!G.blocked()) openBig(G); }, 'aria-label': '小地圖（點一下放大）' }, [levelCap, canvas, caption]);
       hud.appendChild(box);
     }
+    // v2.0（老闆 2026-10-26）洞窟、迷宮（maps.js no_minimap: true）：小地圖整個不顯示（連寶箱數也不顯示）、放大地圖也關掉；換到一般地圖就恢復
+    var off = !!(scene.map && scene.map.no_minimap === true);
+    box.hidden = off;
+    if (off) { clearInterval(timer); timer = 0; if (bigHandle) bigHandle.close(); Minimap.offLog = (Minimap.offLog || 0) + 1; return; }
     var info = scene.minimapInfo();
     var v0 = viewFor(info, true);
     var sz = size({ w: v0.w, h: v0.h }, 170, 110);
@@ -215,6 +219,7 @@
   function openBig(G) {
     var sc = G.mapScene;
     if (!sc) return null;
+    if (sc.map && sc.map.no_minimap === true) return null;   // v2.0 洞窟、迷宮不給地圖
     var info = sc.minimapInfo(), D = G.data, st = G.state;
     if (bigHandle && document.body.contains(bigHandle.node)) return bigHandle;   // v0.9.6 B03 已經開著就不再開
     var mx = bigMax(window.innerWidth, window.innerHeight), sz = size(info, mx.w, mx.h);

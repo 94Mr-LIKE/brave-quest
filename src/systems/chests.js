@@ -7,6 +7,7 @@
   var isNode = typeof module !== 'undefined' && typeof require === 'function';
   var Character = isNode ? require('./character.js') : window.JQ.Character;
   var QuestLog = isNode ? require('./questlog.js') : window.JQ.QuestLog;
+  var Exp = isNode ? require('./exp.js') : window.JQ.Exp;   // v2.0 新經濟：寶箱 reward.exp
 
   function isOpened(state, chestId) { return !!state.chests[chestId]; }
 
@@ -23,8 +24,12 @@
     state.player.coins += gold;
     var item = rw.item ? String(rw.item).replace(/^item_/, '') : null;
     if (item) Character.addItem(state, item, rw.n || 1);
+    // v2.0 新經濟（67 號第二節第 7 項、69 號附錄 A1）：寶箱算進「委託＋寶箱」的經驗值預算，經驗值也發出去（用法同委託完成時的 Exp.addExp）
+    var exp = Number(rw.exp) > 0 ? Math.floor(Number(rw.exp)) : 0, levels = exp ? Exp.addExp(state.player, exp) : 0;
     var done = QuestLog.onChestOpened(state, quests || {}, chest.id, data);
-    return { ok: true, gold: gold, item: item, quests: done };
+    var res = { ok: true, gold: gold, item: item, quests: done };
+    if (exp) { res.exp = exp; res.levels = levels; }
+    return res;
   }
 
   /** 題目情境跟寶箱有關（scene/stem 含「寶箱」或 id 含 CHEST）：留給寶箱用，戰鬥不出 */

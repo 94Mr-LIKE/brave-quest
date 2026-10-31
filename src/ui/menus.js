@@ -505,6 +505,8 @@
             silhouette ? null : card]), btn]));
       });
       body.appendChild(list);
+      // v2.0（69 號 5.2）中級職業：到過大甲鎮瀾宮以後開放；v2.0 還沒有中級職業資料（v2.1 上線），先寫「即將登場」
+      body.appendChild(h('p.small.inter-note', { text: st.tierOpen && st.tierOpen.inter ? '🏮 中級職業即將登場！（已經到過大甲鎮瀾宮）' : '🏮 中級職業：到大甲鎮瀾宮以後開放。' }));
     }
     render();
     return handle;

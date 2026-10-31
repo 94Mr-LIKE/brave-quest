@@ -169,6 +169,8 @@
     if (st.migratedCh1) G.pendingMigrateCh1 = st.migratedCh1;
     // v1.3 台北章（62 號 5.1 第 5 點）：Ch3Migrate 動過舊存檔 → 進地圖後旁白 D_MIGRATE_CH3 一次（看完才清）
     if (st.migratedCh3) G.pendingMigrateCh3 = st.migratedCh3;
+    // v2.0 新經濟（67 號 5.2）：EconMigrate 換算過舊存檔 → 進地圖後旁白 D_MIGRATE_ECON 一次（看完才清）
+    if (st.migratedEcon) G.pendingMigrateEcon = st.migratedEcon;
     G.applySettings(true);
     G.save(true);
     J.HUD.show(true);
@@ -395,6 +397,7 @@
     // v0.9.3 地名＋建議等級「擎天草原 Lv1–4」。v0.9.6（47 號 B06）同一張地圖重新開始（轉職換走路圖）不再跳地名，免得蓋住轉職的光芒
     if (enteredMap) J.HUD.mapBanner(J.MapInfo.nameWithLevel(map, scene.mapId));
     G.bgm(J.MapInfo.bgmFor(map));
+    if (J.Daily && J.Daily.setMap) J.Daily.setMap(G.state && G.state.daily, scene.mapId);   // v2.0 新經濟（67 號第二節第 8 項）：每日小任務的金幣跟著目前所在區
     if (J.Minimap) J.Minimap.attach(G, scene);
     G.refreshHud();
     G.save();
@@ -404,6 +407,15 @@
     if (map.type === 'interior' && map.statue && enteredMap && firstVisit && !G.pendingIntro) {
       var introMap = scene.mapId;
       setTimeout(function () { if (G.mapScene === scene && scene.mapId === introMap && !scene.transitioning && !G.mapChanging && !G.blocked()) G.templeIntro(scene); }, 500);
+    }
+    // v1.4.1（63 號第七節第 4 點）：還沒轉職、見習 Lv17 以上走進石門水庫（M15）時，旁白多一句「要轉職的話，可以搭車去慈護宮、行天宮或指南宮」（D_TY_JOB_HINT）。
+    //   每次開遊戲最多說一次（只記在 G.tyJobHintShown，不寫進存檔、不改存檔格式）；那時候有別的對話、視窗或戰鬥就這次不說，下次走進來再說
+    if (enteredMap && scene.mapId === 'M15' && !G.tyJobHintShown && (G.data.dialogs || {}).D_TY_JOB_HINT && st.player.level >= 17 && J.Character.needsJobHint(st, G.data)) {
+      setTimeout(function () {
+        if (G.mapScene !== scene || scene.mapId !== 'M15' || scene.transitioning || G.mapChanging || G.blocked() || (J.UI.isOpen && J.UI.isOpen()) || G.tyJobHintShown) return;
+        G.tyJobHintShown = true;
+        G.say('D_TY_JOB_HINT', [{ who: 'narrator', text: '要轉職的話，可以搭車去慈護宮、行天宮或指南宮。' }]);
+      }, 700);
     }
     var migrateV3Done = null;   // v1.0 升級說明播完的時間點（第一章說明要接在它後面，不會兩段對話同時跳出來）
     if (G.pendingMigrate) {
@@ -432,10 +444,20 @@
     if (G.pendingMigrateCh3) {
       var mc3 = G.pendingMigrateCh3; G.pendingMigrateCh3 = null;
       G.migrateCh3Shown = mc3;   // 測試用
-      (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {
+      migrateV3Done = (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {   // v2.0：記下來，新經濟的說明接在後面
         return G.say('D_MIGRATE_CH3', [{ who: 'narrator', text: '紅樹林搬到台北北投的旁邊了！以後也可以從北投走過去。' }]);
       }).then(function () {
         if (G.state) { delete G.state.migratedCh3; G.migrateCh3Done = true; G.save(); }   // 看完了才清掉
+      });
+    }
+    // v2.0 新經濟（67 號 5.2）：經驗值換算、物價調整的說明（接在前面的升級說明後面，不會兩段同時跳出來）
+    if (G.pendingMigrateEcon) {
+      var me = G.pendingMigrateEcon; G.pendingMigrateEcon = null;
+      G.migrateEconShown = me;   // 測試用
+      (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {
+        return G.say('D_MIGRATE_ECON', [{ who: 'narrator', text: "勇者大冒險更新了！你的等級和能力都沒有變。" }]);
+      }).then(function () {
+        if (G.state) { delete G.state.migratedEcon; G.migrateEconDone = true; G.save(); }   // 看完了才清掉
       });
     }
     if (G.pendingTrialQuit && G.pendingTrialQuit.length) {
@@ -611,7 +633,13 @@
     var first = !G.placeIntroSeen[place];
     G.placeIntroSeen[place] = true;
     G.templeVolunteerLog = (G.templeVolunteerLog || []).concat([place]);   // 測試用
-    return (first ? G.say(TD.intro_place || npc.dialog, []) : Promise.resolve()).then(function () { return G.jobPlace(place); });
+    // v2.0（69 號 5.1）opensTier：第一次和鎮瀾宮志工說話就開放中級職業（存檔 state.tierOpen；介紹宮廟後旁白 D_INTER_OPEN）
+    var plc = (((G.data.jobRules || {}).places) || []).filter(function (x) { return x.id === place; })[0] || {};
+    var opens = plc.opensTier && !(G.state.tierOpen && G.state.tierOpen[plc.opensTier]) ? plc.opensTier : null;
+    if (opens) { G.state.tierOpen = G.state.tierOpen || {}; G.state.tierOpen[opens] = true; G.tierOpenLog = (G.tierOpenLog || []).concat([opens]); G.save(); }
+    return (first || opens ? G.say(TD.intro_place || npc.dialog, []) : Promise.resolve()).then(function () {
+      if (opens) return G.say('D_INTER_OPEN', [{ who: 'narrator', text: '從現在起，在任何一間宮廟都可以挑戰中級職業了！' }]);
+    }).then(function () { return G.jobPlace(place); });
   };
 
   /** 轉職清單上按了某個職業 */
@@ -912,9 +940,11 @@
     var st = G.state, Q = G.data.quests, q = Q[id];
     var lr = q.level_range || [1, 4];
     var units = q.units || [];
+    // v1.4.1（v14_畫面審查 缺陷 7）：委託可以列 skip_scene（字詞）——情境或題目裡有這些字的題不抽（例：豆干店的帳不抽「地精拿走寶石」、新竹解說員不抽「金山的圖書館」；題庫不改）
+    var skip = q.skip_scene || [];
     var sess = J.Session.create(st, G.questions, J.QuestLog.helpSubject(q, 0), {
-      mode: 'free', expMult: G.coef(scene.mapId),
-      filter: function (x) { return (!units.length || units.indexOf(x.unit) >= 0) && x.level >= lr[0] && x.level <= lr[1]; }
+      mode: 'free', noPay: true,   // v2.0 新經濟（67 號第二節第 5 項）：答題不給經驗值和金幣，完成委託時一次給
+      filter: function (x) { return (!units.length || units.indexOf(x.unit) >= 0) && x.level >= lr[0] && x.level <= lr[1] && !skip.some(function (w) { return String(x.scene || '').indexOf(w) >= 0 || String(x.stem || '').indexOf(w) >= 0; }); }
     });
     function nextQ() {
       if (J.QuestLog.canComplete(st, Q, id, G.data)) { G.completeQuest(id, scene); return; }
@@ -952,7 +982,7 @@
     if (J.Chests.isOpened(st, chest.id)) { G.say('D_CHEST_DONE', [{ who: 'pet', text: '這個寶箱已經打開過了。' }]); return; }
     var spec = J.Chests.questionSpec(chest);
     G.say('D_CHEST_LOCKED', [{ who: 'pet', text: '寶箱上有數字鎖！答對就能打開。' }]).then(function () {
-      var sess = J.Session.create(st, G.questions, spec.subject, { mode: 'free', expMult: G.coef(scene.mapId), filter: J.Chests.isChestQuestion });
+      var sess = J.Session.create(st, G.questions, spec.subject, { mode: 'free', noPay: true, filter: J.Chests.isChestQuestion });
       var q = J.Session.next(sess, Date.now(), { forceLevel: spec.level, preferType: spec.preferType });
       if (!q) { J.UI.toast('題目還在準備中。'); return; }
       J.Quiz.ask({
@@ -968,6 +998,8 @@
           G.jingle('chest', null, 'chest');
           var parts = [];
           if (o.gold) parts.push('金幣 +' + o.gold);
+          if (o.exp) parts.push('經驗值 +' + o.exp);   // v2.0 新經濟：寶箱也給經驗值
+          if (o.levels && !o.quests.length) setTimeout(function () { G.afterReward(o.levels); }, 300);
           if (o.item) parts.push('得到「' + ((G.data.items[o.item] || {}).name || o.item) + '」');
           J.UI.banner('寶箱打開了！' + (parts.length ? parts.join('、') : ''));
           G.refreshHud();
@@ -1523,7 +1555,7 @@
     if (!st) return;
     if (document.visibilityState === 'hidden') { J.Playtime.pause(st.playtime); return; }
     var now = Date.now();
-    if (J.Daily.ensure(st.daily, now)) J.UI.toast('新的一天！每日小任務換新了。');
+    if (J.Daily.ensure(st.daily, now)) J.UI.toast('新的一天！每日小任務換新了。', null, { defer: true });   // v1.4.1：題目、戰鬥、對話開著時先等，關掉才出現（不蓋題目）
     var ev = J.Playtime.tick(st.playtime, st.settings, now);
     // 今日上限：不在冒險途中硬擋——戰鬥、對話、題目或其他視窗開著時先記著，結束後才顯示（上限本身不變）
     if ((ev.indexOf('limit') >= 0 || G.limitPending) && !G.limitHandle) {

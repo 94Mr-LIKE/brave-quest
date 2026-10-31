@@ -176,6 +176,11 @@ window.JOB_RULES = {
     // v1.3 台北章（62 號 4.5；劇本組草稿）：intro_place＝第一次和志工說話的介紹，bless＝轉職成功的祝福（志工說「這是你自己努力得來的」）
     temple_ht: { locked: "D_TEMPLE_LOCKED_HT", intro: "D_TRIAL_INTRO_HT", pass: "D_TRIAL_PASS_HT", fail: "D_TRIAL_FAIL_HT", again: "D_TRIAL_AGAIN_HT", lv1: "D_JOB_LV1_HT", back: "D_JOB_BACK_HT", bless: "D_TEMPLE_BLESS_HT", intro_place: "D_TEMPLE_HT_INTRO" },
     temple_zn: { locked: "D_TEMPLE_LOCKED_ZN", intro: "D_TRIAL_INTRO_ZN", pass: "D_TRIAL_PASS_ZN", fail: "D_TRIAL_FAIL_ZN", again: "D_TRIAL_AGAIN_ZN", lv1: "D_JOB_LV1_ZN", back: "D_JOB_BACK_ZN", bless: "D_TEMPLE_BLESS_ZN", intro_place: "D_TEMPLE_ZN_INTRO" },
+    // v2.0 中部（69 號 5.3；劇本組草稿）：intro_place＝第一次和志工說話的介紹，bless＝轉職成功的祝福（志工說「這是你自己努力得來的」）
+    temple_zl: { locked: "D_TEMPLE_LOCKED_ZL", intro: "D_TRIAL_INTRO_ZL", pass: "D_TRIAL_PASS_ZL", fail: "D_TRIAL_FAIL_ZL", again: "D_TRIAL_AGAIN_ZL", lv1: "D_JOB_LV1_ZL", back: "D_JOB_BACK_ZL", bless: "D_TEMPLE_BLESS_ZL", intro_place: "D_TEMPLE_ZL_INTRO" },
+    temple_lk: { locked: "D_TEMPLE_LOCKED_LK", intro: "D_TRIAL_INTRO_LK", pass: "D_TRIAL_PASS_LK", fail: "D_TRIAL_FAIL_LK", again: "D_TRIAL_AGAIN_LK", lv1: "D_JOB_LV1_LK", back: "D_JOB_BACK_LK", bless: "D_TEMPLE_BLESS_LK", intro_place: "D_TEMPLE_LK_INTRO" },
+    temple_ct: { locked: "D_TEMPLE_LOCKED_CT", intro: "D_TRIAL_INTRO_CT", pass: "D_TRIAL_PASS_CT", fail: "D_TRIAL_FAIL_CT", again: "D_TRIAL_AGAIN_CT", lv1: "D_JOB_LV1_CT", back: "D_JOB_BACK_CT", bless: "D_TEMPLE_BLESS_CT", intro_place: "D_TEMPLE_CT_INTRO" },
+    temple_wd: { locked: "D_TEMPLE_LOCKED_WD", intro: "D_TRIAL_INTRO_WD", pass: "D_TRIAL_PASS_WD", fail: "D_TRIAL_FAIL_WD", again: "D_TRIAL_AGAIN_WD", lv1: "D_JOB_LV1_WD", back: "D_JOB_BACK_WD", bless: "D_TEMPLE_BLESS_WD", intro_place: "D_TEMPLE_WD_INTRO" },
     pet: { cheer: "D_TRIAL_CHEER", wrong: "D_TRIAL_WRONG", fail: "D_TRIAL_FAIL_PET", quit: "D_TRIAL_QUIT_PET" }
   },
   open_jobs: ["novice", "swordsman", "fighter", "mage", "priest", "dancer", "archer", "bard", "sailor", "shepherd", "jester", "tamer", "merchant"],
@@ -185,7 +190,12 @@ window.JOB_RULES = {
     { id: "guild_fc", map: "M10", kind: "npc", npc: "guild", name: "府城古城職業公會" },
     // v1.3 台北章（62 號 4.5）：宮廟志工阿伯主持（不畫神像、不點香、不擲筊、不收費）；規則和慈護宮完全一樣
     { id: "temple_ht", map: "M12", kind: "npc", npc: "temple_volunteer_ht", name: "行天宮" },
-    { id: "temple_zn", map: "M13", kind: "npc", npc: "temple_volunteer_zn", name: "指南宮" }
+    { id: "temple_zn", map: "M13", kind: "npc", npc: "temple_volunteer_zn", name: "指南宮" },
+    // v2.0 中部（69 號 5.1）：宮廟志工阿伯主持（不畫神像、不點香、不擲筊、不收費）；規則和慈護宮完全一樣。opensTier＝第一次和志工說話就開放中級職業（state.tierOpen）
+    { id: "temple_zl", map: "M18", kind: "npc", npc: "volunteer_zl", name: "鎮瀾宮", opensTier: "inter" },
+    { id: "temple_lk", map: "M19", kind: "npc", npc: "volunteer_lk", name: "鹿港天后宮" },
+    { id: "temple_ct", map: "M20", kind: "npc", npc: "volunteer_ct", name: "朝天宮" },
+    { id: "temple_wd", map: "M20", kind: "npc", npc: "volunteer_wd", name: "武德宮" }
   ],
   growth: { hp: 8, mp: 2, atk: 2, def: 0.5 },   // 48 號 2.1：所有職業一樣
   floor_ratio: 0.5, transfer_step: 0.2,

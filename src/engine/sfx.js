@@ -36,6 +36,8 @@
     [/^ty_tofu$|^ty_carve$/, 'beast'], [/^wx_thunder$|^wx_wind$|^hc_noodle$/, 'spirit'], [/^mc_vacuum$|^mb_floodgate$/, 'armor'],
     // v1.3 台北章（和 voices.js 一致）：茶芽螳螂、焙籠火狸、噴氣嘶嘶蛇、硫晶刺蝟＝野獸；霧茶夜蛾、藍尾鵲鵲＝鳥；機械系＝盔甲；青磺水靈＝精靈
     [/^tea_mantis$|^tea_basket$|^gt_steam$|^gt_sulfur$/, 'beast'], [/^tea_moth$|^an_magpie$/, 'bird'], [/^mc_gondola$|^mc_alarm$|^mc_roaster$|^mc_signal$|^mc_vending$/, 'armor'], [/^gt_jade$/, 'spirit'],
+    // v2.0 中部（和 voices.js 一致）：號誌臂、火車頭＝盔甲；莓莓刺刺、藺草編編＝植物；高腳白鷺＝鳥；芋頭圓圓＝史萊姆；紙傘妖、木屐、燈籠、燈籠霧將＝精靈；白鼻心＝野獸
+    [/^ml_signal$|^mb_train$/, 'armor'], [/^ml_berry$|^dj_rush$/, 'plant'], [/^an_egret$/, 'bird'], [/^dj_taro$/, 'slime'], [/^gh_umbrella$|^gh_geta$|^gh_lantern$|^mb_lantern$/, 'spirit'], [/^gh_civet$/, 'beast'],
     // v1.2 第二章（和 voices.js 一致）：虎紋霧獸＝野獸、金棗彈彈＝史萊姆、蔥稈草甲獸＝植物、冷泉氣泡精與黏黏雨雲王＝精靈、鯖鯖跳刀魚＝水生
     [/^ly_tigerwind$/, 'beast'], [/^ly_kumquat$/, 'slime'], [/^ly_scallion$/, 'plant'], [/^ly_bubble$|^wxb_raincloud$/, 'spirit'], [/^ly_mackerel$/, 'aquatic'],
     [/^wx_rain$|^mn_dust$|^mn_lamp$/, 'spirit'], [/^mn_cart$/, 'armor'], [/^mn_ore$|^mnb_goldjaw$/, 'rock'], [/^mn_drill$|^mn_timber$/, 'beast'],

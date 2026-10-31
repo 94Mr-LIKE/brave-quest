@@ -86,7 +86,8 @@
    * - 回傳新物件（不改題庫原題）：options、answer、option_why 一起換；optionOrder[i]＝畫面第 i 個選項原本的索引。
    *   打亂過的題目帶 shuffled: true，再呼叫一次會原樣回傳（同一題重開視窗時，刪去卡的索引不會亂掉）。
    */
-  var FIXED_OPTION = /^\s*(以上皆是|以上皆非|以上皆對|以上皆錯|以上都對|以上都不對|以上都是|以上都不是|以上都錯|都對|都不對|都是|都不是)\s*[。.]?\s*$/;
+  // v1.4.1（交接第三節第 8 點）：諺語挑錯的「兩句都沒錯」也固定在原位（第 3 個），只打亂前半句、後半句
+  var FIXED_OPTION = /^\s*(以上皆是|以上皆非|以上皆對|以上皆錯|以上都對|以上都不對|以上都是|以上都不是|以上都錯|都對|都不對|都是|都不是|兩句都沒錯|兩句都沒有錯|兩句都對|兩句都錯)\s*[。.]?\s*$/;
   function shuffleOptions(q, rng) {
     if (!q || (q.type !== 'choice' && q.type !== 'multi') || !Array.isArray(q.options) || q.shuffled) return q;
     rng = rng || Math.random;

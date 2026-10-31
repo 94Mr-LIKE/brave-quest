@@ -47,10 +47,15 @@
    * 規則同 v3 備份：只寫一次、不覆蓋、list() 不列。schema 3 的存檔照舊只寫 v3 備份（那份就是升級前的原檔）。
    */
   var BACKUP_V4_KEY = Save.SAVE_KEY + '_v4_backup';
+  /**
+   * v2.0 新經濟（67 號 5.2）：v1.3～v1.4（schema 5）存檔在 EconMigrate 升到 schema 6 之前的備份 key：bq_save_v5_backup（其他欄位 bq_save_v5_backup:<欄位>）。
+   * 規則同 v3、v4 備份：只寫一次、不覆蓋、list() 不列。
+   */
+  var BACKUP_V5_KEY = Save.SAVE_KEY + '_v5_backup';
   /** which：省略＝v2 備份（v1.0.1 家長設定的還原按鈕）；'v3'＝v1.1 升級前備份 */
   function backupKeyFor(slot, which) {
     slot = slot || DEFAULT_SLOT;
-    var base = which === 'v4' ? BACKUP_V4_KEY : which === 'v3' ? BACKUP_V3_KEY : BACKUP_KEY;   // v1.3：'v4'＝v1.3 升級前備份
+    var base = which === 'v5' ? BACKUP_V5_KEY : which === 'v4' ? BACKUP_V4_KEY : which === 'v3' ? BACKUP_V3_KEY : BACKUP_KEY;   // v1.3：'v4'＝v1.3 升級前備份
     return slot === DEFAULT_SLOT ? base : base + ':' + slot;
   }
 
@@ -126,6 +131,8 @@
           try { if (st.getItem(backupKeyFor(slot, 'v3')) === null) st.setItem(backupKeyFor(slot, 'v3'), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
         } else if (obj.version === 4) {   // v1.3：Ch3Migrate（4 → 5）之前也備份一份
           try { if (st.getItem(backupKeyFor(slot, 'v4')) === null) st.setItem(backupKeyFor(slot, 'v4'), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
+        } else if (obj.version === 5) {   // v2.0 新經濟：EconMigrate（5 → 6）之前也備份一份
+          try { if (st.getItem(backupKeyFor(slot, 'v5')) === null) st.setItem(backupKeyFor(slot, 'v5'), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
         }
         return Save.migrate(obj);
       } catch (e) { return null; }   // 升級失敗：回傳 null，loadError 會說明原因；原本的存檔不動
@@ -194,7 +201,7 @@
   CloudSaveProvider.prototype.list = notReady;
   CloudSaveProvider.prototype['delete'] = notReady;
 
-  var SaveProvider = { BACKUP_KEY: BACKUP_KEY, BACKUP_V3_KEY: BACKUP_V3_KEY, BACKUP_V4_KEY: BACKUP_V4_KEY, backupKeyFor: backupKeyFor, migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
+  var SaveProvider = { BACKUP_KEY: BACKUP_KEY, BACKUP_V3_KEY: BACKUP_V3_KEY, BACKUP_V4_KEY: BACKUP_V4_KEY, BACKUP_V5_KEY: BACKUP_V5_KEY, backupKeyFor: backupKeyFor, migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.SaveProvider = SaveProvider; }
   if (typeof module !== 'undefined') module.exports = SaveProvider;
 })();

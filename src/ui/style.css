@@ -510,3 +510,25 @@ body.banner-on #toasts .toast { visibility: hidden; }
 .quiz-foot .scroll-more { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); margin-bottom: 4px; padding: 2px 14px; border-radius: 999px;
   background: #f2c14e; color: #2a1e22; font-size: 18px; font-weight: bold; white-space: nowrap; pointer-events: none; box-shadow: 0 2px 0 #0b1236; z-index: 1; }
 .quiz-foot .scroll-more[hidden] { display: none; }
+
+/* ===== v1.4.1 上線後小問題（交接_換對話.md 第三節第 8 點；wip_v14/v141_fixes_apply.js 每次重跑都整段重建）BEGIN ===== */
+/* 1. 北口被 HUD 蓋住：主角在狀態卡或四個按鈕底下時（地圖最上面幾列；電腦版、手機橫放），那一塊變半透明（MapScene.fadeOverlays，和小地圖同一套）；狀態卡不擋點擊，按鈕照常能按 */
+#hud .hud-card, #hud .hud-buttons { transition: opacity .2s; }
+#hud .hud-card.hud-fade { opacity: .3; pointer-events: none; }
+#hud .hud-buttons.hud-fade { opacity: .45; }
+/* 2. 地名橫幅蓋住主角：手機橫放（矮螢幕）時主角在畫面正中間，橫幅在 HUD 下面正好壓在主角身上 → 改放在主角下方、Ⓐ 提示鈕上面；
+      不管哪種畫面，橫幅還是疊到主角時就變淡（用 filter，不和淡出動畫的 opacity 打架） */
+@media (max-height: 460px) { .map-banner { top: auto; bottom: calc(max(14px, env(safe-area-inset-bottom)) + 64px); } }
+.map-banner.hero-under { filter: opacity(.3); }
+/* 6. 「見習冒…」截字：直放 HUD 第一行（名字・等級職業・金幣）放不下時，原本 .lv 是 flex: 1 1 0、被擠的是職業 → 改成等級職業先拿到完整寬度、再給名字（名字放不下才「…」，至少留 2 個字），金幣靠右 */
+@media (orientation: portrait) {
+  #hud .hud-card .name { flex: 1 1 0; min-width: 2em; max-width: max-content; }
+  #hud .hud-card .lv { flex: 1000 1 0; max-width: max-content; }
+  #hud .hud-card .coins { flex: none; margin-left: auto; }
+}
+/* 14. 換行不斷在詞中間（v14_畫面審查 缺陷 5「25 金／幣」「藥／草」）：J.UI.h() 把金額、「」裡的短名稱包成 <jq-nb>，整塊不換行 */
+jq-nb { white-space: nowrap; }
+/* ===== v1.4.1 END ===== */
+
+/* v2.0（老闆 2026-10-26）洞窟、迷宮不給小地圖：minimap.js 設 hidden（.minimap 本來是 display: flex，要蓋過去） */
+#hud .minimap[hidden] { display: none !important; }

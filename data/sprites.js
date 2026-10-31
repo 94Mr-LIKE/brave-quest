@@ -1565,5 +1565,11 @@ window.SPRITES = {
   "type": "icon",
   "frameW": 30,
   "frameH": 32
+ },
+ "boss_mb_lantern": {
+  "file": "assets/monsters/boss_mb_lantern.png",
+  "type": "single",
+  "frameW": 161,
+  "frameH": 160
  }
 };

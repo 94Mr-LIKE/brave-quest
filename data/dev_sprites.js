@@ -702,6 +702,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 165,
   "frameH": 160
  },
+ "boss_mb_lantern": {
+  "file": "assets/monsters/boss_mb_lantern.png",
+  "type": "single",
+  "frameW": 161,
+  "frameH": 160
+ },
  "boss_mb_train": {
   "file": "assets/monsters/boss_mb_train.png",
   "type": "single",

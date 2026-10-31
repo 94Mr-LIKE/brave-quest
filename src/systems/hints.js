@@ -2,13 +2,13 @@
  * 提示階梯
  *  ① hints[0]（免費）
  *  ② 課本哪裡找：顯示 source_ref（免費，不顯示頁碼）
- *  ③ hints[1]（1 張引導卡 或 15 金幣）
- *  ④ hints[2]（1 張引導卡 或 15 金幣）
+ *  ③ hints[1]（1 張引導卡 或 5 金幣）
+ *  ④ hints[2]（1 張引導卡 或 5 金幣）
  * 刪去卡（只限 choice）：刪掉一個錯誤選項，至少保留正解＋1 個錯誤選項
  */
 (function () {
   'use strict';
-  var HINT_COIN_COST = 15;
+  var HINT_COIN_COST = 5;   // v2.0 新經濟（67 號第二節第 10 項）：舊的 15 金在新經濟前期等於 5 場戰鬥
   var STEPS = [
     { step: 1, kind: 'hint', index: 0, paid: false, label: '小提示' },
     { step: 2, kind: 'source', paid: false, label: '課本哪裡找' },

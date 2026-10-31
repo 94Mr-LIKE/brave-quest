@@ -37,13 +37,13 @@
   /** 等級 L、經驗值 exp 的累計經驗值 */
   function cumulative(level, exp) {
     var n = 0;
-    for (var l = 1; l < level; l++) n += Exp.expToNext(l);
+    for (var l = 1; l < level; l++) n += Exp.oldExpToNext(l);   // v2.0 新經濟：這裡是 v0.9 → v1.0 的換算，照舊表（之後 EconMigrate 再換到新表）
     return n + (Number(exp) || 0);
   }
   /** 累計經驗值 → { lv, exp } */
   function fromCumulative(total) {
     var lv = 1, left = Math.max(0, Math.floor(total));
-    while (left >= Exp.expToNext(lv) && lv < 99) { left -= Exp.expToNext(lv); lv++; }
+    while (left >= Exp.oldExpToNext(lv) && lv < 99) { left -= Exp.oldExpToNext(lv); lv++; }   // v2.0 新經濟：舊表
     return { lv: lv, exp: left };
   }
   /** 第 5 節的換算（舊職業等級 → 新職業 { lv, exp }） */
@@ -62,7 +62,7 @@
     var p = s.player, rec = { from: s.version || 2, job: p.job || 'novice', oldLevel: p.level, newLevel: p.level, robe: null, pendingExp: 0 };
     // 1. 先結算舊存檔的戰鬥經驗值
     var pend = Number(p.pendingExp) || 0;
-    if (pend > 0) { Exp.addExp(p, pend); rec.pendingExp = pend; rec.oldLevel = p.level; }
+    if (pend > 0) { Exp.addExpWith(p, pend, Exp.oldExpToNext); rec.pendingExp = pend; rec.oldLevel = p.level; }   // v2.0 新經濟：舊規則結算（67 號 5.1）
     p.pendingExp = 0;
     var job = OLD_GROWTH[p.job] ? p.job : 'novice';
     p.job = job;

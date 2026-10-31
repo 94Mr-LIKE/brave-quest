@@ -31,6 +31,26 @@
 
   function esc(s) { return window.JQ.Assets.esc(s == null ? '' : s); }
 
+  /*
+   * v1.4.1（v14_畫面審查 缺陷 5「25 金／幣」「藥／草」）：金額和「」裡的短名稱不要在中間換行。所有文字介面都經過 h()，在這裡處理一次：
+   * 符合的片段包成 <jq-nb>（style.css：white-space: nowrap），其他照舊是文字；textContent 和原本一樣。沒有符合的回傳 false（呼叫端照舊放文字）
+   */
+  var NB_RE = /(?:金幣|經驗值)\s?[+＋]\s?\d[\d,]*|\d[\d,]*\s?金幣|\d[\d,]*\s?金(?![\u3400-\u9fff])|「[^「」\n]{1,10}」/g;
+  function nbText(node, s) {
+    s = String(s);
+    NB_RE.lastIndex = 0;
+    if (!NB_RE.test(s)) return false;
+    NB_RE.lastIndex = 0;
+    var i = 0, m;
+    while ((m = NB_RE.exec(s))) {
+      if (m.index > i) node.appendChild(document.createTextNode(s.slice(i, m.index)));
+      var nb = document.createElement('jq-nb'); nb.textContent = m[0]; node.appendChild(nb);
+      i = m.index + m[0].length;
+    }
+    if (i < s.length) node.appendChild(document.createTextNode(s.slice(i)));
+    return true;
+  }
+
   /** h('button.primary', {onclick:fn, 'aria-label':'…'}, ['文字' 或元素…]) */
   function h(sel, attrs, children) {
     var parts = sel.split('.');
@@ -42,13 +62,13 @@
       if (v === undefined || v === null || v === false) return;
       if (k.indexOf('on') === 0 && typeof v === 'function') node.addEventListener(k.slice(2), v);
       else if (k === 'html') node.innerHTML = v;
-      else if (k === 'text') node.textContent = v;
+      else if (k === 'text') { if (!nbText(node, v)) node.textContent = v; }   // v1.4.1（缺陷 5）：金額、「」裡的短名稱不換行
       else if (k === 'style' && typeof v === 'object') Object.assign(node.style, v);
       else node.setAttribute(k, v === true ? '' : v);
     });
     (children || []).forEach(function (c) {
       if (c === null || c === undefined || c === false) return;
-      node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      if (typeof c !== 'string') node.appendChild(c); else if (!nbText(node, c)) node.appendChild(document.createTextNode(c));   // v1.4.1（缺陷 5）
     });
     return node;
   }
@@ -103,6 +123,7 @@
     document.body.classList.toggle('pass-open', stack.some(function (e) { return e.passMove; }));
     // v1.1 畫面品管 4：戰鬥畫面開著（直放時重新排版，見 style.css）
     document.body.classList.toggle('in-battle', stack.some(function (e) { return !!(e.content.querySelector && e.content.querySelector('.battle-ui')); }));
+    if (!anyModal()) flushDeferred();   // v1.4.1：視窗全部關掉，等著的系統提示才出來
   }
 
   function closeAll() { while (stack.length) stack[stack.length - 1].handle.close(true); }
@@ -141,14 +162,36 @@
   function toastMax() { return lowScreen() ? TOAST_MAX_LOW : narrowPortrait() ? TOAST_MAX_PORTRAIT : Infinity; }
   function toastRoom() { return bannerCount === 0 && toasts.children.length < toastMax(); }
   function pumpToasts() { while (toastQueue.length && toastRoom()) { var t = toastQueue.shift(); showToast(t.text, t.ms); } }
-  function toast(text, ms) {
+  /*
+   * v1.4.1 上線後小問題（交接第三節第 8 點「提示泡泡蓋題目」）：opts.defer＝系統提示（例如 G.tick 的「新的一天！」），
+   * 有視窗（題目、戰鬥、對話、面板）開著時先放進 deferred，不放到畫面上、不佔泡泡名額；視窗全部關掉 0.6 秒後才出現（期間又開了視窗就再等）。
+   * 題目裡自己按出來的提示（刪去卡、提示、引導卡）不加 defer，照常馬上顯示。
+   */
+  var deferred = [];
+  function anyModal() { return stack.some(function (e) { return e.modal; }); }
+  function flushDeferred() {
+    if (!deferred.length) return;
+    setTimeout(function () { if (anyModal()) return; deferred.splice(0).forEach(function (t) { toast(t.text, t.ms); }); }, 600);
+  }
+  function toast(text, ms, opts) {
+    if (opts && opts.defer && anyModal()) { deferred.push({ text: text, ms: ms }); return; }
     var item = { text: text, ms: ms };
+    if (/^下一步/.test(String(text))) dropStaleNext();   // v1.4.1（缺陷 4）：舊的「下一步」不再冒出來
     if (!toastRoom() || toastQueue.length) {
       if (/^下一步/.test(String(text))) toastQueue.unshift(item); else toastQueue.push(item);
       pumpToasts();
       return;
     }
     showToast(text, ms);
+  }
+  /*
+   * v1.4.1（v14_畫面審查 缺陷 4「舊的下一步又冒出來」）：視窗開著時，之前的泡泡（.bg）藏著等、大橫幅會把泡泡收回排隊，
+   * 連著做兩個委託時，上一個委託的「下一步」在視窗關掉後又冒出來、和新的疊在一起。「下一步」只留最新的一則：
+   * 新的「下一步」出現時，舊的（畫面上藏著的、排隊中的）丟掉。其他提示照舊。
+   */
+  function dropStaleNext() {
+    for (var i = toastQueue.length - 1; i >= 0; i--) if (/^下一步/.test(String(toastQueue[i].text))) toastQueue.splice(i, 1);
+    Array.prototype.slice.call(toasts.children).forEach(function (n) { if (/^下一步/.test(String(n.textContent)) && n.parentNode) n.parentNode.removeChild(n); });
   }
   function showToast(text, ms) {
     var bg = !stack.some(function (e) { return e.modal; });

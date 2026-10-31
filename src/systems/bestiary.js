@@ -3,11 +3,11 @@
  * state.bestiary = { 怪物id: { seen, defeated } }；state.bestiaryClaims = { 獎勵id: true }；state.titles = [稱號]
  *
  * 收集獎勵（數量依 monsters.js 自動計算：小怪＝boss 以外、頭目＝boss）：
- *   遇見 5 種   → 金幣 50
+ *   遇見 5 種   → 金幣 15
  *   遇見 10 種  → 藥草 ×3
  *   遇見 15 種  → 稱號「怪物觀察家」
  *   遇見全部    → 貼紙「怪物博士」＋稱號「怪物博士」
- *   每種小怪各打倒 3 次 → 金幣 150＋貼紙「勇敢徽章」
+ *   每種小怪各打倒 3 次 → 金幣 40＋貼紙「勇敢徽章」
  *   打倒全部頭目        → 稱號「霧散英雄」＋貼紙「五道光」
  */
 (function () {
@@ -51,11 +51,11 @@
   function rewards(state, monsters, maps) {
     var c = counts(state, monsters, maps);
     var list = [
-      { id: 'seen5', text: '遇見 5 種怪物', have: c.seen, need: Math.min(5, c.total), reward: { gold: 50 } },
+      { id: 'seen5', text: '遇見 5 種怪物', have: c.seen, need: Math.min(5, c.total), reward: { gold: 15 } },
       { id: 'seen10', text: '遇見 10 種怪物', have: c.seen, need: Math.min(10, c.total), reward: { item: 'herb', n: 3 } },
       { id: 'seen15', text: '遇見 15 種怪物', have: c.seen, need: Math.min(15, c.total), reward: { title: '怪物觀察家' } },
       { id: 'seenAll', text: '遇見全部 ' + c.total + ' 種怪物', have: c.seen, need: c.total, reward: { title: '怪物博士', sticker: 'bk_doctor' } },
-      { id: 'mobs3', text: '每種小怪（' + c.mobs + ' 種）都打倒 3 次', have: c.mobsDefeated3, need: c.mobs, reward: { gold: 150, sticker: 'bk_brave' } },
+      { id: 'mobs3', text: '每種小怪（' + c.mobs + ' 種）都打倒 3 次', have: c.mobsDefeated3, need: c.mobs, reward: { gold: 40, sticker: 'bk_brave' } },
       { id: 'bosses', text: '打倒全部 ' + c.bosses + ' 隻頭目', have: c.bossesDefeated, need: c.bosses, reward: { title: '霧散英雄', sticker: 'bk_light' } }
     ];
     var claimed = state.bestiaryClaims || {};

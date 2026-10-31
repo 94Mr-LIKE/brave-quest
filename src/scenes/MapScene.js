@@ -910,8 +910,23 @@
       this.syncDepths();
     }
 
+    /** v2.0（69 號 3.4）maps.js npcs[].show＝{ after, until }：after 完成以後、until 完成以前才出現（石虎寶寶）；沒出現時看不到、不擋路、不能說話、小地圖不畫 */
+    updateNpcShow() {
+      var g = G(), st = g.state, Q = (g.data && g.data.quests) || {}, self = this;
+      (this.npcs || []).forEach(function (n) {
+        var s = n.data.show;
+        if (!s) return;
+        var on = (!s.after || J.QuestLog.status(st, Q, s.after) === 'done') && !(s.until && J.QuestLog.status(st, Q, s.until) === 'done');
+        n.hidden = !on;
+        n.img.setVisible(on && n.inView !== false);
+        (n.tw || []).forEach(function (t) { if (on && n.inView !== false) t.resume(); else t.pause(); });
+        if (self.blocked) { if (on) self.blocked[n.data.x + ',' + n.data.y] = true; else delete self.blocked[n.data.x + ',' + n.data.y]; }
+      });
+    }
+
     refreshMarkers() {
       var g = G();
+      this.updateNpcShow();   // v2.0 石虎寶寶
       this.npcs.forEach(function (n) {
         var m = g.npcMarker(n.data);
         n.markOn = !!m;
@@ -1288,7 +1303,7 @@
     // ---------------------------------------------------------------- 互動
     interactableAt(x, y) {
       var i;
-      for (i = 0; i < this.npcs.length; i++) if (this.npcs[i].data.x === x && this.npcs[i].data.y === y) return { kind: 'npc', npc: this.npcs[i].data };
+      for (i = 0; i < this.npcs.length; i++) if (!this.npcs[i].hidden && this.npcs[i].data.x === x && this.npcs[i].data.y === y) return { kind: 'npc', npc: this.npcs[i].data };
       for (i = 0; i < this.chests.length; i++) if (this.chests[i].data.x === x && this.chests[i].data.y === y) return { kind: 'chest', chest: this.chests[i].data };
       for (i = 0; i < this.lamps.length; i++) if (this.lamps[i].data.x === x && this.lamps[i].data.y === y) return { kind: 'lamp', lamp: this.lamps[i].data };
       if (this.station && this.station.x === x && this.station.y === y) return { kind: 'station', station: this.station };
@@ -1375,7 +1390,7 @@
       this.updateGhost();
 
       this.shrineCamera();
-      if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); this.fadeMinimap(); }
+      if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); this.fadeMinimap(); this.fadeOverlays(); }
       this.wanderMonsters(time);
       if (!g.busy) this.wanderAnimals(time);
       this.syncDepths();
@@ -1404,6 +1419,32 @@
       var hit = !!r.width && px + hw > r.left && px - hw < r.right && py > r.top && py - ht < r.bottom;
       if (hit !== mm.classList.contains('mm-fade')) mm.classList.toggle('mm-fade', hit);
       return hit;
+    }
+
+    /**
+     * v1.4.1 上線後小問題（交接第三節第 8 點）：
+     *  ・北口被 HUD 蓋住：電腦版、手機橫放的 HUD 疊在遊戲畫面上面；走到地圖最上面幾列時鏡頭貼邊，主角被畫在狀態卡或按鈕底下。
+     *  ・地名橫幅蓋住主角：橫幅疊到主角身上（手機橫放最明顯；style.css 已把矮螢幕的橫幅移到主角下方，這裡處理其他情況）。
+     * 和 fadeMinimap 同一套算法（主角腳底往上約 1.6 格、左右各 0.6 格；只算畫布裡看得到的部分），重疊就加 class（style.css：.hud-fade 半透明、.hero-under 變淡），離開就拿掉。
+     * 直放時遊戲畫面在 HUD 下面（畫布上緣＝HUD 下緣），所以 HUD 不會被判成重疊。回傳 { 選擇器: 有沒有重疊 }（測試用）
+     */
+    fadeOverlays() {
+      if (typeof document === 'undefined' || typeof document.querySelectorAll !== 'function' || !this.player || !this.sys || !this.sys.game || !this.sys.game.canvas) return null;
+      var cv = this.sys.game.canvas.getBoundingClientRect(), wv = this.cameras.main.worldView;
+      if (!cv.width || !wv.width || !wv.height) return null;
+      var sx = cv.width / wv.width, sy = cv.height / wv.height;
+      var px = cv.left + (this.player.x - wv.x) * sx, py = cv.top + (this.player.y - wv.y) * sy;
+      var hw = T * 0.6 * sx, top = Math.max(cv.top, py - T * 1.6 * sy), bottom = Math.min(cv.top + cv.height, py), out = {};
+      [['#hud .hud-card', 'hud-fade'], ['#hud .hud-buttons', 'hud-fade'], ['#ui > .map-banner', 'hero-under']].forEach(function (p) {
+        out[p[0]] = false;
+        Array.prototype.forEach.call(document.querySelectorAll(p[0]) || [], function (el) {
+          var r = el.getBoundingClientRect();
+          var hit = !!r.width && bottom > top && px + hw > r.left && px - hw < r.right && bottom > r.top && top < r.bottom;
+          if (hit !== el.classList.contains(p[1])) el.classList.toggle(p[1], hit);
+          if (hit) out[p[0]] = true;
+        });
+      });
+      return out;
     }
 
     syncDepths() {
@@ -1442,7 +1483,7 @@
         var v = inView(n.img.x, n.img.y);
         if (v === n.inView) return;
         n.inView = v;
-        n.img.setVisible(v);
+        n.img.setVisible(v && !n.hidden);   // v2.0：沒出現的 NPC（石虎寶寶）一直藏著
         n.mark.setVisible(v && !!n.markOn);
         (n.tw || []).forEach(function (t) { if (v) t.resume(); else t.pause(); });
       });
@@ -1542,7 +1583,7 @@
         walk: function (x, y) { return self.walkable(x, y); },
         player: { x: this.p.tx, y: this.p.ty },
         // v0.9.5 mark：有委託可以接（'new'）或可以回報（'ready'）→ 小地圖、放大地圖畫「！」（和頭頂的記號同一個判斷 G.npcMarker）
-        npcs: this.npcs.filter(function (n) { return !n.data.virtual; }).map(function (n) { var mk = g.npcMarker(n.data); return { id: n.data.id, name: g.speaker(n.data.id).name, x: n.data.x, y: n.data.y, mark: mk ? (mk === 'ready' || mk === 'proverb' ? mk : 'new') : null }; }),
+        npcs: this.npcs.filter(function (n) { return !n.data.virtual && !n.hidden; }).map(function (n) { var mk = g.npcMarker(n.data); return { id: n.data.id, name: g.speaker(n.data.id).name, x: n.data.x, y: n.data.y, mark: mk ? (mk === 'ready' || mk === 'proverb' ? mk : 'new') : null }; }),
         exits: (this.map.exits || []).map(function (e) { return { x: e.x, y: e.y, to: e.to, name: (g.data.maps[e.to] || {}).name || e.to }; }),
         shops: (this.signs || []).map(function (s) { return { kind: s.spot.kind, text: s.spot.text, x: s.spot.npcX, y: s.spot.npcY }; }),
         station: this.station ? { x: this.station.x, y: this.station.y, name: this.station.name } : null,

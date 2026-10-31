@@ -113,7 +113,7 @@
         id: id, name: m.name || id, sprite: m.sprite || ('mon_' + id), level: Number(m.level || 1),
         hp: Math.max(1, Number(m.hp || 10)), atk: Number(m.atk || 2), subject: m.subject || '數學',
         exp: Number(m.exp || 5), gold: Number(m.gold || 3), drops: Array.isArray(m.drops) ? m.drops : [],
-        boss: !!m.boss, battle_bg: m.battle_bg || null,
+        boss: !!m.boss, final: m.final === true, battle_bg: m.battle_bg || null,   // v2.0：最終頭目旗標（69 號附錄 A4）
         subjects: Array.isArray(m.subjects) && m.subjects.length ? m.subjects : null,
         q_levels: Array.isArray(m.q_levels) && m.q_levels.length === 2 ? m.q_levels : null,
         phases: Number(m.phases || 3), phase_q: Number(m.phase_q || 2), last_q_level: Number(m.last_q_level || 4),
@@ -245,7 +245,7 @@
     return warn;
   }
 
-  function mapCoef(level) { return [1.0, 1.1, 1.2, 1.3, 1.5][Math.max(1, Math.min(5, level | 0)) - 1]; }
+  function mapCoef() { return 1; }   // v2.0 新經濟（67 號第二節第 2 項）：地圖係數取消，一律 1.0（舊表 1.0／1.1／1.2／1.3／1.5；26 號直接用每一區的 E、G）
 
   var World = { EFFECTS: EFFECTS, DAMAGE_EFFECTS: DAMAGE_EFFECTS, TIER_MULT: TIER_MULT, normalizeJobRules: normalizeJobRules, CORE_ITEMS: CORE_ITEMS, CORE_BASE: CORE_BASE, battleBg: battleBg, normalizeShops: normalizeShops, CORE_JOBS: CORE_JOBS, normalizeItems: normalizeItems, normalizeJobs: normalizeJobs, normalizeMonsters: normalizeMonsters, fromWindow: fromWindow, size: size, charAt: charAt, tileDef: tileDef, blockers: blockers, isWalkable: isWalkable, exitAt: exitAt, exitOpen: exitOpen, validate: validate, mapCoef: mapCoef };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.World = World; }

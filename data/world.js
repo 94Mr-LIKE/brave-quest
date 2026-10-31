@@ -54,6 +54,10 @@ window.WORLD = {
     { id: "R_BEITOU", name: "北投・關渡", real_ref: "臺北市北投區（北投溫泉博物館、地熱谷）", map_entry: "M53", tx: 47, ty: 25, x: 0.75, y: 0.05, unlock_quest: null, unlock_visit: "M53" },
     { id: "R_XINYI", name: "信義", real_ref: "臺北市信義區（臺北101、四四南村、象山）", map_entry: "M54", tx: 7, ty: 25, x: 0.78, y: 0.08, unlock_quest: null, unlock_visit: "M54" },
     { id: "R_SHIMEN", name: "石門水庫・大溪", real_ref: "桃園市石門水庫、大溪老街", map_entry: "M15", tx: 25, ty: 33, x: 0.62, y: 0.14, unlock_quest: null, unlock_visit: "M15" },
-    { id: "R_HSINCHU", name: "新竹風城", real_ref: "新竹市（迎曦門、新竹米粉）", map_entry: "M16", tx: 15, ty: 22, x: 0.49, y: 0.14, unlock_quest: null, unlock_visit: "M16" }
+    { id: "R_HSINCHU", name: "新竹風城", real_ref: "新竹市（迎曦門、新竹米粉）", map_entry: "M16", tx: 15, ty: 22, x: 0.49, y: 0.14, unlock_quest: null, unlock_visit: "M16" },
+    { id: "R_MIAOLI", name: "苗栗山城", real_ref: "苗栗縣三義鄉勝興車站、舊山線，大湖草莓", map_entry: "M17", tx: 44, ty: 14, x: 0.391, y: 0.268, unlock_quest: null, unlock_visit: "M17" },
+    { id: "R_DAJIA", name: "大甲藺草鎮", real_ref: "臺中市大甲區（大甲鎮瀾宮、大甲藺）", map_entry: "M18", tx: 11, ty: 31, x: 0.312, y: 0.281, unlock_quest: null, unlock_visit: "M18" },
+    { id: "R_LUKANG", name: "鹿港老街", real_ref: "彰化縣鹿港鎮（鹿港天后宮、老街）", map_entry: "M19", tx: 79, ty: 30, x: 0.216, y: 0.365, unlock_quest: null, unlock_visit: "M19" },
+    { id: "R_BEIGANG", name: "北港媽祖鎮", real_ref: "雲林縣北港鎮（北港朝天宮、武德宮、北港溪）", map_entry: "M20", tx: 35, ty: 24, x: 0.152, y: 0.509, unlock_quest: null, unlock_visit: "M20" }
   ]
 };

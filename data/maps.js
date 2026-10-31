@@ -11,7 +11,7 @@
  *   '.' 地面   ',' 花草/裝飾地面   '=' 路/石板/月台   '%' 淺泥/淺灘/沙   'D' 門   'B' 橋/木棧道   'S' 樓梯   'c' 地毯（以上可走）
  *   'T' 樹/柱   '#' 牆/岩壁/城牆/泥岩脊   '~' 水   'H' 房屋牆   'R' 屋頂   'F' 柵欄   '*' 灌木/岩石   'K' 大型擺設（以上擋路）
  *
- * v0.5 大地圖：M01、M02、M03、M04、M05、M06、M07、M08、M09、M10、M11、M46、M47、M48、M49、M14、M50、M51、M52、M13、M12、M53、M54、M15、M16 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42、M46 84×48、M47 96×57、M48 90×54、M49 84×48、M14 96×57、M50 90×54、M51 96×57、M52 84×48、M13 90×60、M12 96×60、M53 96×57、M54 84×54、M15 90×57、M16 90×54），
+ * v0.5 大地圖：M01、M02、M03、M04、M05、M06、M07、M08、M09、M10、M11、M46、M47、M48、M49、M14、M50、M51、M52、M13、M12、M53、M54、M15、M16、M17、M18、M19、M20 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42、M46 84×48、M47 96×57、M48 90×54、M49 84×48、M14 96×57、M50 90×54、M51 96×57、M52 84×48、M13 90×60、M12 96×60、M53 96×57、M54 84×54、M15 90×57、M16 90×54、M17 90×54、M18 90×54、M19 90×54、M20 96×57），
  *   格子依 GPT 背景逐格重描（來源 tools/bigmaps/<ID>.txt／.json，背景 docs/assets/maps/bg_<ID>.webp）。
  *
  * 地區之間：
@@ -138,17 +138,17 @@ window.MAPS = {
       { subject: "社會", x: 29, y: 45 }
     ],
     chests: [
-      { id: "C_M01_1", x: 20, y: 10, subject: "數學", level: 1, reward: { gold: 20, item: "herb" } },
-      { id: "C_M01_2", x: 3, y: 7, subject: "數學", level: 1, reward: { gold: 20, item: null } },
-      { id: "C_M01_3", x: 8, y: 49, subject: "數學", level: 1, reward: { gold: 20, item: "herb" } },
-      { id: "C_M01_4", x: 77, y: 22, subject: "數學", level: 1, reward: { gold: 25, item: null } },
-      { id: "C_M01_5", x: 94, y: 55, subject: "數學", level: 1, reward: { gold: 25, item: "herb" } },
-      { id: "C_M01_6", x: 41, y: 5, subject: "數學", level: 1, reward: { gold: 30, item: "herb" } }
+      { id: "C_M01_1", x: 20, y: 10, subject: "數學", level: 1, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M01_2", x: 3, y: 7, subject: "數學", level: 1, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M01_3", x: 8, y: 49, subject: "數學", level: 1, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M01_4", x: 77, y: 22, subject: "數學", level: 1, reward: { gold: 1, exp: 0, item: null } },
+      { id: "C_M01_5", x: 94, y: 55, subject: "數學", level: 1, reward: { gold: 1, exp: 0, item: "herb" } },
+      { id: "C_M01_6", x: 41, y: 5, subject: "數學", level: 1, reward: { gold: 1, exp: 0, item: "herb" } }
     ],
     spawns: [
       { monster: "fog_octopus", count: 1, area: [64, 2, 1, 1], boss: true, quest: "Q_MER_4" }
     ],
-    inn: { npc: "innkeeper", price: 5, x: 84, y: 16, name: "金包里溫泉旅館", sign: "溫泉", freeIfBroke: true, dialog_nocoin: "D_INN_FREE", bath: { price: 5, label: "♨️ 泡溫泉" }, dialog_bath: "D_INN_JINBAOLI_BATH" },
+    inn: { npc: "innkeeper", price: 2, x: 84, y: 16, name: "金包里溫泉旅館", sign: "溫泉", freeIfBroke: true, dialog_nocoin: "D_INN_FREE", bath: { price: 1, label: "♨️ 泡溫泉" }, dialog_bath: "D_INN_JINBAOLI_BATH" },
     shop: { shop_id: "general", npc: "shopkeeper", x: 31, y: 33 },
     lights: [
       { x: 34, y: 49, r: 1 },
@@ -254,11 +254,11 @@ window.MAPS = {
       { id: "park_ranger", x: 49, y: 17, sprite: "npc_park_ranger", dialog: "D_RANGER_IDLE", quest: "Q_N1_BUFFALO", quests: ["Q_N1_BUFFALO"] }
     ],
     chests: [
-      { id: "C_M02_1", x: 8, y: 46, subject: "數學", level: 1, reward: { gold: 30, item: null } },
-      { id: "C_M02_2", x: 82, y: 3, subject: "數學", level: 1, reward: { gold: 20, item: "eraser" } },
-      { id: "C_M02_3", x: 27, y: 33, subject: "數學", level: 1, reward: { gold: 25, item: "herb" } },
-      { id: "C_M02_4", x: 11, y: 9, subject: "數學", level: 1, reward: { gold: 30, item: "snack" } },
-      { id: "C_M02_5", x: 84, y: 46, subject: "數學", level: 1, reward: { gold: 40, item: null } }
+      { id: "C_M02_1", x: 8, y: 46, subject: "數學", level: 1, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M02_2", x: 82, y: 3, subject: "數學", level: 1, reward: { gold: 1, exp: 1, item: "eraser" } },
+      { id: "C_M02_3", x: 27, y: 33, subject: "數學", level: 1, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M02_4", x: 11, y: 9, subject: "數學", level: 1, reward: { gold: 1, exp: 0, item: "snack" } },
+      { id: "C_M02_5", x: 84, y: 46, subject: "數學", level: 1, reward: { gold: 1, exp: 0, item: null } }
     ],
     spawns: [
       { monster: "dango", count: 3, area: [20, 2, 22, 14] },
@@ -341,11 +341,11 @@ window.MAPS = {
       { id: "hiker", x: 79, y: 17, sprite: "npc_fisher", dialog: "D_HIKER_IDLE", quest: "Q_YM_1", quests: ["Q_YM_1", "Q_SIDE_STEAM"] }
     ],
     chests: [
-      { id: "C_M03_1", x: 81, y: 6, subject: "數學", level: 2, reward: { gold: 40, item: null } },
-      { id: "C_M03_2", x: 80, y: 41, subject: "數學", level: 2, reward: { gold: 20, item: "guide" } },
-      { id: "C_M03_3", x: 3, y: 5, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } },
-      { id: "C_M03_4", x: 24, y: 10, subject: "數學", level: 2, reward: { gold: 40, item: null } },
-      { id: "C_M03_5", x: 24, y: 44, subject: "數學", level: 2, reward: { gold: 35, item: "eraser" } }
+      { id: "C_M03_1", x: 81, y: 6, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M03_2", x: 80, y: 41, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "guide" } },
+      { id: "C_M03_3", x: 3, y: 5, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M03_4", x: 24, y: 10, subject: "數學", level: 2, reward: { gold: 1, exp: 0, item: null } },
+      { id: "C_M03_5", x: 24, y: 44, subject: "數學", level: 2, reward: { gold: 1, exp: 0, item: "eraser" } }
     ],
     spawns: [
       { monster: "mushroom", count: 3, area: [16, 6, 13, 9] },
@@ -434,11 +434,11 @@ window.MAPS = {
       { id: "elf_kid_lost", x: 76, y: 28, sprite: "npc_elf_kid", dialog: "D_LOST_IDLE", quest: "Q_SIDE_LOST", quests: ["Q_SIDE_LOST"] }
     ],
     chests: [
-      { id: "C_M04_1", x: 28, y: 12, subject: "數學", level: 2, reward: { gold: 50, item: null } },
-      { id: "C_M04_2", x: 2, y: 11, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } },
-      { id: "C_M04_3", x: 53, y: 4, subject: "數學", level: 2, reward: { gold: 40, item: "herb" } },
-      { id: "C_M04_4", x: 86, y: 28, subject: "數學", level: 2, reward: { gold: 45, item: null } },
-      { id: "C_M04_5", x: 85, y: 53, subject: "數學", level: 2, reward: { gold: 35, item: "eraser" } }
+      { id: "C_M04_1", x: 28, y: 12, subject: "數學", level: 2, reward: { gold: 3, exp: 2, item: null } },
+      { id: "C_M04_2", x: 2, y: 11, subject: "數學", level: 2, reward: { gold: 3, exp: 2, item: "herb" } },
+      { id: "C_M04_3", x: 53, y: 4, subject: "數學", level: 2, reward: { gold: 3, exp: 2, item: "herb" } },
+      { id: "C_M04_4", x: 86, y: 28, subject: "數學", level: 2, reward: { gold: 4, exp: 2, item: null } },
+      { id: "C_M04_5", x: 85, y: 53, subject: "數學", level: 2, reward: { gold: 4, exp: 3, item: "eraser" } }
     ],
     spawns: [
       { monster: "mushroom", count: 3, area: [3, 38, 27, 15] },
@@ -448,7 +448,7 @@ window.MAPS = {
       { monster: "mushroom", count: 2, area: [66, 24, 21, 13] },
       { monster: "owl", count: 2, area: [47, 46, 40, 10] }
     ],
-    inn: { npc: null, price: 10, x: 23, y: 9, name: "神木樹屋旅店", sign: "樹屋", dialog: "D_INN_SHENMU", dialog_nocoin: "D_INN_SHENMU_NOCOIN" },
+    inn: { npc: null, price: 4, x: 23, y: 9, name: "神木樹屋旅店", sign: "樹屋", dialog: "D_INN_SHENMU", dialog_nocoin: "D_INN_SHENMU_NOCOIN" },
     shop: null,
     lights: [
       { x: 5, y: 4, r: 1.2 },
@@ -488,7 +488,7 @@ window.MAPS = {
       "T~~~~FBBF~TT~~~~~RRRRRRRTTT~FBBF%%%%%%%%%%%%%%%UTT,,UUU,HHHHHHHHHTTTHHHHHHHHTTTHHHHHHHHTTT",
       "TT~~~FBBFTTT~~~~~RRRRRRRTTT~FBBF%%%%%%%%%%%%%%%UTT,,TTTKHHHHHHHHHTTTHHHHHHHHK,KHHHHHHHHTTT",
       "TT~~~FBBFTTT~~~~~HHHHHHH~~~~FBBF%%%UU%%%%%%%%%%TTT,,TTT,HHHHHHHHH,,,HHHHHHHHK,KHHHHHHHHTTT",
-      "T~~T~FBBF~~~~~~~~TTTKUUT~~~~FBBF%%%UUU%%%%%%%%%%UU,,===================================TTT",
+      "T~~T~FBBF~~~~~~~~TTTKUBT~~~~FBBF%%%UUU%%%%%%%%%%UU,,===================================TTT",
       "T~~TTFBBF~~~~~~~~FFFBBFF~~~~FBBF%%%TTT%%%%FBBF%UUU,,========KKKKKKKK====KUUUU=====UUU==TTT",
       "T~~TTFBBF~~~~~~~~TTFBBF~~~~~FBBF%%%%TT%%%%FBBF%TTT,,,UUU**==KKKKKKKK=KKKK==KKKK===TTT==TTT",
       "T~~TTFBBF~~~~~~~~TTFBBF~~~~~FBBF%%%%%%%%%%FBBF%%T%,,,TTT**==KKKKKKKK=KKKKKKKKKKK==TTTRRRRT",
@@ -550,14 +550,14 @@ window.MAPS = {
       { id: "gnome_measure", x: 19, y: 38, sprite: "npc_gnome", dialog: "D_MEASURE_IDLE", quest: "Q_SIDE_MEASURE", quests: ["Q_SIDE_MEASURE"] }
     ],
     chests: [
-      { id: "C_M05_1", x: 40, y: 3, subject: "數學", level: 3, reward: { gold: 50, item: "herb" } },
-      { id: "C_M05_2", x: 85, y: 47, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M05_3", x: 22, y: 8, subject: "數學", level: 3, reward: { gold: 45, item: "herb" } },
-      { id: "C_M05_4", x: 13, y: 43, subject: "數學", level: 3, reward: { gold: 55, item: null } },
-      { id: "C_M05_5", x: 85, y: 9, subject: "數學", level: 3, reward: { gold: 50, item: "guide" } },
-      { id: "C_M05_6", x: 84, y: 13, subject: "數學", level: 3, reward: { gold: 40, item: "herb" } },
-      { id: "C_M05_7", x: 48, y: 31, subject: "數學", level: 3, reward: { gold: 30, item: "snack" } },
-      { id: "C_M05_8", x: 87, y: 31, subject: "數學", level: 3, reward: { gold: 35, item: null } }
+      { id: "C_M05_1", x: 40, y: 3, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "herb" } },
+      { id: "C_M05_2", x: 85, y: 47, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: null } },
+      { id: "C_M05_3", x: 22, y: 8, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "herb" } },
+      { id: "C_M05_4", x: 13, y: 43, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: null } },
+      { id: "C_M05_5", x: 85, y: 9, subject: "數學", level: 3, reward: { gold: 1, exp: 1, item: "guide" } },
+      { id: "C_M05_6", x: 84, y: 13, subject: "數學", level: 3, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M05_7", x: 48, y: 31, subject: "數學", level: 3, reward: { gold: 1, exp: 2, item: "snack" } },
+      { id: "C_M05_8", x: 87, y: 31, subject: "數學", level: 3, reward: { gold: 1, exp: 2, item: null } }
     ],
     spawns: [
       { monster: "mudslime", count: 3, area: [31, 1, 12, 11] },
@@ -566,7 +566,7 @@ window.MAPS = {
       { monster: "mudslime", count: 2, area: [46, 36, 19, 12] },
       { monster: "fiddler_crab", count: 2, area: [65, 33, 22, 16] }
     ],
-    inn: { npc: null, price: 20, x: 81, y: 9, name: "紅樹林地精旅舍", sign: "旅舍", dialog: "D_INN_MANGROVE", dialog_nocoin: "D_INN_MANGROVE_NOCOIN" },
+    inn: { npc: null, price: 10, x: 81, y: 9, name: "紅樹林地精旅舍", sign: "旅舍", dialog: "D_INN_MANGROVE", dialog_nocoin: "D_INN_MANGROVE_NOCOIN" },
     shop: null,
     lights: [
       { x: 60, y: 5, r: 1.5 },
@@ -632,6 +632,7 @@ window.MAPS = {
     ],
     start: { x: 2, y: 16 },
     station: { x: 4, y: 14, name: "野柳海蝕站", shelter: { x: 5, y: 12 } },
+    no_minimap: true,
     exits: [
       { x: 0, y: 15, to: "M01", tx: 94, ty: 11 },
       { x: 0, y: 16, to: "M01", tx: 94, ty: 12 },
@@ -644,12 +645,12 @@ window.MAPS = {
       { id: "goblin_kid_echo", x: 65, y: 28, sprite: "npc_goblin_kid", dialog: "D_ECHO_IDLE", quest: "Q_SIDE_ECHO", quests: ["Q_SIDE_ECHO"] }
     ],
     chests: [
-      { id: "C_M06_1", x: 68, y: 2, subject: "數學", level: 3, reward: { gold: 40, item: "crystal" } },
-      { id: "C_M06_2", x: 9, y: 40, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M06_3", x: 47, y: 18, subject: "數學", level: 3, reward: { gold: 50, item: "crystal" } },
-      { id: "C_M06_4", x: 35, y: 5, subject: "數學", level: 3, reward: { gold: 40, item: "herb" } },
-      { id: "C_M06_5", x: 80, y: 42, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M06_6", x: 41, y: 33, subject: "數學", level: 2, reward: { gold: 40, item: null } }
+      { id: "C_M06_1", x: 68, y: 2, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "crystal" } },
+      { id: "C_M06_2", x: 9, y: 40, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: null } },
+      { id: "C_M06_3", x: 47, y: 18, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "crystal" } },
+      { id: "C_M06_4", x: 35, y: 5, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "herb" } },
+      { id: "C_M06_5", x: 80, y: 42, subject: "數學", level: 3, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M06_6", x: 41, y: 33, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } }
     ],
     spawns: [
       { monster: "crab", count: 3, area: [3, 4, 37, 15] },
@@ -734,10 +735,10 @@ window.MAPS = {
       { id: "goblin_kid", x: 31, y: 15, sprite: "npc_goblin_kid", dialog: "D_GOBKID_IDLE", quest: "Q_GOB_2", quests: ["Q_GOB_2"] }
     ],
     chests: [
-      { id: "C_M07_1", x: 64, y: 6, subject: "數學", level: 3, reward: { gold: 50, item: "guide" } },
-      { id: "C_M07_2", x: 26, y: 30, subject: "數學", level: 3, reward: { gold: 40, item: "herb" } },
-      { id: "C_M07_3", x: 66, y: 39, subject: "數學", level: 3, reward: { gold: 50, item: null } },
-      { id: "C_M07_4", x: 3, y: 5, subject: "數學", level: 3, reward: { gold: 30, item: "snack" } }
+      { id: "C_M07_1", x: 64, y: 6, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "guide" } },
+      { id: "C_M07_2", x: 26, y: 30, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "herb" } },
+      { id: "C_M07_3", x: 66, y: 39, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: null } },
+      { id: "C_M07_4", x: 3, y: 5, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "snack" } }
     ],
     spawns: [
       { monster: "goblin", count: 3, area: [12, 13, 40, 12] },
@@ -745,7 +746,7 @@ window.MAPS = {
       { monster: "goblin", count: 2, area: [6, 27, 22, 14] },
       { monster: "bat", count: 2, area: [57, 26, 25, 15] }
     ],
-    inn: { npc: null, price: 20, x: 30, y: 12, name: "哥布林石屋客棧", sign: "客棧", dialog: "D_INN_GOBLIN", dialog_nocoin: "D_INN_GOBLIN_NOCOIN" },
+    inn: { npc: null, price: 4, x: 30, y: 12, name: "哥布林石屋客棧", sign: "客棧", dialog: "D_INN_GOBLIN", dialog_nocoin: "D_INN_GOBLIN_NOCOIN" },
     shop: null,
     lights: [
       { x: 3, y: 2, r: 1.2 },
@@ -844,10 +845,10 @@ window.MAPS = {
       { id: "orc_bank", x: 72, y: 32, sprite: "npc_orc", dialog: "D_ORC_BANK_IDLE", quest: "Q_SIDE_PIGGY", quests: ["Q_SIDE_PIGGY"] }
     ],
     chests: [
-      { id: "C_M08_1", x: 3, y: 3, subject: "數學", level: 4, reward: { gold: 60, item: null } },
-      { id: "C_M08_2", x: 86, y: 45, subject: "數學", level: 4, reward: { gold: 40, item: "herb" } },
-      { id: "C_M08_3", x: 13, y: 9, subject: "數學", level: 4, reward: { gold: 50, item: "guide" } },
-      { id: "C_M08_4", x: 66, y: 44, subject: "數學", level: 4, reward: { gold: 40, item: "herb" } }
+      { id: "C_M08_1", x: 3, y: 3, subject: "數學", level: 4, reward: { gold: 12, exp: 10, item: null } },
+      { id: "C_M08_2", x: 86, y: 45, subject: "數學", level: 4, reward: { gold: 12, exp: 10, item: "herb" } },
+      { id: "C_M08_3", x: 13, y: 9, subject: "數學", level: 4, reward: { gold: 12, exp: 10, item: "guide" } },
+      { id: "C_M08_4", x: 66, y: 44, subject: "數學", level: 4, reward: { gold: 11, exp: 10, item: "herb" } }
     ],
     spawns: [
       { monster: "boar", count: 3, area: [28, 37, 30, 10] },
@@ -856,7 +857,7 @@ window.MAPS = {
       { monster: "boar", count: 2, area: [62, 20, 26, 14] },
       { monster: "wisp", count: 2, area: [14, 15, 26, 14] }
     ],
-    inn: { npc: null, price: 30, x: 69, y: 8, name: "月世界帳篷營地", sign: "營帳", dialog: "D_INN_MOON", dialog_nocoin: "D_INN_MOON_NOCOIN" },
+    inn: { npc: null, price: 10, x: 69, y: 8, name: "月世界帳篷營地", sign: "營帳", dialog: "D_INN_MOON", dialog_nocoin: "D_INN_MOON_NOCOIN" },
     shop: null,
     lights: [
       { x: 77, y: 13, r: 1.5 },
@@ -945,20 +946,20 @@ window.MAPS = {
       { id: "taro_seller", x: 67, y: 17, sprite: "npc_uncle_taro", dialog: "D_TARO_IDLE", quest: "Q_SIDE_TARO", quests: ["Q_SIDE_TARO"] }
     ],
     chests: [
-      { id: "C_M09_1", x: 41, y: 1, subject: "數學", level: 2, reward: { gold: 30, item: "snack" } },
-      { id: "C_M09_2", x: 32, y: 48, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } },
-      { id: "C_M09_3", x: 93, y: 43, subject: "數學", level: 2, reward: { gold: 40, item: null } },
-      { id: "C_M09_4", x: 93, y: 8, subject: "數學", level: 2, reward: { gold: 35, item: "snack" } },
-      { id: "C_M09_5", x: 15, y: 7, subject: "數學", level: 2, reward: { gold: 35, item: "snack" } },
-      { id: "C_M09_6", x: 13, y: 32, subject: "數學", level: 2, reward: { gold: 40, item: "herb" } },
-      { id: "C_M09_7", x: 52, y: 42, subject: "數學", level: 2, reward: { gold: 30, item: null } }
+      { id: "C_M09_1", x: 41, y: 1, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "snack" } },
+      { id: "C_M09_2", x: 32, y: 48, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M09_3", x: 93, y: 43, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M09_4", x: 93, y: 8, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "snack" } },
+      { id: "C_M09_5", x: 15, y: 7, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "snack" } },
+      { id: "C_M09_6", x: 13, y: 32, subject: "數學", level: 2, reward: { gold: 2, exp: 1, item: "herb" } },
+      { id: "C_M09_7", x: 52, y: 42, subject: "數學", level: 2, reward: { gold: 2, exp: 1, item: null } }
     ],
     spawns: [
       { monster: "seagull", count: 3, area: [56, 32, 24, 10] },
       { monster: "seagull", count: 2, area: [30, 43, 33, 10] },
       { monster: "mn_cart", count: 2, area: [70, 24, 24, 8] }
     ],
-    inn: { npc: "innkeeper_port", price: 15, x: 6, y: 9, name: "山城民宿", sign: "民宿", dialog_nocoin: "D_INN_PORT_NOCOIN" },
+    inn: { npc: "innkeeper_port", price: 6, x: 6, y: 9, name: "山城民宿", sign: "民宿", dialog_nocoin: "D_INN_PORT_NOCOIN" },
     shop: { shop_id: "item", npc: "item_keeper", x: 33, y: 18 },
     extra_shops: [
       { x: 6, y: 19, shop_id: "weapon", npc: "blacksmith" },
@@ -1097,20 +1098,20 @@ window.MAPS = {
       { id: "librarian", x: 75, y: 12, sprite: "npc_librarian", dialog: "D_LIBRARIAN_IDLE", quest: "Q_SIDE_LIB", quests: ["Q_SIDE_LIB"] }
     ],
     chests: [
-      { id: "C_M10_1", x: 1, y: 42, subject: "數學", level: 4, reward: { gold: 60, item: "guide" } },
-      { id: "C_M10_2", x: 67, y: 40, subject: "數學", level: 4, reward: { gold: 50, item: "herb" } },
-      { id: "C_M10_3", x: 82, y: 40, subject: "數學", level: 4, reward: { gold: 60, item: null } },
-      { id: "C_M10_4", x: 46, y: 47, subject: "數學", level: 4, reward: { gold: 45, item: "guide" } },
-      { id: "C_M10_5", x: 61, y: 28, subject: "數學", level: 4, reward: { gold: 30, item: "snack" } },
-      { id: "C_M10_6", x: 33, y: 6, subject: "數學", level: 4, reward: { gold: 40, item: null } },
-      { id: "C_M10_7", x: 51, y: 40, subject: "數學", level: 4, reward: { gold: 35, item: "herb" } }
+      { id: "C_M10_1", x: 1, y: 42, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "guide" } },
+      { id: "C_M10_2", x: 67, y: 40, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "herb" } },
+      { id: "C_M10_3", x: 82, y: 40, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: null } },
+      { id: "C_M10_4", x: 46, y: 47, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "guide" } },
+      { id: "C_M10_5", x: 61, y: 28, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "snack" } },
+      { id: "C_M10_6", x: 33, y: 6, subject: "數學", level: 4, reward: { gold: 9, exp: 9, item: null } },
+      { id: "C_M10_7", x: 51, y: 40, subject: "數學", level: 4, reward: { gold: 9, exp: 10, item: "herb" } }
     ],
     spawns: [
       { monster: "armor", count: 3, area: [45, 28, 30, 13] },
       { monster: "wisp", count: 2, area: [72, 17, 11, 24] },
       { monster: "wisp", count: 1, area: [57, 3, 24, 15] }
     ],
-    inn: { npc: null, price: 35, x: 53, y: 29, name: "府城老客棧", sign: "客棧", dialog: "D_INN_FUCHENG", dialog_nocoin: "D_INN_FUCHENG_NOCOIN" },
+    inn: { npc: null, price: 12, x: 53, y: 29, name: "府城老客棧", sign: "客棧", dialog: "D_INN_FUCHENG", dialog_nocoin: "D_INN_FUCHENG_NOCOIN" },
     shop: null,
     lights: [
       { x: 34, y: 3, r: 1.2 },
@@ -1202,9 +1203,9 @@ window.MAPS = {
     ],
     npcs: [],
     chests: [
-      { id: "C_M11_1", x: 8, y: 40, subject: "數學", level: 4, reward: { gold: 60, item: "herb" } },
-      { id: "C_M11_2", x: 65, y: 29, subject: "數學", level: 4, reward: { gold: 60, item: "guide" } },
-      { id: "C_M11_3", x: 6, y: 20, subject: "數學", level: 4, reward: { gold: 50, item: "herb" } }
+      { id: "C_M11_1", x: 8, y: 40, subject: "數學", level: 4, reward: { gold: 23, exp: 21, item: "herb" } },
+      { id: "C_M11_2", x: 65, y: 29, subject: "數學", level: 4, reward: { gold: 23, exp: 21, item: "guide" } },
+      { id: "C_M11_3", x: 6, y: 20, subject: "數學", level: 4, reward: { gold: 22, exp: 22, item: "herb" } }
     ],
     spawns: [
       { monster: "wisp", count: 2, area: [8, 24, 26, 11] },
@@ -1345,11 +1346,11 @@ window.MAPS = {
       { id: "rice_guide", x: 74, y: 19, sprite: "npc_rice_guide", dialog: "D_RICEGUIDE_IDLE", quest: "Q_ZZH_2", quests: ["Q_ZZH_2"] }
     ],
     chests: [
-      { id: "C_M46_1", x: 5, y: 6, subject: "數學", level: 2, reward: { gold: 40, item: null } },
-      { id: "C_M46_2", x: 79, y: 8, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } },
-      { id: "C_M46_3", x: 32, y: 41, subject: "數學", level: 2, reward: { gold: 50, item: null } },
-      { id: "C_M46_4", x: 79, y: 15, subject: "數學", level: 2, reward: { gold: 30, item: "eraser" } },
-      { id: "C_M46_5", x: 74, y: 40, subject: "數學", level: 2, reward: { gold: 40, item: "guide" } }
+      { id: "C_M46_1", x: 5, y: 6, subject: "數學", level: 2, reward: { gold: 2, exp: 1, item: null } },
+      { id: "C_M46_2", x: 79, y: 8, subject: "數學", level: 2, reward: { gold: 2, exp: 1, item: "herb" } },
+      { id: "C_M46_3", x: 32, y: 41, subject: "數學", level: 2, reward: { gold: 2, exp: 1, item: null } },
+      { id: "C_M46_4", x: 79, y: 15, subject: "數學", level: 2, reward: { gold: 2, exp: 1, item: "eraser" } },
+      { id: "C_M46_5", x: 74, y: 40, subject: "數學", level: 2, reward: { gold: 2, exp: 2, item: "guide" } }
     ],
     spawns: [
       { monster: "mushroom", count: 3, area: [3, 13, 6, 30] },
@@ -1444,14 +1445,14 @@ window.MAPS = {
       { id: "stall_keeper", x: 40, y: 36, sprite: "npc_keelung_vendor", dialog: "D_SHOP_KEELUNG_IDLE", quest: "Q_KL_2", quests: ["Q_KL_2"] }
     ],
     chests: [
-      { id: "C_M47_1", x: 20, y: 4, subject: "數學", level: 2, reward: { gold: 40, item: null } },
-      { id: "C_M47_2", x: 68, y: 4, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } },
-      { id: "C_M47_3", x: 92, y: 4, subject: "數學", level: 2, reward: { gold: 50, item: null } },
-      { id: "C_M47_4", x: 29, y: 47, subject: "數學", level: 2, reward: { gold: 40, item: "snack" } },
-      { id: "C_M47_5", x: 92, y: 12, subject: "數學", level: 2, reward: { gold: 30, item: "eraser" } },
-      { id: "C_M47_6", x: 63, y: 48, subject: "數學", level: 2, reward: { gold: 50, item: null } },
-      { id: "C_M47_7", x: 51, y: 19, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } },
-      { id: "C_M47_8", x: 43, y: 33, subject: "數學", level: 2, reward: { gold: 40, item: null } }
+      { id: "C_M47_1", x: 20, y: 4, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M47_2", x: 68, y: 4, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M47_3", x: 92, y: 4, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M47_4", x: 29, y: 47, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "snack" } },
+      { id: "C_M47_5", x: 92, y: 12, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "eraser" } },
+      { id: "C_M47_6", x: 63, y: 48, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M47_7", x: 51, y: 19, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M47_8", x: 43, y: 33, subject: "數學", level: 2, reward: { gold: 2, exp: 0, item: null } }
     ],
     spawns: [
       { monster: "wx_rain", count: 3, area: [19, 19, 46, 6] },
@@ -1459,7 +1460,7 @@ window.MAPS = {
       { monster: "crab", count: 2, area: [70, 1, 24, 6] },
       { monster: "wx_rain", count: 2, area: [74, 10, 20, 6] }
     ],
-    inn: { x: 54, y: 34, npc: null, price: 10, name: "港邊旅店", sign: "旅店", dialog: "D_INN_KEELUNG", dialog_nocoin: "D_INN_KEELUNG_NOCOIN" },
+    inn: { x: 54, y: 34, npc: null, price: 6, name: "港邊旅店", sign: "旅店", dialog: "D_INN_KEELUNG", dialog_nocoin: "D_INN_KEELUNG_NOCOIN" },
     shop: { x: 40, y: 36, shop_id: "item_keelung", npc: "stall_keeper" },
     lights: [
       { x: 33, y: 31, r: 1 },
@@ -1550,14 +1551,14 @@ window.MAPS = {
       { id: "museum_guide", x: 47, y: 9, sprite: "npc_museum_guide", dialog: "D_MUSEUM_IDLE", quest: "Q_JGS_2", quests: ["Q_JGS_2"] }
     ],
     chests: [
-      { id: "C_M48_1", x: 7, y: 2, subject: "數學", level: 2, reward: { gold: 40, item: null } },
-      { id: "C_M48_2", x: 59, y: 9, subject: "數學", level: 2, reward: { gold: 50, item: null } },
-      { id: "C_M48_3", x: 27, y: 50, subject: "數學", level: 2, reward: { gold: 30, item: "herb" } },
-      { id: "C_M48_4", x: 3, y: 45, subject: "數學", level: 2, reward: { gold: 40, item: "guide" } },
-      { id: "C_M48_5", x: 75, y: 29, subject: "數學", level: 3, reward: { gold: 60, item: "crystal" } },
-      { id: "C_M48_6", x: 87, y: 39, subject: "數學", level: 3, reward: { gold: 60, item: "herb" } },
-      { id: "C_M48_7", x: 20, y: 4, subject: "數學", level: 2, reward: { gold: 30, item: "snack" } },
-      { id: "C_M48_8", x: 29, y: 4, subject: "數學", level: 2, reward: { gold: 35, item: "herb" } }
+      { id: "C_M48_1", x: 7, y: 2, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M48_2", x: 59, y: 9, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: null } },
+      { id: "C_M48_3", x: 27, y: 50, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M48_4", x: 3, y: 45, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "guide" } },
+      { id: "C_M48_5", x: 75, y: 29, subject: "數學", level: 3, reward: { gold: 1, exp: 1, item: "crystal" } },
+      { id: "C_M48_6", x: 87, y: 39, subject: "數學", level: 3, reward: { gold: 1, exp: 1, item: "herb" } },
+      { id: "C_M48_7", x: 20, y: 4, subject: "數學", level: 2, reward: { gold: 1, exp: 1, item: "snack" } },
+      { id: "C_M48_8", x: 29, y: 4, subject: "數學", level: 2, reward: { gold: 2, exp: 0, item: "herb" } }
     ],
     spawns: [
       { monster: "mn_cart", count: 3, area: [2, 33, 24, 10] },
@@ -1568,7 +1569,7 @@ window.MAPS = {
       { monster: "mn_timber", count: 2, area: [64, 36, 24, 6] },
       { monster: "mnb_goldjaw", count: 1, area: [84, 5, 1, 1], boss: true, quest: "Q_JGS_3" }
     ],
-    inn: { x: 14, y: 9, npc: null, price: 15, name: "礦山宿舍旅店", sign: "宿舍", dialog: "D_INN_JINGUASHI", dialog_nocoin: "D_INN_JINGUASHI_NOCOIN" },
+    inn: { x: 14, y: 9, npc: null, price: 6, name: "礦山宿舍旅店", sign: "宿舍", dialog: "D_INN_JINGUASHI", dialog_nocoin: "D_INN_JINGUASHI_NOCOIN" },
     shop: null,
     lights: [
       { x: 85, y: 3, r: 1.2 },
@@ -1663,10 +1664,10 @@ window.MAPS = {
       { id: "trail_volunteer", x: 33, y: 11, sprite: "npc_trail_volunteer", dialog: "D_VOLUNTEER_IDLE", quest: "Q_CL_1", quests: ["Q_CL_1"] }
     ],
     chests: [
-      { id: "C_M49_1", x: 15, y: 20, subject: "數學", level: 3, reward: { gold: 50, item: null } },
-      { id: "C_M49_2", x: 52, y: 6, subject: "數學", level: 3, reward: { gold: 40, item: "herb" } },
-      { id: "C_M49_3", x: 50, y: 30, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M49_4", x: 81, y: 31, subject: "數學", level: 3, reward: { gold: 40, item: "guide" } }
+      { id: "C_M49_1", x: 15, y: 20, subject: "數學", level: 3, reward: { gold: 4, exp: 3, item: null } },
+      { id: "C_M49_2", x: 52, y: 6, subject: "數學", level: 3, reward: { gold: 4, exp: 3, item: "herb" } },
+      { id: "C_M49_3", x: 50, y: 30, subject: "數學", level: 3, reward: { gold: 3, exp: 3, item: null } },
+      { id: "C_M49_4", x: 81, y: 31, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "guide" } }
     ],
     spawns: [
       { monster: "mn_dust", count: 2, area: [0, 13, 30, 8] },
@@ -1765,19 +1766,19 @@ window.MAPS = {
       { id: "stall_yilan", x: 30, y: 10, sprite: "npc_yilan_vendor", dialog: "D_SHOP_YILAN_IDLE" }
     ],
     chests: [
-      { id: "C_M14_1", x: 43, y: 2, subject: "數學", level: 3, reward: { gold: 50, item: null } },
-      { id: "C_M14_2", x: 74, y: 3, subject: "數學", level: 3, reward: { gold: 40, item: "herb" } },
-      { id: "C_M14_3", x: 45, y: 18, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M14_4", x: 34, y: 32, subject: "數學", level: 3, reward: { gold: 50, item: "snack" } },
-      { id: "C_M14_5", x: 5, y: 51, subject: "數學", level: 3, reward: { gold: 40, item: "eraser" } },
-      { id: "C_M14_6", x: 74, y: 50, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M14_1", x: 43, y: 2, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M14_2", x: 74, y: 3, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "herb" } },
+      { id: "C_M14_3", x: 45, y: 18, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M14_4", x: 34, y: 32, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "snack" } },
+      { id: "C_M14_5", x: 5, y: 51, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "eraser" } },
+      { id: "C_M14_6", x: 74, y: 50, subject: "數學", level: 3, reward: { gold: 3, exp: 1, item: null } }
     ],
     spawns: [
       { monster: "ly_kumquat", count: 3, area: [48, 20, 27, 7] },
       { monster: "ly_tigerwind", count: 2, area: [3, 19, 38, 8] },
       { monster: "ly_kumquat", count: 2, area: [49, 30, 25, 9] }
     ],
-    inn: { x: 25, y: 39, npc: null, price: 15, bath: { price: 10, label: "♨️ 泡溫泉" }, name: "礁溪溫泉旅館", sign: "溫泉", dialog: "D_INN_JIAOXI", dialog_nocoin: "D_INN_JIAOXI_NOCOIN", dialog_bath: "D_INN_JIAOXI_BATH" },
+    inn: { x: 25, y: 39, npc: null, price: 8, bath: { price: 4, label: "♨️ 泡溫泉" }, name: "礁溪溫泉旅館", sign: "溫泉", dialog: "D_INN_JIAOXI", dialog_nocoin: "D_INN_JIAOXI_NOCOIN", dialog_bath: "D_INN_JIAOXI_BATH" },
     shop: { x: 30, y: 10, shop_id: "item_yilan", npc: "stall_yilan" }
   },
 
@@ -1860,18 +1861,18 @@ window.MAPS = {
       { id: "opera_actor", x: 31, y: 34, sprite: "npc_opera_actor", dialog: "D_OPERA_IDLE", quest: "Q_YL_OPERA", quests: ["Q_YL_OPERA"] }
     ],
     chests: [
-      { id: "C_M50_1", x: 3, y: 4, subject: "數學", level: 3, reward: { gold: 50, item: null } },
-      { id: "C_M50_2", x: 86, y: 8, subject: "數學", level: 3, reward: { gold: 40, item: "herb" } },
-      { id: "C_M50_3", x: 37, y: 36, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M50_4", x: 64, y: 36, subject: "數學", level: 3, reward: { gold: 40, item: "guide" } },
-      { id: "C_M50_5", x: 2, y: 37, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M50_1", x: 3, y: 4, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: null } },
+      { id: "C_M50_2", x: 86, y: 8, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "herb" } },
+      { id: "C_M50_3", x: 37, y: 36, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: null } },
+      { id: "C_M50_4", x: 64, y: 36, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "guide" } },
+      { id: "C_M50_5", x: 2, y: 37, subject: "數學", level: 3, reward: { gold: 2, exp: 3, item: null } }
     ],
     spawns: [
       { monster: "ly_scallion", count: 3, area: [46, 22, 19, 15] },
       { monster: "ly_kumquat", count: 2, area: [65, 4, 21, 15] },
       { monster: "ly_scallion", count: 2, area: [62, 34, 24, 7] }
     ],
-    inn: { x: 32, y: 12, npc: null, price: 15, name: "三星農村民宿", sign: "民宿", dialog: "D_INN_SANXING", dialog_nocoin: "D_INN_SANXING_NOCOIN" },
+    inn: { x: 32, y: 12, npc: null, price: 8, name: "三星農村民宿", sign: "民宿", dialog: "D_INN_SANXING", dialog_nocoin: "D_INN_SANXING_NOCOIN" },
     shop: null
   },
 
@@ -1955,12 +1956,12 @@ window.MAPS = {
       { id: "sa_fisher", x: 26, y: 36, sprite: "npc_sa_fisher", dialog: "D_SAFISHER_IDLE", quest: "Q_YL_5", quests: ["Q_YL_5", "Q_YL_FISH"] }
     ],
     chests: [
-      { id: "C_M51_1", x: 8, y: 9, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M51_2", x: 35, y: 20, subject: "數學", level: 3, reward: { gold: 50, item: "herb" } },
-      { id: "C_M51_3", x: 89, y: 12, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M51_4", x: 16, y: 53, subject: "數學", level: 3, reward: { gold: 50, item: "snack" } },
-      { id: "C_M51_5", x: 60, y: 47, subject: "數學", level: 3, reward: { gold: 60, item: "eraser" } },
-      { id: "C_M51_6", x: 41, y: 47, subject: "數學", level: 3, reward: { gold: 60, item: "herb" } }
+      { id: "C_M51_1", x: 8, y: 9, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M51_2", x: 35, y: 20, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "herb" } },
+      { id: "C_M51_3", x: 89, y: 12, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M51_4", x: 16, y: 53, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "snack" } },
+      { id: "C_M51_5", x: 60, y: 47, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "eraser" } },
+      { id: "C_M51_6", x: 41, y: 47, subject: "數學", level: 3, reward: { gold: 3, exp: 1, item: "herb" } }
     ],
     spawns: [
       { monster: "ly_bubble", count: 3, area: [44, 13, 17, 10] },
@@ -1968,7 +1969,7 @@ window.MAPS = {
       { monster: "ly_bubble", count: 2, area: [2, 26, 37, 8] },
       { monster: "wxb_raincloud", count: 1, area: [88, 49, 1, 1], boss: true, quest: "Q_YL_5" }
     ],
-    inn: { x: 52, y: 10, npc: null, price: 15, bath: { price: 10, label: "♨️ 泡冷泉" }, name: "蘇澳冷泉旅店", sign: "冷泉", dialog: "D_INN_SUAO", dialog_nocoin: "D_INN_SUAO_NOCOIN", dialog_bath: "D_INN_SUAO_BATH" },
+    inn: { x: 52, y: 10, npc: null, price: 8, bath: { price: 4, label: "♨️ 泡冷泉" }, name: "蘇澳冷泉旅店", sign: "冷泉", dialog: "D_INN_SUAO", dialog_nocoin: "D_INN_SUAO_NOCOIN", dialog_bath: "D_INN_SUAO_BATH" },
     shop: null
   },
 
@@ -2045,11 +2046,11 @@ window.MAPS = {
       { id: "tea_farmer", x: 19, y: 41, sprite: "npc_tea_farmer", dialog: "D_TEAFARMER_IDLE", quest: "Q_PL_1", quests: ["Q_PL_1", "Q_PL_2"] }
     ],
     chests: [
-      { id: "C_M52_1", x: 4, y: 7, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M52_2", x: 41, y: 5, subject: "數學", level: 3, reward: { gold: 50, item: "herb" } },
-      { id: "C_M52_3", x: 79, y: 7, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M52_4", x: 6, y: 33, subject: "數學", level: 3, reward: { gold: 50, item: "guide" } },
-      { id: "C_M52_5", x: 79, y: 39, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M52_1", x: 4, y: 7, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M52_2", x: 41, y: 5, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "herb" } },
+      { id: "C_M52_3", x: 79, y: 7, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M52_4", x: 6, y: 33, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "guide" } },
+      { id: "C_M52_5", x: 79, y: 39, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: null } }
     ],
     spawns: [
       { monster: "tea_mantis", count: 3, area: [33, 36, 46, 7] },
@@ -2147,12 +2148,12 @@ window.MAPS = {
       { id: "tea_farmer_mk", x: 64, y: 37, sprite: "npc_tea_farmer_mk", dialog: "D_TEAFARMER_MK_IDLE", quest: "Q_MK_2", quests: ["Q_MK_2"] }
     ],
     chests: [
-      { id: "C_M13_1", x: 25, y: 6, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M13_2", x: 42, y: 6, subject: "數學", level: 3, reward: { gold: 50, item: "herb" } },
-      { id: "C_M13_3", x: 85, y: 24, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M13_4", x: 4, y: 44, subject: "數學", level: 3, reward: { gold: 50, item: "snack" } },
-      { id: "C_M13_5", x: 50, y: 25, subject: "數學", level: 3, reward: { gold: 60, item: "eraser" } },
-      { id: "C_M13_6", x: 86, y: 46, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M13_1", x: 25, y: 6, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M13_2", x: 42, y: 6, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "herb" } },
+      { id: "C_M13_3", x: 85, y: 24, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M13_4", x: 4, y: 44, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "snack" } },
+      { id: "C_M13_5", x: 50, y: 25, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "eraser" } },
+      { id: "C_M13_6", x: 86, y: 46, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: null } }
     ],
     spawns: [
       { monster: "an_magpie", count: 3, area: [46, 29, 17, 15] },
@@ -2160,7 +2161,7 @@ window.MAPS = {
       { monster: "mc_alarm", count: 3, area: [65, 29, 20, 15] },
       { monster: "mc_roaster", count: 2, area: [26, 29, 17, 15] }
     ],
-    inn: { x: 17, y: 37, npc: null, price: 20, name: "貓空茶館", sign: "茶館", dialog: "D_INN_MAOKONG", dialog_nocoin: "D_INN_MAOKONG_NOCOIN" },
+    inn: { x: 17, y: 37, npc: null, price: 10, name: "貓空茶館", sign: "茶館", dialog: "D_INN_MAOKONG", dialog_nocoin: "D_INN_MAOKONG_NOCOIN" },
     shop: null
   },
 
@@ -2248,7 +2249,7 @@ window.MAPS = {
       { x: 95, y: 30, to: "M54", tx: 1, ty: 25 },
       { x: 95, y: 31, to: "M54", tx: 1, ty: 26 },
       { x: 0, y: 30, to: "M15", tx: 88, ty: 28, requires: "Q_LAMPS_MATH", requires_dialog: "D_EXIT_LOCK_CH3" },
-      { x: 0, y: 31, to: "M15", tx: 88, ty: 29, requires: "Q_LAMPS_MATH", requires_dialog: "D_EXIT_LOCK_CH3" }
+      { x: 0, y: 31, to: "M15", tx: 88, ty: 28, requires: "Q_LAMPS_MATH", requires_dialog: "D_EXIT_LOCK_CH3" }
     ],
     npcs: [
       { id: "temple_volunteer_ht", x: 71, y: 13, sprite: "npc_temple_volunteer_ht", dialog: "D_TEMPLE_HT_INTRO", quest: null, quests: [] },
@@ -2260,15 +2261,15 @@ window.MAPS = {
       { id: "item_taipei", x: 82, y: 28, sprite: "npc_uncle_market", dialog: "D_ITEM_TAIPEI_IDLE", quest: null, quests: [] }
     ],
     chests: [
-      { id: "C_M12_1", x: 8, y: 4, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M12_2", x: 90, y: 4, subject: "數學", level: 3, reward: { gold: 50, item: "herb" } },
-      { id: "C_M12_3", x: 44, y: 21, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M12_4", x: 8, y: 55, subject: "數學", level: 3, reward: { gold: 60, item: "guide" } },
-      { id: "C_M12_5", x: 92, y: 47, subject: "數學", level: 3, reward: { gold: 50, item: "eraser" } },
-      { id: "C_M12_6", x: 77, y: 56, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M12_1", x: 8, y: 4, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M12_2", x: 90, y: 4, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "herb" } },
+      { id: "C_M12_3", x: 44, y: 21, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M12_4", x: 8, y: 55, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "guide" } },
+      { id: "C_M12_5", x: 92, y: 47, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "eraser" } },
+      { id: "C_M12_6", x: 77, y: 56, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: null } }
     ],
     spawns: [],
-    inn: { x: 29, y: 29, npc: null, price: 20, name: "台北城市旅館", sign: "旅館", dialog: "D_INN_TAIPEI", dialog_nocoin: "D_INN_TAIPEI_NOCOIN" },
+    inn: { x: 29, y: 29, npc: null, price: 10, name: "台北城市旅館", sign: "旅館", dialog: "D_INN_TAIPEI", dialog_nocoin: "D_INN_TAIPEI_NOCOIN" },
     shop: { x: 82, y: 28, shop_id: "item_taipei", npc: "item_taipei" },
     extra_shops: [
       { x: 59, y: 28, shop_id: "weapon_taipei", npc: "smith_taipei" },
@@ -2361,19 +2362,19 @@ window.MAPS = {
       { id: "geo_ranger", x: 57, y: 15, sprite: "npc_geo_ranger", dialog: "D_GEORANGER_IDLE", quest: "Q_BT_2", quests: ["Q_BT_2"] }
     ],
     chests: [
-      { id: "C_M53_1", x: 22, y: 4, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M53_2", x: 82, y: 24, subject: "數學", level: 3, reward: { gold: 60, item: "herb" } },
-      { id: "C_M53_3", x: 46, y: 29, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M53_4", x: 92, y: 38, subject: "數學", level: 3, reward: { gold: 60, item: "snack" } },
-      { id: "C_M53_5", x: 2, y: 41, subject: "數學", level: 3, reward: { gold: 60, item: "guide" } },
-      { id: "C_M53_6", x: 92, y: 46, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M53_1", x: 22, y: 4, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M53_2", x: 82, y: 24, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "herb" } },
+      { id: "C_M53_3", x: 46, y: 30, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M53_4", x: 92, y: 38, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "snack" } },
+      { id: "C_M53_5", x: 2, y: 41, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: "guide" } },
+      { id: "C_M53_6", x: 88, y: 45, subject: "數學", level: 3, reward: { gold: 2, exp: 1, item: null } }
     ],
     spawns: [
       { monster: "gt_steam", count: 3, area: [57, 7, 26, 18] },
       { monster: "gt_jade", count: 2, area: [16, 29, 30, 9] },
       { monster: "gt_steam", count: 2, area: [2, 39, 44, 6] }
     ],
-    inn: { x: 56, y: 36, npc: null, price: 20, bath: { price: 10, label: "♨️ 泡溫泉" }, name: "北投溫泉旅館", sign: "溫泉", dialog: "D_INN_BEITOU", dialog_nocoin: "D_INN_BEITOU_NOCOIN", dialog_bath: "D_INN_BEITOU_BATH" },
+    inn: { x: 56, y: 36, npc: null, price: 10, bath: { price: 5, label: "♨️ 泡溫泉" }, name: "北投溫泉旅館", sign: "溫泉", dialog: "D_INN_BEITOU", dialog_nocoin: "D_INN_BEITOU_NOCOIN", dialog_bath: "D_INN_BEITOU_BATH" },
     shop: null
   },
 
@@ -2455,17 +2456,17 @@ window.MAPS = {
       { id: "village_guide", x: 13, y: 10, sprite: "npc_village_guide", dialog: "D_VILLAGE_IDLE", quest: "Q_XY_2", quests: ["Q_XY_2"] }
     ],
     chests: [
-      { id: "C_M54_1", x: 3, y: 10, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M54_2", x: 77, y: 14, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M54_3", x: 79, y: 22, subject: "數學", level: 3, reward: { gold: 50, item: "herb" } },
-      { id: "C_M54_4", x: 4, y: 46, subject: "數學", level: 3, reward: { gold: 60, item: "guide" } },
-      { id: "C_M54_5", x: 61, y: 35, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M54_1", x: 3, y: 10, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M54_2", x: 77, y: 14, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: null } },
+      { id: "C_M54_3", x: 79, y: 22, subject: "數學", level: 3, reward: { gold: 2, exp: 2, item: "herb" } },
+      { id: "C_M54_4", x: 4, y: 46, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: "guide" } },
+      { id: "C_M54_5", x: 61, y: 35, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: null } }
     ],
     spawns: [
       { monster: "mc_signal", count: 3, area: [41, 26, 15, 13] },
       { monster: "mc_vending", count: 2, area: [58, 30, 15, 12] }
     ],
-    inn: { x: 22, y: 49, npc: null, price: 20, name: "信義城市旅館", sign: "旅館", dialog: "D_INN_XINYI", dialog_nocoin: "D_INN_XINYI_NOCOIN" },
+    inn: { x: 22, y: 49, npc: null, price: 10, name: "信義城市旅館", sign: "旅館", dialog: "D_INN_XINYI", dialog_nocoin: "D_INN_XINYI_NOCOIN" },
     shop: null
   },
 
@@ -2545,7 +2546,7 @@ window.MAPS = {
       { x: 89, y: 28, to: "M12", tx: 1, ty: 30 },
       { x: 89, y: 29, to: "M12", tx: 1, ty: 31 },
       { x: 0, y: 44, to: "M16", tx: 88, ty: 19 },
-      { x: 0, y: 45, to: "M16", tx: 88, ty: 20 }
+      { x: 0, y: 45, to: "M16", tx: 88, ty: 19 }
     ],
     npcs: [
       { id: "reservoir_keeper", x: 36, y: 32, sprite: "npc_reservoir_keeper", dialog: "D_RESERVOIR_IDLE", quest: "Q_TY_1", quests: ["Q_TY_1", "Q_TY_2", "Q_TY_5"] },
@@ -2553,21 +2554,21 @@ window.MAPS = {
       { id: "wood_artisan", x: 60, y: 48, sprite: "npc_wood_artisan", dialog: "D_WOOD_IDLE", quest: "Q_TY_4", quests: ["Q_TY_4"] }
     ],
     chests: [
-      { id: "C_M15_1", x: 6, y: 4, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M15_2", x: 62, y: 28, subject: "數學", level: 3, reward: { gold: 60, item: "herb" } },
-      { id: "C_M15_3", x: 40, y: 50, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M15_4", x: 2, y: 46, subject: "數學", level: 3, reward: { gold: 60, item: "guide" } },
-      { id: "C_M15_5", x: 67, y: 49, subject: "數學", level: 3, reward: { gold: 60, item: "eraser" } },
-      { id: "C_M15_6", x: 88, y: 37, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M15_1", x: 6, y: 4, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: null } },
+      { id: "C_M15_2", x: 62, y: 28, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: "herb" } },
+      { id: "C_M15_3", x: 40, y: 50, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: null } },
+      { id: "C_M15_4", x: 5, y: 46, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: "guide" } },
+      { id: "C_M15_5", x: 67, y: 49, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "eraser" } },
+      { id: "C_M15_6", x: 88, y: 37, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: null } }
     ],
     spawns: [
-      { monster: "ty_tofu", count: 3, area: [32, 29, 14, 9] },
+      { monster: "ty_tofu", count: 3, area: [44, 33, 13, 6] },
       { monster: "ty_carve", count: 2, area: [44, 43, 16, 8] },
       { monster: "wx_thunder", count: 3, area: [3, 3, 6, 19] },
       { monster: "ty_tofu", count: 2, area: [8, 46, 20, 7] },
       { monster: "mb_floodgate", count: 1, area: [40, 22, 1, 1], boss: true, quest: "Q_TY_5" }
     ],
-    inn: { x: 80, y: 36, npc: null, price: 25, name: "大溪老街旅店", sign: "旅店", dialog: "D_INN_DAXI", dialog_nocoin: "D_INN_DAXI_NOCOIN" },
+    inn: { x: 80, y: 36, npc: null, price: 12, name: "大溪老街旅店", sign: "旅店", dialog: "D_INN_DAXI", dialog_nocoin: "D_INN_DAXI_NOCOIN" },
     shop: null
   },
 
@@ -2626,11 +2627,11 @@ window.MAPS = {
       "~~~~**TTTTTT........UUT.T.....T.===.....TTT.......UU.....T...TTT........TT.UU....T...TTTTT",
       "~~~~**TTTTTTTT.....TTU.....TTT..===......TT......TTUU........TTTU...T.....TTTU........TTTT",
       "~~~~**TTTTTTTT.......TUU......T.===.......UTT..U..TTT...T......TT.T........TTT.T..TUUU.TTT",
-      "~~~~**TTTTTTT..UUU....TT..UU....=K=U..UU..TTTTTTU..TT....U..............U...TTU....TTTUTTT",
-      "TTTTTTTTTTTTTUUTTTUUUUTTUUTTUUUUUTUTUUTTUUTTTTTTTUUUTUUUUTUUUUUUUUUUUUUUTUUUUTTUUUUTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+      "~~~~**TTTTTTT..UUU....TT..UU....===U..UU..TTTTTTU..TT....U..............U...TTU....TTTUTTT",
+      "TTTTTTTTTTTTTUUTTTUUUUTTUUTTUUUU==TTUUTTUUTTTTTTTUUUTUUUUTUUUUUUUUUUUUUUTUUUUTTUUUUTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     start: { x: 15, y: 22 },
     station: { x: 14, y: 22, name: "新竹站", shelter: { x: 16, y: 21 } },
@@ -2642,22 +2643,21 @@ window.MAPS = {
     ],
     exits: [
       { x: 89, y: 19, to: "M15", tx: 1, ty: 44 },
-      { x: 89, y: 20, to: "M15", tx: 1, ty: 45 }
+      { x: 89, y: 20, to: "M15", tx: 1, ty: 45 },
+      { x: 32, y: 53, to: "M17", tx: 43, ty: 1, requires: "Q_TY_5", requires_dialog: "D_EXIT_LOCK_TY" },
+      { x: 33, y: 53, to: "M17", tx: 44, ty: 1, requires: "Q_TY_5", requires_dialog: "D_EXIT_LOCK_TY" }
     ],
     npcs: [
       { id: "noodle_master", x: 63, y: 26, sprite: "npc_noodle_master", dialog: "D_NOODLE_IDLE", quest: "Q_HC_1", quests: ["Q_HC_1", "Q_HC_2"] },
       { id: "hc_guide", x: 36, y: 20, sprite: "npc_hc_guide", dialog: "D_HCGUIDE_IDLE", quest: "Q_HC_3", quests: ["Q_HC_3"] }
     ],
-    roadsigns: [
-      { id: "sign_miaoli", x: 33, y: 49, dialog: "D_SIGN_MIAOLI" }
-    ],
     chests: [
-      { id: "C_M16_1", x: 28, y: 2, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M16_2", x: 83, y: 6, subject: "數學", level: 3, reward: { gold: 60, item: "herb" } },
-      { id: "C_M16_3", x: 85, y: 29, subject: "數學", level: 3, reward: { gold: 60, item: null } },
-      { id: "C_M16_4", x: 10, y: 24, subject: "數學", level: 3, reward: { gold: 60, item: "snack" } },
-      { id: "C_M16_5", x: 13, y: 45, subject: "數學", level: 3, reward: { gold: 60, item: "guide" } },
-      { id: "C_M16_6", x: 84, y: 46, subject: "數學", level: 3, reward: { gold: 60, item: null } }
+      { id: "C_M16_1", x: 28, y: 4, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: null } },
+      { id: "C_M16_2", x: 83, y: 6, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: "herb" } },
+      { id: "C_M16_3", x: 85, y: 29, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: null } },
+      { id: "C_M16_4", x: 10, y: 24, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: "snack" } },
+      { id: "C_M16_5", x: 13, y: 45, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "guide" } },
+      { id: "C_M16_6", x: 84, y: 46, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: null } }
     ],
     spawns: [
       { monster: "wx_wind", count: 3, area: [50, 35, 36, 6] },
@@ -2665,7 +2665,411 @@ window.MAPS = {
       { monster: "hc_noodle", count: 3, area: [42, 22, 10, 14] },
       { monster: "wx_wind", count: 2, area: [36, 44, 48, 6] }
     ],
-    inn: { x: 12, y: 19, npc: null, price: 30, name: "新竹城市旅店", sign: "旅店", dialog: "D_INN_HSINCHU", dialog_nocoin: "D_INN_HSINCHU_NOCOIN" },
+    inn: { x: 12, y: 19, npc: null, price: 12, name: "新竹城市旅店", sign: "旅店", dialog: "D_INN_HSINCHU", dialog_nocoin: "D_INN_HSINCHU_NOCOIN" },
+    shop: null
+  },
+
+  // ───────────────────────────── M17 苗栗山城（v2.0 新增；來源 tools/bigmaps/M17.txt／.json）─────────────────────────────
+  M17: {
+    name: "苗栗山城", type: "field", level: 5, bgm: "field", battle_bg: "railway", tileset: "field",
+    real_ref: "苗栗縣三義鄉勝興車站與舊山線（C1）、三義木雕（C2、C3）、大湖草莓（C4）、淺山相思樹林（C5）",
+    art_note: "淺山丘陵：西邊山壁上的舊山線隧道口（裝飾），一條停用的舊鐵軌（枕木間長草）往東經過日式木造的勝興車站站房（古蹟，不能進；月台上小石碑不寫字），再鑽進東邊樹林；車站東北是木雕街（兩排木造工坊，門口擺動物造型木雕，不畫宗教神像）；東南是草莓園；西南是相思樹林；南邊山城民宿。壓縮的遊戲地圖（三義與大湖放在同一張）。背景 tools/bigmaps/M17_bg.webp（GPT 四塊延續法＋最小誤差接縫）。",
+    grid: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...T==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT......UT==..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.........TT==....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...U.......==TT..TTTTTT....TTTRRRRRRRRRRRRRRRRRRRRRRRRRRTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..TTT......==....TTTTT..T....TRRRRRRRRRRRRRRRRRRRRRRRRRRTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...........==..U..............RRRRRRRRRRRRRRRRRRRRRRRRRRTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT......TT..==..TTT.....U..UU..HHHHHHHHHHHHHHHHHHHHHHHHHHTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT............==......UUU.TTTTTTTHHHDHHHHHDHHHHHDHHHHHDHHHHTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT...U..........==....UUTTUU...==============================TT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUUUT........T==T...TTTTTTT..==============================TT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT....U....==.....TTT.....==..RRRRRRRRRRRRRRRRRRRRRRRRRRTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRR==..........TTT==UURRRRRRRRRRRRRRRRRRRRRRRRRRTT",
+      "TT####TTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRR==...UUU.......==UURRRRRRRRRRRRRRRRRRRRRRRRRRTT",
+      "TT####TTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRR==..UUTTTT.....==TTHHHHHHHHHHHHHHHHHHHHHHHHHHTT",
+      "TT####TTTTTTTTTTTTTTTTTTTTTTTTTTTHHHHHHHHHH===TTTTTTT.UUUU==........TTTTTTTTTTTTTTTTTTTTTT",
+      "TT#KK#TTTTTTTTTTTTTTTTTT..TTTTTTTHHHHHHHHHH===..TTTTTUUUUU==U...UU..TTTTTTTTTTTTTTTTTTTTTT",
+      "TT####TTT..TTTTTTTTTTTT...TTTT=K==============..TTTTTTTTTT==T...TTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTT==============================================================TTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTT==============================================================TTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTU.UUU....TT............U...........U..===..TTUU......==...TTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTUUUUU..........U......TUUU...TTTTTTTTT===...TTTU.UT..==T....TTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTT.......TTTTT.....TTT...===============T==TTT=====.UUU.TTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTT=======================================================UTTTT...........TTTTTTTTTTTTTT",
+      "TTTTT=======================================================U............UU.TTTTTTTTTTTTTT",
+      "TTTTTU.....T...............................===............==TT.....UUUU..TT....TTTTTTTTTTT",
+      "TTTTTTTT......UUU..U......UU..........TTT..===.TUU....UU..==......TTUUUUU....UUTTTTTTTTTTT",
+      "TTTTTTTTTUU...TTUUUTU....UTTU.==================TTTTTTUUU.==U.UU....TTTTTT.UUUUTTTTTTTTTTT",
+      "TTTTTTTTTTTTT...TTTTTT..TTTTT.========================TTTT==UUUUUUU........TTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTT...TTT.....TTT..================T=TTTT========TTTTTTTT............TTTTTTTTTT",
+      "TTTTTTTTTTTTTTUU.TTTUUUU.TTTU.==...........===......TTTUUT===============================T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTU==...........===.UUUT....TU.===============================T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==...........===TTTT......T.U=UUUUUUUUUUUU==UUUUUUUUUUUUU==T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==...........===.....UUUU...T=************==*************==T",
+      "TTTTTTTTT..........TTTTTTTTTTT==...........===T..TTUUTTUU.T=************==*************==T",
+      "TTTTTTTTT.......UU.TTTTTTTTTTT==...........===.....TTTTTTTT=************==*************==T",
+      "TTTTTTTTT.......TT.TTTTTTTTTTT==RRRRRRRRRRR===..U....TT...===============================T",
+      "TTTTTTTTT.TUU......TTTTTTTTTT.==RRRRRRRRRRRT==UUTUU.......U=UUUUUUUUUUUU==UUUUUUUUUUUUU==T",
+      "TTTTTTTTT..TT.....TTTTTTTTTTT.==RRRRRRRRRRR.==TTTTTT...UU.T=************==*************==T",
+      "TT==============================RRRRRRRRRRRU==TTTTTT..TTTTT=************==*************==T",
+      "TT==============================RRRRRRRRRRRT==TTTTTT......T=************==*************==T",
+      "TTUUUU.TUUUUUU............UU.T==HHHHHHHHHHHT==........U...===============================T",
+      "TTTTTTTTTTTTTT..........TUTTU.==HHHHHDHHHHHT==UU....UUTTU.U=UUUUUUUUUUUU==UUUUUUUUUUUUU==T",
+      "TTTTTTTTTTTTTT.....T..U..UTTTU================TTT..UTTTTTTT=************==*************==T",
+      "TTTTTTTTTTTTTT..U.....TT.TTTTT================....TTTTTTTTT=************==*************==T",
+      "TTTTTTTTTTTTTTTTTTT.......TTTT================TTT..TTTTTTTT=************==*************==T",
+      "TTTTTTTTTTTTTT...........UTTTTUU......U.....==............===============================T",
+      "TTTTTTTTTTTTTT.U...UU.UUUTTTTTTT...UUUTUUUUT==U...UUU...UU===============================T",
+      "TTTTTTTTTTTTTTTTUUUTU.TTTTTTTTTTT.UTTTTTTTT.==T..TTTTT.UTTUUU.....UUUUU.........UUUUUUUU.T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..TTTTTTTTTU==........UTTTTTTUU...TTUUTUUU..UUUUUTTTUUTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUTTTTTTTTTT==UUUU..UUUTTTTTTTTU....TTTTTUUUUTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.==TTTTTTTTTTTTTTTTTTUUU...TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTU==TTTTTTTTTTTTTTTTTTUUUU..TTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    start: { x: 44, y: 14 },
+    station: { x: 45, y: 14, name: "苗栗站", shelter: { x: 46, y: 11 } },
+    landmarks: [
+      { name: "勝興車站", area: [30, 11, 14, 9] },
+      { name: "舊山線", area: [2, 13, 65, 7] },
+      { name: "木雕街", area: [58, 4, 30, 11] },
+      { name: "草莓園", area: [58, 30, 31, 18] },
+      { name: "相思樹林", area: [2, 31, 28, 20] }
+    ],
+    exits: [
+      { x: 43, y: 0, to: "M16", tx: 32, ty: 52 },
+      { x: 44, y: 0, to: "M16", tx: 33, ty: 52 },
+      { x: 44, y: 53, to: "M18", tx: 42, ty: 1 },
+      { x: 45, y: 53, to: "M18", tx: 43, ty: 1 }
+    ],
+    npcs: [
+      { id: "old_stationmaster", x: 38, y: 20, sprite: "npc_old_stationmaster", dialog: "D_STATIONMASTER_IDLE", quest: "Q_ML_1", quests: ["Q_ML_1", "Q_ML_2"] },
+      { id: "conservation_guide", x: 14, y: 36, sprite: "npc_conservation_guide", dialog: "D_CONSERV_IDLE", quest: "Q_ML_3", quests: ["Q_ML_3"] },
+      { id: "wood_carver", x: 60, y: 11, sprite: "npc_wood_carver", dialog: "D_CARVER_IDLE", quest: "Q_ML_4", quests: ["Q_ML_4"] },
+      { id: "berry_farmer", x: 57, y: 33, sprite: "npc_berry_farmer", dialog: "D_BERRY_IDLE", quest: "Q_ML_5", quests: ["Q_ML_5"] },
+      { id: "leopardcat_cub", x: 18, y: 44, sprite: "npc_leopardcat_cub", dialog: "D_CUB_FOUND", show: { after: "Q_ML_1", until: "Q_ML_3" } }
+    ],
+    chests: [
+      { id: "C_M17_1", x: 3, y: 39, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "herb" } },
+      { id: "C_M17_2", x: 87, y: 9, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "guide" } },
+      { id: "C_M17_3", x: 66, y: 19, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "eraser" } },
+      { id: "C_M17_4", x: 88, y: 47, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "snack" } },
+      { id: "C_M17_5", x: 32, y: 30, subject: "數學", level: 3, reward: { gold: 6, exp: 8, item: "herb" } },
+      { id: "C_M17_6", x: 25, y: 45, subject: "數學", level: 3, reward: { gold: 6, exp: 8, item: "crystal" } }
+    ],
+    spawns: [
+      { monster: "ml_signal", count: 3, area: [6, 18, 24, 7] },
+      { monster: "ml_berry", count: 3, area: [46, 26, 11, 20] },
+      { monster: "ml_signal", count: 2, area: [8, 33, 14, 7] },
+      { monster: "ml_berry", count: 2, area: [12, 41, 14, 6] },
+      { monster: "mb_train", count: 1, area: [20, 18, 1, 1], boss: true, quest: "Q_ML_2" }
+    ],
+    inn: { x: 38, y: 43, npc: null, price: 14, name: "苗栗山城民宿", sign: "民宿", dialog: "D_INN_SANYI", dialog_nocoin: "D_INN_SANYI_NOCOIN" },
+    shop: null
+  },
+
+  // ───────────────────────────── M18 大甲藺草鎮（v2.0 新增；來源 tools/bigmaps/M18.txt／.json）─────────────────────────────
+  M18: {
+    name: "大甲藺草鎮", type: "town", level: 5, bgm: "town", battle_bg: "rushfield", tileset: "field",
+    real_ref: "臺中市大甲區（大甲鎮瀾宮、大甲藺、奶油酥餅；69 號 2.3、2.9.2，來源 C6–C10）",
+    art_note: "以大廟為中心的小鎮：北邊是鎮瀾宮外觀（一般閩南式廟宇畫法，不畫成特定的真實外觀；門內暗、不畫神像，廟埕沒有香爐、供桌）與廟埕，北口石板路從廟東側繞下來；西邊街道有兩間糕餅店（只畫餅的圖案）與紅磚街屋；東邊水圳旁是藺草工坊（門口晾著藺草、草帽、草蓆）和三塊藺草田；南邊是稻田與芋頭田，石板路往南通往鹿港。不畫遶境隊伍。v2.0 新增，背景 tools/bigmaps/M18_bg.webp（q0–q2 地圖師A、q3 地圖師B，GPT 分四塊延續法＋最小誤差接縫；北口繞廟的石板路為 GPT 局部補畫 M18_north_fixed.png）。",
+    grid: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...T===...TTTTTTTTTTTT~~=TTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTU...==========TTTTTTTT~~=...TTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRRRRRRRRRRR.==TTTTTTTT~~=TTTTTTRRRRRRRRRRRRRRRRTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRRRRRRRRRRRU.=TTTTTTTT~~.TTTTTTRRRRRRRRRRRRRRRRTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRRRRRRRRRRRTU=..TTTTTT~~...TTTTRRRRRRRRRRRRRRRRTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRRRRRRRRRRRTT=UUTTTTTT~~=TTTTTTRRRRRRRRRRRRRRRRTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRRRRRRRRRRRT.=TTTTT.TT~~...TTTTRRRRRRRRRRRRRRRRTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRRRRRRRRRRR..=TTT....T~~=T.TTTTHHHHHHHHHHHHHHHHTTTTT",
+      "TTTTTRRRRRRRRRRTTRRRRRRRRRRRTTRRRRRRRRRRRRRRRRRRRU.=TT....TT~~=..TTTKKKKKHHHHHHKKKKKKKTTTT",
+      "TTTTTRRRRRRRRRRTTRRRRRRRRRRRTTTHHHHHHHHHHHHHHHHHTTT=TTUU....~~=.TTTTKKKKKHHHHHHKKKKKKKTTTT",
+      "TTTTTRRRRRRRRRRTTRRRRRRRRRRRTTTHHHHHHHHHHHHHHHHHTT.=TTUT.T.U~~......KKKKK...==.KKKKKKKTTTT",
+      "TTTTTRRRRRRRRRRTTRRRRRRRRRRRTTTHHHHHHHHHHHHHHHHHTT.=.TTT...T~~=..UU.KKKKK..====KKKKKKKTTTT",
+      "TTTTTRRRRRRRRRRTTRRRRRRRRRRRTTTHHHHHHHHHHHHHHHHHTTT=.TTT...T~~.TTUTT========.==KKKKKKK.TTT",
+      "TTTTTHHHHHHHHHHTTHHHHHHHHHHHTTTTTTTTT.K=======.KTT.=TTTTT..T~~=TTT.TU......UUUU........TTT",
+      "TTTTTHHHHHHHHHHTTHHHHHHHHHHHTTTT.T.TT.K=======.KT===========~~=TT..TT......TTTTT....UT..TT",
+      "TT..THHHHHHHHHHTTHHHHHHHHHHHT..T============================~~=.......TTT..........TT..UTT",
+      "TT..TT.........TTTT.........T..T===========================BBBBT.......................TTT",
+      "TT..=======================================================BBBB=========================TT",
+      "TTT.=======================================================.~~.========================.TT",
+      "TT..RRRRRRR=RRRRRR=RRRRRRRRRR===================..........TU~~==**********************=UTT",
+      "TT.URRRRRRR.RRRRRR.RRRRRRRRRR..U================..TT...T.T.T~~==**********************=TTT",
+      "TT.TRRRRRRR.RRRRRR.RRRRRRRRRR..T......UU..===........U......~~==**********************=TTT",
+      "TT.TRRRRRRR.RRRRRR.RRRRRRRRRR..TU....UTTU.===UUUUUU.UTU.....~~==**********************=TTT",
+      "TTTTHHHHHHH.HHHHHH.HHHHHHHHHH..TU....TTTTU===TTUTTU.TTT..TT.~~==**********************=TTT",
+      "TTTTHHHHHHH.HHHHHH.HHHHHHHHHH..TTT....TTTT===.TTTTTTTT......~~==**********************=TTT",
+      "TTTTHHHHHHHTHHHHHHUHHHHHHHHHHT...TT...T.T.===.TTTTTTT.....TU~~=========================TTT",
+      "TTT....T..T..TT...TT..T......TT.T....TT.TU===.TTTTTTT...T..~~~~...TU.U...TT.....U.UTU.TTTT",
+      "TTT.============================.UU......T===..TTTTTTTTT...BBBBTT..TUTUU...T.TTTT.TTTTTTTT",
+      "TTT.============================UUU.U....T===.UTTTTTTTTTT.U.~~...UUTTTTTU.......TTTTTTTTTT",
+      "TTT.U................T..........TTTTT...TT===.TTTTTTTTTTT.T.~~==**********************=TTT",
+      "TTTUTT..UUU....................T.........T===UTTTTTT.......T~~==**********************=TTT",
+      "TTTUT..TTTTTT.............TT..........U...===TTTTTTTU....TT.~~==**********************=TTT",
+      "TTTTTT........T......T..T....T..TT...TT...===..TT...TTTT....~~==**********************=TTT",
+      "TT..========================================================~~==**********************=TTT",
+      "TTU.========================================================~~==**********************=TTT",
+      "TTT.=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===...****=******.~~==**********************=TTT",
+      "TTTU=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===..U****=******.~~=========================TTT",
+      "TTTT=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===.UU****=******.~~==**********************.TTT",
+      "TTTT=========================================.TT****=******.~~==**********************=TTT",
+      "TTTT=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===..T****=******BBBB=**********************=TTT",
+      "TT..=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===TTU****=******BBBB=**********************=TTT",
+      "TTU.=========================================..U****=******.~~.=**********************=TTT",
+      "TTTU=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===TUT****=******.~~==**********************=TTT",
+      "TT.T=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===.TT****=******.~~==**********************=TTT",
+      "TT..=========================================..T****=******.~~=========================TTT",
+      "TTTT=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===UTT****=******.~~=..........TT..U........UTTT",
+      "TTTT=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===TTT****=******.~~=.....UT.TT...UTT..TT.T.UTTT",
+      "TTTT=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~===.TT****=******.~~=..T.UTTT...U.T......U..TTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT....===..T****=******.~~=T..TTTT...TTT..TUU.TTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTU...===.UTT...........~~..TTTTTTTT.......TT..TTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUT===TTTT.U.U.UUUUUUTTTTTTTTTTTT.T.TTTTTTUUTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTUU.===.TTTUUUUUUUUUUUTTTTTTTTTTTTTTTTTTTTTUUTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    start: { x: 11, y: 31 },
+    station: { x: 12, y: 31, name: "大甲站", shelter: { x: 13, y: 30 } },
+    landmarks: [
+      { name: "大甲鎮瀾宮", area: [29, 2, 30, 18] },
+      { name: "大甲街道", area: [2, 8, 27, 26] },
+      { name: "藺草田", area: [59, 0, 30, 46] },
+      { name: "稻田與芋頭田", area: [3, 34, 57, 17] }
+    ],
+    exits: [
+      { x: 42, y: 0, to: "M17", tx: 44, ty: 52 },
+      { x: 43, y: 0, to: "M17", tx: 45, ty: 52 },
+      { x: 42, y: 53, to: "M19", tx: 44, ty: 1, requires: "Q_ML_2", requires_dialog: "D_EXIT_LOCK_ML" },
+      { x: 43, y: 53, to: "M19", tx: 45, ty: 1, requires: "Q_ML_2", requires_dialog: "D_EXIT_LOCK_ML" }
+    ],
+    npcs: [
+      { id: "volunteer_zl", x: 44, y: 17, sprite: "npc_volunteer_zl", dialog: "D_TEMPLE_ZL_INTRO", quest: null, quests: [] },
+      { id: "pastry_shop", x: 9, y: 17, sprite: "npc_pastry_shop", dialog: "D_PASTRY_IDLE", quest: "Q_DJ_3", quests: ["Q_DJ_3"] },
+      { id: "rush_weaver", x: 76, y: 12, sprite: "npc_rush_weaver", dialog: "D_WEAVER_IDLE", quest: "Q_DJ_1", quests: ["Q_DJ_1", "Q_DJ_2"] }
+    ],
+    chests: [
+      { id: "C_M18_1", x: 39, y: 1, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "herb" } },
+      { id: "C_M18_2", x: 65, y: 2, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "guide" } },
+      { id: "C_M18_3", x: 2, y: 16, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "crystal" } },
+      { id: "C_M18_4", x: 3, y: 36, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "eraser" } },
+      { id: "C_M18_5", x: 87, y: 19, subject: "數學", level: 3, reward: { gold: 6, exp: 8, item: "snack" } },
+      { id: "C_M18_6", x: 63, y: 47, subject: "數學", level: 3, reward: { gold: 6, exp: 8, item: "herb", n: 2 } }
+    ],
+    spawns: [
+      { monster: "an_egret", count: 3, area: [4, 34, 41, 15] },
+      { monster: "dj_rush", count: 3, area: [62, 19, 26, 27] },
+      { monster: "dj_taro", count: 3, area: [44, 34, 16, 17] },
+      { monster: "an_egret", count: 1, area: [62, 45, 26, 6] }
+    ],
+    inn: { x: 22, y: 17, npc: null, price: 14, name: "大甲小鎮旅店", sign: "旅店", dialog: "D_INN_DAJIA", dialog_nocoin: "D_INN_DAJIA_NOCOIN" },
+    shop: null
+  },
+
+  // ───────────────────────────── M19 鹿港老街（v2.0 新增；來源 tools/bigmaps/M19.txt／.json）─────────────────────────────
+  M19: {
+    name: "鹿港老街", type: "town", level: 5, bgm: "town", battle_bg: "lanternlane", tileset: "town",
+    real_ref: "彰化縣鹿港鎮（鹿港天后宮、清代街道與日治後期市街改正的中山路、舊港；69 號 2.4、2.9.3，來源 C11–C13）",
+    art_note: "西半是一間間窄長的清代紅磚街屋，夾著彎彎曲曲的紅磚窄巷（不取名、不寫街名）；東北是鹿港天后宮的外觀與廟埕（前簷下密密的網目斗栱；門內暗、不畫神像、沒有香爐供桌）；中間一條較寬的大街（中山路）旁是三棟日治立面街屋（客棧、糕餅店）；東南是石砌岸邊的河口舊港，水上停著幾艘木船。v2.0 新增，背景 tools/bigmaps/M19_bg.webp（GPT 分四塊延續法＋最小誤差接縫拼接）。",
+    grid: [
+      "THTTTTHTHTHTTTTTTTHTTHTTHTTTTTTTTTHHTTTTTTTH==TTTHHTTTHHTTTTTTTTTTTTTTTTTTTTTTHTTHTHTTTTTT",
+      "TTTTTTHTTTTTTTHTHTTTTHTHTHTTHHHTTTTTHTTHTTH.==HHTTTTHTTTTTHTTHHTTTTHTHHTTTTTHTHTTTTTHHHTTT",
+      "TTTHHHHHHHHHHHHHHHH==HHHHHHHHHHHHHHHHHHHHHH===...THHHTTTHHTHHTHHHTTHHHTTHTTTTTTTTHTTTHTTTT",
+      "HHTHHHHHHHHHHHHHHHH==HHHHHHHHHHHHHHHHHHHHHHH==H..HTHRRRRRRRRRRRRRRRRRRRRRRRRRTTTHTHTTHTTTT",
+      "TTTHHHHHHHHHHHHHHHH==HHHHHHHHHHHHHHHHHHHHHHH==......RRRRRRRRRRRRRRRRRRRRRRRRR.......HHTTTT",
+      "THTHHHHHHHHHHHHHHHH==HHHHHHHHHHHHH============.U....RRRRRRRRRRRRRRRRRRRRRRRRRHH......TTTTT",
+      "THTHHHHHHHHHHHHHHHH==HHHHHHHHHHHHH============HH....RRRRRRRRRRRRRRRRRRRRRRRRRHH.......HHHT",
+      "HHTHHHHHHHHHHHHHHHH==HHHHHHHHHHHHH=HHHHHHHHH==......RRRRRRRRRRRRRRRRRRRRRRRRRHH...UU...TTT",
+      "TTTH==H==HH==HH=HH===HTHHTTHHHHHHH=HHHHHHHHT==TU....RRRRRRRRRRRRRRRRRRRRRRRRRHH..UUU....TT",
+      "TTT==================HHHHHHHHHHHHH=HHHHHHHHT==.T.....HHHHHHHHHHHHHHHHHHHHHHHHHH..THT...TTT",
+      "TTTHHHHHHH==HHHHHHH==HHHHHHHHHHHHH=HHHHHHHHT==.......HHHHHHHHHHHHHHHHHHHHHHHHHHH.......THT",
+      "TTTHHHHHHH==HHHHHHH==HHHHHHHHHHHHH=HHHHHHHHT==......HHHHHHHHHHHHHHHHHHHHHHHH=HHH....UU.TTT",
+      "TTTHHHHHHH==HHHHHHH==HHHHHHHHHHHHH=HHHHHHHHT==.T....===========================H.H..UU.TTT",
+      "HTTHHHHHHH==HHHHHHH====================HHTHH==....==============================....TTTTTT",
+      "TTTHHHHHHH==HHHHHHH===================HHHHH.==HU..==============================.......TTT",
+      "HTTHHHHHHH==HHHHHHHHHHHHHH==HHHHHHHH==HHHHHU==HT..==============================..UU...TTT",
+      "TTTHHHHHHH==HTHHTHHHHHHHHH==HHHHHHHHH=HHHHHT====================================..HU...TTH",
+      "TTTHHHHHHH==HHHHHHHHHHHHHH==HHHHHHHHH=HHHHHT====================================..TT...TTT",
+      "TTTHHHHHHH==HHHHHHHHHHHHHH==HHHHHHHHH=HHHHHT==.U..==============================.....H.TTT",
+      "TTHHHHHHHH==HHHHHHHHHHHHHH==HHHHHHHHH=HHHHTT==.H..==============================.......TTT",
+      "THTHHHHHHH==HHHHHHHHHHHHHH==HHHHHHHHH=HHHHHT==HH..=====================================HHH",
+      "TTTHHHHH=H============================HHHHHT==....======================================TH",
+      "TTTH=====H================================HH==HT.H======================================TT",
+      "TTT=====================================================================================.T",
+      "THTH===================================================================================HUT",
+      "TTTHHHHH==HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH==..HHHHHHHH.HHHHHHH.HHHHHHHH..............HHT",
+      "TTTHHHHH=HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH==.UHHHHHHHH.HHHHHHH.HHHHHHHH..............THT",
+      "TTTHHHHH==HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHT==.THHHHHHHH.HHTHTHH.HHHHHHH=..............TTT",
+      "TTTHHHHH==HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHT==HTH~HHHHHH.H~HHHHH.HHHHHHHH..............HTT",
+      "HTTHHHHH==HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHT==.HHHHHHHHH.HHHHHHH.HHHHHHHH..............TTT",
+      "THTHHTHH==HTHHTH=HHTHHTHHTHHTHHTHHTHHHTHHHHH==..HHHHHHHH.HHHHHHH.HHHHHHHH..............HTT",
+      "TTTHHHHH==HHHHH==HHHHHHHHHHHHHHHHHHH==HHHHHH==T.=======================================TTT",
+      "THTHHHHH==HHHHH==HHHHHHHHHHHHHHHHHHH==HHHHHT==.U=======================================THT",
+      "TTTHHHHH==HHHHH==HHHT==H=HTHHHHHHHHH==HHHHHT==TUT======================================TTT",
+      "TTTHHHHHH=HHHHH================HHHHHH=HHHHHH==.T=======================================HTT",
+      "TTTHHHHHH=HHHHHHHHHHH==HHHHHH==HHHHHT=HHHHHH==..=======================================TTT",
+      "TTTHHTHTH=HHHHHHHHHHH==HHHHHH==HHHHHH=HHHHHT==TT=======================================TTT",
+      "TTTHHHHH==HHHHHHHHHHH==HHHHHH==HHHHH==========..#######################################HTT",
+      "TTTHHHHH==HHHHHHHHHHH==HHHHHHH=HHHHH==========.U#######################################TTT",
+      "TTTHHHHH=HHHHHHHHHHHH==HHHHHHT=HHHHHHHHHHHHH==TH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTH",
+      "THTHHHHH=======HHHHHH==HHHHHHT=HHHHHHHHHHHHH==..~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTH",
+      "TTHHHHHHHHHHHHHHHHHHH==HHHHHHH=HHHHHHHHHHHHH==UU~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTT",
+      "TTTHHHHHHHHHHHHHHHHHH==HHHHHH==HHHHHHHHHHHHH==HU~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HTT",
+      "TTTTTTTHHHHHHHHHHHHHH==HHHHHH=================.H~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTT",
+      "TTTHTTTHHHHHHHHHHHHHH==HHHHHHHHHHHHHHHHHH=======~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~THT",
+      "THTHHHHHHHHHHHHHHHHHH==HHHHHHHHHHHHHHHHHHHHH==.U~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HHT",
+      "TTTHHHHHHHHHHHHHHHHHHH=HHHHHHHHHHHHHHHHHHHHT==HT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTT",
+      "TTTHHHHHH=H=HH==HH==HH=H=HH=HHHHHHHHHHHHHHHT==..~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~THT",
+      "TTHHHHHH=====================HHHHHTHHHHHHHHH==TU~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTT",
+      "TTTHHHHHH..H.HH...H...H..HH.THHHHHHHHHHHHHHH==.TTHHTHTT~~~T~~~~~~~~~~H~HH~TT~H~~~~HT~HHTTT",
+      "HTTTHTHTT.TT.TTHT.T..UT..TTTTHHTTHHTTHHTHHHH==...TTTTTTHHTTTTHTTTTTTTTTHTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTUHHT.TTTTHTTHTTTTTTTTTTHH==.U.THTTHTTTTTTHTTTHTTTHTTTTTHTHTTTTTTHTTTTTT",
+      "HHTTTTHTTTTTTTTHTTHUTTTTTTTTTTHTTTTTTTTTTTTH==.HHTTHTTTHTHHTTTTTTTTTTTTTTTTTHHTTTTTHTTTTTT",
+      "TTTTTTTHHTTHTTTTTTTTTTTHTHTTTTHHTHHTTTTTTHTT==TTTTTTTTTTTTTTTTHTTTTTHTHTTTTTHTTTHHHTTTTTHT"
+    ],
+    start: { x: 79, y: 30 },
+    station: { x: 80, y: 29, name: "鹿港站", shelter: { x: 77, y: 25 } },
+    landmarks: [
+      { name: "鹿港天后宮", area: [46, 2, 41, 20] },
+      { name: "鹿港老街", area: [3, 2, 41, 48] },
+      { name: "中山路", area: [46, 22, 41, 9] },
+      { name: "鹿港舊港", area: [48, 31, 39, 18] }
+    ],
+    exits: [
+      { x: 44, y: 0, to: "M18", tx: 42, ty: 52 },
+      { x: 45, y: 0, to: "M18", tx: 43, ty: 52 },
+      { x: 44, y: 53, to: "M20", tx: 47, ty: 1 },
+      { x: 45, y: 53, to: "M20", tx: 48, ty: 1 }
+    ],
+    npcs: [
+      { id: "volunteer_lk", x: 64, y: 14, sprite: "npc_volunteer_lk", dialog: "D_TEMPLE_LK_INTRO", quest: null, quests: [] },
+      { id: "lk_guide", x: 3, y: 9, sprite: "npc_lk_guide", dialog: "D_LKGUIDE_IDLE", quest: "Q_LK_1", quests: ["Q_LK_1"] },
+      { id: "umbrella_shop", x: 20, y: 22, sprite: "npc_umbrella_shop", dialog: "D_UMBRELLA_IDLE", quest: "Q_LK_2", quests: ["Q_LK_2"] },
+      { id: "pastry_lk", x: 61, y: 31, sprite: "npc_pastry_lk", dialog: "D_PASTRYLK_IDLE", quest: "Q_LK_3", quests: ["Q_LK_3"] }
+    ],
+    chests: [
+      { id: "C_M19_1", x: 3, y: 23, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "guide" } },
+      { id: "C_M19_2", x: 34, y: 5, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "herb" } },
+      { id: "C_M19_3", x: 36, y: 38, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "eraser" } },
+      { id: "C_M19_4", x: 8, y: 48, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "crystal" } },
+      { id: "C_M19_5", x: 85, y: 34, subject: "數學", level: 3, reward: { gold: 9, exp: 10, item: "snack" } },
+      { id: "C_M19_6", x: 84, y: 19, subject: "數學", level: 3, reward: { gold: 9, exp: 10, item: "guide" } }
+    ],
+    spawns: [
+      { monster: "gh_umbrella", count: 3, area: [3, 3, 40, 20] },
+      { monster: "gh_geta", count: 2, area: [3, 26, 40, 23] },
+      { monster: "gh_umbrella", count: 2, area: [55, 31, 22, 6] }
+    ],
+    inn: { x: 52, y: 31, npc: null, price: 16, name: "鹿港老街客棧", sign: "客棧", dialog: "D_INN_LUKANG", dialog_nocoin: "D_INN_LUKANG_NOCOIN" },
+    shop: null
+  },
+
+  // ───────────────────────────── M20 北港媽祖鎮（v2.0 新增；來源 tools/bigmaps/M20.txt／.json）─────────────────────────────
+  M20: {
+    name: "北港媽祖鎮", type: "town", level: 5, bgm: "town", battle_bg: "levee", tileset: "town",
+    real_ref: "雲林縣北港鎮（北港朝天宮、北港老街、北港溪與女兒橋、北港武德宮、花生；69 號 2.5、2.9.4，來源 C14–C18）",
+    art_note: "鎮中央是朝天宮的外觀和很大的石板廟埕（門內暗、不畫神像；沒有香爐、供桌、金爐），廟埕邊停一座還沒裝好的藝閣車（竹骨架、彩布、紅燈籠）；從廟口往南的老街兩旁是兩層紅磚店屋（麻油瓶、糕餅、雜貨竹簍），街尾接北港溪堤防與北港大橋；東邊是武德宮外觀與廟埕（不畫金爐、金紙、元寶）和幾間紅磚民宅；西邊是一畦畦花生田，田邊小路盡頭有空白路牌（往嘉義）；南邊是長長的堤防步道、北港溪、北港大橋與女兒橋（兩座橋都是裝飾，不能上橋）。不畫遊行隊伍與炮。v2.0 新增，背景 tools/bigmaps/M20_bg.webp（GPT 分四塊延續法＋最小誤差接縫拼接）。",
+    grid: [
+      "HTTTTTTTHHHTHTTTTTTTTTTT~TTTTTTTTTTT~TTTTTTTTHT==THTTTTTTTHTTTTTTTTTTTTTTTTTTTTTTTHTTTTTTTTHTTTT",
+      "THTHTTTTHTTTTTTTTTTTTTHTTTTTHT~TTHTTTTTTT~THTTT==HTTTHHTTTTTTTTTTTHTTTTTHTTTTTTTTTTTTTTHTTTTTTHT",
+      "TTTHHTHTTTHTHTTTTTHTHHHTTTTTHTTTTTTHHHHT~HTTTTT==TTTHHTTTTTTTHHTTTTHTTTTTTTTHTTTTHHHTTTTHHTTTTTT",
+      "TT.....TTHHHTTTRRRRRRRRRRRRRRRRRRRRRRRRRRRRTTHT==HHTTTTTHHTTRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTTTHTTH",
+      "TT*...T..***TTTRRRRRRRRRRRRRRRRRRRRRRRRRRRRTTHT==.TTTTHHHTTHRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTTTHTTT",
+      "TTT....==.....HRRRRRRRRRRRRRRRRRRRRRRRRRRRRTT..==..TTTTHTTHTRRRRRRRRRRRRRRRRRRRRRRRRRRRTHTTTTTTT",
+      "TTT**T*==**U*..RRRRRRRRRRRRRRRRRRRRRRRRRRRRTTU.==.UTTTTTTTTTRRRRRRRRRRRRRRRRRRRRRRRRRRRTHHTTTTHT",
+      "TTT*T**==****..RRRRRRRRRRRRRRRRRRRRRRRRRRRRHTTU==HTTHTHTTTTTRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTTTTHTT",
+      "HT*....==.....URRRRRRRRRRRRRRRRRRRRRRRRRRRRT.HT==HHHTTHTTHTTRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTHTHTTT",
+      "TT.**U*==**U*.THHHHHHHHHHHHHHHHHHHHHHHHHHHT..TT==HTTHTTTTTHTHHHHHHHHHHHHHHHHHHHHHHHHHHHHHTTTTTTH",
+      "TT.****==****.HTHHHHHHHHHHHHHHHHHHHHHHHHHHT..HT==.TTHTTTHTHTTHHHHHHHHHHHHHHHHHHHHHHHHHTTTTTTTTTH",
+      "TT.....==.....TTT========================TTT..H==.TTTHTHHTTTTT========================HHTTTTTTTH",
+      "TT***U*==**U*.HTT========================HTTT..==.TTTTTTTHHTHT========================HHTHHTTTTT",
+      "HH*****==****.TTT=========================HTTH.==.HHTTTH.HTTTT========================HTTTT=THTT",
+      "TT.....==.....===================================...HTHH...=================================.HTH",
+      "HT.**U*==*UU*.==========================KKKKK====.UU..TTT..=================================.THT",
+      "TT.****==****.==========================KKKKK====UTT.......=================================.HTT",
+      "TT.....==.....==========================KKKKK====HH=========================================.THT",
+      "HT.**U*==*UU*.==========================KKKKK====HT=========================================TTTT",
+      "TT.****==****.===================================...H......=================================.HTT",
+      "TT.....==.....=====================================HT..HH..=================================...T",
+      "TT***U*==**U*.=====================================..UUTT..=================================UUUT",
+      "TT*****==****.===================================...UTHTTH.=================================TTTH",
+      "HH.....==.....===================================.U.UTTTTT.=================================THTT",
+      "HT.*UU*==*UU*.===================================.HTTTHTTTHU......UU..........U....UU....H..HTTT",
+      "T..****==****.==================.U==========.====TTTTTTTTTTT.HT...TT.UUUU.HH.UTUHU.TTU..UT..THTT",
+      "T.*....==.....==================UTUU...HH..HUT..TTTTTTTTTTT..HTTTT...HTTT.TTUHTTTT..TT.UTTTTTTTH",
+      "TU**UU*==*UU*.=.U==HHHHHHHHH====HHHHHHHHHHTTH..UTTTTHTTTHHHHHHHHHHHT.HHHHHHHHHHTHHHHHHHHHHTTTTHT",
+      "TTT****==****.UUT.UHHHHHHHHH====HHHHHHHHHHTTTTTTTTTTTTTTHHHHHHHHHHT..HHHHHHHHHHTHHHHHHHHHHHHTHTT",
+      "HTT....==.....HHTTHHHHHHHHHH====HHHHHHHHHHTTTTTTTTTTTTTTTHHHHHHHHHT..HHHHHHHHHTTHHHHHHHHHHTTTTTT",
+      "HT*UUU*==*UU*.THTTTHH~HHH~HH====HHHHHH~~HHHTHTTTHTTTTHTTTHH~HHH~~HTHUHH~HHH~HHHTHH~HHH~HHHTTTTTT",
+      "TTT****==****.TTHTTHHHHHHHHH====HHHHHHHHHTTTTTHTTHTTTTTTTHHHHHHHHHTTUHHHHHHHHHTTHHHHHHHHHHHTHHTH",
+      "TT*....==.....TTHHTHHHHHHHHH====HHHHHHHHHHHHTTTTTTTTT...HHTHHTHHHHTTTHTHHTTHHTHHHTHHTHHHHTTTTTTT",
+      "TTTU*U*==*UU*.HTTTTHHHHHHHHH====HHHHHHHHHTTTTTTTTTTTTH...HHHHHHHHH....HHHHHHHHTTHHHHHHHHHHTHTTTT",
+      "HH.****==****.....HHHHHHHHHHT===HHHHHHHHHTTTTTTTTHHTTTT....T.....TU..........TTT.........TTTTHTT",
+      "HT.....==.....UU...HHHHHHTTH====HHHHHHHHHHTTTTTTTTTHH..HT...HU..TTTTHT.UHH...TTTTTHU..HH.HTHTTTT",
+      "TT.**U*==**U*.TTTTUHHHHHHHHH====HHHHHHHHHHTTTTTTT...H......TTTH.......TTT.........TT..TT..TTTTTT",
+      "HT.****==****.HHTTTHHHHHHHHH====HHHHHHHHHHTTTTHHTT.=========================================THTT",
+      "TT.....==.....HTTHTHHHHHHHHH====HHHHHHHHHHTTHHTTTTT...H..........U...............UH.........THTT",
+      "TT***U*=====*....HHHHHHHHHHH====HHHHHHHHHHTH.....TTU..TUT.......UTU...T......T..UTT......UU.HHTT",
+      "HH******======..HTHHHHHHHHHH====HHHHHHHHHHT.....UTTTU.TT...T...UTTTH...HU......UTTT..TT.TTTHTTTT",
+      "TTT........H==TT..T======================HT..HU.HHHTUT...HU..H.HHHTHU..TT..UUUHHTHHU......TTHTHH",
+      "TTT=....TTH.KH..T..======================....TTTHTTHT....HH..TTHHTTTT......TTT.TTTTT...HT.THHHTT",
+      "HT=======================================================================F===================TTT",
+      "TT==========================FFFF====================================FFFFFF===================TTH",
+      "TT==========================FFFF====================================FFFFFF===================THH",
+      "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~TT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~TT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~H~~~~~~####H~~~~~~~~~~~~~~~~~~~~~~",
+      "~~TT~~~TTT~~H~~~~~TTT~~~~~~~~##~~~~~~~~~~~~~~~~~~H~~HH~T~~H~~TTT~~~~~####H~~~~~~~~~~~~~H~~H~~~H~",
+      "TTTTTTTTTTT~TTT~HTTTTTTHTTTH~##~~T~~~TTT~HHTTTTHTTTTTTTTTTTTTTTTTTTTH####HHT~~HTT~~~~TTTTTTTTTTT",
+      "TTTHTTTTHTTTTTTTTTHHTTTTTTTTH##TTTTTTTTTTTTTTTTTTTTTTTTTTTHTTHTTTTTTT####HTTTTTTTTTTTTTTTTHTTTTT",
+      "THTTTTTTTTTTHTHHHTTTTTTTTTTTT##HTTTTTTHHTTTHTTTTTTTHHHTTHTHTTTTTTHTTT####TTTTTTTTTTTTTTHTTTTTTTT",
+      "TTTTHHTTTTTTTTHTTTTTTTTTTTHTH##HTTTTHHTTTHHTTTTTTHTHHTHHHTTTTTTTHTTTH####HTTTTTTTHHHTTTTTTTTTHHT"
+    ],
+    start: { x: 35, y: 24 },
+    station: { x: 36, y: 24, name: "北港站", noShelter: "北港站在朝天宮大廟埕的南緣，四周是廟埕和老街的石板路（GPT 依配置圖留空的是步道，不是草地），放候車亭會擋住廟埕往老街的人潮動線" },
+    landmarks: [
+      { name: "北港朝天宮", area: [14, 3, 35, 22] },
+      { name: "北港老街", area: [19, 25, 22, 18] },
+      { name: "北港武德宮", area: [55, 3, 38, 21] },
+      { name: "北港溪堤防", area: [2, 43, 91, 3] },
+      { name: "花生田", area: [2, 3, 12, 40] }
+    ],
+    exits: [
+      { x: 47, y: 0, to: "M19", tx: 44, ty: 52 },
+      { x: 48, y: 0, to: "M19", tx: 45, ty: 52 }
+    ],
+    npcs: [
+      { id: "volunteer_ct", x: 28, y: 12, sprite: "npc_volunteer_ct", dialog: "D_TEMPLE_CT_INTRO", quest: null, quests: [] },
+      { id: "temple_elder", x: 20, y: 14, sprite: "npc_temple_elder", dialog: "D_ELDER_BG_IDLE", quest: "Q_BG_1", quests: ["Q_BG_1"] },
+      { id: "float_master", x: 42, y: 19, sprite: "npc_float_master", dialog: "D_FLOAT_IDLE", quest: "Q_BG_2", quests: ["Q_BG_2", "Q_BG_4"] },
+      { id: "volunteer_wd", x: 73, y: 12, sprite: "npc_volunteer_wd", dialog: "D_TEMPLE_WD_INTRO", quest: null, quests: [] },
+      { id: "oil_shop", x: 23, y: 41, sprite: "npc_oil_shop", dialog: "D_OIL_IDLE", quest: "Q_BG_5", quests: ["Q_BG_5"] },
+      { id: "grocer_bg", x: 36, y: 41, sprite: "npc_grocer_bg", dialog: "D_GROCER_IDLE", quest: "Q_BG_3", quests: ["Q_BG_3"] }
+    ],
+    roadsigns: [
+      { id: "sign_chiayi", x: 12, y: 42, dialog: "D_SIGN_CHIAYI" }
+    ],
+    chests: [
+      { id: "C_M20_1", x: 2, y: 3, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "herb" } },
+      { id: "C_M20_2", x: 92, y: 14, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "guide" } },
+      { id: "C_M20_3", x: 3, y: 41, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "crystal" } },
+      { id: "C_M20_4", x: 50, y: 14, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "eraser" } },
+      { id: "C_M20_5", x: 90, y: 44, subject: "數學", level: 3, reward: { gold: 9, exp: 10, item: "snack" } },
+      { id: "C_M20_6", x: 66, y: 33, subject: "數學", level: 3, reward: { gold: 9, exp: 10, item: "guide" } }
+    ],
+    spawns: [
+      { monster: "gh_lantern", count: 3, area: [49, 37, 43, 6] },
+      { monster: "gh_civet", count: 3, area: [2, 3, 12, 38] },
+      { monster: "gh_lantern", count: 2, area: [44, 40, 22, 6] },
+      { monster: "mb_lantern", count: 1, area: [82, 44, 1, 1], boss: true, quest: "Q_BG_4" }
+    ],
+    inn: { x: 62, y: 34, npc: null, price: 16, name: "北港鎮上旅店", sign: "旅店", dialog: "D_INN_BEIGANG", dialog_nocoin: "D_INN_BEIGANG_NOCOIN" },
     shop: null
   }
 };
