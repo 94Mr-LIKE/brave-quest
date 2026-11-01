@@ -1232,6 +1232,8 @@
     ctx.qn++;
     G.bcommands(false);
     // 每題只消耗一次增益；刪除索引給既有選項介面，讀屏標記留給 UI 接線。
+    // v2.1 修正（wip_v20/v21_apply.js）：先打亂選項並存回 ctx.sess.q，再挑要刪的選項（以前先刪、quiz.js 才打亂，智慧之光會刪到正確答案）
+    if (J.Answer && J.Answer.shuffleOptions) q = ctx.sess.q = J.Answer.shuffleOptions(q, Math.random);
     var questionFx = J.Battle.prepareQuestion(b, q, { timerOff: J.Battle.timerOff(st.settings.answerTime), erased: ctx.sess.erased });
     ctx.sess.erased = questionFx.erased;
     ctx.sess.optionLabels = questionFx.optionLabels;
