@@ -76,6 +76,7 @@
       this.heroKey = A.heroKey(g.state.player.gender, g.state.player.job);
       A.queue(this, this.heroKey, g.state.player.name);
       A.queue(this, 'pet_imo', '番薯仔');
+      if (J.Followers) J.Followers.preload(this);   // v3.0 跟班掛鉤（codex5）：載入已加入的霧仔
       this.npcList().forEach(function (n) { A.queue(self, n.sprite || 'npc_unknown', g.speaker(n.id).name); });
       (map.spawns || []).forEach(function (s) {
         var m = g.data.monsters[s.monster];
@@ -90,6 +91,7 @@
       if (map.statue) A.queue(this, map.statue.sprite || J.MapInfo.STATUE_SPRITE, '媽祖');
       // v1.1 路牌（59 號 2.8；地圖物件，不是 NPC）：美術 obj_road_sign（32×48，底部置中）；沒有圖時用程式畫的木牌
       if ((map.roadsigns || []).length && A.has('obj_road_sign')) A.queue(this, 'obj_road_sign');
+      (map.friendly || []).forEach(function (f) { A.queue(self, f.sprite, f.name); });   // v3.0 友善動物（黑面琵鷺、綠蠵龜）
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
@@ -510,6 +512,33 @@
         var img = self.add.image(l.x * T + T / 2, l.y * T + T, self.tex, self.frameOf(lit ? 'lamp_on' : 'lamp_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T);
         self.lamps.push({ data: l, img: img });
       });
+      this.buildSouth();   // v3.0 南部：友善動物、碼頭的船
+    }
+
+    /**
+     * v3.0（70 號 3.5、第七節）友善動物（maps.js friendly：黑面琵鷺、綠蠵龜；不能互動，周圍 keepaway 格內擋路）、
+     * 碼頭的船（boat_dock.ship_area：背景留空、程式畫一艘白色客船；點船或在上船格按 A＝搭船，G.boardBoat）
+     */
+    buildSouth() {
+      var self = this;
+      this.friendlies = (this.map.friendly || []).map(function (f) {
+        var tk = J.Assets.texKey(f.sprite), frame = self.textures.exists(tk) && self.textures.get(tk).has(1) ? 1 : undefined;
+        var img = self.add.image(f.x * T + T / 2, (f.y + 1) * T, tk, frame).setOrigin(0.5, 1).setDepth((f.y + 1) * T);
+        self.tweens.add({ targets: img, y: img.y - 2, duration: 900 + (f.x * 53) % 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+        return { data: f, img: img };
+      });
+      this.boat = null;
+      var bd = this.map.boat_dock;
+      if (bd && Array.isArray(bd.ship_area)) {
+        var a = bd.ship_area, g = this.add.graphics(), x = a[0] * T + 4, y = a[1] * T + 4, w = a[2] * T - 8, h = a[3] * T - 8, tall = h > w;
+        g.fillStyle(0xf4f1e8, 1).fillRoundedRect(x, y, w, h, Math.min(w, h) / 3);   // 白色船身
+        g.lineStyle(3, 0x2f6fb0, 1).strokeRoundedRect(x, y, w, h, Math.min(w, h) / 3);   // 藍色船邊
+        g.fillStyle(0xdfe7ef, 1).fillRect(tall ? x + w * 0.2 : x + w * 0.3, tall ? y + h * 0.3 : y + h * 0.2, tall ? w * 0.6 : w * 0.4, tall ? h * 0.4 : h * 0.6);   // 船艙
+        g.fillStyle(0x2a1e22, 1);
+        for (var i = 0; i < 3; i++) { if (tall) g.fillRect(x + w * 0.35, y + h * (0.36 + i * 0.1), w * 0.3, h * 0.05); else g.fillRect(x + w * (0.36 + i * 0.1), y + h * 0.35, w * 0.05, h * 0.3); }   // 窗
+        g.setDepth((a[1] + a[3]) * T);
+        this.boat = { data: bd, gfx: g };
+      }
     }
 
     setChestOpen(id) {
@@ -847,6 +876,7 @@
 
     /** 番薯仔跟隨。邏輯在 JQ.PetFollow（可單元測試），這裡只負責套到精靈上。 */
     updatePet(delta) {
+      if (J.Followers && J.Followers.update(this, delta)) return;   // v3.0 跟班掛鉤（codex5）：兩隻共用腳印；單隻沿用下面的流程
       var pet = this.pet;
       if (!this.petState) this.petState = J.PetFollow.create('down');
       var r = J.PetFollow.step(this.petState, {
@@ -897,6 +927,7 @@
       this.petTarget = { x: this.pet.x, y: this.pet.y };
       this.petState = null;   // 換地圖時重設跟隨狀態（場景物件會沿用），從朝下站姿重新開始
       this.petDist = 0;
+      if (J.Followers) J.Followers.build(this);   // v3.0 跟班掛鉤（codex5）：每次進場重建隊伍
 
       this.npcList().forEach(function (n) {
         var tk = J.Assets.texKey(n.sprite || 'npc_unknown');
@@ -936,6 +967,7 @@
     }
 
     walkable(x, y) {
+      if (J.KeepAway && J.KeepAway.blocked(this.map, x, y)) return false;   // v3.0 保持距離掛鉤（codex5）：友善動物附近不能走
       if (this.blocked && this.blocked[x + ',' + y]) return false;
       return J.World.isWalkable(G().data.tilesets, this.map, x, y, null);
     }
@@ -950,6 +982,7 @@
           if (st.bosses[s.monster]) return;
           if (s.quest && J.QuestLog.status(st, g.data.quests, s.quest) !== 'active') return;
         }
+        if (s.elite && s.quest && J.QuestLog.status(st, g.data.quests, s.quest) !== 'active') return;   // v3.0 精英：只在委託進行中出現
         for (var i = 0; i < (s.count || 1); i++) {
           var mob = { spawn: s, mon: m, id: s.monster, idx: si * 10 + i, active: false, sprite: null, tx: 0, ty: 0, moving: false, nextMove: 0, respawnAt: 0, boss: !!(s.boss || m.boss) };
           self.placeMonster(mob, true);
@@ -1138,9 +1171,11 @@
     onPointer(pointer) {
       // v0.9.5 放大地圖（passMove 視窗）開著時，點面板外露出來的遊戲畫面也能走（只有擋路的視窗才不理會）
       if (!this.p || J.UI.blocksMove() || this.transitioning || G().busy) return;
+      if (J.Followers && J.Followers.onPointer(this, pointer)) return;   // v3.0 跟班掛鉤（codex5）：直接點霧仔說話
       var x = Math.floor(pointer.worldX / T), y = Math.floor(pointer.worldY / T);
       if (x < 0 || y < 0 || x >= this.size.w || y >= this.size.h) return;
       var target = this.interactableAt(x, y);
+      if (target && target.kind === 'boat' && target.dock.board) { x = target.dock.board.x; y = target.dock.board.y; }   // v3.0 點船身（在水上）：走到上船格
       if (target) {
         if (this.isAdjacent(x, y)) { this.face(x, y); this.interact(target); return; }
         this.walkTo(x, y, target);
@@ -1179,6 +1214,7 @@
      */
     walkTo(x, y, target) {
       var self = this, p = this.p;
+      if (J.KeepAway) J.KeepAway.warn(this.map, x, y, J.UI.toast);   // v3.0 保持距離掛鉤（codex5）：只對玩家點的目的地提示
       var w = function (cx, cy) { return self.walkable(cx, cy); };
       var path = J.Move8.planWalk(w, this.size.w, this.size.h, { c: p.tx, r: p.ty }, x, y, !!target, J.Pathfind);
       if (!path) return false;
@@ -1210,6 +1246,7 @@
      */
     tryStep(dir) {
       var p = this.p, self = this;
+      if (J.KeepAway) J.KeepAway.warnStep(this.map, p.tx, p.ty, J.Move8.DIRS[dir], J.UI.toast);   // v3.0 保持距離掛鉤（codex5）：方向鍵／搖桿嘗試靠近才提示
       var r = J.Move8.resolveStep(p.tx, p.ty, dir, function (x, y) { return self.freeAt(x, y); }, p.facing);
       if (!r.dir) {
         var an = this.blockingAnimal(p.tx, p.ty, dir);
@@ -1256,6 +1293,7 @@
       this.petTarget = { x: spot.x * T + T / 2, y: spot.y * T + T };
       // v1.0.6 斜走：這一步的距離可能是 √2 格，番薯仔等比例加快，一定在主角走完這一步前到達（不落後、不從半路切過牆角）
       this.petDist = Math.sqrt(Math.pow(this.petTarget.x - this.pet.x, 2) + Math.pow(this.petTarget.y - this.pet.y, 2));
+      if (J.Followers) J.Followers.beginStep(this);   // v3.0 跟班掛鉤（codex5）：記下主角這一步，讓兩隻依序跟上
     }
 
     arrive() {
@@ -1311,6 +1349,8 @@
       for (i = 0; i < (this.viewpoints || []).length; i++) if (this.viewpoints[i].data.x === x && this.viewpoints[i].data.y === y) return { kind: 'viewpoint', view: this.viewpoints[i].data };
       var sh = J.MapInfo.shrineAt(this.map, x, y);   // v0.9.5 媽祖神像、供桌
       if (sh) return { kind: 'shrine', spot: sh };
+      var bd = this.map.boat_dock;   // v3.0 碼頭的船：上船格、船身都算
+      if (bd && ((bd.board && bd.board.x === x && bd.board.y === y) || (Array.isArray(bd.ship_area) && x >= bd.ship_area[0] && y >= bd.ship_area[1] && x < bd.ship_area[0] + bd.ship_area[2] && y < bd.ship_area[1] + bd.ship_area[3]))) return { kind: 'boat', dock: bd };
       var an = this.animalAt(x, y);
       if (an) return { kind: 'animal', animal: an };
       return null;
@@ -1344,10 +1384,13 @@
       else if (t.kind === 'shrine') g.shrineJob(this);
       else if (t.kind === 'roadsign') g.say(t.sign.dialog, [{ who: 'pet', text: '這裡的路還不能走喔。' }]);   // v1.1 路牌：番薯仔念牌子（華語）
       else if (t.kind === 'viewpoint') g.viewpoint(t.view);   // v1.1 美人山眺望點
+      else if (t.kind === 'boat') g.boardBoat(t.dock, this);   // v3.0 碼頭的船
       else if (t.kind === 'animal') { t.animal.nextMove = Math.max(t.animal.nextMove, this.time.now + 2500); g.animalTalk(t.animal.spec); }   // 說話時先站著不動
     }
 
     promptText(t) {
+      if (t.kind === 'npc' && t.npc.ferry) return '買船票／搭船';   // v3.0 船班（codex3）
+      if (t.kind === 'boat') return '搭船';   // v3.0 碼頭的船
       if (t.kind === 'npc') return '和' + G().speaker(t.npc.id).name + '說話';
       if (t.kind === 'animal') return '摸摸' + t.animal.spec.name;
       if (t.kind === 'chest') return G().state.chests[t.chest.id] ? '看看寶箱' : '打開寶箱';

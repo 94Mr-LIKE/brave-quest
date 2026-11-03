@@ -120,6 +120,8 @@
         q_levels: Array.isArray(m.q_levels) && m.q_levels.length === 2 ? m.q_levels : null,
         phases: Number(m.phases || 3), phase_q: Number(m.phase_q || 2), last_q_level: Number(m.last_q_level || 4),
         dialog_before: m.dialog_before || null, dialog_after: m.dialog_after || null,
+        // v3.0：舊南部的數值 legacy_s（legacySouth 時用）要帶進遊戲；elite＝精英（不是頭目）
+        legacy_s: m.legacy_s ? Object.assign({}, m.legacy_s) : null, elite: m.elite === true,
         desc: m.desc || '', wake: m.wake || ((m.name || id) + '清醒了，開心地跑走了。')
       };
     });

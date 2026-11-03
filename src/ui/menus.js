@@ -269,6 +269,7 @@
       var grid = h('ul.list.book', { 'aria-label': '怪物名冊' });
       J.Bestiary.split(D.monsters, D.maps).all.forEach(function (id) {
         var m = J.Ch3Migrate ? J.Ch3Migrate.displayMonster(st, D.monsters[id]) : D.monsters[id], r = (st.bestiary || {})[id] || { seen: 0, defeated: 0 };   // v1.3 舊紅樹林旗標
+        if (J.SouthMigrate) m = J.SouthMigrate.displayMonster(st, m);   // v3.0 舊南部旗標
         var known = r.seen > 0;
         var icon = h('span.icon.book-icon' + (known ? '' : '.unknown'), { html: J.Assets.domIcon(m.sprite, { size: 56, label: known ? m.name : '?', alt: '' }) });
         var where = J.Bestiary.habitats(id, D.maps);
@@ -395,6 +396,18 @@
     var st = G.state, name = (innInfo && innInfo.name) || '旅店';
     var stay = J.Shop.innStay(st, innInfo || {});
     G.lastInnStay = stay;
+    // v3.0（71 號第九節）老闆兼賣「每區一件新裝備」（inn.sells＝SHOPS 的 id）：先選住一晚或看裝備
+    if (innInfo && innInfo.sells && !innInfo.__stayOnly && !innInfo.__noSell) {
+      return J.UI.choose(name + '：要住一晚，還是看看老闆兼賣的裝備？你現在有 ' + st.player.coins + ' 金幣。', [
+        { value: 'stay', text: '🛏️ 住一晚（' + stay.price + ' 金幣）', primary: true },
+        { value: 'shop', text: '🛒 看看裝備' }
+      ]).then(function (v) {
+        G.lastInnChoice = v;   // 測試用
+        if (v === 'stay') return inn(G, mapId, Object.assign({}, innInfo, { __noSell: true }), npcId);
+        if (v === 'shop') shop(G, innInfo.sells);
+        return false;
+      });
+    }
     // v1.2（61 號 2.8）有泡溫泉的旅館（inn.bath）：先選「住一晚」或「泡溫泉」（住不起但泡得起也可以選）；選住一晚再走原本的流程
     var bp = innInfo && innInfo.bath && !innInfo.__stayOnly ? J.Shop.bathStay(st, innInfo) : null;
     if (bp && (stay.action !== 'refuse' || bp.action === 'pay')) {

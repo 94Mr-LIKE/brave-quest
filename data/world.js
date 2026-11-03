@@ -36,10 +36,10 @@ window.WORLD = {
   regions: [
     { id: "R_JINBAOLI", name: "金包里",     real_ref: "新北市金山區",                         map_entry: "M01", tx: 46, ty: 17,  x: 0.82, y: 0.03, unlock_quest: null },
     { id: "R_SHANCHENG", name: "山城市集",  real_ref: "新北市瑞芳九份",                       map_entry: "M09", tx: 41,  ty: 45, x: 0.92, y: 0.07, unlock_quest: null, unlock_visit: "M09" },
-    { id: "R_SHENMU",   name: "神木森林",   real_ref: "嘉義阿里山",                           map_entry: "M04", tx: 34, ty: 53, x: 0.40, y: 0.53, unlock_quest: "Q_TUT_3" },
-    { id: "R_FUCHENG",  name: "府城古城",   real_ref: "台南府城",                             map_entry: "M10", tx: 17,  ty: 51, x: 0.10, y: 0.68, unlock_quest: "Q_TUT_3" },
+    { id: "R_SHENMU",   name: "神木森林",   real_ref: "嘉義阿里山",                           map_entry: "M04", tx: 34, ty: 53, x: 0.40, y: 0.53, unlock_quest: null, unlock_visit: "M04" },
+    { id: "R_FUCHENG",  name: "府城古城",   real_ref: "台南府城",                             map_entry: "M10", tx: 17,  ty: 51, x: 0.10, y: 0.68, unlock_quest: null, unlock_visit: "M10" },
     { id: "R_MANGROVE", name: "紅樹林濕地", real_ref: "臺北市北投區關渡",   map_entry: "M05", tx: 55, ty: 49, x: 0.74, y: 0.05, unlock_quest: null, unlock_visit: "M05" },
-    { id: "R_MOON",     name: "月世界",     real_ref: "高雄田寮月世界",                       map_entry: "M08", tx: 12,  ty: 46, x: 0.20, y: 0.71, unlock_quest: ["Q_GNO_4", "Q_GOB_4"] },
+    { id: "R_MOON",     name: "月世界",     real_ref: "高雄田寮月世界",                       map_entry: "M08", tx: 12,  ty: 46, x: 0.20, y: 0.71, unlock_quest: null, unlock_visit: "M08" },
     { id: "R_YEHLIU",   name: "野柳海蝕洞", real_ref: "新北市萬里區野柳地質公園（海蝕洞、蕈狀岩）", map_entry: "M06", tx: 2,  ty: 16, x: 0.87, y: 0.01, unlock_quest: null },
     { id: "R_GOBLIN",   name: "哥布林村莊", real_ref: "（奇幻地點，接在野柳海蝕洞深處）",           map_entry: "M07", tx: 11, ty: 16, x: 0.88, y: 0.035, unlock_quest: null },
     { id: "R_ZHUZIHU", name: "竹子湖", real_ref: "臺北市北投區陽明山竹子湖", map_entry: "M46", tx: 42, ty: 8, x: 0.77, y: 0.04, unlock_quest: null, unlock_visit: "M46" },
@@ -58,6 +58,10 @@ window.WORLD = {
     { id: "R_MIAOLI", name: "苗栗山城", real_ref: "苗栗縣三義鄉勝興車站、舊山線，大湖草莓", map_entry: "M17", tx: 44, ty: 14, x: 0.391, y: 0.268, unlock_quest: null, unlock_visit: "M17" },
     { id: "R_DAJIA", name: "大甲藺草鎮", real_ref: "臺中市大甲區（大甲鎮瀾宮、大甲藺）", map_entry: "M18", tx: 11, ty: 31, x: 0.312, y: 0.281, unlock_quest: null, unlock_visit: "M18" },
     { id: "R_LUKANG", name: "鹿港老街", real_ref: "彰化縣鹿港鎮（鹿港天后宮、老街）", map_entry: "M19", tx: 79, ty: 30, x: 0.216, y: 0.365, unlock_quest: null, unlock_visit: "M19" },
-    { id: "R_BEIGANG", name: "北港媽祖鎮", real_ref: "雲林縣北港鎮（北港朝天宮、武德宮、北港溪）", map_entry: "M20", tx: 35, ty: 24, x: 0.152, y: 0.509, unlock_quest: null, unlock_visit: "M20" }
+    { id: "R_BEIGANG", name: "北港媽祖鎮", real_ref: "雲林縣北港鎮（北港朝天宮、武德宮、北港溪）", map_entry: "M20", tx: 35, ty: 24, x: 0.152, y: 0.509, unlock_quest: null, unlock_visit: "M20" },
+    { id: "R_ANPING", name: "安平海港", real_ref: "臺南市安平區（安平古堡、億載金城、劍獅）", map_entry: "M21", tx: 85, ty: 24, x: 0.08, y: 0.676, unlock_quest: null, unlock_visit: "M21" },
+    { id: "R_TAIJIANG", name: "鹿耳門台江", real_ref: "臺南市安南區（正統鹿耳門聖母廟、台江國家公園）", map_entry: "M22", tx: 88, ty: 43, x: 0.064, y: 0.657, unlock_quest: null, unlock_visit: "M22" },
+    { id: "R_DASHU", name: "大樹鳳梨山", real_ref: "高雄市大樹區（高屏舊鐵橋、鳳梨荔枝、佛光山）", map_entry: "M23", tx: 6, ty: 48, x: 0.223, y: 0.751, unlock_quest: null, unlock_visit: "M23" },
+    { id: "R_PINGTUNG", name: "屏東恆春半島", real_ref: "屏東縣（東港碼頭、恆春古城、鵝鑾鼻燈塔）", map_entry: "M25", tx: 24, ty: 14, x: 0.35, y: 0.912, unlock_quest: null, unlock_visit: "M25" }
   ]
 };

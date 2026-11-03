@@ -15,9 +15,12 @@
     if (r) return r.status;
     var q = quests[id];
     if (!q) return 'locked';
-    var ok = (q.requires || []).every(function (req) { var rr = rec(state, req); return rr && rr.status === 'done'; });
+    // v3.0（70 號 5.2）舊南部旗標（legacySouth）時用 legacy_requires（舊前置：精靈鏈、獸人鏈照舊可接）；requires_visit＝到過那張地圖才能接（南部舊支線）
+    var reqs = state.legacySouth === true && Array.isArray(q.legacy_requires) ? q.legacy_requires : (q.requires || []);
+    var ok = reqs.every(function (req) { var rr = rec(state, req); return rr && rr.status === 'done'; });
     var lightsOk = (q.requires_lights || []).every(function (l) { return state.lights && state.lights[l]; });
-    return ok && lightsOk ? 'available' : 'locked';
+    var visitOk = !q.requires_visit || !!(state.visited && state.visited[q.requires_visit]);
+    return ok && lightsOk && visitOk ? 'available' : 'locked';
   }
 
   function giverMatches(q, npcId) { return q.giver === npcId; }
@@ -123,6 +126,10 @@
     }
     state.quests[id] = { status: 'done', progress: (rec(state, id) || {}).progress || 0 };
     if (id === 'Q_GNO_4' && state.legacyM05) state.legacyM05 = false;   // v1.3（62 號 5.4）地精鏈做完：舊紅樹林旗標關掉，之後照台北章的數值
+    if (id === 'Q_ORC_4' && state.legacySouth) state.legacySouth = false;   // v3.0（70 號 5.1）獸人鏈做完：舊南部旗標關掉
+    if (q.sets_flag) { if (!state.flags || typeof state.flags !== 'object') state.flags = {}; state.flags[q.sets_flag] = true; }   // v3.0：霧仔加入（fogling_joined，codex5 跟班）
+    if (q.lamp_auto && rw.light) { if (!state.lamps) state.lamps = {}; state.lamps[rw.light] = true; }   // v3.0（70 號 4.4）拿到光就自動點亮金包里的燈
+    if (quests.Q_LAMPS && quests.Q_LAMPS.retired && ['國語', '英語', '數學', '自然', '社會'].every(function (l) { return state.lamps && state.lamps[l]; }) && !(state.quests.Q_LAMPS && state.quests.Q_LAMPS.status === 'done')) state.quests.Q_LAMPS = { status: 'done', progress: 0 };   // v3.0 Q_LAMPS 退役：五盞燈都亮就算完成
     if (state.story.indexOf(id) < 0) state.story.push(id);
     return { ok: true, reward: { exp: rw.exp || 0, gold: rw.gold || 0, item: item, light: rw.light || null }, levels: levels };
   }

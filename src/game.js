@@ -23,6 +23,7 @@
   // ---------------------------------------------------------------- 啟動
   G.boot = function () {
     G.data = J.World.fromWindow(window);
+    if (J.Ferry) J.Ferry.install(G.data, window.FERRIES);   // v3.0 船班（codex3）：航線與票券留在獨立模組
     if (G.BIGPILOT && J.BigPilot) J.BigPilot.load(G);
     var norm = J.Answer.normalizeQuestions(window.QUESTIONS || []);
     G.questions = norm.valid;
@@ -153,6 +154,7 @@
 
   G.startWorld = function (isNew) {
     var st = G.state;
+    if (J.Ferry) J.Ferry.ensure(st);   // v3.0 船班（codex3）：舊存檔補票券欄位，不改 schema
     J.Daily.ensure(st.daily, Date.now());
     J.Character.clampVitals(st, G.data);
     // v0.5：地圖放大後，舊存檔的位置（location、lastInn）換算到新地圖最近能站的格子
@@ -169,6 +171,7 @@
     if (st.migratedCh1) G.pendingMigrateCh1 = st.migratedCh1;
     // v1.3 台北章（62 號 5.1 第 5 點）：Ch3Migrate 動過舊存檔 → 進地圖後旁白 D_MIGRATE_CH3 一次（看完才清）
     if (st.migratedCh3) G.pendingMigrateCh3 = st.migratedCh3;
+    if (st.migratedSouth) G.pendingMigrateSouth = st.migratedSouth;   // v3.0（70 號 5.1 第 6 點）
     // v2.0 新經濟（67 號 5.2）：EconMigrate 換算過舊存檔 → 進地圖後旁白 D_MIGRATE_ECON 一次（看完才清）
     if (st.migratedEcon) G.pendingMigrateEcon = st.migratedEcon;
     G.applySettings(true);
@@ -359,7 +362,11 @@
     return ids.length ? G.data.maps[ids[0]].name : '村子';
   };
 
-  G.coef = function (mapId) { var m = G.data.maps[mapId || (G.mapScene && G.mapScene.mapId)]; return J.World.mapCoef(m ? m.level : 1); };
+  G.coef = function (mapId) {
+    var id = mapId || (G.mapScene && G.mapScene.mapId), m = G.data.maps[id], lv = m ? m.level : 1;
+    if (J.SouthMigrate && G.state) lv = J.SouthMigrate.mapLevel(G.state, id, lv);   // v3.0 舊南部旗標：M04、M08、M10 照 v2.0 的等級
+    return J.World.mapCoef(lv);
+  };
 
   /** 答對後：升級、補滿、提示 */
   G.afterReward = function (levels) {
@@ -389,6 +396,8 @@
     st.location = { map: scene.mapId, x: scene.p.tx, y: scene.p.ty };
     var firstVisit = !st.visited[scene.mapId];   // v0.9.6 這份存檔第一次來這張地圖（慈護宮介紹只播一次）
     st.visited[scene.mapId] = true;
+    // v3.0（70 號 8.3【建議】）見習 Lv31 以上第一次進神木森林：精靈族長提醒「到宮廟或府城公會轉職」（D_SOUTH_JOB_HINT）
+    if (firstVisit && scene.mapId === 'M04' && st.player.job === 'novice' && st.player.level >= 31 && (G.data.dialogs || {}).D_SOUTH_JOB_HINT) { G.southJobHint = (G.southJobHint || 0) + 1; setTimeout(function () { if (G.mapScene === scene && !G.blocked()) G.say('D_SOUTH_JOB_HINT', []); }, 1200); }
     if (map.inn) {
       var w = function (x, y) { return scene.walkable(x, y); };
       var spot = w(map.inn.x, map.inn.y + 1) ? { c: map.inn.x, r: map.inn.y + 1 } : J.Pathfind.nearestWalkable(w, scene.size.w, scene.size.h, { c: map.inn.x, r: map.inn.y }, null);
@@ -454,11 +463,19 @@
     if (G.pendingMigrateEcon) {
       var me = G.pendingMigrateEcon; G.pendingMigrateEcon = null;
       G.migrateEconShown = me;   // 測試用
-      (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {
+      migrateV3Done = (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {   // v3.0：南部的說明接在後面
         return G.say('D_MIGRATE_ECON', [{ who: 'narrator', text: "勇者大冒險更新了！你的等級和能力都沒有變。" }]);
       }).then(function () {
         if (G.state) { delete G.state.migratedEcon; G.migrateEconDone = true; G.save(); }   // 看完了才清掉
       });
+    }
+    // v3.0 南部（70 號 5.1 第 6 點）：舊存檔改過南部（舊南部旗標、補記去過、補發碎片、點燈）→ 旁白 D_MIGRATE_SOUTH 一次（接在前面的說明後面；看完才清）
+    if (G.pendingMigrateSouth) {
+      var msx = G.pendingMigrateSouth; G.pendingMigrateSouth = null;
+      G.migrateSouthShown = msx;   // 測試用
+      (migrateV3Done || new Promise(function (res) { setTimeout(res, 500); })).then(function () {
+        return G.say('D_MIGRATE_SOUTH', [{ who: 'narrator', text: '嘉義、台南和高雄的地方變了！以前去過的地方照樣能去。' }]);
+      }).then(function () { if (G.state) { delete G.state.migratedSouth; G.migrateSouthDone = true; G.save(); } });
     }
     if (G.pendingTrialQuit && G.pendingTrialQuit.length) {
       var quit = G.pendingTrialQuit; G.pendingTrialQuit = null;
@@ -638,6 +655,7 @@
     var opens = plc.opensTier && !(G.state.tierOpen && G.state.tierOpen[plc.opensTier]) ? plc.opensTier : null;
     if (opens) { G.state.tierOpen = G.state.tierOpen || {}; G.state.tierOpen[opens] = true; G.tierOpenLog = (G.tierOpenLog || []).concat([opens]); G.save(); }
     return (first || opens ? G.say(TD.intro_place || npc.dialog, []) : Promise.resolve()).then(function () {
+      if (opens === 'adv') return G.say('D_ADV_OPEN', [{ who: 'narrator', text: '高級職業即將登場喔！' }]);   // v3.0（70 號 2.7）鹿耳門聖母廟
       if (opens) return G.say('D_INTER_OPEN', [{ who: 'narrator', text: '從現在起，在任何一間宮廟都可以挑戰中級職業了！' }]);
     }).then(function () { return G.jobPlace(place); });
   };
@@ -789,6 +807,7 @@
 
   G.talkTo = function (npc, scene, opts) {
     if (G.blocked()) return;
+    if (npc.ferry && J.FerryUI) return J.FerryUI.interact(G, npc, scene);   // v3.0 船班（codex3）：東港碼頭售票員買票、上船
     opts = opts || {};
     var map = scene.map, st = G.state, Q = G.data.quests;
     var r = npcRole(npc, map);
@@ -860,6 +879,7 @@
         scene.refreshMarkers();
         if ((q2.kind || 'help') === 'help') G.runHelp(f.id, npc, scene);
         else if (q2.kind === 'boss') { J.UI.toast('目標：' + (q2.goal || ''), 5000); G.respawnBosses(); }
+        if (q2.kind === 'hunt') G.respawnBosses();   // v3.0：打獵委託的精英（錨錨大副）接下就出現
         else if (J.QuestLog.canComplete(st, Q, f.id, G.data)) G.completeQuest(f.id, scene);
       });
       return;
@@ -874,12 +894,12 @@
     var sc = G.mapScene;
     if (!sc || !sc.p) return;   // 地圖還在載入（create 之前）：建好時 buildMonsters 會自己放頭目
     (sc.map.spawns || []).forEach(function (s) {
-      if (!(s.boss && s.quest)) return;
+      if (!((s.boss || s.elite) && s.quest)) return;   // v3.0：精英（錨錨大副）也在接委託後馬上出現
       if (sc.monsters.some(function (m) { return m.spawn === s; })) return;
-      if (J.QuestLog.status(G.state, G.data.quests, s.quest) !== 'active' || G.state.bosses[s.monster]) return;
+      if (J.QuestLog.status(G.state, G.data.quests, s.quest) !== 'active' || (s.boss && G.state.bosses[s.monster])) return;
       var m = G.data.monsters[s.monster];
       if (!m || !sc.textures.exists(J.Assets.texKey(m.sprite))) { sc.scene.restart({ mapId: sc.mapId, x: sc.p.tx, y: sc.p.ty, facing: sc.p.facing }); return; }
-      var mob = { spawn: s, mon: m, id: s.monster, idx: 99, active: false, sprite: null, tx: 0, ty: 0, moving: false, nextMove: 0, respawnAt: 0, boss: true };
+      var mob = { spawn: s, mon: m, id: s.monster, idx: 99, active: false, sprite: null, tx: 0, ty: 0, moving: false, nextMove: 0, respawnAt: 0, boss: !!s.boss };
       sc.placeMonster(mob, false);
       sc.monsters.push(mob);
     });
@@ -938,11 +958,16 @@
         return G.say('D_LIGHT_GET', [{ who: 'pet', text: '拿回了' + r.reward.light + '之光！' }]).then(function () { J.UI.banner('拿回了「' + r.reward.light + '之光」！'); });
       }
     }).then(function () {
+      // v3.0（70 號 4.4）拿到自然、社會之光：遠方的金包里自動點燈（QuestLog.complete 已點）；Q_LE_3 霧帆號逃走的過場（q.cutscene）
+      if (q.lamp_auto && r.reward.light) { if (scene && scene.updateLamps) scene.updateLamps(); return G.say('D_LAMP_AUTO', [{ who: 'narrator', text: '遠方的金包里，一盞燈亮了。' }]); }
+    }).then(function () {
+      if (q.cutscene) { G.cutsceneLog = (G.cutsceneLog || []).concat([q.cutscene]); return G.say(q.cutscene, []); }   // 測試用 cutsceneLog
+    }).then(function () {
       if (q.chapter_end) return G.chapterEnd(q.chapter_end);
     }).then(function () {
       if (q.log_next) J.UI.toast('下一步：' + q.log_next, 6000);
       if (scene && scene.refreshMarkers) scene.refreshMarkers();
-      if (q.dialog_ending || id === 'Q_FINAL') return G.ending(q);
+      if (q.dialog_ending) return G.ending(q);   // v3.0（70 號 4.2）南霧將不再播結局（結局移到終章；要播的委託寫 dialog_ending）
     });
   };
 
@@ -1038,6 +1063,24 @@
     G.openWorldMap();
   };
 
+  /**
+   * v3.0（70 號第七節）碼頭的船（maps.js boat_dock）：有票就上船（codex3 的過場、扣票、換圖）；東港這一端沒票 → 請孩子先找售票員；
+   * 小琉球這一端沒票（不應該發生，例如舊資料）→ 免費載回東港，不會被困在島上。G.boatLog 測試用
+   */
+  G.boardBoat = function (dock, scene) {
+    if (G.blocked() || !J.Ferry || !J.FerryUI || !dock) return Promise.resolve();
+    var route = J.Ferry.routes(G.data).filter(function (r) { return r.id === dock.route; })[0];
+    if (!route) return Promise.resolve();
+    var side = route.from.map === scene.mapId ? 'from' : route.to.map === scene.mapId ? 'to' : null;
+    if (!side) return Promise.resolve();
+    J.Ferry.ensure(G.state);
+    var has = G.state.ferry.tickets[route.id] > 0;
+    G.boatLog = (G.boatLog || []).concat([{ map: scene.mapId, side: side, ticket: has }]);
+    if (!has && side === 'from') return G.say('D_FERRY_NEED_TICKET', [{ who: 'pet', text: '要先跟售票員買船票，才能上船喔。' }]);
+    if (!has) return G.say('D_FERRY_FREE_RETURN', [{ who: 'pet', text: '船長說：這班回程船讓你免費搭！' }]).then(function () { var d = route.from; G.changeMap(d.map, d.x, d.y, 'down'); });
+    return J.FerryUI.interact(G, { id: 'pet', ferry: { id: route.id, side: side } }, scene);
+  };
+
   /** v0.9.3 面對動物按 A：「哞～」跳出一句話（不能戰鬥） */
   G.animalTalk = function (spec) {
     G.animalSprite = spec.sprite;
@@ -1098,6 +1141,7 @@
 
   G.startBattle = function (mob, scene) {
     var map = scene.map, mon = J.Ch3Migrate ? J.Ch3Migrate.battleMonster(G.state, mob.mon, scene.mapId) : mob.mon;   // v1.3（62 號 5.4）舊紅樹林旗標
+    if (J.SouthMigrate) mon = J.SouthMigrate.battleMonster(G.state, mon, scene.mapId);   // v3.0（70 號 5.1）舊南部旗標
     J.UI.closePassMove();   // v0.9.3 開著放大地圖走路時遇到怪物：先把地圖關掉
     G.battleCtx = { mob: mob, mon: mon, mapId: scene.mapId, over: false };
     var bg = G.battleBgFor(mon, scene.mapId);
@@ -1128,7 +1172,7 @@
     });
     ctx.qn = 0;
     G.battleUI(ctx);
-    var intro = mon.boss && mon.dialog_before ? G.say(mon.dialog_before, []) : Promise.resolve();
+    var intro = (mon.boss || mon.elite) && mon.dialog_before ? G.say(mon.dialog_before, []) : Promise.resolve();   // v3.0：精英也播
     intro.then(function () {
       G.bmsg((mon.boss ? '頭目「' : '') + mon.name + (mon.boss ? '」' : '') + '出現了！' + (mon.boss ? '（不能逃跑）' : ''));
       G.bcommands(true);
@@ -1448,7 +1492,7 @@
     ctx.won = true;
     G.save();
     var levels = st.player.level - lvl;
-    var after = mon.boss && mon.dialog_after ? function () { return G.say(mon.dialog_after, []); } : function () { return Promise.resolve(); };
+    var after = (mon.boss || mon.elite) && mon.dialog_after ? function () { return G.say(mon.dialog_after, []); } : function () { return Promise.resolve(); };
     var h = J.UI.h;
     ctx.el.cmds.innerHTML = '';
     var btn = h('button.primary', { onclick: function () {

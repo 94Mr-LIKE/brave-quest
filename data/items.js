@@ -90,7 +90,19 @@ window.ITEMS = {
   train_whistle: { name: "火車汽笛",   sprite: "item_train_whistle", kind: "key", price: 0, precious: true, desc: "迷路火車頭清醒後送的汽笛，吹起來嘟嘟響。" },
   umbrella_rib:  { name: "紙傘骨",     sprite: "item_umbrella_rib",  kind: "material", price: 0, desc: "傘傘紙傘妖掉下的竹製傘骨。" },
   lantern_paper: { name: "燈籠紙",     sprite: "item_lantern_paper", kind: "material", price: 0, desc: "燈燈小燈籠掉下的紅色燈籠紙。" },
-  dawn_shard_c:  { name: "中之曙光碎片", sprite: "item_dawn_shard_c", kind: "key", price: 0, precious: true, desc: "中霧將清醒後交出的一小片曙光，暖暖的。" }
+  dawn_shard_c:  { name: "中之曙光碎片", sprite: "item_dawn_shard_c", kind: "key", price: 0, precious: true, desc: "中霧將清醒後交出的一小片曙光，暖暖的。" },
+  // v3.0 南部（70 號 3.6）：記憶貝殼、航海圖碎片（素材）、航海圖（Q_AP_4）、鳳梨（Q_DS_2）、海玻璃、來回船票（codex3 船班）、南之曙光碎片（手帳 3／4）
+  memory_shell: { name: "記憶貝殼", sprite: "item_memory_shell", kind: "material", price: 0, desc: "海盜們搶走的貝殼，裡面好像藏著大家的回憶。" },
+  chart_piece: { name: "航海圖碎片", sprite: "item_chart_piece", kind: "material", price: 0, desc: "被撕下來的航海圖一角。" },
+  sea_chart: { name: "航海圖", sprite: "item_sea_chart", kind: "key", price: 0, precious: true, desc: "港口書記被搶走的航海圖，畫著往台江的水道。" },
+  pineapple: { name: "鳳梨", sprite: "item_pineapple", kind: "material", price: 0, desc: "被小怪搶走的鳳梨，要還給鳳梨農。" },
+  sea_glass: { name: "海玻璃", sprite: "item_sea_glass", kind: "material", price: 0, desc: "被浪磨得圓圓的玻璃。" },
+  ferry_ticket: { name: "東港⇄小琉球來回船票", sprite: "item_ferry_ticket", kind: "key", price: 0, precious: true, not_for_sale: true, desc: "往返小琉球的船票，只賣來回。" },
+  dawn_shard_s: { name: "南之曙光碎片", sprite: "item_dawn_shard_s", kind: "key", price: 0, precious: true, desc: "南霧將清醒後交出的一小片曙光，暖暖的。" },
+  // v3.0（71 號第九節，老闆同意「南部以後每區一件新裝備」）：通用款，武器、防具輪流；圖示 art_src\v1\east\items（沒有時先借既有裝備圖示）
+  gear_z8_blade: { name: "古城長劍", sprite: "item_gear_z8_blade", kind: "weapon", fam: "gen", price: 2800, atk: 18, def: 0, mp: 0, jobs: null, desc: "府城古城老鐵匠打的長劍。大家都能用。" },
+  gear_z9_vest: { name: "鳳梨硬殼背心", sprite: "item_gear_z9_vest", kind: "armor", fam: "gen", price: 2750, atk: 0, def: 10, mp: 0, jobs: null, desc: "用鳳梨葉纖維織的硬背心，又輕又耐打。大家都能穿。" },
+  gear_z10_cutlass: { name: "燈塔守護劍", sprite: "item_gear_z10_cutlass", kind: "weapon", fam: "gen", price: 4050, atk: 25, def: 0, mp: 0, jobs: null, desc: "燈塔守護員送修的老劍，亮得像燈塔的光。大家都能用。" }
 };
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */
@@ -107,5 +119,9 @@ window.SHOPS = {
   // v1.3 台北章（62 號 2.5【建議】品項同九份三家）：台北城的武器鋪、防具店、道具店（照 v1.2 頭城老街道具攤的做法另開 id，店名寫台北）
   weapon_taipei: { name: "台北武器鋪", items: ["wood_sword", "iron_sword", "steel_sword", "gloves", "staff", "rod", "ribbon_fan", "bow", "harp", "anchor_axe", "whip", "clapper", "tamer_whip", "abacus_knife"] },
   armor_taipei: { name: "台北防具店", items: ["leather", "cloak", "heavy_armor", "light_armor", "robe"] },
-  item_taipei: { name: "台北道具店", items: ["herb", "snack", "eraser", "guide"] }
+  item_taipei: { name: "台北道具店", items: ["herb", "snack", "eraser", "guide"] },
+  // v3.0 南部（71 號第九節）：旅館老闆兼賣的「每區一件新裝備」（maps.js inn.sells）
+  gear_fucheng: { name: "府城老客棧（兼賣裝備）", items: ["gear_z8_blade"] },
+  gear_dashu: { name: "鳳梨田民宿（兼賣裝備）", items: ["gear_z9_vest"] },
+  gear_kenting: { name: "墾丁旅店（兼賣裝備）", items: ["gear_z10_cutlass"] }
 };

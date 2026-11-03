@@ -14,6 +14,7 @@
   var JobMigrate = isNode ? require('./jobmigrate.js') : window.JQ.JobMigrate;
   var Ch1Migrate = isNode ? require('./ch1migrate.js') : window.JQ.Ch1Migrate;
   var Ch3Migrate = isNode ? require('./ch3migrate.js') : window.JQ.Ch3Migrate;
+  var SouthMigrate = isNode ? require('./southmigrate.js') : window.JQ.SouthMigrate;   // v3.0 南部（70 號第五節）
   var EconMigrate = isNode ? require('./econmigrate.js') : window.JQ.EconMigrate;
 
   var KEY_PREFIX = 'bq_';
@@ -125,6 +126,8 @@
     // v2.0（69 號第七節）：tierOpen 壞掉（不是物件）就改回預設；inter 只留 true／false
     if (!s.tierOpen || typeof s.tierOpen !== 'object' || Array.isArray(s.tierOpen)) s.tierOpen = { inter: false };
     s.tierOpen.inter = s.tierOpen.inter === true;
+    s.tierOpen.adv = s.tierOpen.adv === true;   // v3.0
+    dropBadEntries(s.flags, function (v) { return typeof v === 'boolean'; });   // v3.0 劇情旗標
     repairJobs(s);
     return s;
   }
@@ -182,6 +185,8 @@
     if (Ch1Migrate.needs(s)) Ch1Migrate.migrate(s);
     // v1.3 台北章（62 號第五節）：v4 → v5（紅樹林算去過、幫接好 Q_GNO_1、補記 Q_LAMPS_MATH、舊紅樹林旗標）；只新增不刪除，也要在補預設值之前
     if (Ch3Migrate.needs(s)) Ch3Migrate.migrate(s);
+    // v3.0 南部（70 號第五節）：舊南部旗標、補記去過、Q_FINAL 補發南之碎片、自動點燈、Q_LAMPS 退役；只新增不刪除，也要在補預設值之前
+    if (SouthMigrate.needs(s)) SouthMigrate.migrate(s);
     // v2.0 新經濟（67 號第五節）：v5 → v6（等級不變、照進度比例換算經驗值、金幣全部保留）；也要在補預設值之前
     if (EconMigrate.needs(s)) EconMigrate.migrate(s);
     State.migrateAudio(s.settings);   // v0.9.3 語速：舊的預設 1 倍 → 新的預設「稍快」（要在補預設值之前）

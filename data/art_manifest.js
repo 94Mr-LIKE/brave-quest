@@ -61,6 +61,21 @@ window.ART = {
   "M20": {
    "bg": "bg_M20.webp"
   },
+  "M21": {
+   "bg": "bg_M21.webp"
+  },
+  "M22": {
+   "bg": "bg_M22.webp"
+  },
+  "M23": {
+   "bg": "bg_M23.webp"
+  },
+  "M24": {
+   "bg": "bg_M24.webp"
+  },
+  "M25": {
+   "bg": "bg_M25.webp"
+  },
   "M46": {
    "bg": "bg_M46.webp"
   },
@@ -107,7 +122,9 @@ window.ART = {
   "lanternlane": "bb_lanternlane.png",
   "levee": "bb_levee.png",
   "mine": "bb_mine.png",
+  "pacific": "bb_pacific.png",
   "paddy": "bb_paddy.png",
+  "pineapple": "bb_pineapple.png",
   "railway": "bb_railway.png",
   "reservoir": "bb_reservoir.png",
   "rushfield": "bb_rushfield.png",

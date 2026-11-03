@@ -384,6 +384,24 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 32,
   "frameH": 50
  },
+ "npc_fog_kid": {
+  "file": "assets/npcs/npc_fog_kid.png",
+  "type": "single",
+  "frameW": 87,
+  "frameH": 120
+ },
+ "npc_forest_rail": {
+  "file": "assets/npcs/npc_forest_rail.png",
+  "type": "single",
+  "frameW": 45,
+  "frameH": 50
+ },
+ "npc_fort_guide": {
+  "file": "assets/npcs/npc_fort_guide.png",
+  "type": "single",
+  "frameW": 43,
+  "frameH": 50
+ },
  "npc_geo_ranger": {
   "file": "assets/npcs/npc_geo_ranger.png",
   "type": "single",
@@ -420,6 +438,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 38,
   "frameH": 50
  },
+ "npc_green_turtle": {
+  "file": "assets/npcs/npc_green_turtle.png",
+  "type": "single",
+  "frameW": 78,
+  "frameH": 128
+ },
  "npc_grocer_bg": {
   "file": "assets/npcs/npc_grocer_bg.png",
   "type": "single",
@@ -436,6 +460,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/npcs/npc_guild_m.png",
   "type": "single",
   "frameW": 34,
+  "frameH": 50
+ },
+ "npc_harbor_clerk": {
+  "file": "assets/npcs/npc_harbor_clerk.png",
+  "type": "single",
+  "frameW": 25,
   "frameH": 50
  },
  "npc_harbor_uncle": {
@@ -474,6 +504,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 31,
   "frameH": 50
  },
+ "npc_island_guide": {
+  "file": "assets/npcs/npc_island_guide.png",
+  "type": "single",
+  "frameW": 45,
+  "frameH": 50
+ },
  "npc_keelung_vendor": {
   "file": "assets/npcs/npc_keelung_vendor.png",
   "type": "single",
@@ -510,10 +546,22 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 25,
   "frameH": 50
  },
+ "npc_lighthouse_keeper": {
+  "file": "assets/npcs/npc_lighthouse_keeper.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
  "npc_lk_guide": {
   "file": "assets/npcs/npc_lk_guide.png",
   "type": "single",
   "frameW": 42,
+  "frameH": 50
+ },
+ "npc_lychee_farmer": {
+  "file": "assets/npcs/npc_lychee_farmer.png",
+  "type": "single",
+  "frameW": 35,
   "frameH": 50
  },
  "npc_merchant": {
@@ -558,6 +606,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 34,
   "frameH": 50
  },
+ "npc_oldcity_guide": {
+  "file": "assets/npcs/npc_oldcity_guide.png",
+  "type": "single",
+  "frameW": 47,
+  "frameH": 50
+ },
+ "npc_oldhouse_grandpa": {
+  "file": "assets/npcs/npc_oldhouse_grandpa.png",
+  "type": "single",
+  "frameW": 39,
+  "frameH": 50
+ },
  "npc_opera_actor": {
   "file": "assets/npcs/npc_opera_actor.png",
   "type": "single",
@@ -592,6 +652,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/npcs/npc_pastry_shop.png",
   "type": "single",
   "frameW": 32,
+  "frameH": 50
+ },
+ "npc_pineapple_farmer": {
+  "file": "assets/npcs/npc_pineapple_farmer.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "npc_rail_fan": {
+  "file": "assets/npcs/npc_rail_fan.png",
+  "type": "single",
+  "frameW": 31,
   "frameH": 50
  },
  "npc_reservoir_keeper": {
@@ -636,6 +708,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 38,
   "frameH": 50
  },
+ "npc_spoonbill": {
+  "file": "assets/npcs/npc_spoonbill.png",
+  "type": "single",
+  "frameW": 99,
+  "frameH": 152
+ },
  "npc_tea_farmer": {
   "file": "assets/npcs/npc_tea_farmer.png",
   "type": "single",
@@ -672,6 +750,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 29,
   "frameH": 50
  },
+ "npc_ticket_seller": {
+  "file": "assets/npcs/npc_ticket_seller.png",
+  "type": "single",
+  "frameW": 36,
+  "frameH": 50
+ },
  "npc_tofu_shop": {
   "file": "assets/npcs/npc_tofu_shop.png",
   "type": "single",
@@ -688,6 +772,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/npcs/npc_trail_volunteer.png",
   "type": "single",
   "frameW": 33,
+  "frameH": 50
+ },
+ "npc_turtle_volunteer": {
+  "file": "assets/npcs/npc_turtle_volunteer.png",
+  "type": "single",
+  "frameW": 43,
   "frameH": 50
  },
  "npc_umbrella_shop": {
@@ -726,6 +816,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 29,
   "frameH": 50
  },
+ "npc_volunteer_fgs": {
+  "file": "assets/npcs/npc_volunteer_fgs.png",
+  "type": "single",
+  "frameW": 27,
+  "frameH": 50
+ },
+ "npc_volunteer_lem": {
+  "file": "assets/npcs/npc_volunteer_lem.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
  "npc_volunteer_lk": {
   "file": "assets/npcs/npc_volunteer_lk.png",
   "type": "single",
@@ -740,6 +842,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
  },
  "npc_volunteer_zl": {
   "file": "assets/npcs/npc_volunteer_zl.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "npc_wetland_ranger": {
+  "file": "assets/npcs/npc_wetland_ranger.png",
   "type": "single",
   "frameW": 29,
   "frameH": 50
@@ -822,6 +930,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 169,
   "frameH": 160
  },
+ "boss_pib_ship": {
+  "file": "assets/monsters/boss_pib_ship.png",
+  "type": "single",
+  "frameW": 160,
+  "frameH": 160
+ },
  "boss_tree": {
   "file": "assets/monsters/boss_tree.png",
   "type": "single",
@@ -833,6 +947,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "type": "single",
   "frameW": 173,
   "frameH": 160
+ },
+ "mon_al_cloud": {
+  "file": "assets/monsters/mon_al_cloud.png",
+  "type": "single",
+  "frameW": 96,
+  "frameH": 96
+ },
+ "mon_al_cypress": {
+  "file": "assets/monsters/mon_al_cypress.png",
+  "type": "single",
+  "frameW": 123,
+  "frameH": 96
  },
  "mon_an_egret": {
   "file": "assets/monsters/mon_an_egret.png",
@@ -892,6 +1018,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/monsters/mon_dj_taro.png",
   "type": "single",
   "frameW": 104,
+  "frameH": 96
+ },
+ "mon_ds_lychee": {
+  "file": "assets/monsters/mon_ds_lychee.png",
+  "type": "single",
+  "frameW": 104,
+  "frameH": 96
+ },
+ "mon_ds_pineapple": {
+  "file": "assets/monsters/mon_ds_pineapple.png",
+  "type": "single",
+  "frameW": 97,
   "frameH": 96
  },
  "mon_fiddler_crab": {
@@ -1038,6 +1176,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 80,
   "frameH": 96
  },
+ "mon_mm_mudstone": {
+  "file": "assets/monsters/mon_mm_mudstone.png",
+  "type": "single",
+  "frameW": 92,
+  "frameH": 96
+ },
  "mon_mn_cart": {
   "file": "assets/monsters/mon_mn_cart.png",
   "type": "single",
@@ -1091,6 +1235,48 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "type": "single",
   "frameW": 105,
   "frameH": 96
+ },
+ "mon_pi_anchor": {
+  "file": "assets/monsters/mon_pi_anchor.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "mon_pi_crab": {
+  "file": "assets/monsters/mon_pi_crab.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "mon_pi_hermit": {
+  "file": "assets/monsters/mon_pi_hermit.png",
+  "type": "single",
+  "frameW": 92,
+  "frameH": 96
+ },
+ "mon_pi_milkfish": {
+  "file": "assets/monsters/mon_pi_milkfish.png",
+  "type": "single",
+  "frameW": 82,
+  "frameH": 96
+ },
+ "mon_pi_octo": {
+  "file": "assets/monsters/mon_pi_octo.png",
+  "type": "single",
+  "frameW": 100,
+  "frameH": 96
+ },
+ "mon_pi_parrot": {
+  "file": "assets/monsters/mon_pi_parrot.png",
+  "type": "single",
+  "frameW": 92,
+  "frameH": 96
+ },
+ "mon_pib_anchor": {
+  "file": "assets/monsters/mon_pib_anchor.png",
+  "type": "single",
+  "frameW": 127,
+  "frameH": 128
  },
  "mon_rabbit": {
   "file": "assets/monsters/mon_rabbit.png",
@@ -1164,6 +1350,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 93,
   "frameH": 96
  },
+ "mon_wx_wave": {
+  "file": "assets/monsters/mon_wx_wave.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
  "mon_wx_wind": {
   "file": "assets/monsters/mon_wx_wind.png",
   "type": "single",
@@ -1212,6 +1404,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 26,
   "frameH": 32
  },
+ "item_chart_piece": {
+  "file": "assets/items/item_chart_piece.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
  "item_clapper": {
   "file": "assets/items/item_clapper.png",
   "type": "icon",
@@ -1242,16 +1440,46 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 31,
   "frameH": 32
  },
+ "item_dawn_shard_s": {
+  "file": "assets/items/item_dawn_shard_s.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
  "item_feather": {
   "file": "assets/items/item_feather.png",
   "type": "icon",
   "frameW": 28,
   "frameH": 32
  },
+ "item_ferry_ticket": {
+  "file": "assets/items/item_ferry_ticket.png",
+  "type": "icon",
+  "frameW": 36,
+  "frameH": 32
+ },
  "item_gear": {
   "file": "assets/items/item_gear.png",
   "type": "icon",
   "frameW": 33,
+  "frameH": 32
+ },
+ "item_gear_z10_cutlass": {
+  "file": "assets/items/item_gear_z10_cutlass.png",
+  "type": "icon",
+  "frameW": 35,
+  "frameH": 32
+ },
+ "item_gear_z8_blade": {
+  "file": "assets/items/item_gear_z8_blade.png",
+  "type": "icon",
+  "frameW": 33,
+  "frameH": 32
+ },
+ "item_gear_z9_vest": {
+  "file": "assets/items/item_gear_z9_vest.png",
+  "type": "icon",
+  "frameW": 38,
   "frameH": 32
  },
  "item_gloves": {
@@ -1314,10 +1542,22 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 27,
   "frameH": 32
  },
+ "item_memory_shell": {
+  "file": "assets/items/item_memory_shell.png",
+  "type": "icon",
+  "frameW": 33,
+  "frameH": 32
+ },
  "item_mushroom_cap": {
   "file": "assets/items/item_mushroom_cap.png",
   "type": "icon",
   "frameW": 40,
+  "frameH": 32
+ },
+ "item_pineapple": {
+  "file": "assets/items/item_pineapple.png",
+  "type": "icon",
+  "frameW": 23,
   "frameH": 32
  },
  "item_pinwheel": {
@@ -1360,6 +1600,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/items/item_scroll.png",
   "type": "icon",
   "frameW": 38,
+  "frameH": 32
+ },
+ "item_sea_chart": {
+  "file": "assets/items/item_sea_chart.png",
+  "type": "icon",
+  "frameW": 34,
+  "frameH": 32
+ },
+ "item_sea_glass": {
+  "file": "assets/items/item_sea_glass.png",
+  "type": "icon",
+  "frameW": 35,
   "frameH": 32
  },
  "item_snack": {

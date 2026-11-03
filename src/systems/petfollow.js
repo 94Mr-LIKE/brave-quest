@@ -74,7 +74,72 @@
     return st.alpha;
   }
 
-  var PetFollow = { create: create, step: step, chooseDir: chooseDir, fadeAlpha: fadeAlpha, speedFor: speedFor, IDLE_MS: IDLE_MS, GHOST_ALPHA: GHOST_ALPHA };
+  // 跟班掛鉤：雙跟班使用共同的腳印；原本單隻的 step、速度與動畫規則保持原樣。
+  function copyCell(p) { return { x: p.x, y: p.y }; }
+  function sameCell(a, b) { return a.x === b.x && a.y === b.y; }
+  function canFollow(a, b, walk) {
+    var dx = b.x - a.x, dy = b.y - a.y;
+    return Math.abs(dx) <= 1 && Math.abs(dy) <= 1 && walk(b.x, b.y) &&
+      (!(dx && dy) || (walk(b.x, a.y) && walk(a.x, b.y)));
+  }
+
+  /** 進場先找連續的安全格，優先站後方；放不下的跟班等腳印夠長再出現。 */
+  function createParty(leader, count, walk, facing) {
+    count = Math.min(2, Math.max(0, Math.floor(count || 0)));
+    var back = { up: [0, 1], down: [0, -1], left: [1, 0], right: [-1, 0] }[facing] || [0, -1];
+    var dirs = [back, [0, -1], [0, 1], [-1, 0], [1, 0]], best = [copyCell(leader)];
+    function extend(path) {
+      if (path.length > best.length) best = path.slice();
+      if (path.length > count) return true;
+      var last = path[path.length - 1];
+      for (var i = 0; i < dirs.length; i++) {
+        var next = { x: last.x + dirs[i][0], y: last.y + dirs[i][1] };
+        if (!walk(next.x, next.y) || path.some(function (p) { return sameCell(p, next); })) continue;
+        if (extend(path.concat([next]))) return true;
+      }
+      return false;
+    }
+    extend(best);
+    return { count: count, walk: walk, trail: best, from: best.slice() };
+  }
+
+  /** 每一步只保留主角與前兩個腳印，跟班不會從轉角抄近路。 */
+  function advanceParty(party, next) {
+    var head = party.trail[0];
+    if (sameCell(head, next) || !party.walk(next.x, next.y)) return;
+    if (Math.abs(next.x - head.x) > 1 || Math.abs(next.y - head.y) > 1) {
+      party.trail = [copyCell(next)]; party.from = party.trail.slice(); return;
+    }
+    if (!canFollow(head, next, party.walk)) return;
+    party.from = party.trail.slice();
+    party.trail = [copyCell(next)].concat(party.trail).slice(0, party.count + 1);
+  }
+
+  /** 與主角用同一個步伐進度。折返重疊或空間不足時暫時收起後面的跟班。 */
+  function sampleParty(party, progress, tile) {
+    var k = Math.max(0, Math.min(1, progress)), taken = {}, out = [];
+    tile = tile || 32;
+    function at(i) {
+      var to = party.trail[i], from = party.from[i] || to;
+      if (!to) return null;
+      return { x: from.x + (to.x - from.x) * k, y: from.y + (to.y - from.y) * k };
+    }
+    // 和 MapScene 一樣，橫向看中心、縱向看腳底上方一個像素。
+    function cell(p) { return { x: Math.floor(p.x + 0.5), y: Math.floor(p.y + 1 - 1 / tile) }; }
+    var head = cell(at(0)); taken[head.x + ',' + head.y] = true;
+    for (var i = 1; i <= party.count; i++) {
+      var p = at(i);
+      if (!p) { out.push({ x: 0, y: 0, visible: false }); continue; }
+      var c = cell(p), key = c.x + ',' + c.y;
+      p.visible = party.walk(c.x, c.y) && !taken[key];
+      if (p.visible) taken[key] = true;
+      out.push(p);
+    }
+    return out;
+  }
+
+  var PetFollow = { create: create, step: step, chooseDir: chooseDir, fadeAlpha: fadeAlpha, speedFor: speedFor, IDLE_MS: IDLE_MS, GHOST_ALPHA: GHOST_ALPHA,
+    createParty: createParty, advanceParty: advanceParty, sampleParty: sampleParty };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.PetFollow = PetFollow; }
   if (typeof module !== 'undefined') module.exports = PetFollow;
 })();

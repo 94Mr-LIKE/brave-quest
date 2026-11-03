@@ -118,10 +118,10 @@ window.QUESTS = {
   // ═════════════════════ 神木森林・精靈族（M04，自然）═════════════════════
   Q_ELF_1: {
     title: "葉子為什麼黃了", giver: "elf_elder", map: "M04", kind: "help",
-    goal: "在金包里客運站搭車到神木森林，幫精靈長老想起植物和風的知識：答對 3 題自然。",
+    goal: "從北港來到嘉義的神木森林，幫精靈長老想起植物和風的知識：答對 3 題自然。",
     log_next: "去找村子南邊、森林小路旁的精靈小孩葉葉。",
     subject: "自然", units: ["一、植物大發現", "三、風與空氣"], count: 3, level_range: [1, 2],
-    hunt: null, requires: ["Q_TUT_3"], reward: { exp: 11, gold: 17, item: null, light: null },
+    hunt: null, requires: ["Q_BG_4"], legacy_requires: ["Q_TUT_3"], reward: { exp: 35, gold: 32, item: null, light: null },
     dialog_start: "D_ELF_1A", dialog_end: "D_ELF_1B", dialog_locked: "D_ELF_LOCK"
   },
   Q_ELF_2: {
@@ -129,25 +129,25 @@ window.QUESTS = {
     goal: "幫葉葉修好指北針和風車：答對 4 題自然。",
     log_next: "回去找精靈長老。",
     subject: "自然", units: ["二、磁鐵好好玩", "三、風與空氣"], count: 4, level_range: [1, 3],
-    hunt: null, requires: ["Q_ELF_1"], reward: { exp: 11, gold: 17, item: "herb", light: null },
+    hunt: null, requires: ["Q_ELF_1"], reward: { exp: 35, gold: 32, item: "herb", light: null },
     dialog_start: "D_ELF_2A", dialog_end: "D_ELF_2B"
   },
   Q_ELF_3: {
     title: "毒菇帽調查", giver: "elf_elder", map: "M04", kind: "hunt",
     goal: "在神木森林南邊的密林讓毒菇怪清醒，帶回 3 個毒菇帽給長老。",
-    log_next: "長老發現霧是從森林北邊的千年神木飄出來的。",
+    log_next: "精靈長老說：樹王的病，府城古城的古書也許有寫。",
     subject: "自然", units: [], count: null, level_range: [1, 2],
     hunt: { item: "mushroom_cap", n: 3, monster: "mushroom", map: "M04" },
-    requires: ["Q_ELF_2"], reward: { exp: 11, gold: 17, item: "guide", light: null },
+    requires: ["Q_ELF_2"], reward: { exp: 35, gold: 32, item: "guide", light: null },
     dialog_start: "D_ELF_3A", dialog_end: "D_ELF_3B"
   },
   Q_ELF_4: {
     title: "淨化枯萎樹王", giver: "elf_elder", map: "M04", kind: "boss",
     goal: "到神木森林最北邊的千年神木前，讓枯萎樹王清醒，拿回自然之光。",
-    log_next: "拿到自然之光！地精族住在台北北投西邊的紅樹林（台北章）。",
+    log_next: "拿到自然之光！遠方的金包里，一盞燈亮了。往府城古城西邊的安平出發。",
     subject: "自然", units: ["一、植物大發現", "二、磁鐵好好玩", "三、風與空氣", "四、奇妙的溶解", "一、快樂小農夫", "二、千變萬化的水", "三、天氣停看聽", "四、動物王國"], count: null, level_range: [2, 4],
     boss: "tree_king", boss_map: "M04",
-    hunt: null, requires: ["Q_ELF_3"], reward: { exp: 11, gold: 17, item: null, light: "自然" },
+    hunt: null, requires: ["Q_ELF_3", "Q_FC_1"], legacy_requires: ["Q_ELF_3"], reward: { exp: 35, gold: 32, item: null, light: "自然" }, lamp_auto: true,
     dialog_start: "D_ELF_4A", dialog_end: "D_ELF_4B"
   },
 
@@ -262,10 +262,10 @@ window.QUESTS = {
   // ═════════════════════ 月世界泥岩丘・獸人族（M08，社會）═════════════════════
   Q_ORC_1: {
     title: "獵場要怎麼分", giver: "orc_chief", map: "M08", kind: "help",
-    goal: "搭車到月世界，幫獸人族長想出公平的規則和分配方法：答對 4 題社會。",
+    goal: "從府城往南到月世界，幫獸人族長想出公平的規則和分配方法：答對 4 題社會。",
     log_next: "去找營地大門外的獸人獵人。",
     subject: "社會", units: ["第一單元 升上三年級的新學習", "第二單元 校園規範和班級自治", "第五單元 打造更美好的班級"], count: 4, level_range: [2, 4],
-    hunt: null, requires: ["Q_GNO_4", "Q_GOB_4"], reward: { exp: 40, gold: 47, item: null, light: null },
+    hunt: null, requires: ["Q_FINAL"], legacy_requires: ["Q_GNO_4", "Q_GOB_4"], reward: { exp: 77, gold: 62, item: null, light: null },
     dialog_start: "D_ORC_1A", dialog_end: "D_ORC_1B", dialog_locked: "D_ORC_LOCK"
   },
   Q_ORC_2: {
@@ -273,25 +273,25 @@ window.QUESTS = {
     goal: "幫獸人獵人想想怎麼照顧自己、和家人好好相處：答對 4 題社會。",
     log_next: "野豬把柵欄鑰匙叼走了，回去找族長。",
     subject: "社會", units: ["第三單元 我的校園和家庭生活", "第四單元 健康成長的快樂童年"], count: 4, level_range: [2, 4],
-    hunt: null, requires: ["Q_ORC_1"], reward: { exp: 40, gold: 47, item: "herb", light: null },
+    hunt: null, requires: ["Q_ORC_1"], reward: { exp: 77, gold: 62, item: "herb", light: null },
     dialog_start: "D_ORC_2A", dialog_end: "D_ORC_2B"
   },
   Q_ORC_3: {
     title: "柵欄鑰匙", giver: "orc_chief", map: "M08", kind: "hunt",
     goal: "讓泥岩溝谷裡的野豬清醒，找回 3 把柵欄鑰匙。",
-    log_next: "泥岩丘南邊的石像動起來了，再跟族長說話。",
+    log_next: "獸人族長說：石像生氣，是因為南方的水果被搶光了。去大樹看看。",
     subject: "社會", units: [], count: null, level_range: [3, 4],
     hunt: { item: "key", n: 3, monster: "boar", map: "M08" },
-    requires: ["Q_ORC_2"], reward: { exp: 40, gold: 47, item: "guide", light: null },
+    requires: ["Q_ORC_2"], reward: { exp: 77, gold: 62, item: "guide", light: null },
     dialog_start: "D_ORC_3A", dialog_end: "D_ORC_3B"
   },
   Q_ORC_4: {
     title: "暴躁石像", giver: "orc_chief", map: "M08", kind: "boss",
     goal: "到月世界南邊的泥岩溝，讓暴躁石像清醒，拿回社會之光。",
-    log_next: "五道光都拿回來了嗎？搭車回金包里找里長伯點燈！",
+    log_next: "拿到社會之光！五盞燈全亮了。往南到屏東。",
     subject: "社會", units: ["第一單元 升上三年級的新學習", "第二單元 校園規範和班級自治", "第三單元 我的校園和家庭生活", "第四單元 健康成長的快樂童年", "第五單元 打造更美好的班級", "第一單元 我居住的地方", "第二單元 多元的生活空間", "第三單元 生活中的各行各業", "第四單元 生活與工作的轉變", "第五單元 儲蓄與消費", "第六單元 小小街道觀察家"], count: null, level_range: [3, 4],
     boss: "angry_golem", boss_map: "M08",
-    hunt: null, requires: ["Q_ORC_3"], reward: { exp: 40, gold: 47, item: null, light: "社會" },
+    hunt: null, requires: ["Q_ORC_3", "Q_DS_2"], legacy_requires: ["Q_ORC_3"], reward: { exp: 77, gold: 62, item: null, light: "社會" }, lamp_auto: true,
     dialog_start: "D_ORC_4A", dialog_end: "D_ORC_4B"
   },
 
@@ -322,18 +322,18 @@ window.QUESTS = {
     log_next: "霧魔在古城塔頂！搭車去府城古城，找城主。",
     subject: "混合", subjects: ["國語", "英語", "數學", "自然", "社會"], units: [], count: 5, level_range: [1, 3],
     hunt: null, requires: ["Q_ELF_4", "Q_MER_4", "Q_GNO_4", "Q_GOB_4", "Q_ORC_4"],
-    reward: { exp: 64, gold: 68, item: "guide", light: null },
+    reward: { exp: 64, gold: 68, item: "guide", light: null }, retired: true,
     dialog_start: "D_LAMPS_A", dialog_end: "D_LAMPS_B", dialog_locked: "D_CHIEF_IDLE"
   },
   Q_FINAL: {
-    title: "驅散遺忘霧魔", giver: "king", map: "M10", kind: "boss",
-    goal: "從府城城主府後面的樓梯上古城塔頂，用五道光驅散遺忘霧魔。",
-    log_next: "霧散了！可以繼續解村民委託、開寶箱，或回金包里看看。",
-    subject: "混合", subjects: ["國語", "英語", "數學", "自然", "社會"], units: [], count: null, level_range: [3, 4],
+    title: "南霧將：古城塔頂的遺忘霧魔", giver: "king", map: "M10", kind: "boss",
+    goal: "從府城城主府後面的樓梯上古城塔頂，用四道光讓遺忘霧魔清醒。",
+    log_next: "南霧將清醒了，拿到南之曙光碎片（3／4）！塔頂還有一小團霧……",
+    subject: "混合", subjects: ["國語", "英語", "數學", "自然"], units: [], count: null, level_range: [3, 4],
     boss: "fog_demon", boss_map: "M11",
-    hunt: null, requires: ["Q_LAMPS"], requires_lights: ["國語", "英語", "數學", "自然", "社會"],
-    reward: { exp: 64, gold: 68, item: null, light: null },
-    dialog_start: "D_FINAL_A", dialog_end: "D_FINAL_B", dialog_locked: "D_FINAL_LOCK", dialog_ending: "D_ENDING"
+    hunt: null, requires: ["Q_LE_3", "Q_ELF_4"], requires_lights: ["國語", "英語", "數學", "自然"],
+    reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_FINAL_A", dialog_end: "D_FINAL_B", dialog_locked: "D_FINAL_LOCK"
   },
 
   // ═════════════════════ v1.2 第二章：草嶺古道、頭城礁溪、三星、蘇澳南方澳（61 號 4.1、4.2 節）═════════════════════
@@ -785,7 +785,7 @@ window.QUESTS = {
     goal: "幫神木森林密林裡迷路的精靈小孩，想起回家的路和規矩：答對 3 題社會。",
     log_next: "精靈的樹屋村在森林的北邊。",
     subject: "社會", units: ["第三單元 我的校園和家庭生活", "第二單元 校園規範和班級自治"], count: 3, level_range: [1, 2],
-    hunt: null, requires: ["Q_TUT_3"], reward: { exp: 11, gold: 17, item: "herb", light: null },
+    hunt: null, requires: [], requires_visit: "M04", reward: { exp: 35, gold: 32, item: "herb", light: null },
     dialog_start: "D_LOST_A", dialog_end: "D_LOST_B"
   },
   Q_SIDE_MEASURE: {
@@ -809,7 +809,7 @@ window.QUESTS = {
     goal: "幫獸人小班長規劃班費，買盆栽布置教室：答對 2 題社會。",
     log_next: "小班長說：班上的事，大家一起討論決定。",
     subject: "社會", units: ["第五單元 打造更美好的班級"], count: 2, level_range: [3, 4],
-    hunt: null, requires: ["Q_TUT_3"], reward: { exp: 40, gold: 47, item: "guide", light: null },
+    hunt: null, requires: [], requires_visit: "M08", reward: { exp: 77, gold: 62, item: "guide", light: null },
     dialog_start: "D_PIGGY_A", dialog_end: "D_PIGGY_B"
   },
   Q_SIDE_MAGNET: {
@@ -828,12 +828,189 @@ window.QUESTS = {
     hunt: null, requires: ["Q_TUT_3"], reward: { exp: 7, gold: 9, item: "snack", light: null },
     dialog_start: "D_TARO_A", dialog_end: "D_TARO_B"
   },
+  // ═════════════════════ v3.0 南部（第六章嘉南、第七章高屏；70 號 4.1–4.5；wip_v30_draft/v30_apply.js）═════════════════════
+  // 主線：Q_ELF_1–3 → Q_FC_1 → Q_ELF_4 → 安平 Q_AP_1 → Q_AP_2、Q_AP_3 → Q_AP_4（精英錨錨大副）→ 台江 Q_LE_1、Q_LE_2 → Q_LE_3（霧帆號逃走）→ Q_FINAL 南霧將 → Q_V1_FOG（chapter_end: 6）
+  //   → 月世界 Q_ORC_1–3 → 大樹 Q_DS_1 → Q_DS_2 → Q_ORC_4 → 東港 Q_LQ_0（船票）→ 小琉球 Q_LQ_1 → Q_LQ_2、Q_LQ_3 → 屏東 Q_PT_1 → Q_PT_2 → Q_PT_3 霧帆號（chapter_end: 7）
+  // 支線：Q_AL_1、Q_DS_3、Q_PT_4。轉職：鹿耳門聖母廟、佛光山（jobs.js JOB_RULES.places）。經濟：新經濟規則（每區 8 場經驗、20 場金幣平均分給委託和寶箱；每步 Z8 35／32、Z9 77／62、Z10 240／180）
+  Q_FC_1: {
+    title: "府城的古書", giver: "librarian", map: "M10", kind: "help",
+    goal: "到府城古城的圖書館，查樹王為什麼生病：答對 3 題自然。",
+    log_next: "找到了！帶著古書回神木森林。",
+    subject: "自然", units: ["一、植物大發現"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_ELF_3"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_FC_1A", dialog_end: "D_FC_1B", dialog_locked: "D_FC_1_LOCK"
+  },
+  Q_AL_1: {
+    title: "森林小火車", giver: "forest_rail", map: "M04", kind: "help", side: true,
+    goal: "幫林鐵站務阿伯算小火車的班次：答對 3 題數學。",
+    log_next: "站務阿伯說：小火車從嘉義一路爬到阿里山。",
+    subject: "數學", units: ["5 兩步驟應用問題"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_ELF_1"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_AL_1A", dialog_end: "D_AL_1B", dialog_locked: "D_AL_1_LOCK"
+  },
+  Q_AP_1: {
+    title: "外國商船的招呼", giver: "harbor_clerk", map: "M21", kind: "help",
+    goal: "從府城往西到安平，幫港口書記和外國商船打招呼：答對 3 題英語。",
+    log_next: "古堡解說員和老屋阿伯，也有故事要說給你聽。",
+    subject: "英語", units: ["Lesson 1 What's your name?（名字）"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_ELF_4"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_AP_1A", dialog_end: "D_AP_1B"
+  },
+  Q_AP_2: {
+    title: "古堡的故事", giver: "fort_guide", map: "M21", kind: "help",
+    goal: "聽古堡解說員說安平古堡的故事：答對 2 題社會。",
+    log_next: "古堡和劍獅的故事都聽完，就回去找港口書記。",
+    subject: "社會", units: ["第四單元 生活與工作的轉變"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_AP_1"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_AP_2A", dialog_end: "D_AP_2B", dialog_locked: "D_AP_2_LOCK"
+  },
+  Q_AP_3: {
+    title: "門上的劍獅", giver: "oldhouse_grandpa", map: "M21", kind: "help",
+    goal: "聽老屋阿伯說門上劍獅的故事：答對 2 題國語。",
+    log_next: "古堡和劍獅的故事都聽完，就回去找港口書記。",
+    subject: "國語", units: ["第參單元 生活小智慧"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_AP_1"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_AP_3A", dialog_end: "D_AP_3B", dialog_locked: "D_AP_3_LOCK"
+  },
+  Q_AP_4: {
+    title: "拿回航海圖", giver: "harbor_clerk", map: "M21", kind: "hunt",
+    goal: "讓碼頭的錨錨大副清醒，拿回航海圖。",
+    log_next: "拿回航海圖了！往北過橋去台江。",
+    subject: "數學", units: [], count: null, level_range: [2, 3],
+    hunt: { item: "sea_chart", n: 1, monster: "pib_anchor", map: "M21" },
+    requires: ["Q_AP_2", "Q_AP_3"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_AP_4A", dialog_end: "D_AP_4B", dialog_locked: "D_AP_4_LOCK"
+  },
+  Q_LE_1: {
+    title: "台江的黑面琵鷺", giver: "wetland_ranger", map: "M22", kind: "help",
+    goal: "過橋到台江，在賞鳥亭聽保育員介紹黑面琵鷺：答對 2 題自然。",
+    log_next: "保育員說：看鳥不要靠太近，說話要小聲。",
+    subject: "自然", units: ["四、動物王國"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_AP_4"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_LE_1A", dialog_end: "D_LE_1B"
+  },
+  Q_LE_2: {
+    title: "濕地的生活", giver: "wetland_ranger", map: "M22", kind: "help",
+    goal: "聽保育員說台江濕地有什麼：答對 2 題社會。",
+    log_next: "保育員發現，海上有一艘灰色的船……",
+    subject: "社會", units: ["第二單元 多元的生活空間"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_AP_4"], reward: { exp: 35, gold: 32, item: null, light: null },
+    dialog_start: "D_LE_2A", dialog_end: "D_LE_2B"
+  },
+  Q_LE_3: {
+    title: "趕走霧帆號", giver: "wetland_ranger", map: "M22", kind: "help",
+    goal: "用正確的知識保護黑面琵鷺，趕走霧帆號：答對 3 題英語。",
+    log_next: "霧帆號往南逃走了。保育員說：霧是從古城塔頂飄出來的。",
+    subject: "英語", units: ["Lesson 3 Animal（動物）"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_LE_1", "Q_LE_2"], reward: { exp: 35, gold: 32, item: null, light: null }, cutscene: "D_SHIP_ESCAPE",
+    dialog_start: "D_LE_3A", dialog_end: "D_LE_3B"
+  },
+  Q_V1_FOG: {
+    title: "霧仔", giver: "fog_kid", map: "M11", kind: "help",
+    goal: "遺忘霧魔散開後，留下一小團霧在哭。幫它想起霧是什麼：答對 3 題自然。",
+    log_next: "霧仔加入了！牠說霧王在玉山。先往南去月世界吧。",
+    subject: "自然", units: ["二、千變萬化的水"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_FINAL"], reward: { exp: 35, gold: 32, item: null, light: null }, chapter_end: 6, sets_flag: "fogling_joined",
+    dialog_start: "D_V1_FOG_KID", dialog_end: "D_V1_FOG_KID_B"
+  },
+  Q_DS_1: {
+    title: "舊鐵橋", giver: "rail_fan", map: "M23", kind: "help",
+    goal: "從月世界往南到大樹，聽鐵道迷阿伯說舊鐵橋有多長：答對 2 題數學。",
+    log_next: "鳳梨農說：鳳梨田裡的小怪把鳳梨搶走了。",
+    subject: "數學", units: ["1 10000以內的數"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_ORC_3"], reward: { exp: 77, gold: 62, item: null, light: null },
+    dialog_start: "D_DS_1A", dialog_end: "D_DS_1B", dialog_locked: "D_DS_1_LOCK"
+  },
+  Q_DS_2: {
+    title: "鳳梨田的小怪", giver: "pineapple_farmer", map: "M23", kind: "hunt",
+    goal: "讓鳳梨田裡的鳳梨盔甲蟲清醒，拿回 3 顆鳳梨。",
+    log_next: "鳳梨找回來了！回月世界安撫暴躁石像。",
+    subject: "數學", units: [], count: null, level_range: [2, 3],
+    hunt: { item: "pineapple", n: 3, monster: "ds_pineapple", map: "M23" },
+    requires: ["Q_DS_1"], reward: { exp: 77, gold: 62, item: null, light: null },
+    dialog_start: "D_DS_2A", dialog_end: "D_DS_2B", dialog_locked: "D_DS_2_LOCK"
+  },
+  Q_DS_3: {
+    title: "鳳荔之鄉", giver: "lychee_farmer", map: "M23", kind: "help", side: true,
+    goal: "聽荔枝農說大樹的水果：答對 2 題社會。",
+    log_next: "荔枝農說：大樹的鳳梨和荔枝都很有名。",
+    subject: "社會", units: ["第三單元 生活中的各行各業"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_DS_1"], reward: { exp: 77, gold: 62, item: null, light: null },
+    dialog_start: "D_DS_3A", dialog_end: "D_DS_3B", dialog_locked: "D_DS_3_LOCK"
+  },
+  Q_LQ_0: {
+    title: "往小琉球的船", giver: "ticket_seller", map: "M25", kind: "ferry",
+    goal: "在東港碼頭買往小琉球的來回船票（200 金幣）。",
+    log_next: "買到船票了！到碼頭點船，就能去小琉球。",
+    subject: "社會", units: [], count: null, level_range: [2, 3],
+    hunt: null, requires: ["Q_ORC_4"], reward: { exp: 0, gold: 0, item: null, light: null },
+    dialog_start: "D_LQ_0", dialog_end: "D_LQ_0", dialog_locked: "D_FERRY_DONGGANG_LIUQIU_LOCKED"
+  },
+  Q_LQ_1: {
+    title: "淨灘接力", giver: "turtle_volunteer", map: "M24", kind: "help",
+    goal: "跟保育志工淨灘，想一想垃圾為什麼會傷到海龜：答對 3 題自然。",
+    log_next: "保育志工說：看海龜要保持距離，不要打擾牠們。",
+    subject: "自然", units: ["四、動物王國"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_LQ_0"], reward: { exp: 77, gold: 62, item: null, light: null },
+    dialog_start: "D_LQ_1A", dialog_end: "D_LQ_1B"
+  },
+  Q_LQ_2: {
+    title: "友善賞龜", giver: "turtle_volunteer", map: "M24", kind: "help",
+    goal: "學會友善賞龜，用望遠鏡數一數海龜：答對 2 題數學。",
+    log_next: "記住：和海龜保持五公尺以上。島上的委託做完，就坐船回東港。",
+    subject: "數學", units: ["9 列表與規律", "1 10000以內的數"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_LQ_1"], reward: { exp: 77, gold: 62, item: null, light: null },
+    dialog_start: "D_LQ_2A", dialog_end: "D_LQ_2B"
+  },
+  Q_LQ_3: {
+    title: "珊瑚礁島", giver: "island_guide", map: "M24", kind: "help",
+    goal: "聽島上解說員說小琉球是怎樣的島：答對 2 題社會。",
+    log_next: "小琉球是珊瑚礁島！島上的委託做完，就坐船回東港。",
+    subject: "社會", units: ["第二單元 多元的生活空間"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_LQ_1"], reward: { exp: 77, gold: 62, item: null, light: null },
+    dialog_start: "D_LQ_3A", dialog_end: "D_LQ_3B", dialog_locked: "D_LQ_3_LOCK"
+  },
+  Q_PT_1: {
+    title: "第一座國家公園", giver: "park_ranger_kt", map: "M25", kind: "help",
+    goal: "回到屏東，聽解說員介紹墾丁國家公園：答對 2 題社會。",
+    log_next: "解說員說：南邊燈塔的守護員需要幫忙。",
+    subject: "社會", units: ["第一單元 我居住的地方"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_LQ_2", "Q_LQ_3"], reward: { exp: 240, gold: 180, item: null, light: null },
+    dialog_start: "D_PT_1A", dialog_end: "D_PT_1B", dialog_locked: "D_PT_1_LOCK"
+  },
+  Q_PT_2: {
+    title: "讓燈塔再亮", giver: "lighthouse_keeper", map: "M25", kind: "help",
+    goal: "幫燈塔守護員排好燈光閃爍的規律：答對 3 題數學。",
+    log_next: "燈塔亮了！外海的霧裡，好像有一艘船……",
+    subject: "數學", units: ["9 列表與規律"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_PT_1"], reward: { exp: 240, gold: 180, item: null, light: null },
+    dialog_start: "D_PT_2A", dialog_end: "D_PT_2B", dialog_locked: "D_PT_2_LOCK"
+  },
+  Q_PT_3: {
+    title: "屏東頭目：霧帆號", giver: "lighthouse_keeper", map: "M25", kind: "boss",
+    goal: "燈塔照出外海的霧帆號，讓它清醒。",
+    log_next: "第七章完成！大家的記憶貝殼都回來了。",
+    subject: "混合", subjects: ["英語", "自然", "社會"], units: ["Lesson 2 How old are you?（數字）", "Lesson 1 What's your name?（名字）", "Lesson 4 Are you tired?（感覺）", "Lesson 3 I'm short.（身材外貌）", "Lesson 1 Stationery（文具用品）", "Lesson 2 Colors（顏色）", "Review 1 Fun Things（有趣的事物）", "Lesson 3 Animal（動物）", "Lesson 4 Things you can do（能力）", "Get Ready（開學預備）", "二、磁鐵好好玩", "一、植物大發現", "三、風與空氣", "四、奇妙的溶解", "一、快樂小農夫", "二、千變萬化的水", "三、天氣停看聽", "四、動物王國", "第四單元 健康成長的快樂童年", "第二單元 校園規範和班級自治", "第三單元 我的校園和家庭生活", "第一單元 升上三年級的新學習", "第五單元 打造更美好的班級", "第一單元 我居住的地方", "第二單元 多元的生活空間", "第三單元 生活中的各行各業", "第四單元 生活與工作的轉變", "第五單元 儲蓄與消費", "第六單元 小小街道觀察家"], count: null, level_range: [2, 4],
+    boss: "pib_ship", boss_map: "M25",
+    hunt: null, requires: ["Q_PT_2"], reward: { exp: 240, gold: 180, item: null, light: null }, chapter_end: 7,
+    dialog_start: "D_PT_3A", dialog_end: "D_PT_3B"
+  },
+  Q_PT_4: {
+    title: "恆春古城", giver: "oldcity_guide", map: "M25", kind: "help", side: true,
+    goal: "聽古城解說員說恆春古城的四座城門：答對 2 題社會。",
+    log_next: "解說員說：走一走古城門，想想以前的人怎麼生活。",
+    subject: "社會", units: ["第四單元 生活與工作的轉變"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_PT_1"], reward: { exp: 240, gold: 180, item: null, light: null },
+    dialog_start: "D_PT_4A", dialog_end: "D_PT_4B", dialog_locked: "D_PT_4_LOCK"
+  },
+  // ═════════════════════ v3.0 南部委託 END（wip_v30_draft/v30_apply.js 每次照表整段重建）═════════════════════
+  // v3.0：Q_SIDE_LIB 排在南部委託後面（府城圖書館員第一次說話先給主線 Q_FC_1；QuestLog.forNpc 照資料順序挑）
   Q_SIDE_LIB: {
     title: "古城圖書館的英文書", giver: "librarian", map: "M10", kind: "help",
     goal: "幫府城古城圖書館員讀英文書：答對 3 題英語。",
     log_next: "圖書館員說：常常讀，就不會忘。",
     subject: "英語", units: ["Lesson 3 I'm short.（身材外貌）", "Lesson 1 What's your name?（名字）"], count: 3, level_range: [1, 4],
-    hunt: null, requires: ["Q_TUT_3"], reward: { exp: 64, gold: 68, item: "guide", light: null },
+    hunt: null, requires: [], requires_visit: "M10", reward: { exp: 35, gold: 32, item: "guide", light: null },
     dialog_start: "D_LIB_A", dialog_end: "D_LIB_B"
-  }
+  },
 };

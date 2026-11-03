@@ -164,7 +164,32 @@ window.VOICES = {
     inn_beigang: { name: "鎮上旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.66, rate: 0.62, taigi: true, persona: "鎮上旅店老闆，講話親切（v2.0 中部）。" },
     mb_train: { name: "迷路火車頭", gender: "m", age: "adult", stage: "中年", look: "boss_mb_train", rate: 1.1, taigi: false, persona: "急急忙忙、像蒸汽一樣噗噗喘，清醒後慢下來。", pitch: 0.5 },
     mb_lantern: { name: "燈籠霧將", gender: "m", age: "adult", stage: "中年", look: "boss_mb_lantern", rate: 0.74, taigi: false, persona: "低低的、飄忽的聲音，清醒後變得溫暖。", pitch: 0.6 },
-    leopardcat_cub: { name: "石虎寶寶", gender: "m", age: "child", stage: "小孩", look: "npc_leopardcat_cub", pitch: 1.7, rate: 1.2, taigi: false, persona: "不說話的石虎寶寶，只會輕輕「喵～」一聲（v2.0 友善 NPC，69 號 3.4）。" }
+    leopardcat_cub: { name: "石虎寶寶", gender: "m", age: "child", stage: "小孩", look: "npc_leopardcat_cub", pitch: 1.7, rate: 1.2, taigi: false, persona: "不說話的石虎寶寶，只會輕輕「喵～」一聲（v2.0 友善 NPC，69 號 3.4）。" },
+    // v3.0 南部（70 號；聲音照外觀年齡自動挑、和既有角色差 0.05 以上；劇本語音組定稿後以 dialogs_south.js 的 VOICES_SOUTH 為準）
+    forest_rail: { name: "林鐵站務阿伯", gender: "m", age: "adult", stage: "中年", look: "npc_forest_rail", pitch: 0.74, rate: 0.89, taigi: true, persona: "嘉義林鐵小站的站務員，講話穩穩的，很愛小火車。" },
+    harbor_clerk: { name: "港口書記", gender: "m", age: "adult", stage: "青年", look: "npc_harbor_clerk", pitch: 0.88, rate: 1.27, taigi: true, persona: "安平港口的年輕書記，做事快、講話也快。", voice_share: "observatory_staff" },
+    fort_guide: { name: "古堡解說員", gender: "m", age: "adult", stage: "青年", look: "npc_fort_guide", pitch: 0.88, rate: 0.7, taigi: true, persona: "安平古堡的年輕解說員，講古蹟很仔細。", voice_share: "village_guide" },
+    oldhouse_grandpa: { name: "老屋阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_oldhouse_grandpa", pitch: 0.8, rate: 0.63, taigi: true, persona: "住在劍獅老屋的阿伯，講話慢慢的、很和氣。" },
+    wetland_ranger: { name: "溼地保育員", gender: "m", age: "adult", stage: "青年", look: "npc_wetland_ranger", pitch: 1, rate: 0.78, taigi: true, persona: "台江的年輕保育員，說話輕聲，怕嚇到鳥。" },
+    volunteer_lem: { name: "鹿耳門聖母廟志工阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_volunteer_lem", pitch: 0.88, rate: 0.76, taigi: true, persona: "正統鹿耳門聖母廟的志工阿伯，講話親切。", voice_share: "temple_volunteer_ht" },
+    rail_fan: { name: "鐵道迷阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_rail_fan", pitch: 0.9, rate: 0.94, taigi: true, persona: "很愛火車的老阿伯，講到鐵橋就很得意。", voice_share: "old_stationmaster" },
+    pineapple_farmer: { name: "鳳梨農", gender: "m", age: "adult", stage: "中年", look: "npc_pineapple_farmer", pitch: 0.6, rate: 1.3, taigi: true, persona: "種鳳梨的農夫，嗓門大、講話很快。" },
+    lychee_farmer: { name: "荔枝農", gender: "m", age: "adult", stage: "中年", look: "npc_lychee_farmer", pitch: 0.8, rate: 1, taigi: true, persona: "種荔枝的農夫，笑咪咪的。" },
+    volunteer_fgs: { name: "佛光山寺院志工", gender: "m", age: "adult", stage: "中年", look: "npc_volunteer_fgs", pitch: 0.6, rate: 0.6, taigi: true, persona: "佛光山的寺院志工，講台語（老闆 2026-10-26），說話慢、很溫和。" },
+    turtle_volunteer: { name: "海龜保育志工", gender: "m", age: "adult", stage: "青年", look: "npc_turtle_volunteer", pitch: 0.94, rate: 0.62, taigi: true, persona: "小琉球的年輕保育志工，很愛海龜。", voice_share: "conservation_guide" },
+    island_guide: { name: "島上解說員", gender: "m", age: "adult", stage: "青年", look: "npc_island_guide", pitch: 1, rate: 1.26, taigi: true, persona: "小琉球的年輕解說員，講話有精神。", voice_share: "bt_museum_guide" },
+    ticket_seller: { name: "東港碼頭售票員", gender: "m", age: "adult", stage: "中年", look: "npc_ticket_seller", pitch: 0.82, rate: 1.05, taigi: true, persona: "東港碼頭的售票員，講話俐落、提醒安全。" },
+    park_ranger_kt: { name: "國家公園解說員", gender: "m", age: "adult", stage: "青年", look: "npc_park_ranger", pitch: 0.94, rate: 1.22, taigi: true, persona: "墾丁的年輕解說員；和擎天草原的解說員同一張圖，所以共用聲音。", voice_share: "park_ranger" },
+    lighthouse_keeper: { name: "燈塔守護員", gender: "m", age: "elder", stage: "老年", look: "npc_lighthouse_keeper", pitch: 0.85, rate: 0.87, taigi: true, persona: "顧燈塔很多年的老阿伯，聲音沉穩。" },
+    oldcity_guide: { name: "古城解說員", gender: "m", age: "adult", stage: "青年", look: "npc_oldcity_guide", pitch: 1, rate: 0.68, taigi: true, persona: "恆春古城的年輕解說員，講話仔細。", voice_share: "lk_guide" },
+    fog_kid: { name: "霧仔", gender: "m", age: "child", stage: "小孩", look: "npc_fog_kid", pitch: 1.45, rate: 0.88, taigi: false, persona: "拳頭大小的白色小霧團夥伴（27 號），說話輕輕軟軟、有點害羞；講華語。" },
+    inn_anping: { name: "港邊客棧老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.66, rate: 1.26, taigi: true, persona: "港邊客棧老闆，熱情。", voice_share: "inn_lukang" },
+    inn_taijiang: { name: "溼地民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.78, rate: 0.63, taigi: true, persona: "溼地民宿老闆，講話慢、親切。", voice_share: "inn_sanyi" },
+    inn_dashu: { name: "鳳梨田民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.19, taigi: true, persona: "鳳梨田民宿老闆，爽朗。", voice_share: "inn_dajia" },
+    inn_liuqiu: { name: "島上民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.13, taigi: true, persona: "島上民宿老闆，親切。", voice_share: "inn_beitou" },
+    inn_kenting: { name: "墾丁旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.68, rate: 1.2, taigi: true, persona: "墾丁旅店老闆，說話輕快。", voice_share: "inn_xinyi" },
+    pib_ship: { name: "霧帆號", gender: "m", age: "adult", stage: "中年", look: "boss_pib_ship", pitch: 0.54, rate: 1.24, taigi: false, persona: "笑嘻嘻的霧做的帆船，講話又快又調皮，清醒後變得溫和。" },
+    pib_anchor: { name: "錨錨大副", gender: "m", age: "adult", stage: "中年", look: "mon_pib_anchor", pitch: 0.52, rate: 0.92, taigi: false, persona: "很努力但很迷糊的大船錨，講話慢吞吞、喘吁吁。" }
   },
 
   // 主角男女（目前沒有台詞，預留）
@@ -246,6 +271,21 @@ window.VOICES = {
     gh_lantern: { family: "spirit", size: "s", mood: "神祕", pitch_shift: 6, cry: "呼……呼……" },
     gh_civet: { family: "beast", size: "m", mood: "頑皮", pitch_shift: 3, cry: "吱吱！" },
     mb_train: { family: "armor", size: "boss", mood: "暴躁", pitch_shift: -9, cry: "嘟嘟——！" },
-    mb_lantern: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -6, cry: "呼嗚嗚……" }
+    mb_lantern: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -6, cry: "呼嗚嗚……" },
+    // v3.0 南部新怪物（70 號 3.2；家族照外型）
+    al_cypress: { family: "plant", size: "m", mood: "暴躁", pitch_shift: -3, cry: "嘎吱嘎吱！" },
+    al_cloud: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 6, cry: "噗嚕噗嚕～" },
+    pi_hermit: { family: "aquatic", size: "s", mood: "頑皮", pitch_shift: 4, cry: "喀喀！喀喀！" },
+    pi_milkfish: { family: "aquatic", size: "s", mood: "頑皮", pitch_shift: 5, cry: "啪噠啪噠！" },
+    pi_anchor: { family: "armor", size: "m", mood: "迷糊", pitch_shift: -5, cry: "咚——鏘！" },
+    pib_anchor: { family: "armor", size: "l", mood: "迷糊", pitch_shift: -7, cry: "嘿咻——鏘鏘！" },
+    pi_crab: { family: "aquatic", size: "m", mood: "暴躁", pitch_shift: -1, cry: "喀嚓喀嚓！" },
+    mm_mudstone: { family: "rock", size: "m", mood: "迷糊", pitch_shift: -4, cry: "咕嚕……咕嚕……" },
+    ds_pineapple: { family: "beast", size: "s", mood: "暴躁", pitch_shift: 2, cry: "嗡嗡！咚！" },
+    ds_lychee: { family: "plant", size: "s", mood: "頑皮", pitch_shift: 7, cry: "啵！啵！" },
+    pi_parrot: { family: "bird", size: "s", mood: "頑皮", pitch_shift: 8, cry: "喳喳！看到了！" },
+    pi_octo: { family: "aquatic", size: "m", mood: "迷糊", pitch_shift: -2, cry: "咕嚕嚕……" },
+    wx_wave: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 5, cry: "嘩啦——" },
+    pib_ship: { family: "spirit", size: "boss", mood: "頑皮", pitch_shift: -6, cry: "嘿呦——升帆！" }
   }
 };

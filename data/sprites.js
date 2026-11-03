@@ -1763,5 +1763,275 @@ window.SPRITES = {
    "right",
    "up"
   ]
+ },
+ "mon_al_cypress": {
+  "file": "assets/monsters/mon_al_cypress.png",
+  "type": "single",
+  "frameW": 123,
+  "frameH": 96
+ },
+ "mon_al_cloud": {
+  "file": "assets/monsters/mon_al_cloud.png",
+  "type": "single",
+  "frameW": 96,
+  "frameH": 96
+ },
+ "mon_pi_hermit": {
+  "file": "assets/monsters/mon_pi_hermit.png",
+  "type": "single",
+  "frameW": 92,
+  "frameH": 96
+ },
+ "mon_pi_milkfish": {
+  "file": "assets/monsters/mon_pi_milkfish.png",
+  "type": "single",
+  "frameW": 82,
+  "frameH": 96
+ },
+ "mon_pi_anchor": {
+  "file": "assets/monsters/mon_pi_anchor.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "mon_pib_anchor": {
+  "file": "assets/monsters/mon_pib_anchor.png",
+  "type": "single",
+  "frameW": 127,
+  "frameH": 128
+ },
+ "mon_pi_crab": {
+  "file": "assets/monsters/mon_pi_crab.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "mon_mm_mudstone": {
+  "file": "assets/monsters/mon_mm_mudstone.png",
+  "type": "single",
+  "frameW": 92,
+  "frameH": 96
+ },
+ "mon_ds_pineapple": {
+  "file": "assets/monsters/mon_ds_pineapple.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "mon_ds_lychee": {
+  "file": "assets/monsters/mon_ds_lychee.png",
+  "type": "single",
+  "frameW": 104,
+  "frameH": 96
+ },
+ "mon_pi_parrot": {
+  "file": "assets/monsters/mon_pi_parrot.png",
+  "type": "single",
+  "frameW": 92,
+  "frameH": 96
+ },
+ "mon_pi_octo": {
+  "file": "assets/monsters/mon_pi_octo.png",
+  "type": "single",
+  "frameW": 100,
+  "frameH": 96
+ },
+ "mon_wx_wave": {
+  "file": "assets/monsters/mon_wx_wave.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "boss_pib_ship": {
+  "file": "assets/monsters/boss_pib_ship.png",
+  "type": "single",
+  "frameW": 160,
+  "frameH": 160
+ },
+ "npc_forest_rail": {
+  "file": "assets/npcs/npc_forest_rail.png",
+  "type": "single",
+  "frameW": 45,
+  "frameH": 50
+ },
+ "npc_harbor_clerk": {
+  "file": "assets/npcs/npc_harbor_clerk.png",
+  "type": "single",
+  "frameW": 25,
+  "frameH": 50
+ },
+ "npc_fort_guide": {
+  "file": "assets/npcs/npc_fort_guide.png",
+  "type": "single",
+  "frameW": 43,
+  "frameH": 50
+ },
+ "npc_oldhouse_grandpa": {
+  "file": "assets/npcs/npc_oldhouse_grandpa.png",
+  "type": "single",
+  "frameW": 39,
+  "frameH": 50
+ },
+ "npc_wetland_ranger": {
+  "file": "assets/npcs/npc_wetland_ranger.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "npc_volunteer_lem": {
+  "file": "assets/npcs/npc_volunteer_lem.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "npc_rail_fan": {
+  "file": "assets/npcs/npc_rail_fan.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
+ "npc_pineapple_farmer": {
+  "file": "assets/npcs/npc_pineapple_farmer.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "npc_lychee_farmer": {
+  "file": "assets/npcs/npc_lychee_farmer.png",
+  "type": "single",
+  "frameW": 35,
+  "frameH": 50
+ },
+ "npc_volunteer_fgs": {
+  "file": "assets/npcs/npc_volunteer_fgs.png",
+  "type": "single",
+  "frameW": 27,
+  "frameH": 50
+ },
+ "npc_turtle_volunteer": {
+  "file": "assets/npcs/npc_turtle_volunteer.png",
+  "type": "single",
+  "frameW": 43,
+  "frameH": 50
+ },
+ "npc_island_guide": {
+  "file": "assets/npcs/npc_island_guide.png",
+  "type": "single",
+  "frameW": 45,
+  "frameH": 50
+ },
+ "npc_ticket_seller": {
+  "file": "assets/npcs/npc_ticket_seller.png",
+  "type": "single",
+  "frameW": 36,
+  "frameH": 50
+ },
+ "npc_lighthouse_keeper": {
+  "file": "assets/npcs/npc_lighthouse_keeper.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
+ "npc_oldcity_guide": {
+  "file": "assets/npcs/npc_oldcity_guide.png",
+  "type": "single",
+  "frameW": 47,
+  "frameH": 50
+ },
+ "npc_fog_kid": {
+  "file": "assets/npcs/npc_fog_kid.png",
+  "type": "walk",
+  "frameW": 29,
+  "frameH": 30,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "npc_spoonbill": {
+  "file": "assets/npcs/npc_spoonbill.png",
+  "type": "walk",
+  "frameW": 33,
+  "frameH": 38,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "npc_green_turtle": {
+  "file": "assets/npcs/npc_green_turtle.png",
+  "type": "walk",
+  "frameW": 26,
+  "frameH": 32,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "item_memory_shell": {
+  "file": "assets/items/item_memory_shell.png",
+  "type": "icon",
+  "frameW": 33,
+  "frameH": 32
+ },
+ "item_chart_piece": {
+  "file": "assets/items/item_chart_piece.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
+ "item_sea_chart": {
+  "file": "assets/items/item_sea_chart.png",
+  "type": "icon",
+  "frameW": 34,
+  "frameH": 32
+ },
+ "item_pineapple": {
+  "file": "assets/items/item_pineapple.png",
+  "type": "icon",
+  "frameW": 23,
+  "frameH": 32
+ },
+ "item_sea_glass": {
+  "file": "assets/items/item_sea_glass.png",
+  "type": "icon",
+  "frameW": 35,
+  "frameH": 32
+ },
+ "item_ferry_ticket": {
+  "file": "assets/items/item_ferry_ticket.png",
+  "type": "icon",
+  "frameW": 36,
+  "frameH": 32
+ },
+ "item_dawn_shard_s": {
+  "file": "assets/items/item_dawn_shard_s.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
+ "item_gear_z8_blade": {
+  "file": "assets/items/item_gear_z8_blade.png",
+  "type": "icon",
+  "frameW": 33,
+  "frameH": 32
+ },
+ "item_gear_z9_vest": {
+  "file": "assets/items/item_gear_z9_vest.png",
+  "type": "icon",
+  "frameW": 38,
+  "frameH": 32
+ },
+ "item_gear_z10_cutlass": {
+  "file": "assets/items/item_gear_z10_cutlass.png",
+  "type": "icon",
+  "frameW": 35,
+  "frameH": 32
  }
 };

@@ -11,7 +11,7 @@
  *   '.' 地面   ',' 花草/裝飾地面   '=' 路/石板/月台   '%' 淺泥/淺灘/沙   'D' 門   'B' 橋/木棧道   'S' 樓梯   'c' 地毯（以上可走）
  *   'T' 樹/柱   '#' 牆/岩壁/城牆/泥岩脊   '~' 水   'H' 房屋牆   'R' 屋頂   'F' 柵欄   '*' 灌木/岩石   'K' 大型擺設（以上擋路）
  *
- * v0.5 大地圖：M01、M02、M03、M04、M05、M06、M07、M08、M09、M10、M11、M46、M47、M48、M49、M14、M50、M51、M52、M13、M12、M53、M54、M15、M16、M17、M18、M19、M20 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42、M46 84×48、M47 96×57、M48 90×54、M49 84×48、M14 96×57、M50 90×54、M51 96×57、M52 84×48、M13 90×60、M12 96×60、M53 96×57、M54 84×54、M15 90×57、M16 90×54、M17 90×54、M18 90×54、M19 90×54、M20 96×57），
+ * v0.5 大地圖：M01、M02、M03、M04、M05、M06、M07、M08、M09、M10、M11、M46、M47、M48、M49、M14、M50、M51、M52、M13、M12、M53、M54、M15、M16、M17、M18、M19、M20、M21、M22、M23、M24、M25 邊長放大約 3 倍（M01 96×60、M02 90×54、M03 84×48、M04 90×60、M05 90×57、M06 84×48、M07 84×48、M08 90×54、M09 96×57、M10 84×57、M11 72×42、M46 84×48、M47 96×57、M48 90×54、M49 84×48、M14 96×57、M50 90×54、M51 96×57、M52 84×48、M13 90×60、M12 96×60、M53 96×57、M54 84×54、M15 90×57、M16 90×54、M17 90×54、M18 90×54、M19 90×54、M20 96×57、M21 96×57、M22 96×60、M23 90×54、M24 72×48、M25 72×90），
  *   格子依 GPT 背景逐格重描（來源 tools/bigmaps/<ID>.txt／.json，背景 docs/assets/maps/bg_<ID>.webp）。
  *
  * 地區之間：
@@ -360,21 +360,21 @@ window.MAPS = {
 
   // ───────────────────────────── M04 神木森林（精靈族）─────────────────────────────
   M04: {
-    name: "神木森林", type: "tribe", level: 2, bgm: "elf", battle_bg: "forest", tileset: "forest",
+    name: "神木森林", type: "tribe", level: 5, bgm: "elf", battle_bg: "forest", tileset: "forest",
     real_ref: "嘉義阿里山森林（巨木群、森林小火車）",
     art_note: "高大的檜木林。最北邊是一棵巨大的千年神木（'K'），周圍是花草圍成的空地；左右各有精靈樹屋；中段是密林小徑；最南邊是森林小火車的小車站與月台。",
     grid: [
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..T......TTTTTTTTTT...T...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..T......TTTTTTTTTT...T..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..T.*....TTTTTTTTTTTT.....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTHTTTTTTTTTTTTTTHTTTTTTT....UU..UTTTTTTTTTTUUUUU....**TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTSTTTTTTTTTTTTTTSTTTTTTT....TU..TTTTTTTTTTKKKTTT.....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTSTTTTTTTTTTTTTTSTTTTTTT*...TT...TTTTTTTTTKKK........TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTSTTTTTTTTTTTTTTSTTTTTTT..U.......TTTTTTT.KKK....U...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTSTTTTTTTTTTTTTTSTTTTTTT..U.......TTTTTTTTKKK....U...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTT==TTTTTTTTTTTTT==TTTTTT*T*..U........===..KKK..**...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTT==.TTTTTTTTTTTT==TTTTTT..T.UU..U.....===........TU=====U===========UU=UU=UU==UTTTTT",
+      "TTTTTTT==.TTTTTTTTTTTT==TTTTTT..T.UU..U.....===........TU=====U=======TT==UU=UU=UU==UTTTTT",
       "TT===========================T....TT..*.....===........TT*=========U==U========U=====TTTTT",
       "TT============================..............===..KKK...TTUUUUUUUUUUTUUTUUUUUUUUTUUU==TTTTT",
       "TTUUUUUUUUUUUU==....U.UUUU..===================........TTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
@@ -384,18 +384,18 @@ window.MAPS = {
       "TTTTTTTHTTTTTT==TTTTTTHTTTTTTTTTTT*....**TTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
       "TTTTTTTSTTTTTT==TTTTTTSTTTTTTTTTTTUUU..**TTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
       "TTTTTTTSTTTTTT==TTTTTTSTTTTTTTTTTTUUUUU**TTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
-      "TTTTTTTSTTTTTT==TTTTTTSTTTTTTTTTTTTTT..**TTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
+      "TTTTTTTSTTTTTT==TTTTTTSTTTTTTTTTTTTTTT.**TTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
       "TTTTTTT==TTTTT==TTTTTT==TTTTTTT**TTTT..*TTTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
-      "TTT==========================TTT.TTT...*TTTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
-      "TTT==========================TTT..****.*TTTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
-      "TTT==========================TTT..****.*TTTT===TTTTTTTTTTTTTTTTTTTTTTTT........**..==TTTTT",
+      "============================TTTT.TTT...*TTTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
+      "=============================TTT..****.*TTTT===TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTT",
+      "=============================TTT..****.*TTTT===TTTTTTTTTTTTTTTTTTTTTTTT.....T..**T.==TTTTT",
       "TTTKUUUUUUUU......UUUUUUUUUK.TTT..****.*TTTT===TTTTTTTTTTTTTTTTTTTTTTTT........**..==TTTTT",
-      "TTT.KKKKKKKK......KKKK=KKKK.UTTT.......*TTTT===TTTTTTTTTTTTTTTTTTTTT...U*..........==TTTTT",
-      "TTT.KKKKKKKK......KKKKKKKKK.UTTT....**.*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.*...............TTT",
-      "TTT.........................UTTTT*TTTTT*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.......TUUU......TTT",
+      "TTT.KKKKKKKK......KKKK=KKKK.UTTT.......*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.U*..........==TTTTT",
+      "TTT.KKKKKKKK......KKKKKKKKK.UTTT....**.*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.*..........=======K",
+      "TTT.........................UTTTT*TTTTT*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.......TUUU.=======T",
       "TTTUUUUUUUUU......UUUUUUUUU.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTTTT....*U.*TTUUUUU..TTT",
-      "TTTKKKKKKKKK......KKKKKKKKK.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTTT.U..UU*...*TTTTTU.TTT",
-      "TTTKKKKKKKKK*.....KKKKKKKKK.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTT..**.***.....*TTTT.TTT",
+      "TTTKKKKKKKKK......KKKKKKKKK.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTTT.U..UU*..T*TTTTTU.TTT",
+      "TTTKKKKKKKKK*.....KKKKKKKKK.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTT..**.***....T*TTTT.TTT",
       "TTT*.*.TT..TTT..TTT...KKTTTTUTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTT...**.....TTUUUTTTTUTTT",
       "TTT*.............*........**UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTU........****TTTTTTTTTT",
       "TTT.UUUUUUU.......UUUUUUUUU.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTT**U====U***TTTTTTTTTTTTT",
@@ -418,37 +418,46 @@ window.MAPS = {
       "TTTKTTTTTTTTTT===============U=================..............*******TTT***....**....**TTTT",
       "TTTKKKKKKKKKKKUUUUU==========KKKFFFFFFFFFFFF===FF..............****..*...*.....*....**TTTT",
       "TTTKKKKKKKKKKKKKKKKBBBBBBBBBBBBKKBBBBBBBBBBBBBB.......................................TTTT",
-      "TTTTKKKKKKKKKKKKKKKBBBBBBBBBBBBBBBBBBBBBBBBBBBBB######################################TTTT",
-      "TTTTTTTTTTTTTTTTTTTK############################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTT############################*TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+      "TTTTKKKKKKKKKKKKKKKBBBBBBBBBBBBBBBBBBBBBBBBB==BB######################################TTTT",
+      "TTTTTTTTTTTTTTTTTTTK########################==##TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTT#########################==#*TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
     start: { x: 34, y: 53 },
     station: { x: 30, y: 53, name: "神木森林站", shelter: { x: 27, y: 52 } },
-    exits: [],
+    exits: [
+      { x: 44, y: 59, to: "M10", tx: 82, ty: 16 },
+      { x: 45, y: 59, to: "M10", tx: 82, ty: 17 },
+      { x: 0, y: 22, to: "M20", tx: 70, ty: 55 },
+      { x: 0, y: 23, to: "M20", tx: 71, ty: 55 },
+      { x: 0, y: 24, to: "M20", tx: 72, ty: 55 }
+    ],
     npcs: [
       { id: "elf_elder", x: 8, y: 9, sprite: "npc_elf_elder", dialog: "D_ELDER_IDLE", quest: "Q_ELF_1", quests: ["Q_ELF_1", "Q_ELF_3", "Q_ELF_4"] },
       { id: "elf_kid", x: 15, y: 42, sprite: "npc_elf_kid", dialog: "D_ELFKID_IDLE", quest: "Q_ELF_2", quests: ["Q_ELF_2"] },
-      { id: "elf_kid_lost", x: 76, y: 28, sprite: "npc_elf_kid", dialog: "D_LOST_IDLE", quest: "Q_SIDE_LOST", quests: ["Q_SIDE_LOST"] }
+      { id: "elf_kid_lost", x: 76, y: 28, sprite: "npc_elf_kid", dialog: "D_LOST_IDLE", quest: "Q_SIDE_LOST", quests: ["Q_SIDE_LOST"] },
+      { id: "forest_rail", x: 37, y: 54, sprite: "npc_forest_rail", dialog: "D_FORESTRAIL_IDLE", quest: "Q_AL_1", quests: ["Q_AL_1"] }
+    ],
+    roadsigns: [
+      { id: "sign_tataka", x: 89, y: 27, dialog: "D_SIGN_TATAKA" }
     ],
     chests: [
-      { id: "C_M04_1", x: 28, y: 12, subject: "數學", level: 2, reward: { gold: 3, exp: 2, item: null } },
-      { id: "C_M04_2", x: 2, y: 11, subject: "數學", level: 2, reward: { gold: 3, exp: 2, item: "herb" } },
-      { id: "C_M04_3", x: 53, y: 4, subject: "數學", level: 2, reward: { gold: 3, exp: 2, item: "herb" } },
-      { id: "C_M04_4", x: 86, y: 28, subject: "數學", level: 2, reward: { gold: 4, exp: 2, item: null } },
-      { id: "C_M04_5", x: 85, y: 53, subject: "數學", level: 2, reward: { gold: 4, exp: 3, item: "eraser" } }
+      { id: "C_M04_1", x: 28, y: 12, subject: "數學", level: 3, reward: { gold: 6, exp: 7, item: null } },
+      { id: "C_M04_2", x: 2, y: 11, subject: "數學", level: 3, reward: { gold: 6, exp: 7, item: "herb" } },
+      { id: "C_M04_3", x: 53, y: 4, subject: "數學", level: 3, reward: { gold: 6, exp: 7, item: "herb" } },
+      { id: "C_M04_4", x: 81, y: 26, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: null } },
+      { id: "C_M04_5", x: 85, y: 53, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "eraser" } }
     ],
     spawns: [
-      { monster: "mushroom", count: 3, area: [3, 38, 27, 15] },
-      { monster: "sprout", count: 2, area: [57, 8, 30, 19] },
+      { monster: "mushroom", count: 2, area: [3, 38, 27, 15] },
       { monster: "owl", count: 2, area: [30, 13, 14, 16] },
-      { monster: "tree_king", count: 1, area: [45, 9, 1, 1], boss: true, quest: "Q_ELF_4" },
-      { monster: "mushroom", count: 2, area: [66, 24, 21, 13] },
-      { monster: "owl", count: 2, area: [47, 46, 40, 10] }
+      { monster: "al_cypress", count: 3, area: [57, 8, 30, 19] },
+      { monster: "al_cloud", count: 3, area: [47, 46, 40, 10] },
+      { monster: "tree_king", count: 1, area: [45, 9, 1, 1], boss: true, quest: "Q_ELF_4" }
     ],
-    inn: { npc: null, price: 4, x: 23, y: 9, name: "神木樹屋旅店", sign: "樹屋", dialog: "D_INN_SHENMU", dialog_nocoin: "D_INN_SHENMU_NOCOIN" },
+    inn: { npc: null, price: 18, x: 23, y: 9, name: "神木樹屋旅店", sign: "樹屋", dialog: "D_INN_SHENMU", dialog_nocoin: "D_INN_SHENMU_NOCOIN" },
     shop: null,
     lights: [
       { x: 5, y: 4, r: 1.2 },
@@ -777,11 +786,11 @@ window.MAPS = {
 
   // ───────────────────────────── M08 月世界泥岩丘（獸人族）─────────────────────────────
   M08: {
-    name: "月世界泥岩丘", type: "field", level: 4, bgm: "hills", battle_bg: "rock", tileset: "field",
+    name: "月世界泥岩丘", type: "field", level: 5, bgm: "hills", battle_bg: "rock", tileset: "field",
     real_ref: "高雄田寮月世界（泥岩惡地，翰林三下國語〈月世界之旅〉可呼應）",
     art_note: "灰白色的泥岩惡地：'#' 是一道道斜斜的光禿泥岩脊，中間是乾裂的溝谷；東北角柵欄圍起獸人營地；東側一個小水池；西南角是月世界站月台。幾乎沒有樹。",
     grid: [
-      "############################################################F##########################F##",
+      "###########################################==###############F##########################F##",
       "##......#####.........####......####......====....#######...FFFFFFFFFFFFFFFFFFFFFFFFFFFF##",
       "##.....U#####U.......U####U.....####U.....=====.....##...#..FFFFFFFFFFFFFFFFFFFFFFFFFFFF##",
       "##U....########.....U######U.....####U......====#UUU##U.....F...RRRRRRR.....RRRRRRR....F##",
@@ -832,32 +841,37 @@ window.MAPS = {
       "#............................................BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB#",
       "#BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB#",
       "#BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB............................................#",
-      "#............................................#.....#........#.###......#........##......##",
-      "###.#....###....##...............###....##..###.#...........######.#......#.....###......#",
-      "##########################################################################################"
+      "#............................................#..==.#........#.###......#........##......##",
+      "###.#....###....##...............###....##..###.==..........######.#......#.....###......#",
+      "################################################==########################################"
     ],
     start: { x: 12, y: 46 },
     station: { x: 4, y: 46, name: "月世界站", shelter: { x: 15, y: 41 } },
-    exits: [],
+    exits: [
+      { x: 43, y: 0, to: "M10", tx: 37, ty: 55 },
+      { x: 44, y: 0, to: "M10", tx: 38, ty: 55 },
+      { x: 48, y: 53, to: "M23", tx: 42, ty: 1 },
+      { x: 49, y: 53, to: "M23", tx: 43, ty: 1 }
+    ],
     npcs: [
       { id: "orc_chief", x: 81, y: 8, sprite: "npc_orc_chief", dialog: "D_ORC_CHIEF_IDLE", quest: "Q_ORC_1", quests: ["Q_ORC_1", "Q_ORC_3", "Q_ORC_4"] },
       { id: "orc", x: 75, y: 15, sprite: "npc_orc", dialog: "D_ORC_IDLE", quest: "Q_ORC_2", quests: ["Q_ORC_2"] },
       { id: "orc_bank", x: 72, y: 32, sprite: "npc_orc", dialog: "D_ORC_BANK_IDLE", quest: "Q_SIDE_PIGGY", quests: ["Q_SIDE_PIGGY"] }
     ],
     chests: [
-      { id: "C_M08_1", x: 3, y: 3, subject: "數學", level: 4, reward: { gold: 12, exp: 10, item: null } },
-      { id: "C_M08_2", x: 86, y: 45, subject: "數學", level: 4, reward: { gold: 12, exp: 10, item: "herb" } },
-      { id: "C_M08_3", x: 13, y: 9, subject: "數學", level: 4, reward: { gold: 12, exp: 10, item: "guide" } },
-      { id: "C_M08_4", x: 66, y: 44, subject: "數學", level: 4, reward: { gold: 11, exp: 10, item: "herb" } }
+      { id: "C_M08_1", x: 3, y: 3, subject: "數學", level: 3, reward: { gold: 16, exp: 19, item: null } },
+      { id: "C_M08_2", x: 86, y: 45, subject: "數學", level: 3, reward: { gold: 16, exp: 19, item: "herb" } },
+      { id: "C_M08_3", x: 13, y: 9, subject: "數學", level: 3, reward: { gold: 15, exp: 19, item: "guide" } },
+      { id: "C_M08_4", x: 66, y: 44, subject: "數學", level: 3, reward: { gold: 15, exp: 20, item: "herb" } }
     ],
     spawns: [
       { monster: "boar", count: 3, area: [28, 37, 30, 10] },
-      { monster: "wisp", count: 2, area: [16, 1, 24, 14] },
+      { monster: "mm_mudstone", count: 2, area: [16, 1, 24, 14] },
       { monster: "angry_golem", count: 1, area: [42, 34, 1, 1], boss: true, quest: "Q_ORC_4" },
       { monster: "boar", count: 2, area: [62, 20, 26, 14] },
-      { monster: "wisp", count: 2, area: [14, 15, 26, 14] }
+      { monster: "mm_mudstone", count: 2, area: [14, 15, 26, 14] }
     ],
-    inn: { npc: null, price: 10, x: 69, y: 8, name: "月世界帳篷營地", sign: "營帳", dialog: "D_INN_MOON", dialog_nocoin: "D_INN_MOON_NOCOIN" },
+    inn: { npc: null, price: 20, x: 69, y: 8, name: "月世界帳篷營地", sign: "營帳", dialog: "D_INN_MOON", dialog_nocoin: "D_INN_MOON_NOCOIN" },
     shop: null,
     lights: [
       { x: 77, y: 13, r: 1.5 },
@@ -1024,7 +1038,7 @@ window.MAPS = {
 
   // ───────────────────────────── M10 府城古城 ─────────────────────────────
   M10: {
-    name: "府城古城", type: "castle", level: 4, bgm: "castle", battle_bg: "castle", tileset: "castle",
+    name: "府城古城", type: "castle", level: 5, bgm: "castle", battle_bg: "castle", tileset: "castle",
     real_ref: "台南府城（古城牆、城門、赤崁樓一帶的古城氛圍）",
     art_note: "紅磚古城：外圍 '#' 是古城牆；北半部是城主府，紅地毯通到城主的大椅（'KK'），左廳是職業公會、右廳是圖書館（'K' 書櫃、木樁）；城主府後方頂端的樓梯通往古城塔頂；南半部是庭園（'T' 老樹、'~' 水池）；左下角是府城車站月台。",
     grid: [
@@ -1044,8 +1058,8 @@ window.MAPS = {
       "#TTTTTTTTTTTT==TTTTTTTTTTTTTT####TTTTKcccccKTTTTT==TTTTTTTTTTT###TTTTTTT===TTTTTTTT#",
       "#TTTTTTTTTTTT==TTTTTTTTTTTTTT####TTTTKcccccKTTTTT==TTTTTTTTTTT###TTTTTTT===TTTTTTTT#",
       "#==================================================================================#",
-      "#==================================================================================#",
-      "#===========================================UUUUUUUUUUUUUUUUUUU==============#=====#",
+      "====================================================================================",
+      "============================================UUUUUUUUUUUUUUUUUUU==============#======",
       "#KKKKKKKKKKKKKKKKKKKKKKKKKKKTT#TTTTTT=======KKKKKKKKKKKKKKKKKKKTTTTTTTTTTTTTT#=====#",
       "#KKKKKKKKKKKKKKKKKKKKKKKKKKKTT#TTTTTT=======KKKKKKKKKKKKKKKKKKKTTTTTTTTTTTTTT#K====#",
       "#KKKKKKKKKKKKKKKKKKKKKKKKKKK###KK==========KRRRRRRRRRRRRRRRRRRTTTTTTTTTTTTTTT#K====#",
@@ -1080,38 +1094,44 @@ window.MAPS = {
       "#TTTTTTFFFKKKKKK..K.KKKKFKFFTTTTTTTK===TTTTTTKFFFFFFFFFFFFFFFFFFKFFFFFFFFFFFFKK...K#",
       "#TTTTTTTBBBBBBBBBBBBBBBBBBBBTTTTTTTK===TTTTTTBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB#",
       "#TTTTTTTBBBBBBBBBBBBBBBBBBBBTTTTTTTK===TTTTTTBKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK#",
-      "########......................................KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK#",
-      "########====================##################KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK#",
-      "########====================########################################################",
-      "####################################################################################",
-      "####################################################################################"
+      "########............................====......KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK#",
+      "########====================########====######KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK#",
+      "########====================########====############################################",
+      "####################################====############################################",
+      "#####################################==#############################################"
     ],
     start: { x: 17, y: 51 },
     station: { x: 21, y: 50, name: "府城古城站", shelter: { x: 8, y: 49 } },
     exits: [
       { x: 41, y: 0, to: "M11", tx: 35, ty: 40 },
-      { x: 42, y: 0, to: "M11", tx: 36, ty: 40 }
+      { x: 42, y: 0, to: "M11", tx: 36, ty: 40 },
+      { x: 0, y: 16, to: "M21", tx: 94, ty: 25, requires: "Q_ELF_4", requires_dialog: "D_EXIT_LOCK_FC_W" },
+      { x: 0, y: 17, to: "M21", tx: 94, ty: 26, requires: "Q_ELF_4", requires_dialog: "D_EXIT_LOCK_FC_W" },
+      { x: 83, y: 16, to: "M04", tx: 44, ty: 58 },
+      { x: 83, y: 17, to: "M04", tx: 45, ty: 58 },
+      { x: 37, y: 56, to: "M08", tx: 43, ty: 1, requires: "Q_FINAL", requires_dialog: "D_EXIT_LOCK_FC_S" },
+      { x: 38, y: 56, to: "M08", tx: 44, ty: 1, requires: "Q_FINAL", requires_dialog: "D_EXIT_LOCK_FC_S" }
     ],
     npcs: [
       { id: "king", x: 40, y: 7, sprite: "npc_king", dialog: "D_KING_IDLE", quest: "Q_FINAL", quests: ["Q_FINAL"] },
       { id: "guild", x: 15, y: 9, sprite: "npc_guild_m", dialog: "D_GUILD_IDLE", quest: null, quests: [] },
-      { id: "librarian", x: 75, y: 12, sprite: "npc_librarian", dialog: "D_LIBRARIAN_IDLE", quest: "Q_SIDE_LIB", quests: ["Q_SIDE_LIB"] }
+      { id: "librarian", x: 75, y: 12, sprite: "npc_librarian", dialog: "D_LIBRARIAN_IDLE", quest: "Q_FC_1", quests: ["Q_FC_1", "Q_SIDE_LIB"] }
     ],
     chests: [
-      { id: "C_M10_1", x: 1, y: 42, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "guide" } },
-      { id: "C_M10_2", x: 67, y: 40, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "herb" } },
-      { id: "C_M10_3", x: 82, y: 40, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: null } },
-      { id: "C_M10_4", x: 46, y: 47, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "guide" } },
-      { id: "C_M10_5", x: 61, y: 28, subject: "數學", level: 4, reward: { gold: 10, exp: 9, item: "snack" } },
-      { id: "C_M10_6", x: 33, y: 6, subject: "數學", level: 4, reward: { gold: 9, exp: 9, item: null } },
-      { id: "C_M10_7", x: 51, y: 40, subject: "數學", level: 4, reward: { gold: 9, exp: 10, item: "herb" } }
+      { id: "C_M10_1", x: 1, y: 42, subject: "數學", level: 3, reward: { gold: 5, exp: 5, item: "guide" } },
+      { id: "C_M10_2", x: 67, y: 40, subject: "數學", level: 3, reward: { gold: 5, exp: 5, item: "herb" } },
+      { id: "C_M10_3", x: 82, y: 40, subject: "數學", level: 3, reward: { gold: 5, exp: 5, item: null } },
+      { id: "C_M10_4", x: 46, y: 47, subject: "數學", level: 3, reward: { gold: 5, exp: 5, item: "guide" } },
+      { id: "C_M10_5", x: 61, y: 28, subject: "數學", level: 3, reward: { gold: 4, exp: 5, item: "snack" } },
+      { id: "C_M10_6", x: 33, y: 6, subject: "數學", level: 3, reward: { gold: 4, exp: 5, item: null } },
+      { id: "C_M10_7", x: 51, y: 40, subject: "數學", level: 3, reward: { gold: 4, exp: 5, item: "herb" } }
     ],
     spawns: [
       { monster: "armor", count: 3, area: [45, 28, 30, 13] },
       { monster: "wisp", count: 2, area: [72, 17, 11, 24] },
       { monster: "wisp", count: 1, area: [57, 3, 24, 15] }
     ],
-    inn: { npc: null, price: 12, x: 53, y: 29, name: "府城老客棧", sign: "客棧", dialog: "D_INN_FUCHENG", dialog_nocoin: "D_INN_FUCHENG_NOCOIN" },
+    inn: { npc: null, price: 18, x: 53, y: 29, name: "府城老客棧", sign: "客棧", dialog: "D_INN_FUCHENG", dialog_nocoin: "D_INN_FUCHENG_NOCOIN", sells: "gear_fucheng" },
     shop: null,
     lights: [
       { x: 34, y: 3, r: 1.2 },
@@ -1201,11 +1221,13 @@ window.MAPS = {
       { x: 35, y: 41, to: "M10", tx: 41, ty: 1 },
       { x: 36, y: 41, to: "M10", tx: 42, ty: 1 }
     ],
-    npcs: [],
+    npcs: [
+      { id: "fog_kid", x: 39, y: 4, sprite: "npc_fog_kid", dialog: "D_V1_FOG_KID", quest: "Q_V1_FOG", quests: ["Q_V1_FOG"], show: { after: "Q_FINAL", until: "Q_V1_FOG" } }
+    ],
     chests: [
-      { id: "C_M11_1", x: 8, y: 40, subject: "數學", level: 4, reward: { gold: 23, exp: 21, item: "herb" } },
-      { id: "C_M11_2", x: 65, y: 29, subject: "數學", level: 4, reward: { gold: 23, exp: 21, item: "guide" } },
-      { id: "C_M11_3", x: 6, y: 20, subject: "數學", level: 4, reward: { gold: 22, exp: 22, item: "herb" } }
+      { id: "C_M11_1", x: 8, y: 40, subject: "數學", level: 3, reward: { gold: 11, exp: 12, item: "herb" } },
+      { id: "C_M11_2", x: 65, y: 29, subject: "數學", level: 3, reward: { gold: 11, exp: 12, item: "guide" } },
+      { id: "C_M11_3", x: 6, y: 20, subject: "數學", level: 3, reward: { gold: 10, exp: 11, item: "herb" } }
     ],
     spawns: [
       { monster: "wisp", count: 2, area: [8, 24, 26, 11] },
@@ -3015,21 +3037,21 @@ window.MAPS = {
       "TT***U*=====*....HHHHHHHHHHH====HHHHHHHHHHTH.....TTU..TUT.......UTU...T......T..UTT......UU.HHTT",
       "HH******======..HTHHHHHHHHHH====HHHHHHHHHHT.....UTTTU.TT...T...UTTTH...HU......UTTT..TT.TTTHTTTT",
       "TTT........H==TT..T======================HT..HU.HHHTUT...HU..H.HHHTHU..TT..UUUHHTHHU......TTHTHH",
-      "TTT=....TTH.KH..T..======================....TTTHTTHT....HH..TTHHTTTT......TTT.TTTTT...HT.THHHTT",
+      "TTT=....TTH.KH..T..======================....TTTHTTHT....HH..TTHHTTTTK.....TTT.TTTTT...HT.THHHTT",
       "HT=======================================================================F===================TTT",
-      "TT==========================FFFF====================================FFFFFF===================TTH",
-      "TT==========================FFFF====================================FFFFFF===================THH",
-      "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~TT",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~TT",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~~~",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####H~~~~~~~~~~~~~~~~~~~~~~",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~H~~~~~~####H~~~~~~~~~~~~~~~~~~~~~~",
-      "~~TT~~~TTT~~H~~~~~TTT~~~~~~~~##~~~~~~~~~~~~~~~~~~H~~HH~T~~H~~TTT~~~~~####H~~~~~~~~~~~~~H~~H~~~H~",
-      "TTTTTTTTTTT~TTT~HTTTTTTHTTTH~##~~T~~~TTT~HHTTTTHTTTTTTTTTTTTTTTTTTTTH####HHT~~HTT~~~~TTTTTTTTTTT",
-      "TTTHTTTTHTTTTTTTTTHHTTTTTTTTH##TTTTTTTTTTTTTTTTTTTTTTTTTTTHTTHTTTTTTT####HTTTTTTTTTTTTTTTTHTTTTT",
-      "THTTTTTTTTTTHTHHHTTTTTTTTTTTT##HTTTTTTHHTTTHTTTTTTTHHHTTHTHTTTTTTHTTT####TTTTTTTTTTTTTTHTTTTTTTT",
-      "TTTTHHTTTTTTTTHTTTTTTTTTTTHTH##HTTTTHHTTTHHTTTTTTHTHHTHHHTTTTTTTHTTTH####HTTTTTTTHHHTTTTTTTTTHHT"
+      "TT==========================FFFF====================================FFUUUF===================TTH",
+      "TT==========================FFFF====================================FFBBBF===================THH",
+      "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHBBBHHHHHHHHHHHHHHHHHHHHHHH",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#BBBH~~~~~~~~~~~~~~~~~~~~TT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#BBBH~~~~~~~~~~~~~~~~~~~~TT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#BBBH~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#BBBH~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~H~~~~~~#BBBH~~~~~~~~~~~~~~~~~~~~~~",
+      "~~TT~~~TTT~~H~~~~~TTT~~~~~~~~##~~~~~~~~~~~~~~~~~~H~~HH~T~~H~~TTT~~~~~#BBBH~~~~~~~~~~~~~H~~H~~~H~",
+      "TTTTTTTTTTT~TTT~HTTTTTTHTTTH~##~~T~~~TTT~HHTTTTHTTTTTTTTTTTTTTTTTTTTH#BBBHHT~~HTT~~~~TTTTTTTTTTT",
+      "TTTHTTTTHTTTTTTTTTHHTTTTTTTTH##TTTTTTTTTTTTTTTTTTTTTTTTTTTHTTHTTTTTTT#BBBHTTTTTTTTTTTTTTTTHTTTTT",
+      "THTTTTTTTTTTHTHHHTTTTTTTTTTTT##HTTTTTTHHTTTHTTTTTTTHHHTTHTHTTTTTTHTTT#BBBTTTTTTTTTTTTTTHTTTTTTTT",
+      "TTTTHHTTTTTTTTHTTTTTTTTTTTHTH##HTTTTHHTTTHHTTTTTTHTHHTHHHTTTTTTTHTTTH#BBBHTTTTTTTHHHTTTTTTTTTHHT"
     ],
     start: { x: 35, y: 24 },
     station: { x: 36, y: 24, name: "北港站", noShelter: "北港站在朝天宮大廟埕的南緣，四周是廟埕和老街的石板路（GPT 依配置圖留空的是步道，不是草地），放候車亭會擋住廟埕往老街的人潮動線" },
@@ -3042,7 +3064,10 @@ window.MAPS = {
     ],
     exits: [
       { x: 47, y: 0, to: "M19", tx: 44, ty: 52 },
-      { x: 48, y: 0, to: "M19", tx: 45, ty: 52 }
+      { x: 48, y: 0, to: "M19", tx: 45, ty: 52 },
+      { x: 70, y: 56, to: "M04", tx: 1, ty: 22, requires: "Q_BG_4", requires_dialog: "D_EXIT_LOCK_BG" },
+      { x: 71, y: 56, to: "M04", tx: 1, ty: 23, requires: "Q_BG_4", requires_dialog: "D_EXIT_LOCK_BG" },
+      { x: 72, y: 56, to: "M04", tx: 1, ty: 24, requires: "Q_BG_4", requires_dialog: "D_EXIT_LOCK_BG" }
     ],
     npcs: [
       { id: "volunteer_ct", x: 28, y: 12, sprite: "npc_volunteer_ct", dialog: "D_TEMPLE_CT_INTRO", quest: null, quests: [] },
@@ -3053,7 +3078,7 @@ window.MAPS = {
       { id: "grocer_bg", x: 36, y: 41, sprite: "npc_grocer_bg", dialog: "D_GROCER_IDLE", quest: "Q_BG_3", quests: ["Q_BG_3"] }
     ],
     roadsigns: [
-      { id: "sign_chiayi", x: 12, y: 42, dialog: "D_SIGN_CHIAYI" }
+      { id: "sign_chiayi", x: 69, y: 42, dialog: "D_SIGN_CHIAYI_V30" }
     ],
     chests: [
       { id: "C_M20_1", x: 2, y: 3, subject: "數學", level: 3, reward: { gold: 8, exp: 10, item: "herb" } },
@@ -3071,5 +3096,542 @@ window.MAPS = {
     ],
     inn: { x: 62, y: 34, npc: null, price: 16, name: "北港鎮上旅店", sign: "旅店", dialog: "D_INN_BEIGANG", dialog_nocoin: "D_INN_BEIGANG_NOCOIN" },
     shop: null
+  },
+
+  // ───────────────────────────── M21 安平海港（v3.0 新增；來源 tools/bigmaps/M21.txt／.json）─────────────────────────────
+  M21: {
+    name: "安平海港", type: "town", level: 5, bgm: "town", battle_bg: "anping", tileset: "town",
+    real_ref: "臺南市安平：安平古堡（D1）、億載金城（D2）、劍獅（D3）、安平小吃（D4）、台江國家公園海域（D7）",
+    art_note: "西北是海港：灰帆小海盜船（帆上畫雲朵、不畫骷髏；遊戲虛構）、木頭碼頭、港口書記的瞭望小樓；碼頭路南邊一段紅磚殘牆、西邊沙洲。中央偏東是斑駁的紅磚高台，台上一座一般樣式的瞭望塔（D1 沒寫現在高台上建築的樣子，不畫成特定建築），台前一段紅磚城牆遺跡。西南是方形磚造砲台，四周護城河，只有一座城門開向東（D2「城門出入一座，開向東南」；門額是空白石匾）。東南老街：四戶紅磚老屋門楣掛劍獅（以前的人說的民間說法，D3）、兩個小吃攤、兩層的港邊客棧。背景 tools/bigmaps/M21_bg.webp（GPT 四塊延續法＋最小誤差接縫）。",
+    grid: [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~RRRRRR~~~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~RRRRRR~~~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~KKKKKKKKKK~~TTRRRRRRTTTTTTTTTTTTTTTTTTTTTTTTTFBBFTTTTTTTTTRRRRRRRTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~KKKKKKKKKK~~THHHHHHHH....TTTT...........TTTT.===.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~KKKKKKKKKK~~THHHHHHHH....TTTT......UUUU.TTTT.===..........RRRRRRRTTT......T.........TTTTTTTTTTT",
+      "~KKKKKKKKKK~~THHHHHHHH....TTTT..UUUUTTTT.TTTT.===..........RRRRRRR.........TUUUUU....T...TTTTTTT",
+      "~KKKKKKKKKK~~THHHHHHHH....TTTT..TTTTTTTT.TTTT.===.=========HHHHHHH=========.TTTTT........TTTTTTT",
+      "~KKKKKKKKKK~~THHHDHHHH..........TTTTTTTT......===......HHHHHHHHHHHHHHHH..==.TTTTT........TTTTTTT",
+      "~KKKKKKKKKK~~K...=.K..KK........TTTT..........===......HHHHHHHHHHHHHHHH..==.TTTTT........TTTTTTT",
+      "~~~~~BBBBBBBB====================================......HHHHHHHHHHHHHHHH..==.TTTTT..UUUUU......TT",
+      "~~~~~BBBBBBBB====================================......HHHHHHHHHHHHHHHH..==........TTTTT......TT",
+      "~~~~~~~~~~~~~====================================....KTHHHHHHHHHHHHHHHHK.==........TTTTT......TT",
+      "~~~~~~~~~~~~~T################################===...HHHHHHHHHHHHHHHHHHHHH==........TTTTT......TT",
+      "~~KKKKKKK~~~TTTTTTTTTTTTT.....................===...HHHHHHHHHHHHHHHHHHHHH==....UUUU...........TT",
+      "~~KKKKKKK~TTTTTTTTTTTTTTT...............UUUUU.===.U.HHHHHHHHHHHHHHHHHHHHH==....TTTT...........TT",
+      "~~KKKKKKKTTTTTTT%%%%%%%%%..UUUUU........TTTTT.===.*.HHHHHHHHHHHHHHHHHHHHH==....TTTT...........TT",
+      "~~~~~~TTTTTTT%%%%%%%%%%%%..TTTTT........TTTTT.===.*.HHHHHHHHHHHHHHHHHHHHH==....TTTT...........TT",
+      "~~~~~TTTTT%%%%%%%%%%%%%%%..TTTTT........TTTTT.===...HHHHHHHHHHDHHHHHHHHHH==.......*....UUUUU..TT",
+      "~~T~TTTTTT%%%%%%%%%%%%%%%..TTTTT........TTTTT.===........................==.UUUU.......TTTTT..TT",
+      "~~TTTTTTTT%%%%%%%%%%%%%%%..TTTTT.UUUUU........=============================.TTTT.......TTTTT..TT",
+      "~~~TTTTTT%%T%%%%%%%%%%%%%........TTTTT.....UUU=============================.TTTT.......TTTTT..TT",
+      "~~TTTTT%%%%%%%%%%%%%%%%%U........TTTTT.....UUU===...####################.==.TTTT.......TTTTT..TT",
+      "~~TTTTTT%%%%%%%%%%%%%%%%K........TTTTT.....TTTK==.K......................==KTTTT..............TT",
+      "~~TTT%%%%%%%%%%%%%%%%%%TT.....................===........................==...................TT",
+      "~TTTT%%%%%%%%%%%%%%%============================================================================",
+      "~TTTT%T%%%%%%%%%%%%%============================================================================",
+      "~TTTT%%%U%%%%%%%%%%%=#############################...==.UUUU...UUUU....==...........==..UUUU..UT",
+      "~~T~T~~%T%%%%%%%%%%U=#############################...==.TTTT...TTTT....==...........==..TTTT..TT",
+      "~~~TTTTU%%%%%%%%%%%T=#############################...==.TTTT...TTTT....==...........==..TTTT..TT",
+      "TT~~~TTTU%%%%%%%%%%T=#############################...==.TTTT...TTTT....==...........==..TTTT..TT",
+      "~TTTT~TTT~%%%%%%%%TT=#############################...==......RRRRRRRRR.==.RRRRRRRRR.==........TT",
+      "~TTTTT~TTT%~%%%%%%%T=#############################...==......RRRRRRRRR.==.RRRRRRRRR.==........TT",
+      "~~~TT~~TTTTT%%%%%%%T=#############################...==......RRRRRRRRR.==.RRRRRRRRR.==........TT",
+      "~~~~T~TTTT~TT%%%%%%T=#############################...==......HHHHHHHHH.==.HHHHHHHHH.==RRRRRRRRTT",
+      "~~~~~~TTTTTT%%%%T%%T=########.................####...==......HHHHHHHHH.==.HHHHHHHHH.==RRRRRRRRTT",
+      "~~~~~~TTTT~%%%%%%%UT=########.................####...==......HHHDHHHHH.==.HHHHDHHHH.==RRRRRRRRTT",
+      "~~~~~TTTTTTU%%%%%%TT=########.................####...=================================RRRRRRRRTT",
+      "~~~TTTTTTTTT%%%%%%%T=########.................####...==..UUU.RRRRRRRRR.==.RRRRRRRRR.==RRRRRRRRTT",
+      "~~T~TTTTTTT%%%%%%%%T=########.................####...==..KKK.RRRRRRRRR.==.RRRRRRRRR.==RRRRRRRRTT",
+      "~~~~~T~~TT%%%%%%%%%T=########.................==BBB..==......RRRRRRRRR.==.RRRRRRRRR.==RRRRRRRRTT",
+      "~~~~~TTT~TTTT%%%%%%T=###########################BBB..==......RRRRRRRRR.==.RRRRRRRRR.==HHHHHHHHTT",
+      "~~~TTTTTT%%%%%%%%%UT=#############################~..==..UUU.HHHHHHHHH.==.HHHHHHHHH.==HHHHHHHHTT",
+      "~~~~~TTT%%%%%%%%%%TT=#############################~..==..KKK.HHHHHHHHH.==.HHHHHHHHH.==HHHHHHHHTT",
+      "~~~~~TT%%%%%%%%%%%%T=#############################~..==..KKK.HHHDHHHHH.==.HHHHDHHHH.==HHHHDHHHTT",
+      "~~~~TTTTT%%%%%%%%%.T=#############################~..=========================================TT",
+      "~~TTTTTT%%TT%%%%%%%T=#############################...=========================================TT",
+      "~~~~T~TTT%%%%%%%%%TT===================================.......................................TT",
+      "~~~TTTTT%%%%%%%%%%%T..........................=========.......................................TT",
+      "~~TTTT~TU%%%%%%%%%%%.......UUUU.......................UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUTT",
+      "~TTTT~TTTT%%%%%%%%%%.......TTTT...................**..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~TT~TT%%%%%%%%%%%%%%.......TTTT......**...............TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTT~TT~%%%%%%%%%%%%.......TTTT...........UUUUUUUU....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTT%%%T%%%%%%U........TTTT...........TTTTTTTT....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTUUUUUUUUTTTTUUUUUUUUUUUTTTTTTTTUUUUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTUUUUUUUUTTTTUUUUUUUUUUUTTTTTTTTUUUUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    start: { x: 85, y: 24 },
+    station: { x: 85, y: 23, name: "安平站", shelter: { x: 83, y: 20 } },
+    landmarks: [
+      { name: "安平古堡（紅磚高台）", area: [49, 3, 26, 20] },
+      { name: "紅磚城牆遺跡", area: [52, 22, 20, 1] },
+      { name: "億載金城（砲台）", area: [21, 27, 30, 20] },
+      { name: "劍獅老街", area: [53, 27, 41, 20] },
+      { name: "木頭碼頭與海盜船", area: [0, 0, 13, 17] },
+      { name: "沙洲", area: [5, 14, 20, 40] }
+    ],
+    exits: [
+      { x: 95, y: 25, to: "M10", tx: 1, ty: 16 },
+      { x: 95, y: 26, to: "M10", tx: 1, ty: 17 },
+      { x: 47, y: 0, to: "M22", tx: 47, ty: 58, requires: "Q_AP_4", requires_dialog: "D_EXIT_LOCK_AP" },
+      { x: 48, y: 0, to: "M22", tx: 48, ty: 58, requires: "Q_AP_4", requires_dialog: "D_EXIT_LOCK_AP" }
+    ],
+    npcs: [
+      { id: "harbor_clerk", x: 20, y: 10, sprite: "npc_harbor_clerk", dialog: "D_HARBORCLERK_IDLE", quest: "Q_AP_1", quests: ["Q_AP_1", "Q_AP_4"] },
+      { id: "fort_guide", x: 65, y: 20, sprite: "npc_fort_guide", dialog: "D_FORTGUIDE_IDLE", quest: "Q_AP_2", quests: ["Q_AP_2"] },
+      { id: "oldhouse_grandpa", x: 60, y: 36, sprite: "npc_oldhouse_grandpa", dialog: "D_OLDHOUSE_IDLE", quest: "Q_AP_3", quests: ["Q_AP_3"] }
+    ],
+    chests: [
+      { id: "C_M21_1", x: 66, y: 7, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "herb" } },
+      { id: "C_M21_2", x: 45, y: 16, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "guide" } },
+      { id: "C_M21_3", x: 30, y: 36, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "eraser" } },
+      { id: "C_M21_4", x: 93, y: 12, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "crystal" } },
+      { id: "C_M21_5", x: 21, y: 52, subject: "數學", level: 3, reward: { gold: 6, exp: 6, item: "snack" } },
+      { id: "C_M21_6", x: 60, y: 28, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: "guide" } }
+    ],
+    spawns: [
+      { monster: "pi_hermit", count: 3, area: [10, 27, 9, 20] },
+      { monster: "pi_milkfish", count: 3, area: [12, 15, 13, 9] },
+      { monster: "pi_anchor", count: 2, area: [25, 15, 20, 9] },
+      { monster: "pib_anchor", count: 1, area: [5, 11, 1, 1], quest: "Q_AP_4", elite: true }
+    ],
+    inn: { x: 91, y: 45, npc: null, price: 18, name: "港邊客棧", sign: "客棧", dialog: "D_INN_ANPING", dialog_nocoin: "D_INN_ANPING_NOCOIN" },
+    shop: null
+  },
+
+  // ───────────────────────────── M22 鹿耳門台江（v3.0 新增；來源 tools/bigmaps/M22.txt／.json）─────────────────────────────
+  M22: {
+    name: "鹿耳門台江", type: "field", level: 5, bgm: "field", battle_bg: "taijiang", tileset: "field",
+    real_ref: "正統鹿耳門聖母廟（D5、D6）、台江國家公園（D7）、黑面琵鷺（D8）",
+    art_note: "西邊寬闊的水道口通往大海（水面薄霧，Q_LE_3 霧帆號影子出現的地方）；西北是淺水潟湖與紅樹林，木棧道從賞鳥亭接到廟埕。東北是宮殿式大廟外觀（D5「仿若紫禁城般高貴典雅的設計」、D6；金黃屋頂、紅柱、白石欄杆台基，門內暗，不畫神像、香爐、香煙、神將雕像）與很大的石板廣場。南半是方形魚塭（水擋、土堤可走），南邊泥灘與水道，木橋往南回安平；東邊濕地民宿與台江站草地。背景 tools/bigmaps/M22_bg.webp（GPT 四塊延續法＋最小誤差接縫）。",
+    grid: [
+      "~~~~~~~~~~TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~~~~~~~~~~%%*****~~~~~~~******~~~~~~~~~*******TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~~~~~~~~~~%%*****~~~~~~~******~~~~~~~~~******..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTTTTTTTTTTT",
+      "~~~~~~~~~~%%*****~~~~~~~~~~~~~~~~~~~~~~******..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTTTTTTTTTTT",
+      "~~~~~~~~~~%%*****~~~~~~~~~~~~~~~~~~~~~~******..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTTTTTTTTTTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRTTTTTTTTTTTTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..T....T..TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..T....T..TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..T.......TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH.U*UU.UUUUTTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..HHHHHHHHHHHHHHHHHDDHHHHHHHHHHHHHHHHH.****.****TTT",
+      "~~~~~~~~~~%%~~~~~~RRRRRRR~~~~~~~~~~~~~~~~~~~~..HHHHHHHHHHHHHHHHSSSSSHHHHHHHHHHHHHHH.****.****TTT",
+      "~~~~~~~~~~%%~~~~~~RRRRRRR~~~~~~~~~~~~~~~~~~~~..HHHHHHHHHHHHHHHHSSSSSHHHHHHHHHHHHHHH..........TTT",
+      "~~~~~~~~~~%%~~~~~~RRRRRRR~~~~~~~~~~~~~~~~~~~~..HHHHHHHHHHHHHHHHSSSSSHHHHHHHHHHHHHHH..........TTT",
+      "~~~~~~~~~~%%~~~~~~BBBBBBBBBBBBBBBBBBBBBBBBBBBBB==============================================TTT",
+      "~~~~~~~~~~%%~~~~~~BBBBBBBBBBBBBBBBBBBBBBBBBBBBB==============================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUU==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%.................................TTTTTT==========================================TTT",
+      "~~~~~~~~~~%%=======================================================================..........TTT",
+      "~~~~~~~~~~%%=======================================================================...........TT",
+      "~~~~~~~~~~%%...................................==................................==...........TT",
+      "~~~~~~~~~~%%..%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%..==%%%%%%%%%%%%%%%%%%%%%%%%%%%%~%%%==.RRRRRRRRRRTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==TRRRRRRRRRRTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==.RRRRRRRRRRTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==.RRRRRRRRRRTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==UHHHHHHHHHHTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==UHHHHHHHHHHTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==THHHHDHHHHHTT",
+      "~~~~~~~~~~%%..%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%..==%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%============TTT",
+      "~~~~~~~~~~%%..%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%..==%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%============TTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==..........TTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==..UU......TTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==..TT.......TT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==........UUUTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==........TTTTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==........TTTTT",
+      "~~~~~~~~~~%%..%%~~~~~~~~%%~~~~~~~~%%~~~~~~~~%..==%~~~~~~~~~~%%~~~~~~~~~%~~~~~~~~%==........TTTTT",
+      "~~~~~~~~~~%%..%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%..==%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%==UUUUUUUUTTTTT",
+      "~~~~~~~~~~%%...................................==................................==TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%...................................==................................==TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%........UUU.................UUU....==..........UUU............UUU....==TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%........UUU.......UUU.......UUU....==..........UUU............UUU....==TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%........TTT.......UUU.......TTT....==..........TTT............TTT....==TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%..................TTT..............==..................................TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%...................................==..................................TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%...................................==..................................TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%FBBF%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%TTTTTTTTTTTTT",
+      "~~~~~~~~~~%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%FBBF%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%T~~~~~~~~T",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FBBF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    start: { x: 88, y: 43 },
+    station: { x: 88, y: 42, name: "台江站", shelter: { x: 87, y: 39 } },
+    landmarks: [
+      { name: "正統鹿耳門聖母廟", area: [47, 2, 36, 12] },
+      { name: "廟前石板廣場", area: [47, 14, 46, 12] },
+      { name: "潟湖與紅樹林", area: [12, 2, 33, 24] },
+      { name: "賞鳥亭", area: [18, 11, 7, 6] },
+      { name: "魚塭", area: [14, 29, 67, 17] },
+      { name: "水道口", area: [0, 0, 9, 60] }
+    ],
+    exits: [
+      { x: 47, y: 59, to: "M21", tx: 47, ty: 1 },
+      { x: 48, y: 59, to: "M21", tx: 48, ty: 1 }
+    ],
+    npcs: [
+      { id: "volunteer_lem", x: 62, y: 15, sprite: "npc_volunteer_lem", dialog: "D_TEMPLE_LEM_INTRO" },
+      { id: "wetland_ranger", x: 18, y: 15, sprite: "npc_wetland_ranger", dialog: "D_RANGER_LE_IDLE", quest: "Q_LE_1", quests: ["Q_LE_1", "Q_LE_2", "Q_LE_3"] }
+    ],
+    chests: [
+      { id: "C_M22_1", x: 45, y: 3, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "herb" } },
+      { id: "C_M22_2", x: 92, y: 13, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "guide" } },
+      { id: "C_M22_3", x: 10, y: 2, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "eraser" } },
+      { id: "C_M22_4", x: 14, y: 53, subject: "數學", level: 3, reward: { gold: 5, exp: 6, item: "crystal" } },
+      { id: "C_M22_5", x: 79, y: 52, subject: "數學", level: 3, reward: { gold: 6, exp: 6, item: "snack" } },
+      { id: "C_M22_6", x: 24, y: 41, subject: "數學", level: 3, reward: { gold: 6, exp: 5, item: "herb" } }
+    ],
+    spawns: [
+      { monster: "pi_crab", count: 3, area: [9, 2, 6, 24] },
+      { monster: "pi_hermit", count: 2, area: [14, 29, 31, 17] },
+      { monster: "pi_milkfish", count: 2, area: [49, 29, 32, 17] }
+    ],
+    inn: { x: 90, y: 36, npc: null, price: 18, name: "濕地民宿", sign: "民宿", dialog: "D_INN_TAIJIANG", dialog_nocoin: "D_INN_TAIJIANG_NOCOIN" },
+    shop: null,
+    friendly: [
+      { id: "spoonbill_1", kind: "spoonbill", sprite: "npc_spoonbill", name: "黑面琵鷺", x: 28, y: 7 },
+      { id: "spoonbill_2", kind: "spoonbill", sprite: "npc_spoonbill", name: "黑面琵鷺", x: 31, y: 9 },
+      { id: "spoonbill_3", kind: "spoonbill", sprite: "npc_spoonbill", name: "黑面琵鷺", x: 26, y: 10 }
+    ],
+    keepaway: [
+      { id: "spoonbill_1", x: 28, y: 7, radius: 5, hint: "遠遠看就好，不要嚇到牠們喔！" },
+      { id: "spoonbill_2", x: 31, y: 9, radius: 5, hint: "遠遠看就好，不要嚇到牠們喔！" },
+      { id: "spoonbill_3", x: 26, y: 10, radius: 5, hint: "遠遠看就好，不要嚇到牠們喔！" }
+    ]
+  },
+
+  // ───────────────────────────── M23 大樹鳳梨山（v3.0 新增；來源 tools/bigmaps/M23.txt／.json）─────────────────────────────
+  M23: {
+    name: "大樹鳳梨山", type: "field", level: 5, bgm: "field", battle_bg: "pineapple", tileset: "field",
+    real_ref: "高雄市大樹區（下淡水溪鐵橋／高屏舊鐵橋、金鑽鳳梨與玉荷包荔枝、佛光山；70 號 2.9、2.12.3，來源 D12–D14，2026-10-25 開頁核對）",
+    art_note: "西半是寬闊的高屏溪，一座紅褐色鋼桁架長鐵橋從河岸伸向對岸、中間斷開一節（裝飾、不能上橋；斷橋原因原文沒寫，不畫成災害）；河岸步道、濕地草地；東北山上是佛光山大殿外觀（黃褐瓦重簷、門內暗，不畫佛像、塑像、香爐）、殿前石板空地與林蔭石板大道；東南是鳳梨田民宿、五畦鳳梨田、荔枝園；西南角草地是大樹站。v3.x 新增，背景 tools/bigmaps/M23_bg.webp（GPT 分四塊延續法＋最小誤差接縫拼接）。draft：NPC、怪物、寶箱位置先照 70 號放，待企劃定稿。",
+    grid: [
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT..===.TTTTTTTTTTTTTTRRRRRRRRRRRRRRRRRRRRRRRRTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTT...TTT.=TTT.TTTT===.TT=TTTTTTTTTTTRRRRRRRRRRRRRRRRRRRRRRRRTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==T............===.....TTTTTTTTTTRRRRRRRRRRRRRRRRRRRRRRRRTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.............===T......TT..T.T.RRRRRRRRRRRRRRRRRRRRRRRRTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==..........TTU===.UU.UUU.......=RRRRRRRRRRRRRRRRRRRRRRRRTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==UT..........T===.TTTTUU......T=HHHHHHHHHHHHHHHHHHHHHHHHTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==T...UU.......===.....TT...UU..=HHHHHHHHHHHHHHHHHHHHHHHHTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.U.TTT...TT.T===T...T....TUU..=HHHHHHHHHHHHHHHHHHHHHHHHT..UUT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==UT..TTT....T.===.......T..TTUU=HHHHHHHHHHHHHHHHHHHHHHHH..UTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==T...TT......T===T...UU......TU===========================TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.............===....UU...T...T===========================TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TT.......TU..===....TTUT...TT============================TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==..TT.....TTT.===TTT...T......============================TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.............===........UU.TU============================TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==UU...TT....TU===.U.....TUTTTT============================.TTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TUUU........T===.T...T..TTTT.============================UTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TTUT.......UT===TTU...T..T.T.UUUTUTUUTUU===UUTUUUTUUTUTUUTTTT",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKK##TTT.T....TTTT===.TTT.........TTTTTTTTTTT===TTTTTTTTTTTTTTTTTT",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKK##TT...........===T........U...TTTTTTTTTTT===TTTTTTTTTTTTTTTTTT",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKK##TTT..........===..T......TT..TTTTTTTTTTT===TTTTTTTTTTTTTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.T....TT.....===TT..TTTT....TTTTTTTTTTTT===.TTTTTTTTTTTT=TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==..T.TT.....TT===..T.....TTT.TTTTTT.TT..T===TTTTTT.TT.T...TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**===========================================================TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**===========================================================TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==........UU...===...TT...TT..TUTUU..UUUT.===UUUUUUUUUUUUUUTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==UUU.....TTTTT===TUU..........TTTTUUTTTTT===TTTTTTUTTTTTTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TUTU.........===.TTRRRRRRRRRRRTTTTTTTTTT===TTTTTTTTTTTTTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.T.T....T.UU.===TTTRRRRRRRRRRRTTTTTTTTTT===TTTTTTTTTTTTTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.........TUTU===.TTRRRRRRRRRRRTTTTTTTTTT===..TTTTTTTTTTTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TT..U.....T.T===.TTHHHHHHHHHHHTTTTTTT.TT===TT.T.TT.T.TTTTTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==...UT........===T..HHHHHHHHHHHTTTTTT....===..............TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==U..TTU......U===..THHHHHHHHHHHTT..T....T===.U.U.TU...UU.TTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TU..TTT....TT===.T.....==...............===TUTU..TU..TU...TTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TU...........===..T.*******************.===.TTT.TTT.TTTT.UTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TT.......UU..===....*******************.===T.............TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.........UUU.===.UU.....................===..T...T...T..UTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==UUU..TT..TTT.===TTT.*******************.===...U...U.....UTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TUT..........===...T*******************.===UUUU..TU.UTU.TTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TTTT.......U.===.U.....................T===TTTT.TTT.TTT..TTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==T.TT..U....UU===TTUT.******************.===.............UTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.....UTU...TT===..T..******************.===.TU..TU...UU.UTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==.....TTU.....===UUTU....................===..TU.TTT..TT.TTTTT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==UU....TTT.T..===TTTT..*****************.===.UTU.TTT.TTT....TT",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~**==TT.........TT===......*****************.===.TTTTTTT..TT..UTTT",
+      "TTTTT~~~~~~T~~TT~....T...**==.TU......TT..===..U.....................===........T....TTTTT",
+      "TTTTTT.....TT.TT...T.TT..**==.TT.TTT.T..TT===TTT..******************.===.....UUU..U...TTTT",
+      "TTTT...U...................=====================TT******************.===TT..TUTT.TT..TTTTT",
+      "TTT....T.TT.............TT.=====================..TTTTTTTTTTTTTTTTTTT===...TTTTTTTTUUTTTTT",
+      "TTTUU......U.U.................U.....UU.UU===...UUTTTTTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTT",
+      "TTTTTUUUUUUT.TUUUU..UUUUUT.UU.UTUUUUUTTUTT===TTUTUTTTTTTTTTTTTTTTTTTTUUUTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTUTTTTTUUTTTTTTTTTUTTTTTTTTTTTT===.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTUTTTTTUUTTTTTTTTTUTTTTTTTTTTTT===UUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    ],
+    start: { x: 6, y: 48 },
+    station: { x: 8, y: 47, name: "大樹站", shelter: { x: 13, y: 47 } },
+    landmarks: [
+      { name: "高屏舊鐵橋", area: [0, 3, 29, 44] },
+      { name: "佛光山", area: [58, 1, 28, 22] },
+      { name: "鳳梨田", area: [45, 25, 24, 24] },
+      { name: "荔枝園", area: [72, 25, 15, 25] }
+    ],
+    exits: [
+      { x: 42, y: 0, to: "M08", tx: 48, ty: 52 },
+      { x: 43, y: 0, to: "M08", tx: 49, ty: 52 },
+      { x: 42, y: 53, to: "M25", tx: 35, ty: 1, requires: "Q_ORC_4", requires_dialog: "D_EXIT_LOCK_ORC" },
+      { x: 43, y: 53, to: "M25", tx: 36, ty: 1, requires: "Q_ORC_4", requires_dialog: "D_EXIT_LOCK_ORC" }
+    ],
+    npcs: [
+      { id: "volunteer_fgs", x: 71, y: 12, sprite: "npc_volunteer_fgs", dialog: "D_TEMPLE_FGS_INTRO", quest: null, quests: [] },
+      { id: "rail_fan", x: 31, y: 19, sprite: "npc_rail_fan", dialog: "D_RAILFAN_IDLE", quest: "Q_DS_1", quests: ["Q_DS_1"] },
+      { id: "pineapple_farmer", x: 59, y: 36, sprite: "npc_pineapple_farmer", dialog: "D_PINEAPPLE_IDLE", quest: "Q_DS_2", quests: ["Q_DS_2"] },
+      { id: "lychee_farmer", x: 77, y: 36, sprite: "npc_lychee_farmer", dialog: "D_LYCHEE_IDLE", quest: "Q_DS_3", quests: ["Q_DS_3"] }
+    ],
+    chests: [
+      { id: "C_M23_1", x: 40, y: 3, subject: "數學", level: 3, reward: { gold: 10, exp: 13, item: "herb" } },
+      { id: "C_M23_2", x: 85, y: 15, subject: "數學", level: 3, reward: { gold: 10, exp: 13, item: "guide" } },
+      { id: "C_M23_3", x: 85, y: 31, subject: "數學", level: 3, reward: { gold: 10, exp: 13, item: "eraser" } },
+      { id: "C_M23_4", x: 45, y: 44, subject: "數學", level: 3, reward: { gold: 10, exp: 13, item: "crystal" } },
+      { id: "C_M23_5", x: 33, y: 45, subject: "數學", level: 3, reward: { gold: 11, exp: 13, item: "snack" } },
+      { id: "C_M23_6", x: 4, y: 48, subject: "數學", level: 3, reward: { gold: 11, exp: 12, item: "guide" } }
+    ],
+    spawns: [
+      { monster: "ds_pineapple", count: 3, area: [48, 33, 21, 15] },
+      { monster: "ds_lychee", count: 3, area: [72, 30, 14, 17] },
+      { monster: "ds_pineapple", count: 2, area: [29, 25, 12, 20] }
+    ],
+    inn: { x: 53, y: 33, npc: null, price: 20, name: "鳳梨田民宿", sign: "民宿", dialog: "D_INN_DASHU", dialog_nocoin: "D_INN_DASHU_NOCOIN", sells: "gear_dashu" },
+    shop: null
+  },
+
+  // ───────────────────────────── M24 小琉球（v3.0 新增；來源 tools/bigmaps/M24.txt／.json）─────────────────────────────
+  M24: {
+    name: "小琉球", type: "field", level: 5, bgm: "field", battle_bg: "anping", tileset: "field",
+    real_ref: "屏東縣琉球鄉小琉球（臺灣近海唯一的珊瑚礁島嶼、花瓶岩、友善賞龜、麻花捲；70 號 2.10、2.12.4，來源 D15–D20，2026-10-25 開頁核對）",
+    art_note: "一圈灰白色多孔的珊瑚礁岩海岸與白沙灘；北邊伸進海裡的小漁港突堤；島中央一般漁港小村（紅瓦白牆平房，不寫成在地特色）、環島小路、東邊木頭觀景台；西南海邊一塊上大下細、頂上長樹的花瓶岩；南邊是看得到海底礁石的潮間帶淺水（綠蠵龜由程式畫在水裡，只能遠看）。背景沒有畫海龜、船、垃圾袋（由程式放）。不戰鬥。v3.x 新增，背景 tools/bigmaps/M24_bg.webp（GPT 分四塊延續法＋v13_align.py 平移對齊＋最小誤差接縫拼接）。draft：NPC 位置先照 70 號放，待企劃定稿。",
+    grid: [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~******************~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~******************~~~==~~~~~~~********************************~~~~~",
+      "~~~~~******************~~~==~~~~~~~********************************~~~~~",
+      "~~~~~******************~~~==~~~~~~~********************************~~~~~",
+      "~~~~~*****................==.......********************************~~~~~",
+      "~~~~~*****..........=================.........................*****~~~~~",
+      "~~~~~*****..........=================.........................*****~~~~~",
+      "~~~~~*****..........=================.........................*****~~~~~",
+      "~~~~~*****....................................................*****~~~~~",
+      "~~~~~*****....................RRRRRRRRR.......................*****~~~~~",
+      "~~~~~*****.........RRRRRRRRRR.RRRRRRRRR................UU.....*****~~~~~",
+      "~~~~~*****.........RRRRRRRRRR.RRRRRRRRR................TT.....*****~~~~~",
+      "~~~~~*****.........RRRRRRRRRR.RRRRRRRRR...RRRRRRRRR...........*****~~~~~",
+      "~~~~~*****.....UU..RRRRRRRRRR.HHHHHHHHH...RRRRRRRRR..FFFFFFF..*****~~~~~",
+      "~~~~~*****.....TT..HHHHHHHHHH.HHHHHHHHH...RRRRRRRRR..FBBBBBF..*****~~~~~",
+      "~~~~~*****.........HHHHHHHHHH.HHHHH.......RRRRRRRRR..FBBBBBF..*****~~~~~",
+      "~~~~~*****................................HHHHHHHHH..FBBBBBF..*****~~~~~",
+      "~~~~~*****...........................RRR..HHHHHHHHH..FBBBBBF..*****~~~~~",
+      "~~~~~*****...........................RRR.............FFSSFFF..*****~~~~~",
+      "~~~~~*****...........RRRRRRRRRRRRRR..RRR...............SS.....*****~~~~~",
+      "~~~~~*****...........RRRRRRRRRRRRRR..RRR......................*****~~~~~",
+      "~~~~~*****...........RRRRRRRRRRRRRR..RRR.RRRRRRRR.............*****~~~~~",
+      "~~~~~*****...........RRRRRRRRRRRRRR..RRR.RRRRRRRR.............*****~~~~~",
+      "~~~~~*****...........RRRRRRRRRRRRRR...HH.RRRRRRRR.............*****~~~~~",
+      "~~~~~*****.......UU..HHHHHHHHHHHHHH.UUHH.HHHHHHHH...UU........****~~~~~~",
+      "~~~~~*****.......TT..HHHHHHHHHHHHHH.TTHH.HHHHHHHH...TT........****~~~~~~",
+      "~~~~~*****...............................HHHHHHHH...T.........****~~~~~~",
+      "~~~~~*****....................................................****~~~~~~",
+      "~~~~~*****....................................................****~~~~~~",
+      "~~~~######................................................********~~~~~~",
+      "~~~~######*...............................................********~~~~~~",
+      "~~~~######*...............................................*****~~~~~~~~~",
+      "~~~~######*...............................................*****~~~~~~~~~",
+      "~~~~######********************~~~~~~~~~~~~*********************~~~~~~~~~",
+      "~~~~######********************~~~~~~~~~~~~*********************~~~~~~~~~",
+      "~~~~######********************~~~~~~~~~~~~*******************~~~~~~~~~~~",
+      "~~~~~~~~~~********************~~~~~~~~~~~~*******************~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    start: { x: 27, y: 9 },
+    landmarks: [
+      { name: "小琉球漁港", area: [20, 0, 17, 12] },
+      { name: "花瓶岩", area: [3, 32, 8, 9] },
+      { name: "觀景台", area: [52, 16, 9, 9] },
+      { name: "潮間帶", area: [10, 36, 52, 8] }
+    ],
+    exits: [],
+    npcs: [
+      { id: "turtle_volunteer", x: 34, y: 34, sprite: "npc_turtle_volunteer", dialog: "D_TURTLE_VOL_IDLE", quest: "Q_LQ_1", quests: ["Q_LQ_1", "Q_LQ_2"] },
+      { id: "island_guide", x: 57, y: 24, sprite: "npc_island_guide", dialog: "D_ISLAND_GUIDE_IDLE", quest: "Q_LQ_3", quests: ["Q_LQ_3"] }
+    ],
+    chests: [],
+    spawns: [],
+    inn: { x: 23, y: 20, npc: null, price: 20, name: "島上民宿", sign: "民宿", dialog: "D_INN_LIUQIU", dialog_nocoin: "D_INN_LIUQIU_NOCOIN" },
+    shop: null,
+    boat_dock: { route: "F_DONGGANG_LIUQIU", to: "M25", board: { x: 27, y: 2 }, ship_area: [28, 1, 4, 6], arrive: { x: 27, y: 9 } },
+    friendly: [
+      { id: "green_turtle_1", kind: "green_turtle", sprite: "npc_green_turtle", name: "綠蠵龜", x: 34, y: 39 },
+      { id: "green_turtle_2", kind: "green_turtle", sprite: "npc_green_turtle", name: "綠蠵龜", x: 38, y: 40 }
+    ],
+    keepaway: [
+      { id: "green_turtle_1", x: 34, y: 39, radius: 5, hint: "要和海龜保持五公尺以上喔！" },
+      { id: "green_turtle_2", x: 38, y: 40, radius: 5, hint: "要和海龜保持五公尺以上喔！" }
+    ],
+    props: [
+      { id: "trash_bag", x: 12, y: 22, quest: "Q_LQ_1", note: "西邊沙灘（撿起來的垃圾袋，程式畫）" },
+      { id: "trash_bag", x: 20, y: 35, quest: "Q_LQ_1" },
+      { id: "trash_bag", x: 48, y: 35, quest: "Q_LQ_1" }
+    ]
+  },
+
+  // ───────────────────────────── M25 屏東恆春半島（v3.0 新增；來源 tools/bigmaps/M25.txt／.json）─────────────────────────────
+  M25: {
+    name: "屏東恆春半島", type: "field", level: 5, bgm: "field", battle_bg: "pacific", tileset: "field",
+    real_ref: "屏東縣（北端東港碼頭＋恆春古城＋南端墾丁、鵝鑾鼻，壓縮成一張直長圖；70 號 2.10、2.12.5，來源 D17、D21–D24，2026-10-25 開頁核對）",
+    art_note: "直長圖：最北是東港碼頭（突堤、兩艘停靠的白色客船、碼頭廣場、售票亭）；沿海公路一路往南，西邊是海、沙灘與珊瑚礁，東邊是丘陵草原；中段東側一座恆春古城的石砌城門（只畫一座、兩側短短一段殘牆），往東的路通到地圖邊（往台東的路牌）；墾丁旅店；南端草原與珊瑚礁海岸，最南岬角一座白色鐵造圓形燈塔（鵝鑾鼻）與觀景平台。三面環海。不畫黑鮪魚季。v3.x 新增，背景 tools/bigmaps/M25_bg.webp（GPT 直式 1024×1536 分四塊延續法＋最小誤差接縫拼接）。draft：NPC、怪物、寶箱位置先照 70 號放，待企劃定稿。",
+    grid: [
+      "~~~~KKKKKKKKKKK~~~~~~~~~~~~TTHHHHTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "~~~~KKKKKKKKKKK~~~~~~~~~~~~==========TTT.TTTTTTT...........TT..TTT.TTTTT",
+      "~~~~KKKKKKKKKKK~~~~~~~~~~~~==========.TT.....T......................TTTT",
+      "~~~~~================================.TT..........UU................TTTT",
+      "~~~~~================================..T.........UTU............UU..TTTT",
+      "~~~~~================================............TTTT..........UUU..TTTT",
+      "~~~~~FFFFFFFFFFFFFFFFFFFFFF==========....TUU...................TTT..TTTT",
+      "~~~~KKKKKKKKKKK~~~~~~~~~~~~==========.....UUU.......................TTTT",
+      "~~~~KKKKKKKKKKK~~~~~~~~~~~~=UUUUUU===....TTTT............UUU.........TTT",
+      "~~~~KKKKKKKKKKK~~~~~~~~~~~~=TTTTTT===.U..................UUU........T.TT",
+      "~~~~KKKKKKKKKKK~~~~~~~~~~~~=TTTTTT===.TT.................TTTT..........T",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~=TTTTTT===.......T........................U.T",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~====T=====...............................TTTT",
+      "~~~~~~~~~~~~***...................===...........................U....TTT",
+      "~~~~~~~~~~~~***...........UT.TU....==.UU......................TUT....TTT",
+      "~~~~~~~~~~~~***=.........TTTTTTU...==UTU.......................UTU..TTTT",
+      "~~~~~~~~~~~~***=..........TTTTTUTU.==TTT....UUU...............TTTT...TTT",
+      "~~~~~~~~~~~~***==.........TTTTTTTTU==.TTT...UUU.....................UTTT",
+      "~~~~~~~~~~~~***===........TTTTTTTTT==.......TTTT.......UU...........TTTT",
+      "~~~~~~~~~~~~***==.T........TTTTTTTT==.................TUUU..........TTTT",
+      "~~~~~~~~~~~~***==T.........T.TTTTTT==.=................TTT..........TTTT",
+      "~~~~~~~~~~~~***===.....U.....TTTTTT==..............=................TTTT",
+      "~~~~~~~~~~~~***===....UUU.TTTTTTTTT==.....T...............T..........TTT",
+      "~~~~~~~~~~~~***==TT...TTTTTTTTTTTT.==.T...............T...........U..TTT",
+      "~~~~~~~~~~~~***==.......TTTTTTTTTTU==............................UT..TTT",
+      "~~~~~~~~~~~~***==.......TT..TTTTTTT==....UU......................UTU.TTT",
+      "~~~~~~~~~~~~***==.............TTTTT==.T.UTU.....................TTTU.TTT",
+      "~~~~~~~~~~~~***==.T.............TTT==..UTTT........................T.TTT",
+      "~~~~~~~~~~~~***==...........UUUUTTT==TUU.T..........UU...T.......=....TT",
+      "~~~~~~~~~~~~***===..........TTTTTTT==.TT...........UTT..............U..T",
+      "~~~~~~~~~~~~***==............TTTTTT==......T.......TTTU.............TUUT",
+      "~~~~~~~~~~~~***===...........TTTTTT==........=.RRRRRRRRRR...........TTTT",
+      "~~~~~~~~~~~~***===..............TTT==........=.RRRRRRRRRR...........TTTT",
+      "~~~~~~~~~~~~***==................T.==..........RRRRRRRRRR..........TTTTT",
+      "~~~~~~~~~~~~***==..................==..........RRRRRRRRRR............TTT",
+      "~~~~~~~~~~~~***===............U....==.....#####HHHHHHHHHH####.......TTTT",
+      "~~~~~~~~~~~~***====.....U....UT..UT==..U..#####HHH===HHHH####=.....T.TTT",
+      "~~~~~~~~~~~~***===.....UU...UTT.TT.==.UT..#####HHH===HHHH####=T......TTT",
+      "~~~~~~~~~~~~***===.....TTT..TTTTT..==.UTU.#####HHH===HHHH####=........TT",
+      "~~~~~~~~~~~~***==...........TTTTTUU==.TTT...T.TT.T=====T.=TT.T......UUTT",
+      "~~~~~~~~~~~~***===T.........TTTTTTT==.............=====.............UTTT",
+      "~~~~~~~~~~~~***==...........TTTTTT.==.TU..........=====.............TTTT",
+      "~~~~~~~~~~~~***===........U..TTTTT.===.T..........=====..............TTT",
+      "~~~~~~~~~~~~***===.......UUT...TTT.=====.==.===.============.=====.====T",
+      "~~~~~~~~~~~~***===.......TT..UU..TT====================================T",
+      "~~~~~~~~~~~~***==...==...TTTTTTT...====================================K",
+      "~~~~~~~~~~~~***===......UTTTTTT..UT==....T..........................UTUT",
+      "~~~~~~~~~~~~***===.T....TTTTTUUUUTT==.U.........U........T..........TTTT",
+      "~~~~~~~~~~~~***..T....TT..TTTUUUUT.==.TRRRRRRRRRR.T.............UUUUTTTT",
+      "~~~~~~~~~~~~***..........T...TTTTTT==..RRRRRRRRRR..............UTTTTTTTT",
+      "~~~~~~~~~~~~***=..................===..RRRRRRRRRR.............TUTTTTTTTT",
+      "~~~~~~~~~~~~***...................===.URRRRRRRRRR.......UU.....TTTTTTTTT",
+      "~~~~~~~~~~~~***.UT...............T===.THHHHHHHHHHHTT...UTT.......TTTTTTT",
+      "~~~~~~~~~~~~***.T.......T.........===..HHHHHHHHHHH.....UTTU......TTTTTTT",
+      "~~~~~~~~~~~~***......T............===..HHHHHHHHHHHU....TTTT.......TTTTTT",
+      "~~~~~~~~~~~~***==.................===..T...HH.....U................TTTTT",
+      "~~~~~~~~~~~~***=................TU===.TT==.T==.TTTT............U...TTTTT",
+      "~~~~~~~~~~~~***=.................T===================.........TT=....TTT",
+      "~~~~~~~~~~~~***.=.................===================....TT............T",
+      "~~~~~~~~~~~~***=.=................................T....T...UUUUU~~~~~~~~",
+      "~~~~~~~~~~~~***=....................T...T.....T..........T.*****~~~~~~~~",
+      "~~~~~~~~~~~~***==.....UUU.............T..........T.........*****~~~~~~~~",
+      "~~~~~~~~~~~~***=......UTT................T....T....U.....TU*****~~~~~~~~",
+      "~~~~~~~~~~~~***==.....TTTT...........U............UTU.....U*****~~~~~~~~",
+      "~~~~~~~~~~~~***==.=....TT.......T....HHH..TT......UTT.....T*****~~~~~~~~",
+      "~~~~~~~~~~~~***====...............T..HHHH......T..TTTT.TT..*****~~~~~~~~",
+      "~~~~~~~~~~~~***==....................HHH............T......*****~~~~~~~~",
+      "~~~~~~~~~~~~***===T..........U.......HHH...................*****~~~~~~~~",
+      "~~~~~~~~~~~~***==...........UTT...TT.HHH.....T....U......U.*****~~~~~~~~",
+      "~~~~~~~~~~~~***===.........TTTT......HHH.UUT......T......T.*****~~~~~~~~",
+      "~~~~~~~~~~~~***==..U........T.UU.....HHH.TT...T........U..T*****~~~~~~~~",
+      "~~~~~~~~~~~~***=...T........TTTT...T.HHH..T...........UTU..*****~~~~~~~~",
+      "~~~~~~~~~~~~***===.....T.............HHH.=TTU........UTTT..*****~~~~~~~~",
+      "~~~~~~~~~~~~***==.U.............T..==HHH....U........TTTTU.*****~~~~~~~~",
+      "~~~~~~~~~~~~***=..T......U.........==HHH...TTTTU......TTTT.*****~~~~~~~~",
+      "~~~~~~~~~~~~***=.=......TTT.....===============T..........=*****~~~~~~~~",
+      "~~~~~~~~~~~~***=.=......TTT.....===============TT........TU*****~~~~~~~~",
+      "~~~~~~~~~~~~***===T.T...TTTT....===============T......T...T*****~~~~~~~~",
+      "~~~~~~~~~~~~***=.=............FF============FFFFFF........T*****~~~~~~~~",
+      "~~~~~~~~~~~~***UUUUUUUUUUUUUUUFF=================FUUUUUUUU******~~~~~~~~",
+      "~~~~~~~~~~~~******************FF=================F**************~~~~~~~~",
+      "~~~~~~~~~~~~******************FF=================F**************~~~~~~~~",
+      "~~~~~~~~~~~~******************FF=================F**************~~~~~~~~",
+      "~~~~~~~~~~~~******************FFFFFFFFFFFFFFFFFFFF**************~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    start: { x: 24, y: 14 },
+    station: { x: 24, y: 13, name: "屏東站", shelter: { x: 21, y: 13 } },
+    landmarks: [
+      { name: "東港碼頭", area: [0, 0, 35, 13] },
+      { name: "恆春古城", area: [42, 30, 19, 14] },
+      { name: "墾丁", area: [15, 46, 45, 30] },
+      { name: "鵝鑾鼻燈塔", area: [30, 62, 20, 22] }
+    ],
+    exits: [
+      { x: 35, y: 0, to: "M23", tx: 42, ty: 52 },
+      { x: 36, y: 0, to: "M23", tx: 43, ty: 52 }
+    ],
+    npcs: [
+      { id: "ticket_seller", x: 31, y: 2, sprite: "npc_ticket_seller", dialog: "D_TICKET_IDLE", quest: "Q_LQ_0", ferry: { id: "F_DONGGANG_LIUQIU", side: "from" }, quests: ["Q_LQ_0"] },
+      { id: "park_ranger_kt", x: 52, y: 41, sprite: "npc_park_ranger", dialog: "D_RANGER_PT_IDLE", quest: "Q_PT_1", quests: ["Q_PT_1"] },
+      { id: "oldcity_guide", x: 47, y: 40, sprite: "npc_oldcity_guide", dialog: "D_OLDCITY_IDLE", quest: "Q_PT_4", quests: ["Q_PT_4"] },
+      { id: "lighthouse_keeper", x: 42, y: 76, sprite: "npc_lighthouse_keeper", dialog: "D_LIGHTHOUSE_IDLE", quest: "Q_PT_2", quests: ["Q_PT_2", "Q_PT_3"] }
+    ],
+    roadsigns: [
+      { id: "sign_taitung", x: 71, y: 45, dialog: "D_SIGN_TAITUNG" }
+    ],
+    chests: [
+      { id: "C_M25_1", x: 19, y: 20, subject: "數學", level: 3, reward: { gold: 30, exp: 40, item: "herb" } },
+      { id: "C_M25_2", x: 66, y: 2, subject: "數學", level: 3, reward: { gold: 30, exp: 40, item: "guide" } },
+      { id: "C_M25_3", x: 60, y: 40, subject: "數學", level: 3, reward: { gold: 30, exp: 40, item: "eraser" } },
+      { id: "C_M25_4", x: 21, y: 72, subject: "數學", level: 3, reward: { gold: 30, exp: 40, item: "crystal" } },
+      { id: "C_M25_5", x: 57, y: 70, subject: "數學", level: 3, reward: { gold: 30, exp: 40, item: "snack" } },
+      { id: "C_M25_6", x: 34, y: 80, subject: "數學", level: 3, reward: { gold: 30, exp: 40, item: "herb" } }
+    ],
+    spawns: [
+      { monster: "pi_parrot", count: 3, area: [15, 18, 19, 26] },
+      { monster: "pi_octo", count: 3, area: [15, 58, 15, 20] },
+      { monster: "wx_wave", count: 3, area: [50, 60, 9, 18] },
+      { monster: "pib_ship", count: 1, area: [40, 82, 1, 1], boss: true, quest: "Q_PT_3" }
+    ],
+    inn: { x: 44, y: 56, npc: null, price: 22, name: "墾丁旅店", sign: "旅店", dialog: "D_INN_KENTING", dialog_nocoin: "D_INN_KENTING_NOCOIN", sells: "gear_kenting" },
+    shop: null,
+    boat_dock: { route: "F_DONGGANG_LIUQIU", to: "M24", board: { x: 20, y: 5 }, ship_area: [15, 7, 11, 3], arrive: { x: 20, y: 4 } }
   }
 };

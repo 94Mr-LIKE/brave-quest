@@ -1,0 +1,33 @@
+/* 船班過場：純 CSS 畫海面與小船，沒有外連圖片。 */
+.ferry-screen {
+  position: fixed; inset: 0; z-index: 60; overflow: auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  background: #09233d; color: #fff7df; text-align: center;
+  animation: ferry-fade 400ms ease-out both;
+}
+.ferry-screen h2 { margin: 0 0 12px; font-size: clamp(20px, 5vw, 32px); }
+.ferry-status { margin: 0 0 16px; font-size: clamp(22px, 5vw, 32px); }
+.ferry-sea {
+  position: relative; width: min(640px, 90vw); height: clamp(110px, 25vh, 200px);
+  overflow: hidden; border-radius: 12px;
+  background: repeating-linear-gradient(0deg, #24799b 0 18px, #368ca6 18px 20px, #24799b 20px 36px);
+}
+.ferry-boat {
+  position: absolute; top: 35%; left: 12%; width: 90px; height: 56px;
+  animation: ferry-sail 3600ms 400ms linear both;
+}
+.ferry-cabin { position: absolute; left: 22px; top: 0; width: 48px; height: 32px; background: #fff7df; border-top: 6px solid #de744c; }
+.ferry-cabin::after { content: ''; position: absolute; left: 8px; top: 7px; width: 12px; height: 10px; background: #09233d; box-shadow: 20px 0 #09233d; }
+.ferry-hull { position: absolute; bottom: 0; width: 90px; height: 26px; background: #e6ab64; border-radius: 0 0 32px 24px; border-top: 5px solid #fff7df; }
+.ferry-hint { margin: 16px 0; }
+.ferry-skip { min-width: 120px; min-height: 48px; font-size: 20px; touch-action: manipulation; }
+.ferry-skip:focus-visible { outline: 3px solid #fff7df; outline-offset: 4px; }
+@keyframes ferry-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ferry-sail { from { left: 12%; } to { left: 70%; } }
+.ferry-reduced, .ferry-reduced * { animation: none; transition: none; }
+.ferry-reduced .ferry-boat { left: calc(50% - 45px); }
+@media (max-height: 400px) {
+  .ferry-screen h2, .ferry-status, .ferry-hint { margin: 4px 0; }
+  .ferry-sea { min-height: 80px; height: 80px; flex-shrink: 0; }
+}

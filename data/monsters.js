@@ -102,8 +102,9 @@ window.MONSTERS = {
     wake: "樹精寶寶清醒了，開心地去找水喝。"
   },
   owl: {
-    name: "貓頭鷹", sprite: "mon_owl", level: 2, hp: 125, atk: 11, subject: "國語", q_levels: [1, 2],
-    exp: 10, gold: 6, drops: [{ item: "feather", rate: 0.3 }], boss: false,
+    legacy_s: { level: 2, hp: 125, atk: 11, exp: 10, gold: 6, q_levels: [1, 2] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
+    name: "貓頭鷹", sprite: "mon_owl", level: 5, hp: 310, atk: 51, subject: "國語", q_levels: [2, 3],
+    exp: 85, gold: 30, drops: [{ item: "feather", rate: 0.3 }], boss: false,
     desc: "森林裡最愛讀書的鳥，霧讓牠把字都看反了。",
     wake: "貓頭鷹清醒了，咕咕叫著飛回樹洞。"
   },
@@ -211,29 +212,33 @@ window.MONSTERS = {
 
   // ── 地圖等級 4（M08 月世界泥岩丘、M10 府城古城、M11 古城塔頂）──
   boar: {
-    name: "岩丘野豬", sprite: "mon_boar", level: 4, hp: 320, atk: 20, subject: "社會", q_levels: [3, 4],
-    exp: 30, gold: 13, drops: [{ item: "key", rate: 0.4 }], boss: false,
+    legacy_s: { level: 4, hp: 320, atk: 20, exp: 30, gold: 13, q_levels: [3, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
+    name: "岩丘野豬", sprite: "mon_boar", level: 5, hp: 390, atk: 59, subject: "社會", q_levels: [2, 3],
+    exp: 115, gold: 35, drops: [{ item: "key", rate: 0.4 }], boss: false,
     desc: "在泥岩溝谷裡亂跑的野豬，迷糊時把柵欄鑰匙叼走了。",
     wake: "岩丘野豬清醒了，放下鑰匙，跑回溝谷。"
   },
   wisp: {
-    name: "迷霧精", sprite: "mon_wisp", level: 4, hp: 340, atk: 21, subject: "英語", q_levels: [3, 4],
-    exp: 35, gold: 15, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    legacy_s: { level: 4, hp: 340, atk: 21, exp: 35, gold: 15, q_levels: [3, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
+    name: "迷霧精", sprite: "mon_wisp", level: 5, hp: 330, atk: 53, subject: "英語", q_levels: [2, 3],
+    exp: 95, gold: 30, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
     desc: "一小團會飄的霧，是很多很小的水滴。被光照暖就會散掉。",
     wake: "迷霧精被光照暖了，小水滴變成水蒸氣，散掉了。"
   },
   armor: {
-    name: "空盔甲", sprite: "mon_armor", level: 4, hp: 360, atk: 22, subject: "社會", q_levels: [3, 4],
-    exp: 40, gold: 16, drops: [{ item: "gear", rate: 0.3 }], boss: false,
+    legacy_s: { level: 4, hp: 360, atk: 22, exp: 40, gold: 16, q_levels: [3, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
+    name: "空盔甲", sprite: "mon_armor", level: 5, hp: 330, atk: 54, subject: "社會", q_levels: [2, 3],
+    exp: 95, gold: 35, drops: [{ item: "gear", rate: 0.3 }], boss: false,
     desc: "古城的舊盔甲，被霧吹得自己走來走去。",
     wake: "空盔甲清醒了，喀啦喀啦走回展示台站好。"
   },
 
   // ───────────────────────────── 頭目 ─────────────────────────────
   tree_king: {
-    name: "枯萎樹王", sprite: "boss_tree", level: 2, hp: 510, atk: 13, subject: "自然", q_levels: [2, 4],
-    exp: 96, gold: 48, drops: [{ item: "herb", rate: 1 }], boss: true,
-    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["mushroom", "sprout", "owl"],
+    legacy_s: { level: 2, hp: 510, atk: 13, exp: 96, gold: 48, q_levels: [2, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
+    name: "枯萎樹王", sprite: "boss_tree", level: 5, hp: 1460, atk: 48, subject: "自然", q_levels: [2, 4],
+    exp: 950, gold: 350, drops: [{ item: "herb", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["al_cypress", "owl"],
     dialog_before: "D_BOSS_TREE_A", dialog_after: "D_BOSS_TREE_B",
     desc: "守護神木森林的千年神木，被霧附身後忘了怎麼長葉子。",
     wake: "神木清醒了，枝頭冒出新的綠芽。"
@@ -265,21 +270,23 @@ window.MONSTERS = {
     wake: "噪音蝙蝠王清醒了，安安靜靜地倒掛著睡著了。"
   },
   angry_golem: {
-    name: "暴躁石像", sprite: "boss_golem", level: 4, hp: 1200, atk: 21, subject: "社會", q_levels: [3, 4],
-    exp: 350, gold: 150, drops: [{ item: "crystal", rate: 1 }], boss: true,
-    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["boar", "wisp"],
+    legacy_s: { level: 4, hp: 1200, atk: 21, exp: 350, gold: 150, q_levels: [3, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
+    name: "暴躁石像", sprite: "boss_golem", level: 5, hp: 1860, atk: 57, subject: "社會", q_levels: [2, 4],
+    exp: 1400, gold: 450, drops: [{ item: "crystal", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["boar", "mm_mudstone"],
     dialog_before: "D_BOSS_GOLEM_A", dialog_after: "D_BOSS_GOLEM_B",
     desc: "守護月世界的石像，被霧弄得忘了大家一起訂的規則。",
     wake: "暴躁石像清醒了，慢慢坐下來守護泥岩丘。"
   },
   fog_demon: {
-    name: "遺忘霧魔", sprite: "boss_fog", level: 5, hp: 1510, atk: 24, subject: "混合",
-    subjects: ["國語", "英語", "數學", "自然", "社會"], q_levels: [3, 4],
-    exp: 450, gold: 180, drops: [], boss: true, final: true,   // v2.0：最終頭目旗標（battleBgm 看 final，不再看地圖等級）
-    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["armor", "wisp"],
+    legacy_s: { level: 5, hp: 1510, atk: 24, exp: 450, gold: 180, q_levels: [3, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
+    name: "遺忘霧魔", sprite: "boss_fog", level: 5, hp: 1560, atk: 52, subject: "混合",
+    subjects: ["國語", "英語", "數學", "自然"], q_levels: [2, 4],
+    exp: 1100, gold: 350, drops: [{ item: "dawn_shard_s", rate: 1 }], boss: true,   // v3.0（70 號 2.5）：遺忘霧魔改成南霧將，不再是最終頭目（final 旗標拿掉；終章的遺忘霧王才標；v2.0 是「boss: true, final: true,」）
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["wisp", "armor"],
     dialog_before: "D_BOSS_FOG_A", dialog_after: "D_BOSS_FOG_B",
-    desc: "讓大家忘記知識的大霧。五道光一起照它，它就會散開。",
-    wake: "遺忘霧魔被五道光照亮，變成溫暖的晨光散開了。"
+    desc: "南霧將。盤在古城塔頂的大霧，讓整座府城忘了學過的知識。",
+    wake: "遺忘霧魔被四道光照暖，大霧慢慢散開，只留下一小團霧。"
   },
   // v1.1 第一章支線頭目（59 號 3.2 節）：金瓜石坑道最深處，只在 Q_JGS_3 進行中出現；建議 Lv10
   mnb_goldjaw: {
@@ -458,6 +465,99 @@ window.MONSTERS = {
     dialog_before: "D_BOSS_FLOODGATE_A", dialog_after: "D_BOSS_FLOODGATE_B",
     desc: "大水門機器人，胸口的大齒輪被灰霧包住，把水門關起來了。",
     wake: "霧閘機將清醒了，水門打開，清水流向田野。"
+  },
+
+  // ── v3.0 南部（70 號 3.2；71 號 7.2；wip_v30_draft/v30_apply.js）：阿里山系（M04）、海盜系（M21、M22、M25）、月世界系（M08）、大樹系（M23）、風雲系（M25）；精英錨錨大副；屏東頭目霧帆號 ──
+  // exp、gold＝新經濟規則（70 號 3.2 的建議 PL；頭目 ×10、精英 ×3）；Z9、Z10 的 hp、atk 照 71 號 7.2（和每區一件新裝備同一版）。錨錨大副是精英（elite，不是頭目）：只在 Q_AP_4 進行中出現
+  // 27 號的戰鬥演出（升帆叫出小海盜、轉舵換科目、燈塔照到時防禦下降等）只做演出、不改數值（還沒做）
+  al_cypress: {
+    name: "紅檜樹根獸", sprite: "mon_al_cypress", level: 5, hp: 320, atk: 51, subject: "自然", q_levels: [2, 3],
+    exp: 90, gold: 30, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    desc: "紅檜的老樹根被霧弄迷糊，爬出土來，用樹根爪子到處絆人。",
+    wake: "紅檜樹根獸清醒了，鑽回土裡，靜靜抱住大樹。"
+  },
+  al_cloud: {
+    name: "雲海毛毛", sprite: "mon_al_cloud", level: 5, hp: 320, atk: 51, subject: "數學", q_levels: [2, 3],
+    exp: 90, gold: 30, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "山谷裡的雲海被霧攪亂，捲成一團團亂滾的毛毛，一生氣就變灰。",
+    wake: "雲海毛毛清醒了，輕輕飄回山谷，變回白白的雲海。"
+  },
+  pi_hermit: {
+    name: "殼殼寄居蟹水手", sprite: "mon_pi_hermit", level: 5, hp: 340, atk: 54, subject: "英語", q_levels: [2, 3],
+    exp: 100, gold: 35, drops: [{ item: "memory_shell", rate: 0.4 }], boss: false,
+    desc: "背著小木桶當殼的寄居蟹，綁著水手頭巾，一被打就縮進桶裡。",
+    wake: "殼殼寄居蟹清醒了，背著木桶跑回沙灘。"
+  },
+  pi_milkfish: {
+    name: "目目跳跳兵", sprite: "mon_pi_milkfish", level: 5, hp: 340, atk: 56, subject: "數學", q_levels: [2, 3],
+    exp: 100, gold: 35, drops: [{ item: "chart_piece", rate: 0.3 }], boss: false,
+    desc: "穿水手背心的虱目魚，用尾巴一跳一跳，揮著木槳亂敲。",
+    wake: "目目跳跳兵清醒了，撲通一聲游回魚塭。"
+  },
+  pi_anchor: {
+    name: "錨錨船錨怪", sprite: "mon_pi_anchor", level: 5, hp: 340, atk: 56, subject: "數學", q_levels: [2, 3],
+    exp: 105, gold: 35, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "拖著鐵鍊走路的大船錨，又硬又慢，一臉很累的樣子。",
+    wake: "錨錨船錨怪清醒了，沉穩地坐回碼頭邊。"
+  },
+  pib_anchor: {
+    name: "錨錨大副", sprite: "mon_pib_anchor", level: 5, hp: 880, atk: 57, subject: "數學", q_levels: [2, 3],
+    subjects: ["數學", "社會"],   // 精英：數學、社會輪流（70 號 3.2）
+    exp: 315, gold: 105, drops: [{ item: "sea_chart", rate: 1 }], boss: false, elite: true,
+    dialog_before: "D_BOSS_ANCHOR_A", dialog_after: "D_BOSS_ANCHOR_B",   // 精英也播（game.js：boss 或 elite）
+    desc: "戴著舊船長帽的大船錨，鐵鍊像披風，死守著搶來的航海圖。",
+    wake: "錨錨大副清醒了，把航海圖還給港口書記。"
+  },
+  pi_crab: {
+    name: "大鉗泡泡砲手", sprite: "mon_pi_crab", level: 5, hp: 350, atk: 57, subject: "自然", q_levels: [2, 3],
+    exp: 110, gold: 35, drops: [{ item: "memory_shell", rate: 0.4 }], boss: false,
+    desc: "揮著淡紫色大鉗子的招潮蟹，戴水手帽，把嘴邊吐的泡泡當砲彈。",
+    wake: "大鉗泡泡砲手清醒了，揮著大鉗子鑽回泥洞。"
+  },
+  mm_mudstone: {
+    name: "泥岩土偶", sprite: "mon_mm_mudstone", level: 5, hp: 400, atk: 60, subject: "自然", q_levels: [2, 3],
+    exp: 120, gold: 40, drops: [{ item: "crystal", rate: 0.3 }], boss: false,
+    desc: "青灰色的泥岩被霧捏成土偶，身上有雨水沖出的溝紋，一走就掉泥屑。",
+    wake: "泥岩土偶清醒了，坐下來變回一座小土丘。"
+  },
+  ds_pineapple: {
+    name: "鳳梨盔甲蟲", sprite: "mon_ds_pineapple", level: 5, hp: 410, atk: 62, subject: "數學", q_levels: [2, 3],
+    exp: 125, gold: 40, drops: [{ item: "pineapple", rate: 0.5 }], boss: false,
+    desc: "穿著金黃鳳梨盔甲的甲蟲，被霧弄得在鳳梨田裡橫衝直撞。",
+    wake: "鳳梨盔甲蟲清醒了，鑽回鳳梨葉下面。"
+  },
+  ds_lychee: {
+    name: "荔枝紅眼仔", sprite: "mon_ds_lychee", level: 5, hp: 420, atk: 64, subject: "國語", q_levels: [2, 3],
+    exp: 130, gold: 40, drops: [{ item: "snack", rate: 0.4 }], boss: false,
+    desc: "被霧吹落的大荔枝，紅殼一粒一粒，眼睛紅紅的，彈來彈去不肯回家。",
+    wake: "荔枝紅眼仔清醒了，滾回荔枝樹下。"
+  },
+  pi_parrot: {
+    name: "喳喳鸚鵡瞭望手", sprite: "mon_pi_parrot", level: 5, hp: 430, atk: 72, subject: "英語", q_levels: [2, 3],
+    exp: 145, gold: 45, drops: [{ item: "chart_piece", rate: 0.3 }], boss: false,
+    desc: "戴三角帽、拿望遠鏡的綠鸚鵡，一大叫就把小海盜叫過來。",
+    wake: "喳喳鸚鵡清醒了，飛回船桅上唱歌。"
+  },
+  pi_octo: {
+    name: "八八章魚舵手", sprite: "mon_pi_octo", level: 5, hp: 440, atk: 73, subject: "數學", q_levels: [2, 3],
+    exp: 150, gold: 45, drops: [{ item: "memory_shell", rate: 0.4 }], boss: false,
+    desc: "迷霧章魚的小姪子，八隻腳各拿一樣船上的東西，忙著亂打一通。",
+    wake: "八八章魚舵手清醒了，把東西都放回船上。"
+  },
+  wx_wave: {
+    name: "浪花花", sprite: "mon_wx_wave", level: 5, hp: 450, atk: 75, subject: "自然", q_levels: [2, 3],
+    exp: 155, gold: 45, drops: [{ item: "sea_glass", rate: 0.3 }], boss: false,
+    desc: "白浪捲成的小精靈，被霧推著一波一波衝上岸，第三波最大。",
+    wake: "浪花花清醒了，嘩啦一聲回到大海。"
+  },
+  pib_ship: {
+    name: "霧帆號", sprite: "boss_pib_ship", level: 5, hp: 1990, atk: 67, subject: "混合",
+    subjects: ["英語", "自然", "社會"], q_levels: [2, 4],
+    exp: 1550, gold: 450, drops: [{ item: "memory_shell", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["pi_parrot", "pi_octo"], battle_bg: "pacific",
+    dialog_before: "D_BOSS_SHIP_A", dialog_after: "D_BOSS_SHIP_B",
+    desc: "南方海上的霧帆號，升起灰霧做的大帆，搶走了大家的記憶貝殼。",
+    wake: "霧帆號清醒了，霧做的帆變成白雲，載著小海盜們回港。"
   },
 
   // ── v2.0 中部（69 號 3.2、附錄 A2；wip_v20/v20_apply.js）：苗栗系、大甲系、動物系（M17、M18，Z6）；鬼怪系（M19、M20，Z7）；頭目迷路火車頭、燈籠霧將（中霧將）──

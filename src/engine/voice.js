@@ -355,6 +355,7 @@
   function voiceFile(manifest, dialogId, index, line, pref) {
     if (!manifest || !dialogId || index === undefined || index === null) return null;
     var key = dialogId + '_' + index;
+    if (line && line.huayu_only) return null;   // v3.0：台詞改了、還沒重錄（或還沒錄）的句子不播預錄音檔，免得播到舊句子的錄音
     var isTaigi = !!(line && line.taigi);
     if (isTaigi && pref === 'huayu') return manifest[key + '_huayu'] || null;
     return manifest[key] || null;

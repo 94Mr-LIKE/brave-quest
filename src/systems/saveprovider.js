@@ -52,10 +52,15 @@
    * 規則同 v3、v4 備份：只寫一次、不覆蓋、list() 不列。
    */
   var BACKUP_V5_KEY = Save.SAVE_KEY + '_v5_backup';
+  /**
+   * v3.0 南部（同 v1.3 CTO 2026-10-25 裁定的做法）：schema 6 的存檔在 SouthMigrate 升到 schema 7 之前的備份 key：bq_save_v6_backup（其他欄位 bq_save_v6_backup:<欄位>）。
+   * 規則同 v4 備份：只寫一次、不覆蓋、list() 不列。（由 wip_v30_draft/v30_apply.js 加入；6＝套用前的 SCHEMA_VERSION）
+   */
+  var BACKUP_SOUTH_FROM = 6, BACKUP_SOUTH_WHICH = 'v6', BACKUP_SOUTH_KEY = Save.SAVE_KEY + '_v6_backup';
   /** which：省略＝v2 備份（v1.0.1 家長設定的還原按鈕）；'v3'＝v1.1 升級前備份 */
   function backupKeyFor(slot, which) {
     slot = slot || DEFAULT_SLOT;
-    var base = which === 'v5' ? BACKUP_V5_KEY : which === 'v4' ? BACKUP_V4_KEY : which === 'v3' ? BACKUP_V3_KEY : BACKUP_KEY;   // v1.3：'v4'＝v1.3 升級前備份
+    var base = which === BACKUP_SOUTH_WHICH ? BACKUP_SOUTH_KEY : which === 'v5' ? BACKUP_V5_KEY : which === 'v4' ? BACKUP_V4_KEY : which === 'v3' ? BACKUP_V3_KEY : BACKUP_KEY;   // v1.3：'v4'＝v1.3 升級前備份
     return slot === DEFAULT_SLOT ? base : base + ':' + slot;
   }
 
@@ -134,6 +139,9 @@
         } else if (obj.version === 5) {   // v2.0 新經濟：EconMigrate（5 → 6）之前也備份一份
           try { if (st.getItem(backupKeyFor(slot, 'v5')) === null) st.setItem(backupKeyFor(slot, 'v5'), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
         }
+        if (obj.version === BACKUP_SOUTH_FROM) {   // v3.0：SouthMigrate（6 → 7）之前也備份一份
+          try { if (st.getItem(backupKeyFor(slot, BACKUP_SOUTH_WHICH)) === null) st.setItem(backupKeyFor(slot, BACKUP_SOUTH_WHICH), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
+        }
         return Save.migrate(obj);
       } catch (e) { return null; }   // 升級失敗：回傳 null，loadError 會說明原因；原本的存檔不動
     })());
@@ -201,7 +209,7 @@
   CloudSaveProvider.prototype.list = notReady;
   CloudSaveProvider.prototype['delete'] = notReady;
 
-  var SaveProvider = { BACKUP_KEY: BACKUP_KEY, BACKUP_V3_KEY: BACKUP_V3_KEY, BACKUP_V4_KEY: BACKUP_V4_KEY, BACKUP_V5_KEY: BACKUP_V5_KEY, backupKeyFor: backupKeyFor, migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
+  var SaveProvider = { BACKUP_KEY: BACKUP_KEY, BACKUP_V3_KEY: BACKUP_V3_KEY, BACKUP_V4_KEY: BACKUP_V4_KEY, BACKUP_V5_KEY: BACKUP_V5_KEY, BACKUP_SOUTH_KEY: BACKUP_SOUTH_KEY, BACKUP_SOUTH_WHICH: BACKUP_SOUTH_WHICH, backupKeyFor: backupKeyFor, migrateLegacyKeys: migrateLegacyKeys, METHODS: METHODS, DEFAULT_SLOT: DEFAULT_SLOT, missingMethods: missingMethods, keyFor: keyFor, LocalSaveProvider: LocalSaveProvider, CloudSaveProvider: CloudSaveProvider };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.SaveProvider = SaveProvider; }
   if (typeof module !== 'undefined') module.exports = SaveProvider;
 })();

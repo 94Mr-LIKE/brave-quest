@@ -281,6 +281,9 @@ window.JOB_RULES = {
     temple_lk: { locked: "D_TEMPLE_LOCKED_LK", intro: "D_TRIAL_INTRO_LK", pass: "D_TRIAL_PASS_LK", fail: "D_TRIAL_FAIL_LK", again: "D_TRIAL_AGAIN_LK", lv1: "D_JOB_LV1_LK", back: "D_JOB_BACK_LK", bless: "D_TEMPLE_BLESS_LK", intro_place: "D_TEMPLE_LK_INTRO", intro2: "D_TRIAL2_INTRO_LK", fail2: "D_TRIAL2_FAIL_LK" },
     temple_ct: { locked: "D_TEMPLE_LOCKED_CT", intro: "D_TRIAL_INTRO_CT", pass: "D_TRIAL_PASS_CT", fail: "D_TRIAL_FAIL_CT", again: "D_TRIAL_AGAIN_CT", lv1: "D_JOB_LV1_CT", back: "D_JOB_BACK_CT", bless: "D_TEMPLE_BLESS_CT", intro_place: "D_TEMPLE_CT_INTRO", intro2: "D_TRIAL2_INTRO_CT", fail2: "D_TRIAL2_FAIL_CT" },
     temple_wd: { locked: "D_TEMPLE_LOCKED_WD", intro: "D_TRIAL_INTRO_WD", pass: "D_TRIAL_PASS_WD", fail: "D_TRIAL_FAIL_WD", again: "D_TRIAL_AGAIN_WD", lv1: "D_JOB_LV1_WD", back: "D_JOB_BACK_WD", bless: "D_TEMPLE_BLESS_WD", intro_place: "D_TEMPLE_WD_INTRO", intro2: "D_TRIAL2_INTRO_WD", fail2: "D_TRIAL2_FAIL_WD" },
+    // v3.0 南部（70 號 6.3）：台詞照鎮瀾宮志工的句子換說話者（劇本組定稿前）；佛光山祝福「願佛祖保佑你」「這是你自己努力得來的」
+    temple_lem: { locked: "D_TEMPLE_LOCKED_LEM", intro: "D_TRIAL_INTRO_LEM", pass: "D_TRIAL_PASS_LEM", fail: "D_TRIAL_FAIL_LEM", again: "D_TRIAL_AGAIN_LEM", lv1: "D_JOB_LV1_LEM", back: "D_JOB_BACK_LEM", bless: "D_TEMPLE_BLESS_LEM", intro_place: "D_TEMPLE_LEM_INTRO", intro2: "D_TRIAL2_INTRO_LEM", fail2: "D_TRIAL2_FAIL_LEM" },
+    temple_fgs: { locked: "D_TEMPLE_LOCKED_FGS", intro: "D_TRIAL_INTRO_FGS", pass: "D_TRIAL_PASS_FGS", fail: "D_TRIAL_FAIL_FGS", again: "D_TRIAL_AGAIN_FGS", lv1: "D_JOB_LV1_FGS", back: "D_JOB_BACK_FGS", bless: "D_TEMPLE_BLESS_FGS", intro_place: "D_TEMPLE_FGS_INTRO", intro2: "D_TRIAL2_INTRO_FGS", fail2: "D_TRIAL2_FAIL_FGS" },
     pet: { cheer: "D_TRIAL_CHEER", wrong: "D_TRIAL_WRONG", fail: "D_TRIAL_FAIL_PET", quit: "D_TRIAL_QUIT_PET" }
   },
   // v2.1：中級職業不放在 open_jobs，由 state.tierOpen.inter（到過鎮瀾宮）和配方決定（Character.isOpen、recipeStatus）
@@ -296,7 +299,10 @@ window.JOB_RULES = {
     { id: "temple_zl", map: "M18", kind: "npc", npc: "volunteer_zl", name: "鎮瀾宮", opensTier: "inter" },
     { id: "temple_lk", map: "M19", kind: "npc", npc: "volunteer_lk", name: "鹿港天后宮" },
     { id: "temple_ct", map: "M20", kind: "npc", npc: "volunteer_ct", name: "朝天宮" },
-    { id: "temple_wd", map: "M20", kind: "npc", npc: "volunteer_wd", name: "武德宮" }
+    { id: "temple_wd", map: "M20", kind: "npc", npc: "volunteer_wd", name: "武德宮" },
+    // v3.0 南部（70 號 6.1）：志工主持（不畫神像、不點香、不擲筊、不收費）；opensTier: "adv"＝第一次和鹿耳門聖母廟志工說話就記「高級職業開放」（state.tierOpen.adv；高級職業 v3.2 才做）
+    { id: "temple_lem", map: "M22", kind: "npc", npc: "volunteer_lem", name: "正統鹿耳門聖母廟", opensTier: "adv" },
+    { id: "temple_fgs", map: "M23", kind: "npc", npc: "volunteer_fgs", name: "佛光山" }
   ],
   growth: { hp: 8, mp: 2, atk: 2, def: 0.5 },   // 48 號 2.1：所有職業一樣
   floor_ratio: 0.5, transfer_step: 0.2,
