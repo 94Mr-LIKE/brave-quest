@@ -11,6 +11,7 @@
     layer = document.getElementById('layer');
     toasts = document.getElementById('toasts');
     live = document.getElementById('sr-live');
+    wwObserve(document.getElementById('ui'));   // v2.2.1（v20 缺陷 2、12；v21 L1–L4、L8）：新出現的文字不在詞中間換行
     document.addEventListener('keydown', onKey, true);
     // v0.9.6（47 號 B01）用滑鼠／手指點過的 HUD 按鈕不要一直留著焦點：
     // 不然 Z 以外的「對話」鍵（空白鍵、Enter）會去按那個按鈕，重新打開背包、放大地圖。用鍵盤 Tab 過去的照舊（無障礙）
@@ -49,6 +50,97 @@
     }
     if (i < s.length) node.appendChild(document.createTextNode(s.slice(i)));
     return true;
+  }
+
+  /*
+   * v2.2.1（v20_畫面審查 缺陷 2、12；v21_畫面審查 L1–L4、L8；生氣了橫幅）：中文在詞中間換行（「鎮瀾／宮」「魔法戰／士」「kóo-tsik--／ooh」）。
+   * 只靠 h() 不夠（對話框、戰鬥訊息是直接設 textContent）→ #ui 掛一個 MutationObserver：新出現的文字節點，把「詞」包成 <jq-nb>（style.css：不換行），
+   * 換行只落在詞和詞之間。字、textContent、讀屏念的內容都不變。詞（wordRanges）：
+   *   ① 金額、數值、數字＋單位（25 金幣、攻擊 +3、魔力 6、18 題、第 1/3 階段、Lv20–24）、「」裡 10 字以內、台羅有連字號的詞（kóo-tsik--ooh.）
+   *   ② 遊戲裡的名字（地名、職業、道具、怪物、委託名稱、說話的人、NPC，2–8 個字）＋ WW_WORDS 補的常用詞
+   *   ③ 瀏覽器分詞 Intl.Segmenter（2–6 個字；瀏覽器沒有中文詞庫時只剩 ①②，不會出錯）
+   * 超過 8 個字的不包（窄的框還是可以換行，不會撐破版面）。
+   */
+  var WW_SKIP = 'jq-nb, #hud, .timer, #sr-live, script, style, textarea, input, select, option, svg, canvas, .author-mail, .map-banner';
+  var WW_LAT = "A-Za-z\\u00C0-\\u024F\\u1E00-\\u1EFF\\u0300-\\u036F\\u207F'";
+  var WW_RE = new RegExp([
+    '(?:金幣|經驗值|攻擊|防禦力|防禦|魔力|體力)\\s?[+＋−-]?\\s?\\d[\\d,.]*',
+    '(?:第\\s?)?\\d[\\d,.]*(?:\\s?\\/\\s?\\d+)?\\s?(?:金幣|公尺|公里|公斤|公克|公分|分鐘|小時|階段|金(?![\\u3400-\\u9fff])|題|個|秒|級|張|隻|天|次|倍|顆|元|年|月|日|步|格|盞|句|種|件|本|頁|人|位|塊|片|條|盒|包|瓶|杯|碗)',
+    'Lv\\s?\\d+(?:\\s?[–~-]\\s?\\d+)?',
+    '[' + WW_LAT + ']+(?:-{1,2}[' + WW_LAT + ']+)+[.,!?]?',
+    '「[^「」\\n]{1,10}」'
+  ].join('|'), 'g');
+  var WW_CJK = /^[\u3400-\u9fff]+$/;
+  var WW_WORDS = ['鎮瀾宮', '天后宮', '朝天宮', '武德宮', '慈護宮', '行天宮', '指南宮', '廣安宮', '管理員', '解說員', '研究員', '圖書館', '博物館', '老街', '拿手科目', '中級職業', '初級職業',
+    '立志小考', '轉職', '委託', '寶箱', '經驗值', '金幣', '體力', '魔力', '防禦力', '攻擊', '技能', '階段', '豆干', '大漢溪', '竹塹城', '鬥相共', '機器將軍', '觀光網站', '真透', '亂跑',
+    '不安全', '最有名', '最大', '逃跑', '買東西', '賣東西', '拿得動', '變高', '也能用', '也能穿', '力量', '答對', '答錯', '題目', '番薯仔', '小地圖', '世界地圖', '刪去卡', '引導卡',
+    '國語', '數學', '英語', '自然', '社會', '三上', '三下', '單元'];
+  var wwDict = null, wwDictFull = false, wwMax = 0, wwSeg = null, wwMade = typeof WeakSet === 'function' ? new WeakSet() : null;
+  /** 詞庫：WW_WORDS＋遊戲資料的名字（只收 2–8 個中文字；資料還沒載入時先用 WW_WORDS，之後補上） */
+  function wwBuildDict() {
+    var w = typeof window !== 'undefined' ? window : {}, d = {}, max = 0;
+    function add(s) { s = String(s == null ? '' : s).replace(/[\s「」『』（）()〔〕]/g, ''); if (s.length >= 2 && s.length <= 8 && WW_CJK.test(s)) { d[s] = 1; if (s.length > max) max = s.length; } }
+    WW_WORDS.forEach(add);
+    var full = !!(w.MAPS && w.ITEMS);
+    [w.MAPS, w.JOBS, w.ITEMS, w.MONSTERS, w.QUESTS].forEach(function (o) { Object.keys(o || {}).forEach(function (k) { var v = o[k] || {}; add(v.name); add(v.title); (v.npcs || []).forEach(function (n) { add(n && n.name); }); }); });
+    [w.SPEAKERS, w.NPC_NAMES].forEach(function (o) { Object.keys(o || {}).forEach(function (k) { add(o[k]); }); });
+    wwDict = d; wwMax = max; wwDictFull = full;
+  }
+  /** s 裡要整塊不換行的範圍 [[開始, 結束), …]（照順序、不重疊）。純函式，node 測試直接呼叫（J.UI.wordRanges） */
+  function wordRanges(s) {
+    s = String(s == null ? '' : s);
+    var out = [], used = [], i, m;
+    if (s.length < 2) return out;
+    if (!wwDict || !wwDictFull) wwBuildDict();
+    function free(a, b) { for (var k = a; k < b; k++) if (used[k]) return false; return true; }
+    function take(a, b) { out.push([a, b]); for (var k = a; k < b; k++) used[k] = true; }
+    WW_RE.lastIndex = 0;
+    while ((m = WW_RE.exec(s))) { if (m[0].length > 1 && free(m.index, m.index + m[0].length)) take(m.index, m.index + m[0].length); if (!m[0].length) WW_RE.lastIndex++; }
+    for (i = 0; i < s.length; i++) {
+      if (used[i] || !WW_CJK.test(s[i])) continue;
+      for (var L = Math.min(wwMax, s.length - i); L >= 2; L--) { if (wwDict[s.substr(i, L)] && free(i, i + L)) { take(i, i + L); i += L - 1; break; } }
+    }
+    if (wwSeg === null) { try { wwSeg = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter('zh-Hant', { granularity: 'word' }) : false; } catch (e) { wwSeg = false; } }
+    if (wwSeg && /[\u3400-\u9fff]{2}/.test(s)) {
+      try {
+        var it = wwSeg.segment(s)[Symbol.iterator](), r;
+        while (!(r = it.next()).done) { var g = r.value, a = g.index, b = a + g.segment.length; if (g.isWordLike !== false && g.segment.length >= 2 && g.segment.length <= 6 && WW_CJK.test(g.segment) && free(a, b)) take(a, b); }
+      } catch (e) { /* 瀏覽器分詞出錯就只用 ①② */ }
+    }
+    return out.sort(function (x, y) { return x[0] - y[0]; });
+  }
+  function wwKeep(n) { if (wwMade) wwMade.add(n); return n; }
+  /** 一個文字節點：把詞包成 <jq-nb>（已經處理過、在跳過的元素裡、沒有要包的就不動） */
+  function wwText(tn) {
+    if (!tn || (wwMade && wwMade.has(tn))) return;
+    var p = tn.parentNode, s = tn.nodeValue;
+    if (!p || p.nodeType !== 1 || !s || s.length < 2 || (p.closest && p.closest(WW_SKIP))) return;
+    var rs = wordRanges(s), at = 0;
+    if (!rs.length) { wwKeep(tn); return; }
+    var frag = document.createDocumentFragment();
+    rs.forEach(function (r) {
+      if (r[0] > at) frag.appendChild(wwKeep(document.createTextNode(s.slice(at, r[0]))));
+      var nb = document.createElement('jq-nb'); nb.textContent = s.slice(r[0], r[1]); frag.appendChild(nb);
+      at = r[1];
+    });
+    if (at < s.length) frag.appendChild(wwKeep(document.createTextNode(s.slice(at))));
+    p.replaceChild(frag, tn);
+  }
+  /** 一個節點（文字或元素）：裡面所有的文字節點都處理（J.UI.wrapWords，測試、手動補處理用） */
+  function wwNode(n) {
+    if (!n || !n.parentNode) return;
+    if (n.nodeType === 3) { wwText(n); return; }
+    if (n.nodeType !== 1 || (n.closest && n.closest(WW_SKIP)) || typeof document.createTreeWalker !== 'function') return;
+    var tw = document.createTreeWalker(n, 4 /* NodeFilter.SHOW_TEXT */, null), t, all = [];
+    while ((t = tw.nextNode())) all.push(t);
+    all.forEach(wwText);
+  }
+  function wwObserve(root) {
+    if (!root || typeof window === 'undefined' || typeof window.MutationObserver !== 'function') return null;
+    var mo = new window.MutationObserver(function (list) { list.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, wwNode); }); });
+    mo.observe(root, { childList: true, subtree: true });
+    wwNode(root);
+    return mo;
   }
 
   /** h('button.primary', {onclick:fn, 'aria-label':'…'}, ['文字' 或元素…]) */
@@ -340,5 +432,5 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.UI = { choose: choose, init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, blocksMove: blocksMove, closePassMove: closePassMove, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
+  window.JQ.UI = { wordRanges: wordRanges, wrapWords: wwNode, choose: choose, init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, blocksMove: blocksMove, closePassMove: closePassMove, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
 })();

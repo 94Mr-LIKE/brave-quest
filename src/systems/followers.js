@@ -17,7 +17,7 @@
   function build(scene) {
     var J = window.JQ, T = J.CONFIG.TILE, list = specs(J.Game.state);
     scene.followers = null;
-    if (list.length < 2) return;
+    if (list.length < 1) return;   // v3.0.1（86 號 #3）只有番薯仔時也用隊伍內插（以前單隻用 PetFollow.step 固定速度追，實測每秒停 4.4 次）
     var party = PF.createParty({ x: scene.p.tx, y: scene.p.ty }, list.length, function (x, y) { return scene.walkable(x, y); }, scene.p.facing);
     var sprites = [scene.pet], walking = [true];
     list.slice(1).forEach(function (s) {
@@ -66,6 +66,7 @@
     var f = scene.followers;
     if (!f) return false;
     var J = window.JQ, T = J.CONFIG.TILE, spr = f.sprites[1], spec = f.specs[1];
+    if (!spr || !spec) return false;   // v3.0.1（86 號 #3）只有番薯仔
     if (!spr.visible || Math.floor(pointer.worldX / T) !== Math.floor(spr.x / T) ||
         Math.floor(pointer.worldY / T) !== Math.floor((spr.y - 1) / T)) return false;
     scene.p.path = []; scene.p.pending = null;

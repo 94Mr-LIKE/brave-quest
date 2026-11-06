@@ -19,6 +19,9 @@
 
     create() {
       J.Assets.finalize(this);
+      // v3.0.1 ③戰鬥加速：家長設定「快」→ 這個場景的動畫、延遲兩倍速（答題時間在 quiz.js，不受影響）
+      var spd = J.Game && J.Game.battleSpeedMult ? J.Game.battleSpeedMult() : 1;
+      this.tweens.timeScale = 1 / spd; this.time.timeScale = 1 / spd;
       var C = J.CONFIG, W = C.VIEW_W, H = C.VIEW_H, bgH = Math.round(H * 2 / 3);
       this.cameras.main.setBackgroundColor('#0b1236');
       var bgKey = 'bg:' + this.data_.bg;

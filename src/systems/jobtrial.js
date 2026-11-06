@@ -142,7 +142,7 @@
     var inter = data && data.jobs && data.jobs[jobId] && data.jobs[jobId].tier === 'inter';
     var pass = correct >= R.pass && (!inter || (answers || []).length === total(R));
     var units = [];
-    (answers || []).forEach(function (a) { if (a && !a.correct) { var u = (a.subject ? a.subject + '：' : '') + (a.unit || '（沒有單元名稱）'); if (units.indexOf(u) < 0) units.push(u); } });
+    (answers || []).forEach(function (a) { if (a && !a.correct) { var u = (a.subject ? a.subject + '：' : '') + (a.term ? a.term + ' ' : '') + (a.unit || '（沒有單元名稱）');   /* v2.2.1（v21 L5）：寫出三上／三下 */ if (units.indexOf(u) < 0) units.push(u); } });
     r.inProgress = null;
     var job = (data && data.jobs && data.jobs[jobId]) || { name: jobId };
     var out = { pass: pass, correct: correct, total: (answers || []).length, need: R.pass, wrongUnits: units, title: null, amulet: null };

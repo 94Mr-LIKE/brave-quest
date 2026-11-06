@@ -182,6 +182,7 @@
     var loc = st.location && G.data.maps[st.location.map] ? st.location : { map: 'M01', x: undefined, y: undefined };
     G.ensurePhaser(function () {
       G.phaser.scene.start('Map', { mapId: loc.map, x: loc.x, y: loc.y });
+      setTimeout(G.onResize, 0);   // v1.4 直放：地圖畫面加高
     });
     G.pendingIntro = !!isNew;
     if (G.tickTimer) clearInterval(G.tickTimer);
@@ -227,9 +228,42 @@
     if (hud && !hud.hidden && hud.offsetHeight) document.documentElement.style.setProperty('--hud-h', hud.offsetHeight + 'px');
     return portrait;
   };
+  /**
+   * v1.4 直放時遊戲畫面變高（老闆：直放時畫面只佔中間一條，下面到搖桿空一大塊）：
+   * 地圖畫面寬度照舊 640（放大倍數不變＝角色大小不變），高度加長到「HUD 下緣～搖桿／A、B 鍵上緣」，地圖多顯示好幾列。
+   * 戰鬥（HUD 藏起來時）、橫放、電腦版維持 640×360。搖桿被視窗蓋住（display:none）時沿用上一次量到的位置，畫面不會跟著跳。
+   * （wip_v14_ui/v14_tallview_apply.js；v2.2.1 由 wip_v20/v221_fixes_apply.js 併進來）
+   */
+  G.viewSize = function () {
+    var W = C.VIEW_W, H = C.VIEW_H, hud = document.getElementById('hud');
+    if (!G.isPortrait() || !hud || hud.hidden) return { w: W, h: H };
+    var key = window.innerWidth + 'x' + window.innerHeight, bottom = null;
+    ['#pad .joystick', '#pad .abtn', '#pad .bbtn'].forEach(function (sel) {
+      var e = document.querySelector(sel);
+      var r = e && e.getBoundingClientRect();
+      if (r && r.height > 0 && r.top > window.innerHeight / 2) bottom = Math.min(bottom === null ? Infinity : bottom, r.top - 8);
+    });
+    if (bottom === null) bottom = G._padTop && G._padTop.key === key ? G._padTop.y : window.innerHeight;
+    else G._padTop = { key: key, y: bottom };
+    var h = Math.floor((bottom - (hud.offsetHeight || 0)) * W / Math.max(1, window.innerWidth));
+    h = Math.max(H, Math.min(H * 3, h));
+    // 地圖比畫面矮（例如慈護宮正殿 24×20 格）：畫面只加高到地圖高度，地圖下面不會露出一條空白
+    var ms = G.mapScene;
+    if (ms && ms.size && ms.size.h) h = Math.max(H, Math.min(h, ms.size.h * C.TILE));
+    return { w: W, h: h - (h % 2) };
+  };
+  G.applyView = function () {
+    if (!G.phaser || !G.phaser.scale || !G.phaser.scale.gameSize) return;
+    var v = G.viewSize(), sc = G.phaser.scale;
+    if (sc.gameSize.width !== v.w || sc.gameSize.height !== v.h) sc.setGameSize(v.w, v.h);
+    document.body.classList.toggle('tall-view', v.h > C.VIEW_H);
+    var cv = G.phaser.canvas, r = cv && cv.getBoundingClientRect();
+    if (r && r.height) document.documentElement.style.setProperty('--canvas-gap', Math.max(0, Math.round(window.innerHeight - r.bottom)) + 'px');
+  };
   G.onResize = function () {
     var portrait = G.layoutMode();
     if (!G.phaser || !G.phaser.scale) return;
+    G.applyView();
     var sc = G.phaser.scale, z = G.zoomPlan();
     if (sc.scaleMode === Phaser.Scale.NONE && z.integer) sc.setZoom(z.zoom);
     if (sc.scaleMode === Phaser.Scale.FIT) {
@@ -237,6 +271,7 @@
       if (sc.autoCenter !== want) { sc.autoCenter = want; }
       sc.refresh();
     }
+    G.applyView();   // v1.4 重新量畫布下緣（提示泡泡的位置用）
   };
 
   // ---------------------------------------------------------------- 共用
@@ -385,6 +420,7 @@
   // ---------------------------------------------------------------- 地圖
   G.onMapReady = function (scene) {
     G.mapScene = scene;
+    G.applyView();   // v1.4 直放：依這張地圖的高度決定畫面加高多少
     G.mapReadyCount = (G.mapReadyCount || 0) + 1;   // v0.9.5 慈護宮轉職：等轉職後重新開始的場景好了再放光芒
     // v0.9.5 從別張地圖「走進來」才算進廟（轉職換走路圖時同一張地圖重新開始，不再介紹一次）
     var enteredMap = G.lastReadyMap !== scene.mapId;
@@ -750,7 +786,8 @@
     ]);
     var handle = J.UI.open(panel, { label: (v.label || '風景') + '的插圖', escClose: false });
     G.viewShown = (G.viewShown || 0) + 1;
-    return G.say(v.dialog, [{ who: 'narrator', text: '遠方的山稜，看起來像一個人的側臉。' }]).then(function () { handle.close(true); });
+    if (J.Ambience) J.Ambience.viewInteract(true);   // v3.0.1（86 號 #7）觀景：BGM 壓低 10 dB
+    return G.say(v.dialog, [{ who: 'narrator', text: '遠方的山稜，看起來像一個人的側臉。' }]).then(function () { handle.close(true); if (J.Ambience) J.Ambience.viewInteract(false); });
   };
 
   /** v0.9.5 進廟（有神像的室內地圖）時廟公介紹：D_TEMPLE_INTRO */
@@ -987,9 +1024,13 @@
     var units = q.units || [];
     // v1.4.1（v14_畫面審查 缺陷 7）：委託可以列 skip_scene（字詞）——情境或題目裡有這些字的題不抽（例：豆干店的帳不抽「地精拿走寶石」、新竹解說員不抽「金山的圖書館」；題庫不改）
     var skip = q.skip_scene || [];
+    // v2.2.1b（v20_畫面審查 缺陷 9；情境會議決議第 3 步）：J.SceneFit.helpFilter 兩層篩題——第一層＝上面的單元、難度、skip_scene＋不是寶箱題＋
+    // generic／本地圖／家鄉（外地、不在奇幻地圖的奇幻題不抽）；某一科第一層少於要答的題數才退回第二層（舊規則＋不是寶箱題）。noFallback：不再落到「整科都抽」
+    var helpMap = q.map || (scene && scene.mapId), fit = J.SceneFit.helpFilter(G.questions, q, helpMap);
+    if (fit.fallback.length && typeof console !== 'undefined') console.warn('[委託情境] ' + id + '：' + fit.fallback.map(function (s) { return s + ' 嚴格題池 ' + fit.pools[s].strict.length + ' 題'; }).join('、') + '，比要答的題數少，退回寬鬆（照樣不抽寶箱題）');
     var sess = J.Session.create(st, G.questions, J.QuestLog.helpSubject(q, 0), {
       mode: 'free', noPay: true,   // v2.0 新經濟（67 號第二節第 5 項）：答題不給經驗值和金幣，完成委託時一次給
-      filter: function (x) { return (!units.length || units.indexOf(x.unit) >= 0) && x.level >= lr[0] && x.level <= lr[1] && !skip.some(function (w) { return String(x.scene || '').indexOf(w) >= 0 || String(x.stem || '').indexOf(w) >= 0; }); }
+      filter: fit.filter, noFallback: true   // v2.2.1b：scenefit.js（單元、難度、skip_scene 的舊規則也在裡面：SceneFit.baseFits）；noFallback＝篩完沒題不退回整科
     });
     function nextQ() {
       if (J.QuestLog.canComplete(st, Q, id, G.data)) { G.completeQuest(id, scene); return; }
@@ -1000,6 +1041,7 @@
       J.Quiz.ask({
         session: sess, mode: 'help', state: st, title: q.title, subtitle: '幫忙 ' + (prog + 1) + '/' + J.QuestLog.helpCount(q) + '・' + G.speaker(npc.id).name,
         speaker: G.speaker(npc.id).name,   // 題目情境的說話者換成委託人（不改題庫）
+        sceneView: function (x) { return J.SceneFit.sceneView(x, helpMap, G.speaker(npc.id).name, q, J.DialogText); },   // v2.2.1b：generic 才換說話者；家鄉題在金包里以外先說過場句
         onSave: function () { G.save(); },
         onRewards: function (res) { G.refreshHud(); if (res) G.afterReward(res.levelsGained); },
         onDone: function (r) {
@@ -1018,6 +1060,43 @@
       });
     }
     nextQ();
+  };
+
+  /**
+   * v3.0.1 ④錯題回顧（競品吸收清單第 4 項）：冒險手帳「學習紀錄 → 🔁 再挑戰一次」。題目＝J.Review.wrongList（存檔的 qhist＋answered；寶箱題不算），
+   * 出題順序交給 Session（適性難度），一次最多 J.Review.ROUND 題；答對一題給 J.Review.rewardExp 經驗值（不給金幣），答對就離開清單。可以先離開。
+   */
+  G.reviewWrong = function (subject) {
+    if (G.blocked()) return false;
+    var st = G.state, list = J.Review.wrongList(st, G.questions || []).filter(function (x) { return x.subject === subject; });
+    if (!list.length) { J.UI.toast('「' + subject + '」沒有要再挑戰的題目，好厲害！'); return false; }
+    var ids = {}; list.forEach(function (x) { ids[x.id] = true; });
+    var total = Math.min(J.Review.ROUND, list.length), n = 0, right = 0;
+    var sess = J.Session.create(st, G.questions, subject, { mode: 'free', noPay: true, noFallback: true, noRepeat: true, filter: function (x) { return !!ids[x.id]; } });
+    G.reviewLog = { subject: subject, total: total, asked: [], right: 0 };   // 測試用
+    function finish() { G.save(); G.refreshHud(); if (n) J.UI.banner('再挑戰完成：答對 ' + right + '／' + n + ' 題'); }
+    function nextQ() {
+      if (n >= total) { finish(); return; }
+      var qq = J.Session.next(sess, Date.now(), { subject: subject });
+      if (!qq) { finish(); return; }
+      n++; G.reviewLog.asked.push(qq.id);
+      J.Quiz.ask({
+        session: sess, mode: 'review', state: st, title: '🔁 再挑戰一次', subtitle: subject + '　' + n + '／' + total,
+        onSave: function () { G.save(); },
+        onRewards: function () { G.refreshHud(); },
+        onDone: function (r) {
+          if (r.left) { G.save(); J.UI.toast('先休息一下，隨時可以回來再挑戰！'); return; }
+          if (r.correct) {
+            right++; G.reviewLog.right = right;
+            var gain = J.Review.rewardExp(qq), lv = J.Exp.addExp(st.player, gain, G.data);
+            J.UI.toast('答對了！經驗值 +' + gain); G.refreshHud(); if (lv > 0) G.afterReward(lv);
+          }
+          G.save(); nextQ();
+        }
+      });
+    }
+    nextQ();
+    return true;
   };
 
   // ---------------------------------------------------------------- 寶箱與燈
@@ -1139,6 +1218,10 @@
     return G.say(null, [{ who: 'pet', text: '今天只剩 ' + gate.minutes + ' 分鐘，打不完的。明天再來挑戰吧！' }]).then(function () { return false; });
   };
 
+  /** v3.0.1 ③戰鬥加速（競品吸收清單第 3 項）：家長設定「戰鬥動畫速度：快」→ 動畫（BattleScene）兩倍速、戰鬥流程的等待減半；答題時間（quiz.js 計時條）不看這個 */
+  G.battleSpeedMult = function () { return G.state && G.state.settings && G.state.settings.battleSpeed === 'fast' ? 0.5 : 1; };
+  G.bwait = function (ms) { return Math.round(ms * G.battleSpeedMult()); };
+
   G.startBattle = function (mob, scene) {
     var map = scene.map, mon = J.Ch3Migrate ? J.Ch3Migrate.battleMonster(G.state, mob.mon, scene.mapId) : mob.mon;   // v1.3（62 號 5.4）舊紅樹林旗標
     if (J.SouthMigrate) mon = J.SouthMigrate.battleMonster(G.state, mon, scene.mapId);   // v3.0（70 號 5.1）舊南部旗標
@@ -1147,8 +1230,10 @@
     var bg = G.battleBgFor(mon, scene.mapId);
     J.Bestiary.seen(G.state, mon.id);   // 怪物名冊：遇見
     G.bgm(J.MapInfo.battleBgm(mon, map));
+    if (J.Ambience) J.Ambience.battle(true);   // v3.0.1（86 號 #7）環境音 0.3 秒淡出
     scene.scene.sleep();
     J.HUD.show(false);
+    G.applyView();   // v1.4 戰鬥畫面維持 640×360（直放變高只用在地圖）
     Array.prototype.forEach.call(document.querySelectorAll('.map-banner'), function (n) { n.parentNode.removeChild(n); });
     G.phaser.scene.start('Battle', { mon: mon, bg: bg });
   };
@@ -1301,11 +1386,11 @@
       if (!(b.fx && b.fx.shield > 0) && J.Battle.dodgeOnWrong(b, st.settings.answerTime, s.timeMult)) {
         ctx.dodged = (ctx.dodged || 0) + 1;   // 測試用
         G.bmsg('沒打中……但是弓箭手身手敏捷，閃過了這次攻擊！（每場戰鬥一次）');
-        setTimeout(function () { G.bcommands(true); }, 700);
+        setTimeout(function () { G.bcommands(true); }, G.bwait(700));
         return;
       }
       G.bmsg(r.timeout ? '時間到！這一擊沒打出去……' : '沒打中……');
-      setTimeout(function () { G.bmonsterTurn(true); }, 700);
+      setTimeout(function () { G.bmonsterTurn(true); }, G.bwait(700));
       return;
     }
     // 技能效果由規則系統結算；多段攻擊只呼叫一次 Battle.hit，回復與增益答對也算頭目的一題。
@@ -1322,7 +1407,7 @@
         G.skillFx(skill, use, function () {
           G.brender(); G.refreshHud();
           G.bmsg(G.skillText(skill, use));
-          setTimeout(function () { G.bcommands(true); }, 500);
+          setTimeout(function () { G.bcommands(true); }, G.bwait(500));
         });
         return;
       }
@@ -1355,13 +1440,13 @@
         if (i >= shown.length) { done(); return; }
         sc.hitEffect(shown[i], at.crit && i === 0);
         i++;
-        setTimeout(next, shown.length > 1 ? 260 : 0);
+        setTimeout(next, shown.length > 1 ? G.bwait(260) : 0);
       })();
     };
     var finish = function () {
       if (hr.phaseUp) { sc.phaseEffect(); J.UI.banner(mon.name + '生氣了！攻擊變強了！', 'rage-banner'); }   // v0.9.3 生氣了 = 進入下一階段、攻擊 +20%
       G.brender(); G.bmsg(msg);
-      if (b.over) setTimeout(G.bvictory, 700); else setTimeout(function () { G.bcommands(true); }, 500);
+      if (b.over) setTimeout(G.bvictory, G.bwait(700)); else setTimeout(function () { G.bcommands(true); }, G.bwait(500));
     };
     G.brender();
     if (skill) G.skillFx(skill, use, function () { play(finish); }); else play(finish);
@@ -1402,7 +1487,7 @@
     ctx.lastHit = { dmg: t.damage, mult: t.mult, skipped: t.skipped };   // 測試用
     if (t.skipped) {
       G.bmsg(t.skipped === 'shield' ? '守護之盾擋住了，這次沒有受傷！' : t.skipped === 'stun' ? mon.name + '麻麻的，動不了！' : t.skipped === 'evade' ? '輕巧一轉，閃過了' + mon.name + '的攻擊！' : mon.name + '笑到忘了攻擊！');
-      setTimeout(function () { G.bcommands(true); }, 700);
+      setTimeout(function () { G.bcommands(true); }, G.bwait(700));
       return;
     }
     var h = J.Battle.heroHurt(st, t.damage);
@@ -1413,8 +1498,8 @@
       (revived ? '　不倒祈願！又站起來了（體力 ' + revived + '）！' : ''));
     if (revived) ctx.scene.healEffect();
     G.save();
-    if (h.ko && !revived) setTimeout(G.bko, 900);
-    else setTimeout(function () { G.bcommands(true); }, 700);
+    if (h.ko && !revived) setTimeout(G.bko, G.bwait(900));
+    else setTimeout(function () { G.bcommands(true); }, G.bwait(700));
   };
 
   G.bitems = function () {
@@ -1432,7 +1517,7 @@
         G.brender(); G.refreshHud();
         G.bmsg('用了' + it.name + '，體力回復 ' + r.healed + ' 點！');
         G.bcommands(false);
-        setTimeout(G.bmonsterTurn, 800);
+        setTimeout(G.bmonsterTurn, G.bwait(800));
       } }, [it.name + ' ×' + st.inventory[id]]));
     });
     ctx.el.cmds.appendChild(h('button.ghost', { onclick: function () { G.bcommands(true); } }, ['返回']));
@@ -1446,10 +1531,10 @@
     if (J.Battle.tryFlee(ctx.b.boss, null, !!tr.fleeSure)) {   // v1.0 船員：逃跑一定成功
       G.state.stats.battles.fled = (G.state.stats.battles.fled || 0) + 1;
       G.bmsg('順利逃開了！');
-      setTimeout(function () { G.bend('fled'); }, 700);
+      setTimeout(function () { G.bend('fled'); }, G.bwait(700));
     } else {
       G.bmsg('逃不掉！');
-      setTimeout(G.bmonsterTurn, 700);
+      setTimeout(G.bmonsterTurn, G.bwait(700));
     }
   };
 
@@ -1551,7 +1636,9 @@
       document.getElementById('ui').appendChild(veil);
       setTimeout(function () { veil.classList.add('on'); }, 20);
       G.stopBgm(400);
+      if (J.Ambience) J.Ambience.innRest(true);   // v3.0.1（86 號 #7）休息時夜晚蟲鳴
       G.jingle('inn_rest', function () {
+        if (J.Ambience) J.Ambience.innRest(false);
         veil.classList.remove('on');
         setTimeout(function () {
           if (veil.parentNode) veil.parentNode.removeChild(veil);

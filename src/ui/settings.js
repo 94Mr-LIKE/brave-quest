@@ -97,6 +97,37 @@
     });
   }
 
+  /**
+   * v3.0.1 ⑤家長報表一鍵列印：把報表組成一張 section.print-report（style.css 的 @media print 只印這一塊），呼叫 window.print()；印完（afterprint）拿掉。
+   * 只在這台裝置產生，不上傳、不連網。回傳那張報表（測試用）
+   */
+  function printReport(G) {
+    var st = G.state, r = J.Report.build(st, Date.now()), old = document.querySelector('.print-report');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var d = new Date(), ds = d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日';
+    var rows = [h('tr', {}, [h('th', { text: '科目' }), h('th', { text: '完成題數' }), h('th', { text: '一次就答對的比例' })])].concat(r.subjects.map(function (s) {
+      return h('tr', {}, [h('td', { text: s.subject }), h('td', { text: String(s.done) }), h('td', { text: s.rate === null ? '—' : Math.round(s.rate * 100) + '%' })]); }));
+    var wl = J.Review ? J.Review.bySubject(J.Review.wrongList(st, G.questions || [])) : {}, wk = Object.keys(wl);
+    var tl = (st.trialLog || []).slice(-8).reverse();
+    var box = h('section.print-report', { 'aria-label': '列印用的家長報表' }, [
+      h('h1', { text: '勇者大冒險　家長報表' }),
+      h('p', { text: '冒險者：' + (st.player.name || '') + '　等級 ' + st.player.level + '　列印日期：' + ds }),
+      h('table.report', {}, rows),
+      h('p', { text: '需要加強的單元：' + (r.weakUnits.length ? r.weakUnits.map(function (u) { return u.subject + '「' + u.unit + '」（' + Math.round(u.rate * 100) + '%）'; }).join('、') : '資料還不夠') }),
+      h('p', { text: '今天玩了 ' + r.todayMin + ' 分鐘・累計 ' + r.totalMin + ' 分鐘・冒險 ' + r.adventureDays + ' 天' }),
+      h('p', { text: '可以再挑戰的題目（最近答錯、還沒答對）：' + (wk.length ? wk.map(function (s) { return s + ' ' + wl[s] + ' 題'; }).join('、') : '沒有') }),
+      tl.length ? h('ul', {}, tl.map(function (e) { return h('li', { text: '立志小考 ' + e.date + '　' + ((G.data.jobs[e.job] || {}).name || e.job) + '　' + (e.quit ? '考到一半離開' : '答對 ' + e.correct + '／' + e.total + (e.pass ? '　通過' : '　沒通過')) }); })) : null,
+      h('p.small', { text: '這份報表只在這台裝置產生，沒有上傳到任何地方。' })]);
+    document.body.appendChild(box);
+    document.body.classList.add('printing-report');
+    var done = function () { document.body.classList.remove('printing-report'); if (box.parentNode) box.parentNode.removeChild(box); window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    G.lastPrint = { at: Date.now() };   // 測試用
+    try { window.print(); } catch (e) { done(); }
+    return box;
+  }
+  J.Settings_printReport = printReport;   // 測試用
+
   function panel(G) {
     var st = G.state;
     var body = h('div');
@@ -129,6 +160,14 @@
       body.appendChild(radioRow('技能特效（動態效果）', 'motion', [{ value: 'auto', label: '跟裝置設定' }, { value: 'off', label: '播放特效' }, { value: 'on', label: '減少動態（只顯示數字）' }],
         st.settings.reduceMotion || 'auto', function (v) { st.settings.reduceMotion = v; G.save(); }));
       body.appendChild(h('p.small', { text: '技能特效約 0.4～2 秒，點一下可以跳過；閃光每秒最多 3 次。對光線敏感的孩子請選「減少動態」。' }));
+      // v3.0.1 ③戰鬥加速（競品吸收清單第 3 項）：只縮短戰鬥動畫和等待，不縮短答題時間
+      body.appendChild(radioRow('戰鬥動畫速度', 'bspeed', [{ value: 'normal', label: '標準' }, { value: 'fast', label: '快' }], st.settings.battleSpeed === 'fast' ? 'fast' : 'normal',
+        function (v) { st.settings.battleSpeed = v; G.save(); }));
+      body.appendChild(h('p.small', { text: '「快」只會讓戰鬥動畫和怪物的回合變快，答題時間不會變短。' }));
+      // v3.0.1 ②目標指引（競品吸收清單第 2 項）：小地圖、世界地圖上的紅色小旗子；洞窟、解謎的地方不標
+      body.appendChild(radioRow('目標指引（地圖上的紅色小旗子）', 'guide', [{ value: true, label: '顯示' }, { value: false, label: '不顯示' }], st.settings.guide !== false,
+        function (v) { st.settings.guide = v; if (J.Guide) J.Guide.reset(); G.save(); }));
+      body.appendChild(h('p.small', { text: '在小地圖和世界地圖上，用紅色小旗子標出委託的下一步。洞窟和解謎的地方不標，寶箱的位置也不標。' }));
       // 語音（對話與題目朗讀）：家長可以整個關掉
       var apply = function () { G.save(); G.applySettings(); };
       body.appendChild(radioRow('語音（對話、題目朗讀）', 'tts', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.tts, function (v) { st.settings.tts = v; apply(); }));
@@ -169,6 +208,9 @@
       // 報表
       var r = J.Report.build(st, Date.now());
       body.appendChild(h('h3', { text: '📊 家長報表' }));
+      // v3.0.1 ⑤家長報表一鍵列印（競品吸收清單第 5 項）：用瀏覽器列印（也可以存成 PDF），不上傳任何資料
+      body.appendChild(h('div.row.print-row', {}, [h('button.print-report-btn', { onclick: function () { printReport(G); }, 'aria-label': '列印家長報表（用這台裝置的瀏覽器列印，不會上傳）' }, ['🖨️ 列印報表']),
+        h('span.small', { text: '用這台裝置的瀏覽器列印或存成 PDF，不會上傳。' })]));
       var t = h('table.report');
       t.appendChild(h('tr', {}, [h('th', { text: '科目' }), h('th', { text: '完成題數' }), h('th', { text: '一次就答對的比例' })]));
       r.subjects.forEach(function (s) {

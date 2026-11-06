@@ -76,6 +76,7 @@
       this.heroKey = A.heroKey(g.state.player.gender, g.state.player.job);
       A.queue(this, this.heroKey, g.state.player.name);
       A.queue(this, 'pet_imo', '番薯仔');
+      if (J.TreeFX) J.TreeFX.preload(this);   // v3.0.1（86 號 #5 #6）樹影、落葉、轉場葉叢圖（docs/assets/fx）
       if (J.Followers) J.Followers.preload(this);   // v3.0 跟班掛鉤（codex5）：載入已加入的霧仔
       this.npcList().forEach(function (n) { A.queue(self, n.sprite || 'npc_unknown', g.speaker(n.id).name); });
       (map.spawns || []).forEach(function (s) {
@@ -183,16 +184,22 @@
       this.buildSigns();
       this.buildLights();
       this.buildForeground();
+      if (J.TreeFX) J.TreeFX.build(this);   // v3.0.1（86 號 #5）樹冠局部透明、樹蔭、地面樹影、落葉
       if (g.DEBUG) this.buildDebugOverlay();
 
       var cam = this.cameras.main;
       // 鏡頭：限制在地圖範圍內（地圖至少和畫面一樣大，邊界不會露出黑邊）；大地圖跟得柔和一點，主角在中間一小塊範圍內走動時鏡頭不動
       cam.setBounds(0, 0, this.size.w * T, this.size.h * T);
-      var lerp = this.bigMap ? 0.12 : 0.2;
-      cam.startFollow(this.player, true, lerp, lerp);
-      if (this.bigMap) cam.setDeadzone(T * 2, T * 1.5);
+      // v3.0.1（86 號 #1；wip_v301/v301_motion_apply.js）：鏡頭跟著「鏡頭目標」（lerp 1、不用死區），目標每幀由 updateCamTarget 算：
+      //   平滑中心依時間逼近主角（JQ.Motion.camStep），目標＝round(主角)－取整後的落後量 → 主角和鏡頭一起取整，主角在畫面上不會前後跳。
+      //   以前是「大地圖 lerp 0.12＋死區 2×1.5 格、小地圖 lerp 0.2」各自取整：實測主角在畫面上每秒前後跳 3.6–6 次（84 號實測）
+      this.camC = null;
+      this.camTarget = this.add.zone(Math.round(this.player.x), Math.round(this.player.y), 1, 1);
+      cam.startFollow(this.camTarget, true, 1, 1);
+      this.updateCamTarget(0);
       cam.setRoundPixels(true);
-      cam.fadeIn(250, 0, 0, 0);
+      if (!(J.TreeFX && J.TreeFX.sweepIn(this))) cam.fadeIn(250, 0, 0, 0);   // v3.0.1（86 號 #6）
+      if (J.Ambience) J.Ambience.enterMap(this.mapId, this.p.tx, this.p.ty);   // v3.0.1（86 號 #7）環境音
 
       this.input.on('pointerdown', function (p) { self.onPointer(p); });
       this.time.addEvent({ delay: 500, loop: true, callback: function () { self.animTick = !self.animTick; self.anims_.forEach(function (a) { a.img.setFrame(self.animTick ? a.b : a.a); }); } });
@@ -427,7 +434,7 @@
 
     /** v0.9.3 背景圖讀不到（重試後）：不畫備援方塊，鏡頭前蓋一層深色畫面＋文字，等玩家按「重新整理」 */
     buildMissingCover() {
-      var W = C.VIEW_W, H = C.VIEW_H;
+      var W = this.scale.width || C.VIEW_W, H = this.scale.height || C.VIEW_H;   // v1.4 直放畫面變高時文字照樣置中
       this.cameras.main.setBackgroundColor('#0b1236');
       var cover = this.add.rectangle(-W, -H, W * 4, H * 4, 0x0b1236, 1).setOrigin(0, 0).setScrollFactor(0).setDepth(70000);
       var txt = this.add.text(W / 2, H / 2, '地圖圖片讀不到\n請按「重新整理」', { fontFamily: 'sans-serif', fontSize: '28px', color: '#fffbe8', align: 'center' })
@@ -810,6 +817,7 @@
           var d = self.defAt(c.x, c.y);
           img = self.add.image(c.x * T, c.y * T, self.tex, self.frameOf(d.tile)).setOrigin(0, 0).setScale(S).setDepth(FG_CELL_DEPTH);
         }
+        img.fgX = c.x; img.fgY = c.y;   // v3.0.1（86 號 #5）樹冠局部透明要知道這一塊是哪一格
         var bk = Math.floor(c.x / BUCKET) + ',' + Math.floor(c.y / BUCKET);
         (self.fgBuckets[bk] || (self.fgBuckets[bk] = [])).push(img);
       });
@@ -1273,21 +1281,25 @@
       var p = this.p;
       // 腳步聲：依腳下圖塊分草地／石板／木棧道／泥地（每兩步一聲，避免太吵）
       this.stepCount = (this.stepCount || 0) + 1;
-      if (this.stepCount % 2 === 0) J.Audio.play('footstep', J.Sfx ? J.Sfx.terrainOf(this.defAt(nx, ny).tile) : 'grass');
+      if (this.stepCount % 2 === 0 && !(J.Ambience && J.Ambience.stepsReady())) J.Audio.play('footstep', J.Sfx ? J.Sfx.terrainOf(this.defAt(nx, ny).tile) : 'grass');   // v3.0.1（86 號 #8）音效包能用時改成腳落地那一格播（walkStep）
       var dx = nx - p.tx, dy = ny - p.ty;
       var dir = J.Move8.dirOf(dx, dy);
       // v1.0.6 走路圖只有四方向：斜走面向橫向，原本就面向其中一個分量方向時不轉（不閃爍）
       p.facing = J.Move8.facingFor(dir, p.facing);
-      p.moving = true; p.t = 0;
+      p.moving = true; p.t = this.stepCarry || 0; this.stepCarry = 0;   // v3.0.1（86 號 #2）多出來的時間帶到這一格
       p.from = { x: p.tx * T + T / 2, y: p.ty * T + T };
       p.to = { x: nx * T + T / 2, y: ny * T + T };
       // v1.0.6 斜走一步的時間是直走的 √2 倍（速度看起來一致）
       p.stepMs = J.Move8.stepMs(STEP_MS, dir) / G().moveSpeed();
       p.stepDir = dir;
+      if (p.t > 0) { var k0 = Math.min(1, p.t / p.stepMs), bx0 = this.player.x, by0 = this.player.y; this.player.x = p.from.x + (p.to.x - p.from.x) * k0; this.player.y = p.from.y + (p.to.y - p.from.y) * k0; this.walkStep(Math.abs(this.player.x - bx0) + Math.abs(this.player.y - by0)); }   // v3.0.1（86 號 #2）
       p.prev = { x: p.tx, y: p.ty };
       p.tx = nx; p.ty = ny;
       var key = this.player.texture.key + '-' + p.facing;
-      if (!this.player.anims.isPlaying || this.player.anims.currentAnim.key !== key) this.player.anims.play(key);
+      // v3.0.1（86 號 #4）走路圖改成照移動距離換圖（walkStep），不再播 frameRate 8 的動畫；key 留著給別的地方用
+      if (this.player.anims.isPlaying) this.player.anims.stop();
+      if (!this.walkAnim) this.walkAnim = { dist: 0, idx: -1 };
+      if (this.walkAnim.idx < 0) this.walkStep(0);
       var self = this;
       var spot = J.MapInfo.petSpot(function (x, y) { return self.walkable(x, y); }, this.size.w, this.size.h, { x: p.prev.x, y: p.prev.y }, { x: p.tx, y: p.ty }) || p.prev;
       this.petTarget = { x: spot.x * T + T / 2, y: spot.y * T + T };
@@ -1320,6 +1332,9 @@
       this.transitioning = true;
       J.Audio.play('warp');
       J.HUD.prompt(null);
+      if (J.Ambience) J.Ambience.leave();   // v3.0.1（86 號 #7）環境音 0.25 秒淡出
+      // v3.0.1（86 號 #6）：失焦前景葉叢從左邊滑進來蓋滿畫面再換地圖；減少動態效果時 sweepOut 回傳 false，照舊淡出
+      if (J.TreeFX && J.TreeFX.sweepOut(this, function () { G().leafSweepIn = true; G().changeMap(ex.to, ex.tx, ex.ty, self.p.facing); })) return;
       this.cameras.main.fadeOut(250, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', function () { G().changeMap(ex.to, ex.tx, ex.ty, self.p.facing); });
     }
@@ -1401,6 +1416,39 @@
       return '看看' + t.lamp.subject + '燈';
     }
 
+    // ---------------------------------------------------------------- v3.0.1 移動流暢度（86 號 #1、#4；計算在 systems/motion.js）
+    /** #1 鏡頭目標：平滑中心依時間逼近主角，目標＝round(主角)－取整後的落後量（主角和鏡頭一起取整） */
+    updateCamTarget(delta) {
+      if (!this.camTarget || !this.player) return;
+      var pl = this.player;
+      this.camC = J.Motion.camStep(this.camC, pl.x, pl.y, delta, T);
+      var t = J.Motion.camTarget(pl.x, pl.y, this.camC);
+      this.camTarget.x = t.x; this.camTarget.y = t.y;
+    }
+    /** 減少動態效果（家長設定或系統），每秒查一次 */
+    reduceMotionNow() {
+      var now = Date.now();
+      if (!this.rmAt || now - this.rmAt > 1000) { this.rmAt = now; var st = G().state; this.rmVal = J.Motion.reduceMotion(st && st.settings, window.matchMedia && window.matchMedia.bind(window)); }
+      return !!this.rmVal;
+    }
+    /** #4 走路圖照移動距離換圖：每半格一張（0-1-2-1）；換到中間那張時身體上彈 2 像素 */
+    walkStep(dist) {
+      var w = this.walkAnim || (this.walkAnim = { dist: 0, idx: -1 });
+      w.dist += dist || 0;
+      var idx = J.Motion.walkIndex(w.dist, T), f = J.Motion.walkFrame(J.Assets.dirRow(this.heroKey, this.p.facing), idx);
+      if (this.player.texture.has(f) && this.player.frame.name !== f) this.player.setFrame(f);
+      var foot = J.Ambience && this.p.moving ? J.Ambience.landingFoot(w.idx, idx) : null;   // v3.0.1（86 號 #8）腳落地：每走一格一聲，左右腳交替
+      if (foot) { var tile = this.defAt(this.p.tx, this.p.ty).tile, tr = J.Sfx ? J.Sfx.terrainOf(tile) : 'grass'; J.Ambience.footstep(J.Ambience.stepSet(tr, tile, this.mapId, this.map.tileset), foot); }
+      w.idx = idx;
+      this.setBob(J.Motion.bobFor(idx, this.reduceMotionNow()));
+    }
+    setBob(px) {
+      if (this.bobPx === px) return;
+      this.bobPx = px;
+      this.player.setOrigin(0.5, 1 + px / Math.max(1, this.player.displayHeight));   // 腳底（player.y）不變，只把圖往上畫 px 像素
+    }
+    resetWalk() { if (this.walkAnim) { this.walkAnim.dist = 0; this.walkAnim.idx = -1; } this.setBob(0); }
+
     // ---------------------------------------------------------------- 每一格畫面
     update(time, delta) {
       var g = G(), p = this.p;
@@ -1409,11 +1457,14 @@
       if (p.moving) {
         p.t += delta;
         var k = Math.min(1, p.t / (p.stepMs || STEP_MS));
+        var wx0 = this.player.x, wy0 = this.player.y;   // v3.0.1（86 號 #4）這一幀走的距離 → 走路圖
         this.player.x = p.from.x + (p.to.x - p.from.x) * k;
         this.player.y = p.from.y + (p.to.y - p.from.y) * k;
+        this.walkStep(Math.sqrt((this.player.x - wx0) * (this.player.x - wx0) + (this.player.y - wy0) * (this.player.y - wy0)));
         if (k >= 1) {
+          this.stepCarry = J.Motion.carry(p.t, p.stepMs || STEP_MS);   // v3.0.1（86 號 #2）多出來的時間帶到下一格
           p.moving = false;
-          if (this.arrive()) { this.syncDepths(); return; }
+          if (this.arrive()) { this.stepCarry = 0; this.syncDepths(); return; }
         }
       }
       if (!p.moving && !blocked) {
@@ -1426,11 +1477,15 @@
           var selfMs = this;
           if (an2) { this.bumpAnimal(an2); p.path = []; }
           else if (J.Move8.canStep(p.tx, p.ty, n.c, n.r, function (x, y) { return selfMs.freeAt(x, y); })) this.beginStep(n.c, n.r); else p.path = [];
-        } else if (this.player.anims.isPlaying) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, p.facing)); }
+        } else if (this.player.anims.isPlaying || (this.walkAnim && this.walkAnim.idx >= 0)) { this.player.anims.stop(); this.player.setFrame(this.idleFrame(this.heroKey, p.facing)); this.resetWalk(); }   // v3.0.1（86 號 #4）
       }
+      this.stepCarry = 0;   // v3.0.1（86 號 #2）這一幀沒有接著走下一格，多出來的時間不留
       // 番薯仔跟在後面（防閃爍：方向有遲滯、短暫停頓不切站姿、站姿沿用目前方向、透明度平滑變化）
       this.updatePet(delta);
+      this.updateCamTarget(delta);   // v3.0.1（86 號 #1）
       this.updateGhost();
+      if (J.TreeFX) J.TreeFX.update(this, delta, time);   // v3.0.1（86 號 #5）
+      if (J.Ambience) J.Ambience.update(p.tx, p.ty, time);   // v3.0.1（86 號 #7）區域環境音、觀景點
 
       this.shrineCamera();
       if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); this.fadeMinimap(); this.fadeOverlays(); }
@@ -1478,7 +1533,8 @@
       var sx = cv.width / wv.width, sy = cv.height / wv.height;
       var px = cv.left + (this.player.x - wv.x) * sx, py = cv.top + (this.player.y - wv.y) * sy;
       var hw = T * 0.6 * sx, top = Math.max(cv.top, py - T * 1.6 * sy), bottom = Math.min(cv.top + cv.height, py), out = {};
-      [['#hud .hud-card', 'hud-fade'], ['#hud .hud-buttons', 'hud-fade'], ['#ui > .map-banner', 'hero-under']].forEach(function (p) {
+      // v2.2.1（v20 缺陷 11、v21 L7）：委託完成的大橫幅、「下一步」「轉職成…」提示泡泡蓋到主角時也變淡
+      [['#hud .hud-card', 'hud-fade'], ['#hud .hud-buttons', 'hud-fade'], ['#ui > .map-banner', 'hero-under'], ['#ui > .big-banner', 'hero-under'], ['#toasts > .toast', 'hero-under']].forEach(function (p) {
         out[p[0]] = false;
         Array.prototype.forEach.call(document.querySelectorAll(p[0]) || [], function (el) {
           var r = el.getBoundingClientRect();
@@ -1670,6 +1726,7 @@
 
     onWake(data) {
       this.cameras.main.fadeIn(250, 0, 0, 0);
+      if (J.Ambience) J.Ambience.battle(false);   // v3.0.1（86 號 #7）環境音 1.0 秒淡入
       this.encounterCooldown = this.time.now + 2000;
       if (data.mob) this.monsterRunAway(data.mob, data.result === 'win');
       this.refreshMarkers();

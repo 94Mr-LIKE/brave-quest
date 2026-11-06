@@ -42,11 +42,13 @@
   // 比對是「開頭相同」：長的稱呼要排在它的前綴前面（例：溫泉旅館老闆娘 在 溫泉旅館老闆 前面）
   var QUEST_SPEAKERS = ['圖書館阿伯', '賣地瓜的阿伯', '市場阿叔', '賣地瓜的阿姨', '溫泉旅館老闆娘', '溫泉旅館老闆', '溫泉旅館阿姨', '溫泉研究員', '書店阿姨', '圖書館員', '老街阿伯', '漁市阿伯', '漁夫阿伯',
     '地精族長', '地精木匠', '地精工匠', '外國商人', '導護志工', '湯博士', '里長伯', '里長', '布丁', '露露', '岩岩', '嘟嘟', '商人', '地精'];
-  function questScene(scene, npcName) {
+  function questScene(scene, npcName, origSpeaker) {
     var s = String(scene || '');
     if (!npcName) return s;
     var colon = s.search(/[：:]/);
     if (colon < 0 || colon > 30) return s;   // 沒有說話者的敘述不換
+    // v2.2.1b（情境會議決議第 3 步）：題目有寫 speaker（情境開頭的說話者）就照它換，清單裡沒有的說話者也換得到
+    if (origSpeaker && s.indexOf(origSpeaker) === 0) return origSpeaker === npcName ? s : npcName + s.slice(origSpeaker.length);
     for (var i = 0; i < QUEST_SPEAKERS.length; i++) {
       var n = QUEST_SPEAKERS[i];
       if (s.indexOf(n) === 0) return n === npcName ? s : npcName + s.slice(n.length);

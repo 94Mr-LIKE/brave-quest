@@ -243,7 +243,10 @@
     var body = h('div');
     var tabs = h('div.tabs', { role: 'tablist' });
     var handle;
-    [['quests', '委託'], ['book', '怪物名冊'], ['proverbs', '諺語'], ['lights', '五道光'], ['study', '學習紀錄'], ['daily', '每日小任務']].forEach(function (t) {
+    // v3.0.1 ①收集冊（競品吸收清單第 1 項）：怪物名冊、諺語合成一頁「收集冊」（不多開分頁）；舊的 { tab: 'proverbs' } 打開收集冊的諺語
+    var colSec = tab === 'proverbs' ? 'proverbs' : 'monsters';
+    if (tab === 'proverbs') tab = 'book';
+    [['quests', '委託'], ['book', '收集冊'], ['lights', '五道光'], ['study', '學習紀錄'], ['daily', '每日小任務']].forEach(function (t) {
       tabs.appendChild(h('button', { role: 'tab', 'data-tab': t[0], onclick: function () { tab = t[0]; render(); } }, [t[1]]));
     });
     var panel = h('div.win.panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']), h('h2', { text: '📔 冒險手帳' }), tabs, body]);
@@ -312,6 +315,39 @@
       body.appendChild(ul);
       body.appendChild(h('p.small', { text: '民間說法、民間傳說是老一輩流傳的話，不是天氣預報；要知道天氣，請看氣象預報。' }));
     }
+    // ---------- v3.0.1 ①收集冊：上面 5 張卡片（N／M、還差 N 個；證書冊、記憶卡先留位子），下面是選到的那一種（剪影格子＋小知識）
+    function renderCollection() {
+      if (!J.Collect) { if (colSec === 'proverbs') renderProverbs(); else renderBook(); return; }   // collect.js 沒載入（只測手帳的舊測試）：照舊顯示那一頁
+      var sum = J.Collect.summary(st, D, { proverbs: window.PROVERBS || [], quizzes: window.PROVERB_QUIZ || [], world: window.WORLD });
+      body.appendChild(h('p.collect-total', { text: '收集冊：一共收集 ' + sum.got + '／' + sum.total + (sum.left ? '，還差 ' + sum.left + ' 個' : '，全部完成！') }));
+      var cards = h('div.collect-cards', { role: 'group', 'aria-label': '收集冊的種類' });
+      sum.items.forEach(function (it) {
+        var pct = it.total && !it.reserved ? Math.round(it.got / it.total * 100) : 0;
+        cards.appendChild(h('button.collect-card' + (colSec === it.id ? '.selected' : '') + (it.reserved ? '.reserved' : ''), {
+          'aria-pressed': String(colSec === it.id), 'data-sec': it.id,
+          'aria-label': it.name + '：' + (it.reserved ? '還沒開放' : it.got + '／' + it.total + '，' + J.Collect.leftText(it)),
+          onclick: function () { colSec = it.id; render(); }
+        }, [h('span.cc-icon', { text: it.icon, 'aria-hidden': 'true' }), h('b', { text: it.name }), h('span.cc-num', { text: it.reserved ? '🔒' : it.got + '／' + it.total }),
+          h('span.cc-bar', { 'aria-hidden': 'true' }, [h('i', { style: { width: pct + '%' } })]), h('span.small', { text: J.Collect.leftText(it) })]));
+      });
+      body.appendChild(cards);
+      var cur = sum.items.filter(function (it) { return it.id === colSec; })[0] || sum.items[0];
+      body.appendChild(h('h3.collect-head', { text: cur.icon + ' ' + cur.name }));
+      if (cur.id === 'monsters') renderBook();
+      else if (cur.id === 'proverbs') renderProverbs();
+      else if (cur.id === 'places') {
+        body.appendChild(h('p.small', { text: cur.note + '。' + J.Collect.leftText(cur) + '。' }));
+        var ul = h('ul.list.collect-grid', { 'aria-label': '到過的地方' });
+        J.Collect.places(st, window.WORLD).forEach(function (p) {
+          ul.appendChild(h('li' + (p.got ? '' : '.locked'), {}, [h('span.cc-pin', { text: p.got ? '📍' : '❔', 'aria-hidden': 'true' }),
+            h('div.what', {}, p.got ? [h('b', { text: p.name }), h('div.small', { text: '小知識：' + p.ref })] : [h('b', { text: '？？？' }), h('div.small', { text: '還沒去過。' })])]));
+        });
+        body.appendChild(ul);
+      } else {
+        body.appendChild(h('p', { text: cur.note + '。' }));
+        if (cur.id === 'certs') { var slots = h('div.collect-slots', { 'aria-hidden': 'true' }); for (var k = 0; k < cur.total; k++) slots.appendChild(h('span', { text: '？' })); body.appendChild(slots); }
+      }
+    }
     function claim(id) {
       var r = J.Bestiary.claim(st, D.monsters, id, D.maps);
       if (!r.ok) return;
@@ -329,6 +365,8 @@
       body.innerHTML = '';
       if (tab === 'quests') {
         var j = J.QuestLog.journal(st, D.quests, D);
+        var gt = J.Guide ? J.Guide.target(st, D) : null;   // v3.0.1 ②目標指引（家長設定可以關）
+        if (gt) body.appendChild(h('p.guide-next', { text: J.Guide.text(gt, D) }));
         body.appendChild(h('h3', { text: '進行中（' + j.active.length + '）' }));
         var a = h('ul.list');
         if (!j.active.length) a.appendChild(h('li', { text: '目前沒有進行中的委託。找頭上有「！」的人說話吧！' }));
@@ -361,10 +399,8 @@
         if (bk.length) { body.appendChild(h('h3', { text: '貼紙' })); body.appendChild(h('div.lights', {}, bk.map(function (x) { return h('span.on', { text: '⭐ ' + J.Bestiary.STICKER_NAME[x] }); }))); }
         body.appendChild(h('h3', { text: '清醒過來的頭目' }));
         body.appendChild(h('p', { text: bosses.length ? bosses.map(function (b) { return (D.monsters[b] || {}).name || b; }).join('、') : '還沒有。' }));
-      } else if (tab === 'proverbs') {
-        renderProverbs();
-      } else if (tab === 'book') {
-        renderBook();
+      } else if (tab === 'book' || tab === 'proverbs') {   // v3.0.1 ①收集冊
+        renderCollection();
       } else if (tab === 'study') {
         var t = h('table.report');
         t.appendChild(h('tr', {}, [h('th', { text: '科目' }), h('th', { text: '答對題數' }), h('th', { text: '一次就答對' })]));
@@ -374,6 +410,14 @@
         });
         body.appendChild(t);
         body.appendChild(h('p.small', { text: '打倒怪物 ' + (st.stats.battles.won || 0) + ' 次・開過寶箱 ' + Object.keys(st.chests).length + ' 個・冒險 ' + (st.daily.adventureDays || 0) + ' 天' }));
+        // v3.0.1 ④錯題回顧（競品吸收清單第 4 項）：最近答錯、還沒答對的題目，可以再挑戰（G.reviewWrong）
+        var wl = J.Review ? J.Review.bySubject(J.Review.wrongList(st, G.questions || [])) : {}, wsub = SUBJECTS.filter(function (s) { return wl[s]; });
+        body.appendChild(h('h3', { text: '🔁 再挑戰一次' }));
+        if (!wsub.length) body.appendChild(h('p.review-none', { text: '最近沒有答錯還沒答對的題目，好厲害！' }));
+        else {
+          body.appendChild(h('p.small', { text: '最近答錯、還沒答對的題目，可以再挑戰一次。答對一題可以拿到一點經驗值（一次最多 ' + J.Review.ROUND + ' 題）。' }));
+          body.appendChild(h('div.row.review-row', {}, wsub.map(function (s) { return h('button.review-btn', { 'data-subject': s, onclick: function () { handle.close(); G.reviewWrong(s); } }, [s + '（' + wl[s] + ' 題）']); })));
+        }
       } else {
         var dl = h('ul.list');
         (st.daily.tasks || []).forEach(function (tk) {

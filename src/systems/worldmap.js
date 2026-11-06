@@ -101,7 +101,50 @@
     return best;
   }
 
-  var WorldMap = { lockText: lockText, spreadDots: spreadDots, minGap: minGap, isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction };
+  /*
+   * v2.2.1（v20_畫面審查 缺陷 1；老闆 2026-11-02「照建議」＝方案 A）：手機小畫面的世界地圖，北部的點合成一個「北部」圓點，按了才放大北部。
+   *   北部：地區寫 group: 'north' 就算、寫 group: 'none' 就不算；沒寫時看圖上位置 y（比例）< NORTH_MAX_Y（目前 18 個：金包里～新竹風城；苗栗 0.268 以南不算）。
+   *   門檻 collapseFor(視窗寬, 高)：寬 ≤ 680（直放手機）或高 ≤ 460（橫放手機）才合併——和 dom.js 的 narrowPortrait／lowScreen、style.css 的手機斷點一樣；
+   *   電腦、平板（寬 > 680 而且高 > 460）維持原樣全部畫。
+   */
+  var NORTH_MAX_Y = 0.25, COLLAPSE_MAX_W = 680, COLLAPSE_MAX_H = 460;
+  function isNorth(raw, f) {
+    var g = raw && raw.group;
+    if (g === 'north') return true;
+    if (g === 'none') return false;
+    return !!f && Number(f.fy) < NORTH_MAX_Y;
+  }
+  /** raws＝地區資料、fracs＝同順序的比例位置（fraction）→ 北部的索引 */
+  function northIndexes(raws, fracs) {
+    var out = [];
+    (fracs || []).forEach(function (f, i) { if (isNorth(raws && raws[i], f)) out.push(i); });
+    return out;
+  }
+  function collapseFor(vw, vh) { return (vw > 0 && vw <= COLLAPSE_MAX_W) || (vh > 0 && vh <= COLLAPSE_MAX_H); }
+  /** 幾個點的平均位置（北部合併點放這裡） */
+  function centroid(fracs) {
+    var n = (fracs || []).length, x = 0, y = 0;
+    if (!n) return { fx: 0.5, fy: 0.5 };
+    fracs.forEach(function (f) { x += f.fx; y += f.fy; });
+    return { fx: x / n, fy: y / n };
+  }
+  /**
+   * 放大北部：fracs＝北部各點 → { s, x0, y0 }：放大 s 倍後畫面看到的是圖上 [x0, x0+1/s]×[y0, y0+1/s]（比例）。
+   * 北部外加 pad 剛好放得下、置中，不超出圖（1 ≤ s ≤ maxScale）。圖用 transform: scale(s) translate(−x0, −y0)，點用 zoomPoint 換算
+   */
+  function zoomBox(fracs, pad, maxScale) {
+    pad = pad === undefined ? 0.04 : pad; maxScale = maxScale || 3;
+    if (!fracs || !fracs.length) return { s: 1, x0: 0, y0: 0 };
+    var x1 = 1, x2 = 0, y1 = 1, y2 = 0;
+    fracs.forEach(function (f) { x1 = Math.min(x1, f.fx); x2 = Math.max(x2, f.fx); y1 = Math.min(y1, f.fy); y2 = Math.max(y2, f.fy); });
+    x1 = Math.max(0, x1 - pad); x2 = Math.min(1, x2 + pad); y1 = Math.max(0, y1 - pad); y2 = Math.min(1, y2 + pad);
+    var s = Math.max(1, Math.min(maxScale, 1 / Math.max(x2 - x1, y2 - y1, 1e-6))), v = 1 / s;
+    return { s: s, x0: Math.max(0, Math.min(1 - v, (x1 + x2) / 2 - v / 2)), y0: Math.max(0, Math.min(1 - v, (y1 + y2) / 2 - v / 2)) };
+  }
+  function zoomPoint(f, box) { return { fx: (f.fx - box.x0) * box.s, fy: (f.fy - box.y0) * box.s }; }
+
+  var WorldMap = { lockText: lockText, spreadDots: spreadDots, minGap: minGap, isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction,
+    NORTH_MAX_Y: NORTH_MAX_Y, COLLAPSE_MAX_W: COLLAPSE_MAX_W, COLLAPSE_MAX_H: COLLAPSE_MAX_H, isNorth: isNorth, northIndexes: northIndexes, collapseFor: collapseFor, centroid: centroid, zoomBox: zoomBox, zoomPoint: zoomPoint };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.WorldMap = WorldMap; }
   if (typeof module !== 'undefined') module.exports = WorldMap;
 })();

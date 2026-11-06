@@ -172,6 +172,23 @@
         g.fillText('?', bx, by + rad * 0.08);
       }
     });
+    // v3.0.1 ②目標指引（競品吸收清單第 2 項）：下一步的地方畫一面紅色小旗子（家長設定可以關；洞窟不給小地圖；寶箱委託不標位置）
+    // 下一步在這張地圖、但不在小地圖看得到的範圍（大地圖的小地圖只顯示主角附近）：旗子畫在那個方向的邊上（留出旗面的寬度，整面旗子都看得到）；
+    var gt = (J.Guide && J.Game) ? J.Guide.current(J.Game) : null;
+    if (gt && gt.map === info.mapId && gt.x !== null && gt.x !== undefined) {
+      var fh = big ? Math.max(24, r * 4.5) : Math.max(16, r * 3.5), mx = Math.ceil((fh * 0.8 + r * 1.6) / cw), my = Math.ceil(fh / ch);
+      var gx = Math.max(view.x + mx, Math.min(view.x + view.w - 1, gt.x)), gy = Math.max(view.y + my, Math.min(view.y + view.h - 1, gt.y)), edge = gx !== gt.x || gy !== gt.y;
+      var fx = px(gx) - r * 1.6, fy = py(gy) + r * 0.6;
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      [['#ffffff', big ? 6 : 5], ['#1d2b5e', big ? 3 : 2.5]].forEach(function (pen) {   // 白色外框＋深藍旗桿：在深色、綠色、紅屋頂上都看得到
+        g.lineWidth = pen[1]; g.strokeStyle = pen[0];
+        g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx, fy - fh); g.stroke();
+        g.beginPath(); g.moveTo(fx, fy - fh); g.lineTo(fx - fh * 0.7, fy - fh * 0.78); g.lineTo(fx, fy - fh * 0.56); g.closePath(); g.stroke();
+      });
+      g.beginPath(); g.moveTo(fx, fy - fh); g.lineTo(fx - fh * 0.7, fy - fh * 0.78); g.lineTo(fx, fy - fh * 0.56); g.closePath();
+      g.fillStyle = '#ff2d55'; g.fill();
+      Minimap.lastGoal = { map: gt.map, x: gt.x, y: gt.y, big: !!big, edge: edge };   // 測試用（edge＝畫在邊上）
+    }
     if (blink && Date.now() < blink.until && Math.floor(Date.now() / 200) % 2 === 0) {
       g.beginPath(); g.arc(px(blink.x), py(blink.y), r * 3, 0, Math.PI * 2); g.lineWidth = 3; g.strokeStyle = '#ffd34d'; g.stroke();
     }
@@ -263,7 +280,7 @@
           h('div.small', { text: known ? ('已遇見 ' + r.seen + ' 次・已打倒 ' + r.defeated + ' 次') : '還沒遇見' })])]));
     });
     if (!ids.length) monList.appendChild(h('li', { text: '這裡沒有怪物。' }));
-    var legend = h('p.small', { text: '方位：上面是北，下面是南，左邊是西，右邊是東。點地圖上的地方，主角就會走過去。🟡 你　🔵 人　！ 有委託　？ 可以回報　🟠 怪物　🔷 出口　⬜ 車站　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' });
+    var legend = h('p.small', { text: '方位：上面是北，下面是南，左邊是西，右邊是東。點地圖上的地方，主角就會走過去。🟡 你　🔵 人　！ 有委託　？ 可以回報　🟠 怪物　🔷 出口　⬜ 車站　彩色圓圈：武＝武器店、防＝防具店、道＝道具店、雜＝雜貨店、旅＝旅店' + (J.Guide && J.Game && J.Guide.enabled(J.Game.state) ? '　紅色小旗子＝委託的下一步' : '') });   // v3.0.1 ②
     var handle;
     var mapBox = h('div.mm-map', {}, [big, legend]);
     mapBox.style.width = sz.w + 6 + 'px';   // 圖例跟著地圖寬度換行

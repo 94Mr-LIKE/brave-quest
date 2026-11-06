@@ -511,12 +511,12 @@
   function ensureBus(A) {
     if (S.bus && S.bus.ctx === A.ctx) return S.bus;
     var ctx = A.ctx, main = ctx.createGain(), lp = ctx.createBiquadFilter(), bgm = ctx.createGain(), jin = ctx.createGain();
-    main.gain.value = S.volume * MUSIC_BASE;
+    main.gain.value = S.volume * MUSIC_BASE * vpLevel();   // v3.0.1：觀景點壓低（duck）
     lp.type = 'lowpass'; lp.frequency.value = LOWPASS_HZ; lp.Q.value = 0.5;
     bgm.connect(main); jin.connect(main); main.connect(lp); lp.connect(A.out);
     // 預錄音樂：不經過低通，音量另乘 REC_TRIM（和合成版聽起來一樣大聲）
     var mainRec = ctx.createGain(), bgmRec = ctx.createGain(), jinRec = ctx.createGain();
-    mainRec.gain.value = S.volume * MUSIC_BASE * REC_TRIM;
+    mainRec.gain.value = S.volume * MUSIC_BASE * REC_TRIM * vpLevel();
     bgmRec.connect(mainRec); jinRec.connect(mainRec); mainRec.connect(A.out);
     S.bus = { ctx: ctx, main: main, bgm: bgm, jingle: jin, mainRec: mainRec, bgmRec: bgmRec, jingleRec: jinRec };
     return S.bus;
@@ -683,13 +683,24 @@
     return true;
   }
 
+  // v3.0.1（86 號 #7；wip_v301/v301_audio_apply.js）：觀景點壓低 BGM。level 0–1（1＝不壓），sec 秒內漸變；和音量滑桿相乘，短曲的壓低（rampBgmBus）照舊另外算
+  function vpLevel() { return typeof S.vp === 'number' ? S.vp : 1; }
+  function duck(level, sec) {
+    S.vp = Math.max(0, Math.min(1, Number(level))); stats.duck = S.vp;
+    if (!S.bus) return;
+    var now = S.bus.ctx.currentTime;
+    [[S.bus.main.gain, 1], [S.bus.mainRec.gain, REC_TRIM]].forEach(function (x) {
+      var g = x[0], v2 = S.volume * MUSIC_BASE * x[1] * S.vp;
+      try { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(v2, now + Math.max(0.01, sec || 0.6)); } catch (e) { g.value = v2; }
+    });
+  }
   function setVolume(v) {
     v = Number(v); if (!isFinite(v)) return;
     S.volume = Math.max(0, Math.min(1, v)); stats.volume = S.volume;
     if (S.bus) {
       var now = S.bus.ctx.currentTime;
       [[S.bus.main.gain, 1], [S.bus.mainRec.gain, REC_TRIM]].forEach(function (x) {
-        var g = x[0], v2 = S.volume * MUSIC_BASE * x[1];
+        var g = x[0], v2 = S.volume * MUSIC_BASE * x[1] * vpLevel();
         try { g.cancelScheduledValues(now); g.setTargetAtTime(v2, now, 0.05); } catch (e) { g.value = v2; }
       });
     }
@@ -727,7 +738,7 @@
   }
 
   var Music = {
-    playBgm: playBgm, stopBgm: stopBgm, jingle: jingle, setVolume: setVolume, setEnabled: setEnabled, stats: stats,
+    playBgm: playBgm, stopBgm: stopBgm, jingle: jingle, setVolume: setVolume, setEnabled: setEnabled, stats: stats, duck: duck,
     current: function () {
       var A = audioOut(), pos = S.bgm && A ? S.bgm.position(A.ctx.currentTime) : (S.held ? S.held.pos : 0);
       var kind = S.bgm ? S.bgm.kind : (S.held ? S.held.kind : null), sg = song('bgm', S.bgmId || (S.held && S.held.id) || '');

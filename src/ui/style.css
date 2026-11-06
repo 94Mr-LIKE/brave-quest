@@ -537,3 +537,110 @@ jq-nb { white-space: nowrap; }
 .job-list li.tier-head { display: block; border-top: 2px solid #ffd34d; padding-top: 6px; }
 .job-list li.inter-locked { opacity: 0.6; }
 .job-list .recipe { color: #ffd34d; }
+
+/* ===== v2.2.1 上線後小修（交接_換對話.md 第 3 節第 4 項；wip_v20/v221_fixes_apply.js 每次重跑都整段重建）BEGIN ===== */
+/* C（v21 G1）防具店的職業小頭像：一行放不下就換行；頭像真的是 24px（原本 .list li .icon 的 40px 比 .shop-jobs .icon 優先） */
+.shop-jobs { display: flex; flex-wrap: wrap; gap: 2px; margin: 2px 0 0; }
+.list li .shop-jobs .icon, .list li .shop-jobs .icon img, .list li .shop-jobs .icon canvas { width: 24px; height: 24px; }
+/* D 生氣了橫幅：原本 left:50% 的絕對定位只剩半個螢幕寬（直放斷成 5 行）→ 依內容寬度、最寬 92vw（同 v1.1 的 .big-banner） */
+.rage-banner { width: max-content; max-width: min(92vw, 900px); }
+@media (orientation: portrait) and (max-width: 680px) { .rage-banner { font-size: 26px; padding: 10px 16px; } }
+/* E（v20 缺陷 4、v21 X1）觸控 B 鍵不壓在視窗內容上：直放＝視窗底下留出 B 鍵的高度（wip_v14_ui 補丁）；橫放＝視窗左邊留出 B 鍵的寬度。
+      #pad 在 #layer 前面（index.html），只挑「有觸控按鍵」的情況；可以邊看邊走的視窗（.pass）不變 */
+@media (orientation: portrait) {
+  body.panel-open #pad:not([hidden]) ~ #layer > .modal-back:not(.pass) { padding-bottom: calc(max(8px, env(safe-area-inset-bottom)) + 68px); }
+  body.panel-open #pad:not([hidden]) ~ #layer > .modal-back:not(.pass) > .panel { max-height: 100%; }
+}
+@media (orientation: landscape) {
+  body.panel-open #pad:not([hidden]) ~ #layer > .modal-back:not(.pass) { padding-left: calc(max(8px, env(safe-area-inset-left)) + 68px); }
+}
+/* F1 大橫幅、提示泡泡疊到主角時變淡（MapScene.fadeOverlays 加 hero-under；用 filter，不和淡出動畫的 opacity 打架） */
+#ui > .big-banner.hero-under, #toasts > .toast.hero-under { filter: opacity(.3); }
+/* F2（v20 缺陷 5、11）手機橫放（矮螢幕）的地圖：大橫幅（委託完成、寶箱、等級提升）原本在畫面 38% 高，蓋住 HUD 第二行和主角 → 放到主角下方、Ⓐ 提示鈕上面，
+      寬度不超過搖桿和 B 鍵中間（844 寬時約 190～650px）。戰鬥中不變。
+      提示泡泡（「下一步」等）原本在 HUD 下面、靠右 150px，正好在畫面中間主角的頭上 → 改靠左、放在 HUD 狀態卡下面（搖桿上面），寬度最多 40vw，不伸到畫面中間。有視窗開著時不變 */
+@media (max-height: 460px) {
+  body:not(.in-battle) #ui > .big-banner { top: auto; bottom: calc(max(14px, env(safe-area-inset-bottom)) + 64px); transform: translateX(-50%); font-size: 22px; padding: 8px 16px; max-width: min(54vw, 460px); }
+  body:not(.modal-open) #toasts { left: max(8px, env(safe-area-inset-left)); right: auto; align-items: flex-start; }
+  body:not(.modal-open) #toasts .toast { max-width: min(40vw, 340px); }
+}
+/*    直放（H 畫面變高以後主角在畫面中間偏下，原本 38% 高的大橫幅正好疊在主角身上）：大橫幅放到主角下方、Ⓐ 提示鈕上面（橫幅出現時提示泡泡本來就先藏起來） */
+@media (orientation: portrait) {
+  body.tall-view #ui > .big-banner { top: auto; bottom: calc(max(18px, env(safe-area-inset-bottom)) + 236px); transform: translateX(-50%); }
+}
+/*    電腦、平板橫放：大橫幅原本在 38% 高，蓋住畫面中間的主角（v20 缺陷 11 電腦版）→ 放在 HUD 下面、主角頭上方。戰鬥中不變 */
+@media (orientation: landscape) and (min-height: 461px) {
+  body:not(.in-battle) #ui > .big-banner { top: calc(var(--hud-h, 88px) + 12px); transform: translateX(-50%); }
+}
+/*    電腦版：提示泡泡靠右，原本最寬 70vw 會伸到畫面中間（主角、怪物身上）→ 最寬 34vw */
+@media (min-width: 900px) and (min-height: 461px) {
+  body:not(.modal-open) #toasts .toast { max-width: min(34vw, 460px); }
+}
+/* F3（v20 缺陷 3）直放的地名橫幅：原本置中，蓋住右上角小地圖的「建議 Lv」→ 靠左、留出小地圖的寬度，放不下就換行 */
+@media (orientation: portrait) and (max-width: 680px) {
+  .map-banner { left: max(8px, env(safe-area-inset-left)); transform: none; max-width: calc(100vw - 150px); white-space: normal; text-align: left; font-size: clamp(16px, 5vw, 22px); padding: 6px 14px; }
+}
+/* F4（v20 缺陷 6）「任務」紅點：原本排在字後面，出現時按鈕變寬、橫放的狀態卡被擠窄（3 行變 4 行，往下多蓋一塊地圖）→ 疊在按鈕右上角，按鈕寬度不變 */
+#hud .hud-buttons button { position: relative; }
+#hud .hud-buttons .badge { position: absolute; top: -8px; right: -6px; margin: 0; pointer-events: none; }
+/* G（v21 X3）計時條上的「45 秒」：條子裡面只有 16px 高、字是 18px 而且往上偏 2px，下緣壓到條框 → 字在條子裡垂直置中 */
+.timer .label { top: 0; bottom: 0; display: flex; align-items: center; line-height: 1; font-size: 16px; }
+/* H（v20 缺陷 13）直放時遊戲畫面變高（body.tall-view，game.js G.viewSize；wip_v14_ui 補丁）：提示泡泡改成貼在畫面下緣上方（--canvas-gap＝畫布下緣到螢幕底），
+      手機的「Ⓐ」提示鈕在搖桿上面、會疊在畫面下緣，提示泡泡再往上避開它 */
+@media (orientation: portrait) {
+  body.tall-view:not(.panel-open) #toasts { top: auto; bottom: max(calc(var(--canvas-gap, 0px) + 8px), 72px); }
+}
+@media (orientation: portrait) and (max-width: 680px) {
+  body.tall-view:not(.panel-open) #toasts { bottom: max(calc(var(--canvas-gap, 0px) + 8px), calc(max(18px, env(safe-area-inset-bottom)) + 230px)); }
+}
+/* W（v20 缺陷 1；老闆裁示方案 A）世界地圖：手機的「北部」合併圓點（藍色長圓、44px 高）、放大北部時圖跟著放大（不超出框）、左下角「↩ 全台灣」（北部的點都在上半部，不會被它蓋住）收回（≥ 44px） */
+.worldmap .dot.dot-group { width: auto; min-width: 64px; padding: 0 12px; border-radius: 22px; font-size: 18px; font-weight: bold; background: #2a62b8; z-index: 2; }
+.worldmap .stage img { transform-origin: 0 0; transition: transform .25s; }
+@media (prefers-reduced-motion: reduce) { .worldmap .stage img { transition: none; } }
+.worldmap .stage.wm-zoom { overflow: hidden; }
+.worldmap .wm-back { position: absolute; left: 6px; bottom: 6px; min-width: 44px; min-height: 44px; padding: 4px 12px; font-size: 18px; z-index: 3; }
+/* ===== v2.2.1 END ===== */
+
+/* ===== v2.2.1b 委託題目情境（wip_v20/v221b_scene_apply.js 每次重跑都整段重建）BEGIN ===== */
+/* 家鄉題在金包里以外的委託：委託人的過場句（SceneFit.sceneView 的 intro）和情境分兩行 */
+.quiz .scene.has-intro { white-space: pre-line; }
+/* ===== v2.2.1b END ===== */
+
+/* ===== v3.0.1 競品吸收前 5 項（wip_v301/v301_features_apply.js 每次重跑都整段重建）BEGIN ===== */
+/* ① 收集冊：5 張卡片（按鈕，至少 44px 高）、進度條、剪影格子 */
+.collect-total { font-weight: bold; margin: 4px 0; }
+.collect-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 6px 0 10px; }
+.collect-card { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 44px; padding: 8px 10px; text-align: left; }
+.collect-card .cc-icon { font-size: 26px; line-height: 1; }
+.collect-card .cc-num { font-size: 20px; font-weight: bold; }
+.collect-card .cc-bar { display: block; width: 100%; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .2); overflow: hidden; }
+.collect-card .cc-bar > i { display: block; height: 100%; background: #ffd34d; }
+.collect-card.selected { outline: 3px solid #ffd34d; outline-offset: 1px; }
+.collect-card.selected .small, .collect-card.selected .cc-num, .collect-card.selected b { color: #2a1e22; }   /* 選到的卡片是黃底：字改深色（對比） */
+.collect-card.selected .cc-bar { background: rgba(42, 30, 34, .25); }
+.collect-card.selected .cc-bar > i { background: #b85a17; }
+.collect-card.reserved { opacity: .8; }
+.collect-grid li.locked { opacity: .7; }
+.collect-grid .cc-pin { font-size: 24px; flex: none; }
+.collect-slots { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.collect-slots span { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, .12); display: inline-flex; align-items: center; justify-content: center; color: #9aa6d6; }
+/* ② 目標指引：手帳的「🎯 下一步」、世界地圖下一步的圓點（紅色小旗子；北部合併點也一樣） */
+.guide-next { color: #ffd34d; font-weight: bold; margin: 4px 0 8px; }
+.worldmap .dot.goal { box-shadow: 0 0 0 3px #ff4d6d; }
+.worldmap .dot.goal::before { content: ""; position: absolute; right: 6px; top: -18px; width: 2px; height: 22px; background: #1d2b5e; }
+.worldmap .dot.goal::after { content: ""; position: absolute; right: -8px; top: -19px; width: 0; height: 0; border-left: 14px solid #ff4d6d; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+/* ④ 再挑戰一次：每科一顆按鈕 */
+.review-row { flex-wrap: wrap; gap: 8px; }
+.review-btn, .print-report-btn { min-height: 44px; }
+/* ⑤ 家長報表列印：平常不顯示；列印時只印這一張（白底黑字） */
+.print-report { display: none; }
+@media print {
+  body.printing-report > *:not(.print-report) { display: none !important; }
+  body.printing-report { background: #fff !important; }
+  body.printing-report .print-report { display: block; color: #000; background: #fff; font-size: 14pt; line-height: 1.6; }
+  body.printing-report .print-report * { color: #000 !important; text-shadow: none !important; }
+  body.printing-report .print-report h1 { font-size: 20pt; margin: 0 0 8pt; color: #000; }
+  body.printing-report .print-report table { border-collapse: collapse; width: 100%; margin: 6pt 0; }
+  body.printing-report .print-report th, body.printing-report .print-report td { border: 1px solid #000; padding: 4pt 8pt; color: #000; background: #fff; text-align: left; }
+}
+/* ===== v3.0.1 END ===== */

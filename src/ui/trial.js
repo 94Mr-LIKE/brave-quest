@@ -162,7 +162,7 @@
           finished = true;
           cancelAnimationFrame(rafId);
           J.TTS.stop();
-          answers.push({ id: q.id, subject: q.subject, unit: q.unit || '', correct: !!ok, timeout: !!timeout });
+          answers.push({ id: q.id, subject: q.subject, unit: q.unit || '', term: q.term || '', correct: !!ok, timeout: !!timeout });   // v2.2.1（v21 L5）：記學期，沒通過時單元前面寫三上／三下
           J.Audio.play(ok ? 'correct' : 'wrong');
           feedback.className = 'feedback ' + (ok ? 'good' : 'soft');
           feedback.textContent = ok ? '答對了！' : (timeout ? '時間到了。' : '') + petLine(G, 'D_TRIAL_WRONG', '沒關係，記下來就好！');

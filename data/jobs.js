@@ -197,7 +197,7 @@ window.PLAYER_BASE = { hp: 30, mp: 10, atk: 6, def: 0 };
       trait: { healPow: 1.15, skillPow: 1.15 }, wf: ["staff"], af: ["robe"],
       skills: [
         S('sg_heal', 12, "星光療癒", "heal", { r: 0.6 }, 6, "回復六成體力。", "heal", "#B8FFC8", 800),
-        S('sg_assist', 24, "智慧之光", "assist", {}, 6, "下一題刪掉一個錯的答案。", "light", "#FFF8C0", 800),
+        S('sg_assist', 24, "智慧之光", "assist", {}, 6, "下一題刪掉一個錯的答案；有計時的題目，時間也變成 1.5 倍。", "light", "#FFF8C0", 800),
         S('sg_burst', 36, "星辰爆裂", "hit", { p: 3.4 }, 16, "星星在怪物身邊爆開。", "light", "#C9B8FF", 1100),
         S('sg_prayer', 48, "全能祈福", "heal_guard", { r: 1, m: 0.5, t: 3 }, 24, "體力全滿，還有光罩保護。", "heal", "#FFFFFF", 1500)
       ],

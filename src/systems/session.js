@@ -27,6 +27,7 @@
     return {
       state: state, questions: questions, subject: subject, rng: opts.rng || Math.random,
       mode: mode, expMult: opts.expMult || 1, filter: opts.filter || null, noRepeat: !!opts.noRepeat,
+      noFallback: !!opts.noFallback,   // v2.2.1b：委託用——篩完沒題目時不要退回「整科都抽」（回傳 null，呼叫的人說「題目還在準備中」）
       noPay: !!opts.noPay,   // v2.0 新經濟（67 號第二節第 5 項）
       // v0.9.3（老闆 2026-10-10 C1）戰鬥：答對、攻擊都不給經驗值和金幣，打倒怪物時才給（怪物的經驗值、金幣，見 game.js bvictory）；
       // 逃跑、累倒都不給。forgone＝這場答對「本來會拿到」的數字（只給測試看）。
@@ -53,7 +54,7 @@
     var st = sess.state, q = null, isVariant = false;
     var subject = o.subject || sess.subject;
     var pool = sess.questions.filter(function (x) { return x.subject === subject && (!sess.filter || sess.filter(x)); });
-    if (!pool.length) pool = sess.questions.filter(function (x) { return x.subject === subject; });
+    if (!pool.length && !sess.noFallback) pool = sess.questions.filter(function (x) { return x.subject === subject; });
     if (sess.noRepeat && sess.asked.length) {
       var fresh = pool.filter(function (x) { return sess.asked.indexOf(x.id) < 0; });
       if (fresh.length) pool = fresh;

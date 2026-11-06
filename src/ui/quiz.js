@@ -48,8 +48,10 @@
       timerBar = h('div.timer.crit-zone', { role: 'progressbar', 'aria-label': '答題時間', 'aria-valuemin': '0', 'aria-valuemax': '100' }, [timerFill, timerLabel]);
     }
     var speakBtn = h('button', { onclick: speak, 'aria-label': '朗讀題目' }, ['🔊 朗讀']);
-    var sceneText = q.scene ? (o.speaker ? J.DialogText.questScene(q.scene, o.speaker) : q.scene) : '';
-    var sceneEl = sceneText ? h('div.scene', { text: J.UI.fill(sceneText, st.player.name) }) : null;
+    // v2.2.1b（情境會議決議第 3 步）：委託（runHelp）傳 sceneView(q) → { text, intro }：generic 題才換說話者、家鄉題在外地先說過場句（intro，另起一行）
+    var sv = typeof o.sceneView === 'function' && q.scene ? o.sceneView(q) : null;
+    var sceneText = sv ? (sv.intro ? sv.intro + '\n' + sv.text : sv.text) : (q.scene ? (o.speaker ? J.DialogText.questScene(q.scene, o.speaker, q.speaker) : q.scene) : '');
+    var sceneEl = sceneText ? h('div.scene' + (sv && sv.intro ? '.has-intro' : ''), { text: J.UI.fill(sceneText, st.player.name) }) : null;
     var stemEl = h('div.stem', { id: 'quiz-stem', text: J.UI.fill(q.stem, st.player.name) });
     var tipEl = h('p.small', { text: TYPE_TIP[q.type] || '' });
     var answerArea = h('div', { 'aria-labelledby': 'quiz-stem' });
