@@ -102,7 +102,18 @@ window.ITEMS = {
   // v3.0（71 號第九節，老闆同意「南部以後每區一件新裝備」）：通用款，武器、防具輪流；圖示 art_src\v1\east\items（沒有時先借既有裝備圖示）
   gear_z8_blade: { name: "古城長劍", sprite: "item_gear_z8_blade", kind: "weapon", fam: "gen", price: 2800, atk: 18, def: 0, mp: 0, jobs: null, desc: "府城古城老鐵匠打的長劍。大家都能用。" },
   gear_z9_vest: { name: "鳳梨硬殼背心", sprite: "item_gear_z9_vest", kind: "armor", fam: "gen", price: 2750, atk: 0, def: 10, mp: 0, jobs: null, desc: "用鳳梨葉纖維織的硬背心，又輕又耐打。大家都能穿。" },
-  gear_z10_cutlass: { name: "燈塔守護劍", sprite: "item_gear_z10_cutlass", kind: "weapon", fam: "gen", price: 4050, atk: 25, def: 0, mp: 0, jobs: null, desc: "燈塔守護員送修的老劍，亮得像燈塔的光。大家都能用。" }
+  gear_z10_cutlass: { name: "燈塔守護劍", sprite: "item_gear_z10_cutlass", kind: "weapon", fam: "gen", price: 4050, atk: 25, def: 0, mp: 0, jobs: null, desc: "燈塔守護員送修的老劍，亮得像燈塔的光。大家都能用。" },
+  // v4.0 東部（71 號 4.11）：七色絲帶、熱氣球繩結（素材）、東之曙光碎片（手帳 4／4）、富岡⇄綠島／蘭嶼來回船票（codex3 船班）、海草冰、麻糬（回復；效果和價錢照番薯仔點心）
+  rainbow_ribbon: { name: "七色絲帶", sprite: "item_rainbow_ribbon", kind: "material", price: 0, desc: "彎彎彩虹清醒後留下的絲帶，有七種顏色，滑滑亮亮的。" },
+  balloon_knot: { name: "熱氣球繩結", sprite: "item_balloon_knot", kind: "material", price: 0, desc: "霧氣球大王清醒後留下的繩結，綁得又緊又牢。是鹿野高台的紀念品。" },
+  dawn_shard_e: { name: "東之曙光碎片", sprite: "item_dawn_shard_e", kind: "key", price: 0, precious: true, desc: "東霧將清醒後交出的一小片曙光，暖暖的。四片終於到齊了！" },
+  ferry_ticket_gi: { name: "富岡⇄綠島來回船票", sprite: "item_ferry_ticket_gi", kind: "key", price: 0, precious: true, not_for_sale: true, desc: "富岡漁港和綠島南寮漁港的來回船票。坐船大約 50 分鐘。" },
+  ferry_ticket_ly: { name: "富岡⇄蘭嶼來回船票", sprite: "item_ferry_ticket_ly", kind: "key", price: 0, precious: true, not_for_sale: true, desc: "富岡漁港和蘭嶼開元港的來回船票。坐船要 2 到 3 小時。" },
+  seaweed_ice: { name: "海草冰", sprite: "item_seaweed_ice", kind: "consumable", price: 15, effect: { hp: 10, pet: 1 }, desc: "剉冰上放著綠綠的海草，鹹鹹涼涼的。回復 10 點體力，番薯仔也愛吃。" },
+  mochi: { name: "麻糬", sprite: "item_mochi", kind: "consumable", price: 15, effect: { hp: 10, pet: 1 }, desc: "軟軟 QQ 的花蓮麻糬。回復 10 點體力，番薯仔也愛吃。" },
+  // v4.0（71 號第九節，每區一件新裝備）：通用款，Z11 防具、Z12 武器；價錢＝新經濟v30擴充_設計確認.md 8.2 公式 ×1.6（老闆 11-02 後期裝備漲價）
+  gear_z11_cloak: { name: "縱谷風斗篷", sprite: "item_gear_z11_cloak", kind: "armor", fam: "gen", price: 2750, atk: 0, def: 12, mp: 0, jobs: null, desc: "花東縱谷在兩條山脈中間。這件斗篷擋得住谷裡的風。大家都能穿。" },
+  gear_z12_marble: { name: "大理石劍", sprite: "item_gear_z12_marble", kind: "weapon", fam: "gen", price: 4300, atk: 29, def: 0, mp: 0, jobs: null, desc: "用花蓮的大理石，請石雕師傅磨亮的劍。大家都能用。" }
 };
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */
@@ -123,5 +134,10 @@ window.SHOPS = {
   // v3.0 南部（71 號第九節）：旅館老闆兼賣的「每區一件新裝備」（maps.js inn.sells）
   gear_fucheng: { name: "府城老客棧（兼賣裝備）", items: ["gear_z8_blade"] },
   gear_dashu: { name: "鳳梨田民宿（兼賣裝備）", items: ["gear_z9_vest"] },
-  gear_kenting: { name: "墾丁旅店（兼賣裝備）", items: ["gear_z10_cutlass"] }
+  gear_kenting: { name: "墾丁旅店（兼賣裝備）", items: ["gear_z10_cutlass"] },
+  // v4.0 東部（71 號 4.4、4.6、第九節）：旅館老闆兼賣的新裝備（maps.js inn.sells）；綠島冰店、花蓮麻糬店（海草冰、麻糬＝番薯仔點心的效果與價錢，加賣藥草）
+  gear_taitung: { name: "縱谷民宿（兼賣裝備）", items: ["gear_z11_cloak"] },
+  gear_hualien: { name: "海岸旅店（兼賣裝備）", items: ["gear_z12_marble"] },
+  ice_gi: { name: "綠島冰店", items: ["seaweed_ice", "herb"] },
+  mochi_hl: { name: "花蓮麻糬店", items: ["mochi", "herb"] }
 };

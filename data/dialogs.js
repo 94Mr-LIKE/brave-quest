@@ -21,6 +21,8 @@
  * who：NPC id（對應 maps.js）、怪物 id（對應 monsters.js）、"hero"（主角）、"pet"（番薯仔）、"narrator"（旁白）。
  */
 window.SPEAKERS = {
+  // v4.0 東部（71 號 4.9；人類台語角色全部男性；蘭嶼解說員、蘭嶼民宿老闆講華語；頭目霧氣球大王、雲鯨霧將）
+  ruins_guide: "遺址公園解說員", balloon_captain: "熱氣球隊長", fob_balloon: "霧氣球大王", custard_farmer: "釋迦農", ticket_seller_fg: "富岡漁港售票員", inn_taitung: "縱谷民宿老闆", lighthouse_guide_gi: "燈塔解說員", onsen_keeper_gi: "溫泉管理員", oldhouse_gi: "古厝阿伯", ice_shop_gi: "冰店老闆", inn_greenisland: "綠島民宿老闆", tao_guide: "蘭嶼文化解說員", inn_lanyu: "蘭嶼民宿老闆", station_hl: "車站服務員", taroko_ranger: "國家公園解說員", fisher_hl: "海邊的漁夫", wxb_whale: "雲鯨霧將", road_engineer: "公路工程員", stone_carver: "石雕師傅", mochi_shop: "麻糬店老闆", inn_hualien: "海岸旅店老闆",
   // v3.0 南部（70 號；人類 NPC 全部男性、講台語（佛光山志工也講台語）；霧仔講華語；墾丁的國家公園解說員 id 是 park_ranger_kt）
   forest_rail: "林鐵站務阿伯", harbor_clerk: "港口書記", fort_guide: "古堡解說員", oldhouse_grandpa: "老屋阿伯", wetland_ranger: "溼地保育員", volunteer_lem: "鹿耳門聖母廟志工阿伯", rail_fan: "鐵道迷阿伯", pineapple_farmer: "鳳梨農", lychee_farmer: "荔枝農", volunteer_fgs: "佛光山寺院志工", turtle_volunteer: "海龜保育志工", island_guide: "島上解說員", ticket_seller: "東港碼頭售票員", park_ranger_kt: "國家公園解說員", lighthouse_keeper: "燈塔守護員", oldcity_guide: "古城解說員", fog_kid: "霧仔", inn_anping: "港邊客棧老闆", inn_taijiang: "溼地民宿老闆", inn_dashu: "鳳梨田民宿老闆", inn_liuqiu: "島上民宿老闆", inn_kenting: "墾丁旅店老闆", pib_ship: "霧帆號", pib_anchor: "錨錨大副",
   // v2.0 中部（69 號；劇本語音組草稿 wip_v20_draft/dialogs_central.js；燈籠霧將 id 改 mb_lantern；石虎寶寶是不說話的友善 NPC）
@@ -3185,4 +3187,498 @@ window.DIALOGS = {
     { who: "pet", emotion: "平靜", text: "先去塔頂，讓南霧將清醒吧！" }
   ],
   // ═════════════ v3.0 南部 END ═════════════
+
+  // ═════════════ v4.0 東部終章：洞窟解謎的規則與提示（71 號 2.11、2.12；劇本語音組 wip_v40_draft/dialogs_east2.js，v40_apply.js 每次重跑都整段重建）BEGIN ═════════════
+  D_CAVE_NOMAP: [
+    { who: "fog_kid", emotion: "平靜", text: "洞窟裡霧太濃，看不到地圖，跟著羅盤走吧！" },
+    { who: "fog_kid", emotion: "開心", text: "拿出曙光羅盤！地上的金色光點，就是正確的路。" }
+  ],
+  D_CAVE_LAMP: [
+    { who: "pet", emotion: "開心", text: "是山屋小燈！點亮它，可以休息、存檔喔。" }
+  ],
+  D_PZ_SOLVED: [
+    { who: "fog_kid", emotion: "開心", text: "解開了！你好聰明！" }
+  ],
+  D_PZ_STUCK: [
+    { who: "fog_kid", emotion: "平靜", text: "箱子卡住了，按「重來」再試一次吧！" }
+  ],
+  D_PZ_ALL: [
+    { who: "narrator", emotion: "開心", text: "12 道機關全部解開了！得到稱號「霧之洞窟解謎王」！" }
+  ],
+  D_PZ_P1_1_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "踩一塊踏板，連著它的燈會換：暗的變亮、亮的變暗。" },
+    { who: "fog_kid", emotion: "平靜", text: "讓三盞燈都亮，門就開。" }
+  ],
+  D_PZ_P1_1_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "看地上的線：每塊踏板連到哪幾盞燈？" }
+  ],
+  D_PZ_P1_1_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "中間那塊會把已經亮的燈弄暗，先試試旁邊兩塊。" }
+  ],
+  D_PZ_P1_1_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "踩最左邊的踏板，再踩最右邊的踏板。" }
+  ],
+  D_PZ_P1_2_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "牆上的圖案照規律排。下一個是什麼？" },
+    { who: "fog_kid", emotion: "平靜", text: "站到對的地板上。" }
+  ],
+  D_PZ_P1_2_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "形狀是怎麼輪流的？" }
+  ],
+  D_PZ_P1_2_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "顏色是紅、藍、紅、藍……" }
+  ],
+  D_PZ_P1_2_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "下一個是方形，顏色是藍色。" }
+  ],
+  D_PZ_P1_3_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "一次翻兩張，一樣就留著，不一樣會蓋回去。" },
+    { who: "fog_kid", emotion: "平靜", text: "把 4 對都找出來。" }
+  ],
+  D_PZ_P1_3_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "翻過的牌，要記住它在哪裡。" }
+  ],
+  D_PZ_P1_3_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "先把每張都翻一次，記住哪裡有什麼。" }
+  ],
+  D_PZ_P1_3_H3: [
+    { who: "fog_kid", emotion: "開心", text: "我讓牌一起亮一下，看清楚喔！" }
+  ],
+  D_PZ_P2_1_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "冰塊箱只能推、不能拉。" },
+    { who: "fog_kid", emotion: "平靜", text: "把它推到發光的格子上。" }
+  ],
+  D_PZ_P2_1_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "冰塊箱只能推，不能拉；推到牆角就推不出來了。" }
+  ],
+  D_PZ_P2_1_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "先把冰塊箱往左推到牆邊，再往上推。" }
+  ],
+  D_PZ_P2_1_H3: [
+    { who: "fog_kid", emotion: "開心", text: "看地上的箭頭，先照著走 5 步！" }
+  ],
+  D_PZ_P2_2_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "天平左邊是 7 公斤的冰塊。" },
+    { who: "fog_kid", emotion: "平靜", text: "選兩顆石頭放到右邊，讓天平平平的。" }
+  ],
+  D_PZ_P2_2_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "兩顆加起來要等於 7。" }
+  ],
+  D_PZ_P2_2_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "1 和 4 加起來只有 5，不夠。" }
+  ],
+  D_PZ_P2_2_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "試試 2 和 5。" }
+  ],
+  D_PZ_P2_3_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "冰柱上的數字照規律排。下一個是多少？" },
+    { who: "fog_kid", emotion: "平靜", text: "站到對的地板上。" }
+  ],
+  D_PZ_P2_3_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "看看每兩個數差多少。" }
+  ],
+  D_PZ_P2_3_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "差是 1、2、3、4……" }
+  ],
+  D_PZ_P2_3_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "12 再加 5。" }
+  ],
+  D_PZ_P3_1_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "點一下鏡子，它會換方向。" },
+    { who: "fog_kid", emotion: "平靜", text: "讓光從鏡子彈過去，照到水晶。" }
+  ],
+  D_PZ_P3_1_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "光碰到鏡子會彈開，換一個方向。" }
+  ],
+  D_PZ_P3_1_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "有一面鏡子不管怎麼轉，光都碰不到它。" }
+  ],
+  D_PZ_P3_1_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "點左上那面鏡子，再點下面那面。" }
+  ],
+  D_PZ_P3_2_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "從一顆石頭出發，把 8 條路都走過。" },
+    { who: "fog_kid", emotion: "平靜", text: "每條路只能走一次。" }
+  ],
+  D_PZ_P3_2_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "走過的路會發亮，發亮的路不能再走。" }
+  ],
+  D_PZ_P3_2_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "有兩顆石頭連著 3 條路，要從其中一顆出發。" }
+  ],
+  D_PZ_P3_2_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "從左下角的石頭出發。" }
+  ],
+  D_PZ_P3_3_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "三個式子裡，一樣的符號代表一樣的數。" },
+    { who: "fog_kid", emotion: "平靜", text: "■ 是多少？轉動密碼盤。" }
+  ],
+  D_PZ_P3_3_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "先看第一個式子：兩個 ▲ 一樣大。" }
+  ],
+  D_PZ_P3_3_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "▲ 是 4，那 ● 是多少？" }
+  ],
+  D_PZ_P3_3_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "● 是 3。9 減 3 是多少？" }
+  ],
+  D_PZ_P4_1_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "兩個石箱都要推到發光的格子上。" },
+    { who: "fog_kid", emotion: "平靜", text: "只能推、不能拉。" }
+  ],
+  D_PZ_P4_1_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "左邊的箱子推到左邊的格子，右邊的推到右邊。" }
+  ],
+  D_PZ_P4_1_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "中間的牆擋住了，要先從上面繞到箱子旁邊。" }
+  ],
+  D_PZ_P4_1_H3: [
+    { who: "fog_kid", emotion: "開心", text: "看地上的箭頭，照著推左邊的箱子！" }
+  ],
+  D_PZ_P4_2_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "踩一顆星石，它和旁邊兩顆會一起換。" },
+    { who: "fog_kid", emotion: "平靜", text: "亮的變暗，暗的變亮。讓五顆都亮。" }
+  ],
+  D_PZ_P4_2_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "每踩一顆，它和左右兩顆都會換。" }
+  ],
+  D_PZ_P4_2_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "現在亮的是 1 號和 3 號；踩 2 號會讓它們變暗喔。" }
+  ],
+  D_PZ_P4_2_H3: [
+    { who: "fog_kid", emotion: "平靜", text: "踩 1 號、2 號、3 號各一次。" }
+  ],
+  D_PZ_P4_3_RULE: [
+    { who: "fog_kid", emotion: "平靜", text: "把三個石盤全部搬到最右邊的柱子。" },
+    { who: "fog_kid", emotion: "平靜", text: "一次只能搬一個，大的不能壓在小的上面。" }
+  ],
+  D_PZ_P4_3_H1: [
+    { who: "fog_kid", emotion: "平靜", text: "一次只能搬一個，大的不能壓在小的上面。" }
+  ],
+  D_PZ_P4_3_H2: [
+    { who: "fog_kid", emotion: "平靜", text: "第一步：把最小的放到最右邊。" }
+  ],
+  D_PZ_P4_3_H3: [
+    { who: "fog_kid", emotion: "開心", text: "看地上的提示，先照著走 3 步！" }
+  ],
+  // ═════════════ v4.0 東部終章（洞窟解謎） END ═════════════
+
+  // ═════════════ v4.0 東部（71 號第四節 M26–M29；劇本語音組 wip_v40_draft/dialogs_east.js 第一段＋前端佔位句；wip_v40/v40_apply.js 每次重跑都整段重建）BEGIN ═════════════
+  D_EXIT_LOCK_TT_BOSS: [
+    { who: "pet", emotion: "擔心", text: "高台上的霧氣球大王擋住了天空，先讓它清醒。" }
+  ],
+  D_EXIT_LOCK_TT_ISLE: [
+    { who: "fog_kid", emotion: "平靜", text: "東霧將的霧是從海上來的，先去綠島和蘭嶼問問住在海邊的人。" }
+  ],
+  D_EXIT_LOCK_HL: [
+    { who: "pet", emotion: "擔心", text: "東霧將還在海上吹霧，山谷裡什麼都看不見。" },
+    { who: "pet", emotion: "平靜", text: "先去海邊，幫漁夫阿伯的忙吧！" }
+  ],
+  D_ISLANDS_DONE: [
+    { who: "fog_kid", emotion: "驚訝", text: "海水是往北流的……東霧將一定在花蓮！" }
+  ],
+  D_CH8_END: [
+    { who: "narrator", emotion: "開心", text: "第八章完成！" },
+    { who: "fog_kid", emotion: "開心", text: "四片碎片會指向哪裡呢？往西進中橫公路吧！" }
+  ],
+  D_TT_1A: [
+    { who: "ruins_guide", emotion: "開心", text: "歡迎來臺東！這裡有很多古時候的人留下的東西。", taigi: { hanji: "歡迎來臺東！遮有真濟古早人留落來的物件。", tailo: "Huan-gîng lâi Tâi-tang! Tsia ū tsin tsē kóo-tsá-lâng lâu--lo̍h-lâi ê mi̍h-kiānn.", huayu: "歡迎來臺東！這裡有很多古時候的人留下的東西。" } },
+    { who: "pet", emotion: "開心", text: "這裡是卑南遺址公園，是臺灣第一座考古遺址公園喔！" },
+    { who: "ruins_guide", emotion: "平靜", text: "你看，草地中間那根就是月形石柱。", taigi: { hanji: "你看，草埔中央彼支就是月形石柱。", tailo: "Lí khuànn, tsháu-poo tiong-ng hit ki tō-sī gue̍h-hîng tsio̍h-thiāu.", huayu: "你看，草地中間那根就是月形石柱。" } },
+    { who: "ruins_guide", emotion: "擔心", text: "霧讓我忘了這裡的故事，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得遮的故事，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit tsia ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了這裡的故事，幫我想 2 題好嗎？" } }
+  ],
+  D_TT_1B: [
+    { who: "ruins_guide", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "ruins_guide", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } },
+    { who: "pet", emotion: "平靜", text: "鹿野高台的熱氣球隊，好像需要幫忙！" }
+  ],
+  D_RUINS_IDLE: [
+    { who: "ruins_guide", emotion: "平靜", text: "遺址圍起來了，在外面看就好。", taigi: { hanji: "古早人留落來的所在圍起來矣，佇外口看就好。", tailo: "Kóo-tsá-lâng lâu--lo̍h-lâi ê sóo-tsāi uî khí-lâi--ah, tī guā-kháu khuànn tō hó.", huayu: "遺址圍起來了，在外面看就好。" } }
+  ],
+  D_TT_2A: [
+    { who: "balloon_captain", emotion: "開心", text: "歡迎來鹿野！這裡看得到一整片田野。", taigi: { hanji: "歡迎來鹿野！遮看會著規片田園。", tailo: "Huan-gîng lâi Lo̍k-iá! Tsia khuànn ē tio̍h kui phìnn tshân-hn̂g.", huayu: "歡迎來鹿野！這裡看得到一整片田野。" } },
+    { who: "pet", emotion: "開心", text: "每年 6 到 8 月，是鹿野高台飛熱氣球的好時機！" },
+    { who: "balloon_captain", emotion: "擔心", text: "可是霧把我們的球壓住，飛不起來。", taigi: { hanji: "毋過霧共阮的球硩咧，飛袂起來。", tailo: "M̄-koh bū kā guán ê kiû teh--leh, pue bē khí-lâi.", huayu: "可是霧把我們的球壓住，飛不起來。" } },
+    { who: "balloon_captain", emotion: "平靜", text: "幫我們看風，答對 3 題好嗎？", taigi: { hanji: "共阮看風，回答三題，好無？", tailo: "Kā guán khuànn hong, huê-tap sann tê, hó--bô?", huayu: "幫我們看風，答對 3 題好嗎？" } }
+  ],
+  D_TT_2B: [
+    { who: "balloon_captain", emotion: "開心", text: "知道風向了！謝謝你。", taigi: { hanji: "風向知影矣！多謝你。", tailo: "Hong-hiòng tsai-iánn--ah! To-siā--lí.", huayu: "知道風向了！謝謝你。" } },
+    { who: "balloon_captain", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } },
+    { who: "balloon_captain", emotion: "擔心", text: "可是上面有一顆霧做的大球擋著！", taigi: { hanji: "毋過頂懸有一粒霧做的大球擋咧！", tailo: "M̄-koh tíng-kuân ū tsi̍t lia̍p bū tsò ê tuā kiû tòng--leh!", huayu: "可是上面有一顆霧做的大球擋著！" } }
+  ],
+  D_TT_3A: [
+    { who: "balloon_captain", emotion: "平靜", text: "讓那顆大球清醒，天空才會乾淨。", taigi: { hanji: "予彼粒大球清醒，天頂才會清。", tailo: "Hōo hit lia̍p tuā kiû tshing-tshínn, thinn-tíng tsiah ē tshing.", huayu: "讓那顆大球清醒，天空才會乾淨。" } },
+    { who: "pet", emotion: "驚訝", text: "是霧氣球大王！答對題目，把霧放出來！" }
+  ],
+  D_BOSS_BALLOON_A: [
+    { who: "fob_balloon", emotion: "神祕", text: "呼嚕嚕……我要一直飄在這裡……誰也別想飛……" },
+    { who: "pet", emotion: "驚訝", text: "答對題目，讓霧從大球裡漏出來！" }
+  ],
+  D_BOSS_BALLOON_B: [
+    { who: "fob_balloon", emotion: "平靜", text: "霧……漏光了……我要變回彩色的熱氣球了。" }
+  ],
+  D_TT_3B: [
+    { who: "balloon_captain", emotion: "開心", text: "天空乾淨了！謝謝你，勇者！", taigi: { hanji: "天頂清矣！多謝你，勇者！", tailo: "Thinn-tíng tshing--ah! To-siā lí, ióng-tsiá!", huayu: "天空乾淨了！謝謝你，勇者！" } },
+    { who: "balloon_captain", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } },
+    { who: "balloon_captain", emotion: "驚訝", text: "我在上面看到一隻雲做的大鯨魚，往北游。", taigi: { hanji: "我佇頂懸看著一隻雲做的大海翁，向北爿泅。", tailo: "Guá tī tíng-kuân khuànn-tio̍h tsi̍t tsiah hûn tsò ê tuā hái-ang, ǹg pak-pîng siû.", huayu: "我在上面看到一隻雲做的大鯨魚，往北游。" } },
+    { who: "fog_kid", emotion: "平靜", text: "東霧將的霧是從海上來的。先去島上，問問住在海邊的人吧！" },
+    { who: "pet", emotion: "開心", text: "富岡漁港的船開了，可以去綠島和蘭嶼！" }
+  ],
+  D_TT_5A: [
+    { who: "balloon_captain", emotion: "開心", text: "台東第一顆彩繪的大球，是小朋友畫的！", taigi: { hanji: "臺東第一粒畫圖的大球，是囡仔畫的！", tailo: "Tâi-tang tē-it lia̍p uē-tôo ê tuā kiû, sī gín-á uē--ê!", huayu: "台東第一顆彩繪的大球，是小朋友畫的！" } },
+    { who: "pet", emotion: "開心", text: "是縱谷五所國小、335 位小朋友一起畫的！" },
+    { who: "balloon_captain", emotion: "平靜", text: "幫我算 2 題好嗎？", taigi: { hanji: "共我算兩題，好無？", tailo: "Kā guá sǹg nn̄g tê, hó--bô?", huayu: "幫我算 2 題好嗎？" } }
+  ],
+  D_TT_5B: [
+    { who: "balloon_captain", emotion: "開心", text: "算對了！你真聰明。", taigi: { hanji: "算著矣！你真巧。", tailo: "Sǹg tio̍h--ah! Lí tsin khiáu.", huayu: "算對了！你真聰明。" } },
+    { who: "balloon_captain", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_BALLOON_IDLE: [
+    { who: "balloon_captain", emotion: "平靜", text: "看風很重要，風對了，球才飛得穩。", taigi: { hanji: "看風真重要，風著矣，球才飛會穩。", tailo: "Khuànn hong tsin tiōng-iàu, hong tio̍h--ah, kiû tsiah pue ē ún.", huayu: "看風很重要，風對了，球才飛得穩。" } }
+  ],
+  D_TT_4A: [
+    { who: "custard_farmer", emotion: "開心", text: "台東種的釋迦最多，也很有名。", taigi: { hanji: "臺東種的釋迦上濟，嘛真出名。", tailo: "Tâi-tang tsìng ê sik-khia siōng tsē, mā tsin tshut-miâ.", huayu: "台東種的釋迦最多，也很有名。" } },
+    { who: "custard_farmer", emotion: "平靜", text: "釋迦一年可以收成兩次喔！", taigi: { hanji: "釋迦一年會當收兩擺喔！", tailo: "Sik-khia tsi̍t nî ē-tàng siu nn̄g pái--ooh!", huayu: "釋迦一年可以收成兩次喔！" } },
+    { who: "pet", emotion: "平靜", text: "第一次在 7 到 11 月，第二次在 12 到 2 月。" },
+    { who: "custard_farmer", emotion: "擔心", text: "霧讓我忘了收成的時間，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得收成的時間，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit siu-sîng ê sî-kan, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了收成的時間，幫我想 2 題好嗎？" } }
+  ],
+  D_TT_4B: [
+    { who: "custard_farmer", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "custard_farmer", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_CUSTARD_IDLE: [
+    { who: "custard_farmer", emotion: "平靜", text: "釋迦要放軟了才好吃。", taigi: { hanji: "釋迦愛囥予軟才好食。", tailo: "Sik-khia ài khǹg hōo nńg tsiah hó tsia̍h.", huayu: "釋迦要放軟了才好吃。" } }
+  ],
+  D_GI_0: [
+    { who: "ticket_seller_fg", emotion: "平靜", text: "往綠島的船票只賣來回，200 金幣。", taigi: { hanji: "往綠島的船票干焦賣來回，兩百个金幣。", tailo: "Óng Li̍k-tó ê tsûn-phiò kan-na bē lâi-huê, nn̄g-pah ê kim-pè.", huayu: "往綠島的船票只賣來回，200 金幣。" } },
+    { who: "pet", emotion: "平靜", text: "坐船大約 50 分鐘就到了！" }
+  ],
+  D_LY_0: [
+    { who: "ticket_seller_fg", emotion: "平靜", text: "往蘭嶼的船票只賣來回，200 金幣。", taigi: { hanji: "往蘭嶼的船票干焦賣來回，兩百个金幣。", tailo: "Óng Lân-sū ê tsûn-phiò kan-na bē lâi-huê, nn̄g-pah ê kim-pè.", huayu: "往蘭嶼的船票只賣來回，200 金幣。" } },
+    { who: "pet", emotion: "平靜", text: "去蘭嶼比較遠，坐船要 2 到 3 小時。" }
+  ],
+  D_INN_TAITUNG: [
+    { who: "inn_taitung", emotion: "開心", text: "歡迎來台東的民宿！好好休息喔。", taigi: { hanji: "歡迎來臺東的民宿！好好仔歇睏喔。", tailo: "Huan-gîng lâi Tâi-tang ê bîn-sok! Hó-hó-á hioh-khùn--ooh.", huayu: "歡迎來台東的民宿！好好休息喔。" } }
+  ],
+  D_INN_TAITUNG_NOCOIN: [
+    { who: "inn_taitung", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" } }
+  ],
+  D_GI_1A: [
+    { who: "lighthouse_guide_gi", emotion: "開心", text: "歡迎來綠島！你看，這座白色的燈塔。", taigi: { hanji: "歡迎來綠島！你看，這座白色的燈塔。", tailo: "Huan-gîng lâi Li̍k-tó! Lí khuànn, tsit tsō pe̍h-sik ê ting-thah.", huayu: "歡迎來綠島！你看，這座白色的燈塔。" } },
+    { who: "lighthouse_guide_gi", emotion: "平靜", text: "以前有大船在這裡撞到礁石，島上的人勇敢救人。", taigi: { hanji: "較早有大船佇遮挵著礁，島頂的人勇敢救人。", tailo: "Khah-tsá ū tuā tsûn tī tsia lòng-tio̍h ta, tó-tíng ê lâng ióng-kám kiù lâng.", huayu: "以前有大船在這裡撞到礁石，島上的人勇敢救人。" } },
+    { who: "pet", emotion: "平靜", text: "後來美國紅十字會為了感謝，捐錢蓋了這座燈塔。" },
+    { who: "lighthouse_guide_gi", emotion: "擔心", text: "霧把燈蓋住了，幫我想 3 題好嗎？", taigi: { hanji: "霧共燈崁起來矣，共我想三題，好無？", tailo: "Bū kā ting khàm khí-lâi--ah, kā guá siūnn sann tê, hó--bô?", huayu: "霧把燈蓋住了，幫我想 3 題好嗎？" } }
+  ],
+  D_GI_1B: [
+    { who: "lighthouse_guide_gi", emotion: "開心", text: "燈又亮了！看得好遠。", taigi: { hanji: "燈閣光矣！看會足遠。", tailo: "Ting koh kng--ah! Khuànn ē tsiok hn̄g.", huayu: "燈又亮了！看得好遠。" } },
+    { who: "lighthouse_guide_gi", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } },
+    { who: "lighthouse_guide_gi", emotion: "平靜", text: "我看到一片雲往北邊飄去。", taigi: { hanji: "我看著一片雲向北爿飄去。", tailo: "Guá khuànn-tio̍h tsi̍t phìnn hûn ǹg pak-pîng phiau--khì.", huayu: "我看到一片雲往北邊飄去。" } }
+  ],
+  D_GI_2A: [
+    { who: "onsen_keeper_gi", emotion: "開心", text: "這是海底溫泉，而且是鹹的喔！", taigi: { hanji: "這是海底的溫泉，閣是鹹的喔！", tailo: "Tse sī hái-té ê un-tsuânn, koh sī kiâm--ê--ooh!", huayu: "這是海底溫泉，而且是鹹的喔！" } },
+    { who: "onsen_keeper_gi", emotion: "平靜", text: "這裡面對太平洋，看得到太陽從海上升起。", taigi: { hanji: "遮面對太平洋，看會著日頭對海出來。", tailo: "Tsia bīn-tuì Thài-pîng-iûnn, khuànn ē tio̍h ji̍t-thâu tuì hái tshut--lâi.", huayu: "這裡面對太平洋，看得到太陽從海上升起。" } },
+    { who: "onsen_keeper_gi", emotion: "擔心", text: "霧讓我忘了溫泉的事，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得溫泉的代誌，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit un-tsuânn ê tāi-tsì, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了溫泉的事，幫我想 2 題好嗎？" } }
+  ],
+  D_GI_2B: [
+    { who: "onsen_keeper_gi", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "onsen_keeper_gi", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_GI_BATH: [
+    { who: "onsen_keeper_gi", emotion: "平靜", text: "一次不要泡太久，地上很滑，要慢慢走。", taigi: { hanji: "一擺毋通浸傷久，塗跤真滑，愛慢慢仔行。", tailo: "Tsi̍t pái m̄-thang tsìm siunn kú, thôo-kha tsin ku̍t, ài bān-bān-á kiânn.", huayu: "一次不要泡太久，地上很滑，要慢慢走。" } },
+    { who: "pet", emotion: "平靜", text: "泡溫泉不算住宿喔！記得要有大人陪。" }
+  ],
+  D_GI_3A: [
+    { who: "oldhouse_gi", emotion: "開心", text: "這是用海底的珊瑚石蓋的房子。", taigi: { hanji: "這是用海底的珊瑚石起的厝。", tailo: "Tse sī īng hái-té ê suan-ôo-tsio̍h khí ê tshù.", huayu: "這是用海底的珊瑚石蓋的房子。" } },
+    { who: "oldhouse_gi", emotion: "平靜", text: "牆很厚、窗戶小小的，是為了擋東北風。", taigi: { hanji: "壁真厚、窗仔細細，是為著擋東北風。", tailo: "Piah tsin kāu, thang-á sè-sè, sī uī-tio̍h tòng tang-pak-hong.", huayu: "牆很厚、窗戶小小的，是為了擋東北風。" } },
+    { who: "oldhouse_gi", emotion: "擔心", text: "霧讓我忘了古厝的故事，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得古厝的故事，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit kóo-tshù ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了古厝的故事，幫我想 2 題好嗎？" } }
+  ],
+  D_GI_3B: [
+    { who: "oldhouse_gi", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "oldhouse_gi", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_ICE_GI_IDLE: [
+    { who: "ice_shop_gi", emotion: "開心", text: "吃一碗冰，涼一下吧！", taigi: { hanji: "食一碗冰，涼一下！", tailo: "Tsia̍h tsi̍t uánn ping, liâng--tsi̍t-ē!", huayu: "吃一碗冰，涼一下吧！" } },
+    { who: "pet", emotion: "開心", text: "這是綠島的海草冰！" }
+  ],
+  D_INN_GREENISLAND: [
+    { who: "inn_greenisland", emotion: "開心", text: "歡迎來綠島的民宿！好好休息喔。", taigi: { hanji: "歡迎來綠島的民宿！好好仔歇睏喔。", tailo: "Huan-gîng lâi Li̍k-tó ê bîn-sok! Hó-hó-á hioh-khùn--ooh.", huayu: "歡迎來綠島的民宿！好好休息喔。" } }
+  ],
+  D_INN_GREENISLAND_NOCOIN: [
+    { who: "inn_greenisland", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" } }
+  ],
+  D_LY_1A: [
+    { who: "tao_guide", emotion: "開心", text: "歡迎來蘭嶼。我是這裡的解說員，請跟著我走。" },
+    { who: "tao_guide", emotion: "平靜", text: "這裡是達悟族世世代代生活的島。" },
+    { who: "tao_guide", emotion: "平靜", text: "進村子要有禮貌，尊重這裡的文化。" },
+    { who: "tao_guide", emotion: "平靜", text: "不隨便進別人的家。船是別人家的，我們只看不碰。" },
+    { who: "tao_guide", emotion: "平靜", text: "幫我想 3 題，當一個有禮貌的客人。" }
+  ],
+  D_LY_1B: [
+    { who: "tao_guide", emotion: "開心", text: "謝謝你，你是很有禮貌的客人。" }
+  ],
+  D_LY_2A: [
+    { who: "tao_guide", emotion: "平靜", text: "沙灘上的船叫拼板舟，大船用二十幾塊木板拼起來。" },
+    { who: "tao_guide", emotion: "平靜", text: "木板用木釘接起來，船身只用白、黑、紅三種顏色。" },
+    { who: "tao_guide", emotion: "平靜", text: "大船可以坐 10 個人，一起出海捕魚。" },
+    { who: "tao_guide", emotion: "平靜", text: "幫我想 2 題好嗎？" }
+  ],
+  D_LY_2B: [
+    { who: "tao_guide", emotion: "開心", text: "答對了！你聽得很仔細。" }
+  ],
+  D_LY_3A: [
+    { who: "tao_guide", emotion: "平靜", text: "黑潮是從南邊往北流的溫暖海流，會流過蘭嶼。" },
+    { who: "tao_guide", emotion: "平靜", text: "每年 2 月起，飛魚跟著黑潮來到蘭嶼。" },
+    { who: "tao_guide", emotion: "平靜", text: "飛魚季是達悟族一年裡最重要的盛事。" },
+    { who: "tao_guide", emotion: "平靜", text: "飛魚乾是平常吃的食物，也用來送禮表示心意。" },
+    { who: "tao_guide", emotion: "平靜", text: "幫我想 2 題好嗎？" }
+  ],
+  D_LY_3B: [
+    { who: "tao_guide", emotion: "開心", text: "謝謝你認真聽。記得喔，這裡的海水是往北流的。" }
+  ],
+  D_TAO_IDLE: [
+    { who: "tao_guide", emotion: "平靜", text: "這裡的海很清澈，有珊瑚。看就好喔。" }
+  ],
+  D_INN_LANYU: [
+    { who: "inn_lanyu", emotion: "開心", text: "歡迎來蘭嶼的民宿！好好休息喔。" }
+  ],
+  D_INN_LANYU_NOCOIN: [
+    { who: "inn_lanyu", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" }
+  ],
+  D_HL_1A: [
+    { who: "station_hl", emotion: "開心", text: "歡迎來花蓮！花蓮是全國最大的縣。", taigi: { hanji: "歡迎來花蓮！花蓮是全國上大的縣。", tailo: "Huan-gîng lâi Hua-liân! Hua-liân sī tsuân-kok siōng tuā ê kuān.", huayu: "歡迎來花蓮！花蓮是全國最大的縣。" } },
+    { who: "pet", emotion: "平靜", text: "花蓮的面積大約 4,628 平方公里！" },
+    { who: "station_hl", emotion: "平靜", text: "可是適合人住的平地，一百份只有七份。", taigi: { hanji: "毋過適合人蹛的平地，一百份干焦七份。", tailo: "M̄-koh sik-ha̍p lâng tuà ê pênn-tē, tsi̍t-pah hūn kan-na tshit hūn.", huayu: "可是適合人住的平地，一百份只有七份。" } },
+    { who: "station_hl", emotion: "平靜", text: "幫我算 2 題好嗎？", taigi: { hanji: "共我算兩題，好無？", tailo: "Kā guá sǹg nn̄g tê, hó--bô?", huayu: "幫我算 2 題好嗎？" } }
+  ],
+  D_HL_1B: [
+    { who: "station_hl", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "station_hl", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_HL_2A: [
+    { who: "taroko_ranger", emotion: "開心", text: "你看，那邊的山壁，幾乎是直直的。", taigi: { hanji: "你看，彼爿的山壁，差不多是直直的。", tailo: "Lí khuànn, hit-pîng ê suann-piah, tsha-put-to sī ti̍t-ti̍t--ê.", huayu: "你看，那邊的山壁，幾乎是直直的。" } },
+    { who: "pet", emotion: "驚訝", text: "這是太魯閣的大理岩峽谷！" },
+    { who: "taroko_ranger", emotion: "平靜", text: "溪水一直沖刷，山又一直升高，才變成這樣。", taigi: { hanji: "溪水一直沖，山閣一直懸起來，才變按呢。", tailo: "Khe-tsuí it-ti̍t tshiâng, suann koh it-ti̍t kuân--khí-lâi, tsiah piàn án-ne.", huayu: "溪水一直沖刷，山又一直升高，才變成這樣。" } },
+    { who: "taroko_ranger", emotion: "擔心", text: "霧讓我忘了峽谷的故事，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得山谷的故事，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit suann-kok ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了峽谷的故事，幫我想 2 題好嗎？" } }
+  ],
+  D_HL_2B: [
+    { who: "taroko_ranger", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "taroko_ranger", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_HL_3A: [
+    { who: "fisher_hl", emotion: "擔心", text: "海上浮著一隻雲做的大鯨魚，把霧吹進山谷！", taigi: { hanji: "海頂浮一隻雲做的大海翁，共霧歕入去山谷！", tailo: "Hái-tíng phû tsi̍t tsiah hûn tsò ê tuā hái-ang, kā bū pûn ji̍p-khì suann-kok!", huayu: "海上浮著一隻雲做的大鯨魚，把霧吹進山谷！" } },
+    { who: "fisher_hl", emotion: "擔心", text: "鯨魚不醒來，我們的船都不能出海。", taigi: { hanji: "海翁無清醒，阮的船攏袂當出海。", tailo: "Hái-ang bô tshing-tshínn, guán ê tsûn lóng bē-tàng tshut-hái.", huayu: "鯨魚不醒來，我們的船都不能出海。" } },
+    { who: "pet", emotion: "驚訝", text: "是東霧將！走到海灘盡頭，讓它清醒！" }
+  ],
+  D_BOSS_WHALE_A: [
+    { who: "wxb_whale", emotion: "神祕", text: "呼……噗……我要把霧吹滿整座山……" },
+    { who: "pet", emotion: "驚訝", text: "雲鯨霧將！答對題目，把霧吹散！" }
+  ],
+  D_BOSS_WHALE_B: [
+    { who: "wxb_whale", emotion: "平靜", text: "呼……身體變輕了……我要變成白雲，回到太平洋。" }
+  ],
+  D_HL_3B: [
+    { who: "fisher_hl", emotion: "開心", text: "鯨魚變成白雲了！謝謝你，勇者！", taigi: { hanji: "海翁變做白雲矣！多謝你，勇者！", tailo: "Hái-ang piàn-tsò pe̍h-hûn--ah! To-siā lí, ióng-tsiá!", huayu: "鯨魚變成白雲了！謝謝你，勇者！" } },
+    { who: "fisher_hl", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } },
+    { who: "pet", emotion: "開心", text: "拿到東之曙光碎片了！四片都到齊了！" }
+  ],
+  D_FISHER_HL_IDLE: [
+    { who: "fisher_hl", emotion: "平靜", text: "海邊浪很大，不要太靠近。", taigi: { hanji: "海邊仔湧真大，毋通傷倚。", tailo: "Hái-pinn-á íng tsin tuā, m̄-thang siunn uá.", huayu: "海邊浪很大，不要太靠近。" } }
+  ],
+  D_HL_4A: [
+    { who: "road_engineer", emotion: "平靜", text: "要進山，要先查公路和步道有沒有開放。", taigi: { hanji: "欲入山，愛先查公路佮步道有開無。", tailo: "Beh ji̍p suann, ài sing tshâ kong-lōo kah pōo-tō ū khui--bô.", huayu: "要進山，要先查公路和步道有沒有開放。" } },
+    { who: "road_engineer", emotion: "平靜", text: "公路要照公告的時間走，幫我算 2 題好嗎？", taigi: { hanji: "公路愛照公告的時間行，共我算兩題，好無？", tailo: "Kong-lōo ài tsiàu kong-kò ê sî-kan kiânn, kā guá sǹg nn̄g tê, hó--bô?", huayu: "公路要照公告的時間走，幫我算 2 題好嗎？" } }
+  ],
+  D_HL_4B: [
+    { who: "road_engineer", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "road_engineer", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_ENGINEER_IDLE: [
+    { who: "road_engineer", emotion: "平靜", text: "要進山，要先查公路和步道有沒有開放。", taigi: { hanji: "欲入山，愛先查公路佮步道有開無。", tailo: "Beh ji̍p suann, ài sing tshâ kong-lōo kah pōo-tō ū khui--bô.", huayu: "要進山，要先查公路和步道有沒有開放。" } }
+  ],
+  D_HL_5A: [
+    { who: "stone_carver", emotion: "開心", text: "花蓮的石頭很多，很多人在這裡雕石頭。", taigi: { hanji: "花蓮的石頭真濟，真濟人佇遮刻石頭。", tailo: "Hua-liân ê tsio̍h-thâu tsin tsē, tsin tsē lâng tī tsia khik tsio̍h-thâu.", huayu: "花蓮的石頭很多，很多人在這裡雕石頭。" } },
+    { who: "pet", emotion: "平靜", text: "花蓮有全國第一座以石頭為主題的博物館！" },
+    { who: "stone_carver", emotion: "擔心", text: "霧讓我忘了石頭的故事，幫我想 2 題好嗎？", taigi: { hanji: "霧予我袂記得石頭的故事，共我想兩題，好無？", tailo: "Bū hōo guá bē-kì-tit tsio̍h-thâu ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?", huayu: "霧讓我忘了石頭的故事，幫我想 2 題好嗎？" } }
+  ],
+  D_HL_5B: [
+    { who: "stone_carver", emotion: "開心", text: "你都答對了，聽得真認真！", taigi: { hanji: "你攏回答著矣，聽甲真認真！", tailo: "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!", huayu: "你都答對了，聽得真認真！" } },
+    { who: "stone_carver", emotion: "開心", text: "這些金幣送你，謝謝你！", taigi: { hanji: "這寡金幣送你，多謝你！", tailo: "Tsit-kuá kim-pè sàng lí, to-siā--lí!", huayu: "這些金幣送你，謝謝你！" } }
+  ],
+  D_MOCHI_IDLE: [
+    { who: "mochi_shop", emotion: "開心", text: "麻糬軟軟的，吃一顆有精神！", taigi: { hanji: "麻糍軟軟，食一粒有元氣！", tailo: "Muâ-tsî nńg-nńg, tsia̍h tsi̍t lia̍p ū guân-khì!", huayu: "麻糬軟軟的，吃一顆有精神！" } }
+  ],
+  D_STATION_HL_IDLE: [
+    { who: "station_hl", emotion: "平靜", text: "花蓮東邊是太平洋，西邊是中央山脈。", taigi: { hanji: "花蓮東爿是太平洋，西爿是中央山脈。", tailo: "Hua-liân tang-pîng sī Thài-pîng-iûnn, sai-pîng sī Tiong-iong-suann-me̍h.", huayu: "花蓮東邊是太平洋，西邊是中央山脈。" } }
+  ],
+  D_LINTIAN_VIEW: [
+    { who: "pet", emotion: "平靜", text: "這種木頭宿舍在花蓮鳳林的林田山，是四大林場之一。" }
+  ],
+  D_INN_HUALIEN: [
+    { who: "inn_hualien", emotion: "開心", text: "歡迎來海邊的旅店！好好休息喔。", taigi: { hanji: "歡迎來海邊的旅社！好好仔歇睏喔。", tailo: "Huan-gîng lâi hái-pinn ê lí-siā! Hó-hó-á hioh-khùn--ooh.", huayu: "歡迎來海邊的旅店！好好休息喔。" } }
+  ],
+  D_INN_HUALIEN_NOCOIN: [
+    { who: "inn_hualien", emotion: "擔心", text: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。" } }
+  ],
+  D_MACAQUE_AFTER: [
+    { who: "narrator", emotion: "平靜", text: "野生的猴子不要餵，也不要靠近喔。" }
+  ],
+  D_FERRY_FUGANG_GI_BUY: [
+    { who: "ticket_seller_fg", emotion: "開心", text: "要去綠島嗎？來回票在這裡買喔。", taigi: { hanji: "欲去綠島無？來回票佇遮買喔。", tailo: "Beh khì Li̍k-tó--bô? Lâi-huê-phiò tī tsia bé--ooh.", huayu: "要去綠島嗎？來回票在這裡買喔。" } }
+  ],
+  D_FERRY_FUGANG_GI_NO_MONEY: [
+    { who: "ticket_seller_fg", emotion: "擔心", text: "金幣不夠喔，先去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，先去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, sing khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，先去打怪賺金幣。" } }
+  ],
+  D_FERRY_FUGANG_GI_LOCKED: [
+    { who: "ticket_seller_fg", emotion: "擔心", text: "海上起霧了，船暫時不開喔。", taigi: { hanji: "海頂咧罩霧，船暫時無開喔。", tailo: "Hái-tíng teh tà-bū, tsûn tsiām-sî bô khui--ooh.", huayu: "海上起霧了，船暫時不開喔。" } },
+    { who: "pet", emotion: "平靜", text: "先在台東幫大家的忙吧！" }
+  ],
+  D_FERRY_FUGANG_GI_BOARD: [
+    { who: "narrator", emotion: "開心", text: "船員看過船票，上船囉！" }
+  ],
+  D_FERRY_FUGANG_GI_ARRIVE: [
+    { who: "narrator", emotion: "開心", text: "大約 50 分鐘，船靠岸了！下船要小心喔。" }
+  ],
+  D_FERRY_FUGANG_LY_BUY: [
+    { who: "ticket_seller_fg", emotion: "開心", text: "要去蘭嶼嗎？來回票在這裡買喔。", taigi: { hanji: "欲去蘭嶼無？來回票佇遮買喔。", tailo: "Beh khì Lân-sū--bô? Lâi-huê-phiò tī tsia bé--ooh.", huayu: "要去蘭嶼嗎？來回票在這裡買喔。" } }
+  ],
+  D_FERRY_FUGANG_LY_NO_MONEY: [
+    { who: "ticket_seller_fg", emotion: "擔心", text: "金幣不夠喔，先去打怪賺金幣。", taigi: { hanji: "金幣無夠喔，先去拍怪物趁金幣。", tailo: "Kim-pè bô-kàu--ooh, sing khì phah kuài-bu̍t thàn kim-pè.", huayu: "金幣不夠喔，先去打怪賺金幣。" } }
+  ],
+  D_FERRY_FUGANG_LY_LOCKED: [
+    { who: "ticket_seller_fg", emotion: "擔心", text: "海上起霧了，船暫時不開喔。", taigi: { hanji: "海頂咧罩霧，船暫時無開喔。", tailo: "Hái-tíng teh tà-bū, tsûn tsiām-sî bô khui--ooh.", huayu: "海上起霧了，船暫時不開喔。" } },
+    { who: "pet", emotion: "平靜", text: "先在台東幫大家的忙吧！" }
+  ],
+  D_FERRY_FUGANG_LY_BOARD: [
+    { who: "narrator", emotion: "開心", text: "船員看過船票，上船囉！" }
+  ],
+  D_FERRY_FUGANG_LY_ARRIVE: [
+    { who: "narrator", emotion: "開心", text: "坐了好久的船，靠岸了！下船要小心喔。" }
+  ],
+  D_SIGN_ZHONGHENG: [
+    { who: "pet", emotion: "平靜", text: "往西是中橫公路，會穿過高高的中央山脈。" },
+    { who: "pet", emotion: "平靜", text: "這條路要等之後開放才能走喔！" }
+  ],
+  D_FERRY_PICK_NONE: [
+    { who: "pet", emotion: "平靜", text: "還沒有船票喔！先去找售票員買來回票吧。" }
+  ],
+  D_LIGHTHOUSE_GI_IDLE: [
+    { who: "lighthouse_guide_gi", emotion: "平靜", text: "燈塔晚上會亮，讓船知道方向。", taigi: { hanji: "燈塔暗時會光，予船知影方向。", tailo: "Ting-thah àm-sî ē kng, hōo tsûn tsai-iánn hong-hiòng.", huayu: "燈塔晚上會亮，讓船知道方向。" } }
+  ],
+  D_ONSEN_GI_IDLE: [
+    { who: "onsen_keeper_gi", emotion: "開心", text: "一大早來，可以一邊泡溫泉，一邊看日出。", taigi: { hanji: "透早來，會當那浸溫泉，那看日頭出來。", tailo: "Thàu-tsá lâi, ē-tàng ná tsìm un-tsuânn, ná khuànn ji̍t-thâu tshut--lâi.", huayu: "一大早來，可以一邊泡溫泉，一邊看日出。" } }
+  ],
+  D_OLDHOUSE_GI_IDLE: [
+    { who: "oldhouse_gi", emotion: "平靜", text: "以前用珊瑚石蓋房子，現在不可以挖珊瑚了。", taigi: { hanji: "較早用珊瑚石起厝，這馬毋通掘珊瑚矣。", tailo: "Khah-tsá īng suan-ôo-tsio̍h khí tshù, tsit-má m̄-thang ku̍t suan-ôo--ah.", huayu: "以前用珊瑚石蓋房子，現在不可以挖珊瑚了。" } }
+  ],
+  D_TAROKO_IDLE: [
+    { who: "taroko_ranger", emotion: "平靜", text: "花不要亂摘，垃圾要帶回去喔。", taigi: { hanji: "毋通烏白挽花，糞埽愛提轉去喔。", tailo: "M̄-thang oo-pe̍h bán hue, pùn-sò ài the̍h tńg-khì--ooh.", huayu: "花不要亂摘，垃圾要帶回去喔。" } }
+  ],
+  D_STONE_IDLE: [
+    { who: "stone_carver", emotion: "平靜", text: "石頭雕好了，還要磨很久，才會亮晶晶。", taigi: { hanji: "石頭刻好，閣愛磨足久，才會金鑠鑠。", tailo: "Tsio̍h-thâu khik hó, koh ài buâ tsiok kú, tsiah ē kim-siak-siak.", huayu: "石頭雕好了，還要磨很久，才會亮晶晶。" } }
+  ],
+  D_EXIT_LOCK_PT: [
+    { who: "pet", emotion: "擔心", text: "外海的霧帆號還沒清醒，先別往台東走。" },
+    { who: "pet", emotion: "平靜", text: "先回最南邊的燈塔，讓霧帆號清醒吧！" }
+  ],
+  // ═════════════ v4.0 東部（M26–M29） END ═════════════
 };

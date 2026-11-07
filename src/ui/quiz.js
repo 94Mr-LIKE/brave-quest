@@ -50,6 +50,7 @@
     var speakBtn = h('button', { onclick: speak, 'aria-label': '朗讀題目' }, ['🔊 朗讀']);
     // v2.2.1b（情境會議決議第 3 步）：委託（runHelp）傳 sceneView(q) → { text, intro }：generic 題才換說話者、家鄉題在外地先說過場句（intro，另起一行）
     var sv = typeof o.sceneView === 'function' && q.scene ? o.sceneView(q) : null;
+    if (sv && o.sceneOnce && J.SceneFit && J.SceneFit.introOnce) sv = J.SceneFit.introOnce(sv, q.id, o.sceneOnce);   // v4.0（夜班 v3.0.1 建議②、實玩 O-2）：家鄉題過場句同一次幫忙只講一次
     var sceneText = sv ? (sv.intro ? sv.intro + '\n' + sv.text : sv.text) : (q.scene ? (o.speaker ? J.DialogText.questScene(q.scene, o.speaker, q.speaker) : q.scene) : '');
     var sceneEl = sceneText ? h('div.scene' + (sv && sv.intro ? '.has-intro' : ''), { text: J.UI.fill(sceneText, st.player.name) }) : null;
     var stemEl = h('div.stem', { id: 'quiz-stem', text: J.UI.fill(q.stem, st.player.name) });

@@ -1013,4 +1013,155 @@ window.QUESTS = {
     hunt: null, requires: [], requires_visit: "M10", reward: { exp: 35, gold: 32, item: "guide", light: null },
     dialog_start: "D_LIB_A", dialog_end: "D_LIB_B"
   },
+  // ═════════════════════ v4.0 東部（第八章台東・綠島・蘭嶼・花蓮；71 號 4.1–4.10、8.1；wip_v40/v40_apply.js）BEGIN ═════════════════════
+  // 主線：屏東 Q_PT_3（第七章）→ 台東 Q_TT_1 → Q_TT_2 → Q_TT_3 霧氣球大王（富岡漁港的船開了）→ 買船票 Q_GI_0、Q_LY_0 → 綠島 Q_GI_1 → Q_GI_2；蘭嶼 Q_LY_1 → Q_LY_2、Q_LY_3（兩座島先去哪一個都可以）
+  //   → 花蓮 Q_HL_1（前置 Q_TT_3、Q_GI_2、Q_LY_2、Q_LY_3）→ Q_HL_2 → Q_HL_3 雲鯨霧將（chapter_end: 8，東之曙光碎片 4／4）
+  // 支線：Q_TT_4、Q_TT_5、Q_GI_3、Q_HL_4、Q_HL_5。經濟：新經濟規則（每步 Z11 117／83、Z12 267／200；買船票不分預算）。兩座島都完成時霧仔說 D_ISLANDS_DONE（cutscene_when）
+  Q_TT_1: {
+    title: "卑南遺址", giver: "ruins_guide", map: "M26", kind: "help",
+    goal: "從屏東到台東，在遺址公園看月形石柱：答對 2 題社會。",
+    log_next: "熱氣球隊長說：高台的熱氣球飛不起來了。",
+    subject: "社會", units: ["第一單元 我居住的地方"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_PT_3"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_TT_1A", dialog_end: "D_TT_1B"
+  },
+  Q_TT_2: {
+    title: "熱氣球飛不起來", giver: "balloon_captain", map: "M26", kind: "help",
+    goal: "高台的熱氣球被霧壓住了，幫熱氣球隊看風：答對 3 題自然。",
+    log_next: "高台上空，有一顆好大的灰色霧氣球！",
+    subject: "自然", units: ["三、風與空氣"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_TT_1"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_TT_2A", dialog_end: "D_TT_2B"
+  },
+  Q_TT_3: {
+    title: "台東頭目：霧氣球大王", giver: "balloon_captain", map: "M26", kind: "boss",
+    goal: "讓擋在高台上空的霧氣球大王清醒。",
+    log_next: "隊長說：一隻雲做的大鯨魚往北游了。富岡漁港的船開了！",
+    subject: "混合", subjects: ["自然", "數學"], units: ["二、磁鐵好好玩", "一、植物大發現", "三、風與空氣", "四、奇妙的溶解", "一、快樂小農夫", "二、千變萬化的水", "三、天氣停看聽", "四、動物王國", "1 10000以內的數", "5 角與形狀", "3 毫米與數線", "7 公斤與公克", "2 10000以內的加減", "8 分數", "9 列表與規律", "4 乘法", "6 除法", "1 除法", "2 公升與毫升", "3 分數與加減", "4 圓", "5 兩步驟應用問題", "6 一位小數", "7 時間", "8 乘與除", "9 面積"], count: null, level_range: [2, 4],
+    boss: "fob_balloon", boss_map: "M26",
+    hunt: null, requires: ["Q_TT_2"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_TT_3A", dialog_end: "D_TT_3B"
+  },
+  Q_TT_4: {
+    title: "一年兩次的釋迦", giver: "custard_farmer", map: "M26", kind: "help", side: true,
+    goal: "聽釋迦農說釋迦什麼時候收成：答對 2 題社會。",
+    log_next: "釋迦農說：釋迦要放軟了才好吃。",
+    subject: "社會", units: ["第三單元 生活中的各行各業"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_TT_1"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_TT_4A", dialog_end: "D_TT_4B"
+  },
+  Q_TT_5: {
+    title: "小朋友畫的熱氣球", giver: "balloon_captain", map: "M26", kind: "help", side: true,
+    goal: "隊長說台東第一顆彩繪熱氣球是小朋友畫的。數一數：答對 2 題數學。",
+    log_next: "隊長說：謝謝你，熱氣球又能飛上天了。",
+    subject: "數學", units: ["1 10000以內的數"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_TT_3"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_TT_5A", dialog_end: "D_TT_5B"
+  },
+  Q_GI_0: {
+    title: "往綠島的船", giver: "ticket_seller_fg", map: "M26", kind: "ferry",
+    goal: "在富岡漁港買往綠島的來回船票（200 金幣）。",
+    log_next: "買到船票了！到碼頭點船，就能去綠島。",
+    subject: "社會", units: [], count: null, level_range: [2, 3],
+    hunt: null, requires: ["Q_TT_3"], reward: { exp: 0, gold: 0, item: null, light: null },
+    dialog_start: "D_GI_0", dialog_end: "D_GI_0"
+  },
+  Q_GI_1: {
+    title: "擦亮燈塔", giver: "lighthouse_guide_gi", map: "M27", kind: "help",
+    goal: "聽燈塔解說員說居民救人的故事，幫忙擦亮燈：答對 3 題國語。",
+    log_next: "燈塔亮了！溫泉管理員在海邊等你。",
+    subject: "國語", units: ["第肆單元 美好的祝福"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_GI_0"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_GI_1A", dialog_end: "D_GI_1B"
+  },
+  Q_GI_2: {
+    title: "海底溫泉", giver: "onsen_keeper_gi", map: "M27", kind: "help",
+    goal: "在朝日溫泉看日出，聽管理員說海底溫泉：答對 2 題自然。",
+    log_next: "綠島完成了！還沒去蘭嶼的話，坐船回富岡漁港買船票。",
+    subject: "自然", units: ["二、千變萬化的水"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_GI_1"], reward: { exp: 117, gold: 83, item: null, light: null }, cutscene: "D_ISLANDS_DONE", cutscene_when: ["Q_GI_2", "Q_LY_2", "Q_LY_3"],
+    dialog_start: "D_GI_2A", dialog_end: "D_GI_2B"
+  },
+  Q_GI_3: {
+    title: "珊瑚石蓋的房子", giver: "oldhouse_gi", map: "M27", kind: "help", side: true,
+    goal: "聽古厝阿伯說古厝的牆為什麼這麼厚：答對 2 題社會。",
+    log_next: "阿伯說：厚厚的牆，可以擋住冬天的東北季風。",
+    subject: "社會", units: ["第二單元 多元的生活空間"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_GI_0"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_GI_3A", dialog_end: "D_GI_3B"
+  },
+  Q_LY_0: {
+    title: "往蘭嶼的船", giver: "ticket_seller_fg", map: "M26", kind: "ferry",
+    goal: "在富岡漁港買往蘭嶼的來回船票（200 金幣）。",
+    log_next: "買到船票了！到碼頭點船，就能去蘭嶼。",
+    subject: "社會", units: [], count: null, level_range: [2, 3],
+    hunt: null, requires: ["Q_TT_3"], reward: { exp: 0, gold: 0, item: null, light: null },
+    dialog_start: "D_LY_0", dialog_end: "D_LY_0"
+  },
+  Q_LY_1: {
+    title: "拜訪的禮儀", giver: "tao_guide", map: "M28", kind: "help",
+    goal: "當個有禮貌的客人，跟著解說員走、不亂碰別人的東西：答對 3 題社會。",
+    log_next: "記住：拍照前先問，不隨便進別人的家。",
+    subject: "社會", units: ["第二單元 校園規範和班級自治"], count: 3, level_range: [2, 3],
+    hunt: null, requires: ["Q_LY_0"], reward: { exp: 117, gold: 83, item: null, light: null },
+    dialog_start: "D_LY_1A", dialog_end: "D_LY_1B"
+  },
+  Q_LY_2: {
+    title: "拼板舟", giver: "tao_guide", map: "M28", kind: "help",
+    goal: "聽解說員介紹拼板舟：答對 2 題社會。",
+    log_next: "拼板舟是別人家的船，我們只看不碰。",
+    subject: "社會", units: ["第二單元 多元的生活空間"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_LY_1"], reward: { exp: 117, gold: 83, item: null, light: null }, cutscene: "D_ISLANDS_DONE", cutscene_when: ["Q_GI_2", "Q_LY_2", "Q_LY_3"],
+    dialog_start: "D_LY_2A", dialog_end: "D_LY_2B"
+  },
+  Q_LY_3: {
+    title: "跟著黑潮來的飛魚", giver: "tao_guide", map: "M28", kind: "help",
+    goal: "聽解說員說飛魚和黑潮：答對 2 題自然。",
+    log_next: "海水跟著黑潮往北流……霧仔好像想到了什麼！",
+    subject: "自然", units: ["四、動物王國"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_LY_1"], reward: { exp: 117, gold: 83, item: null, light: null }, cutscene: "D_ISLANDS_DONE", cutscene_when: ["Q_GI_2", "Q_LY_2", "Q_LY_3"],
+    dialog_start: "D_LY_3A", dialog_end: "D_LY_3B"
+  },
+  Q_HL_1: {
+    title: "最大的縣", giver: "station_hl", map: "M29", kind: "help",
+    goal: "從台東往北到花蓮，聽車站服務員說花蓮有多大：答對 2 題數學。",
+    log_next: "國家公園解說員在峽谷口等你。",
+    subject: "數學", units: ["1 10000以內的數"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_TT_3", "Q_GI_2", "Q_LY_2", "Q_LY_3"], reward: { exp: 267, gold: 200, item: null, light: null },
+    dialog_start: "D_HL_1A", dialog_end: "D_HL_1B"
+  },
+  Q_HL_2: {
+    title: "大理岩峽谷", giver: "taroko_ranger", map: "M29", kind: "help",
+    goal: "在峽谷口聽解說員說大理岩峽谷怎麼來的：答對 2 題自然。",
+    log_next: "海邊的漁夫說：海上有一隻雲做的大鯨魚！",
+    subject: "自然", units: ["二、千變萬化的水"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_HL_1"], reward: { exp: 267, gold: 200, item: null, light: null },
+    dialog_start: "D_HL_2A", dialog_end: "D_HL_2B"
+  },
+  Q_HL_3: {
+    title: "東霧將：雲鯨霧將", giver: "fisher_hl", map: "M29", kind: "boss",
+    goal: "海上的雲鯨霧將把霧吹進山谷，讓它清醒。",
+    log_next: "拿到東之曙光碎片（4／4）！四片碎片會指向哪裡呢？往西進中橫公路。",
+    subject: "混合", subjects: ["自然", "英語"], units: ["二、磁鐵好好玩", "一、植物大發現", "三、風與空氣", "四、奇妙的溶解", "一、快樂小農夫", "二、千變萬化的水", "三、天氣停看聽", "四、動物王國", "Lesson 2 How old are you?（數字）", "Lesson 1 What's your name?（名字）", "Lesson 4 Are you tired?（感覺）", "Lesson 3 I'm short.（身材外貌）", "Lesson 1 Stationery（文具用品）", "Lesson 2 Colors（顏色）", "Review 1 Fun Things（有趣的事物）", "Lesson 3 Animal（動物）", "Lesson 4 Things you can do（能力）", "Get Ready（開學預備）"], count: null, level_range: [2, 4],
+    boss: "wxb_whale", boss_map: "M29",
+    hunt: null, requires: ["Q_HL_2"], reward: { exp: 267, gold: 200, item: null, light: null }, chapter_end: 8,
+    dialog_start: "D_HL_3A", dialog_end: "D_HL_3B"
+  },
+  Q_HL_4: {
+    title: "山路要照時間走", giver: "road_engineer", map: "M29", kind: "help", side: true,
+    goal: "工程員說進山要照公告的時間走，幫他算一算時間：答對 2 題數學。",
+    log_next: "工程員說：進太魯閣前，先查公路和步道有沒有開放。",
+    subject: "數學", units: ["7 時間"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_HL_1"], reward: { exp: 267, gold: 200, item: null, light: null },
+    dialog_start: "D_HL_4A", dialog_end: "D_HL_4B"
+  },
+  Q_HL_5: {
+    title: "石頭的故鄉", giver: "stone_carver", map: "M29", kind: "help", side: true,
+    goal: "聽石雕師傅說花蓮的石頭：答對 2 題社會。",
+    log_next: "師傅說：石頭要一點一點，慢慢雕。",
+    subject: "社會", units: ["第三單元 生活中的各行各業"], count: 2, level_range: [2, 3],
+    hunt: null, requires: ["Q_HL_1"], reward: { exp: 267, gold: 200, item: null, light: null },
+    dialog_start: "D_HL_5A", dialog_end: "D_HL_5B"
+  },
+  // ═════════════════════ v4.0 東部委託 END（wip_v40/v40_apply.js 每次照表整段重建）═════════════════════
 };

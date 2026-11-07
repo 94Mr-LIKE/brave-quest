@@ -189,7 +189,29 @@ window.VOICES = {
     inn_liuqiu: { name: "島上民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.62, rate: 1.13, taigi: true, persona: "島上民宿老闆，親切。", voice_share: "inn_beitou" },
     inn_kenting: { name: "墾丁旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.68, rate: 1.2, taigi: true, persona: "墾丁旅店老闆，說話輕快。", voice_share: "inn_xinyi" },
     pib_ship: { name: "霧帆號", gender: "m", age: "adult", stage: "中年", look: "boss_pib_ship", pitch: 0.54, rate: 1.24, taigi: false, persona: "笑嘻嘻的霧做的帆船，講話又快又調皮，清醒後變得溫和。" },
-    pib_anchor: { name: "錨錨大副", gender: "m", age: "adult", stage: "中年", look: "mon_pib_anchor", pitch: 0.52, rate: 0.92, taigi: false, persona: "很努力但很迷糊的大船錨，講話慢吞吞、喘吁吁。" }
+    pib_anchor: { name: "錨錨大副", gender: "m", age: "adult", stage: "中年", look: "mon_pib_anchor", pitch: 0.52, rate: 0.92, taigi: false, persona: "很努力但很迷糊的大船錨，講話慢吞吞、喘吁吁。" },
+    // v4.0 東部（劇本語音組 dialogs_east.js 的 VOICES_EAST；男性聲音排不下的用 voice_share）
+    ruins_guide: { name: "遺址公園解說員", gender: "m", age: "adult", stage: "青年", look: "npc_ruins_guide", pitch: 0.89, rate: 0.76, taigi: true, persona: "遺址公園的年輕解說員，講話仔細。", voice_share: "museum_guide" },
+    balloon_captain: { name: "熱氣球隊長", gender: "m", age: "adult", stage: "中年", look: "npc_balloon_captain", pitch: 0.69, rate: 0.92, taigi: true, persona: "熱氣球隊長，聲音宏亮、很懂風。", voice_share: "harbor_uncle" },
+    fob_balloon: { name: "霧氣球大王", gender: "m", age: "adult", stage: "中年", look: "boss_fob_balloon", pitch: 0.79, rate: 0.89, taigi: false, persona: "鼓鼓的、慢吞吞的聲音，清醒後變得輕快。" },
+    custard_farmer: { name: "釋迦農", gender: "m", age: "elder", stage: "老年", look: "npc_custard_farmer", pitch: 0.76, rate: 0.95, taigi: true, persona: "種釋迦的老農夫，講話慢慢的。", voice_share: "potato_seller" },
+    ticket_seller_fg: { name: "富岡漁港售票員", gender: "m", age: "adult", stage: "青年", look: "npc_ticket_seller_fg", pitch: 0.93, rate: 0.95, taigi: true, persona: "富岡漁港的年輕售票員，講話俐落。" },
+    inn_taitung: { name: "縱谷民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.82, rate: 1.1, taigi: true, persona: "縱谷民宿老闆，親切。", voice_share: "stall_keeper" },
+    lighthouse_guide_gi: { name: "燈塔解說員", gender: "m", age: "adult", stage: "中年", look: "npc_lighthouse_guide_gi", pitch: 0.86, rate: 0.9, taigi: true, persona: "綠島燈塔的解說員，愛講燈塔的故事。", voice_share: "hiker" },
+    onsen_keeper_gi: { name: "溫泉管理員", gender: "m", age: "adult", stage: "中年", look: "npc_onsen_keeper_gi", pitch: 0.75, rate: 0.97, taigi: true, persona: "朝日溫泉的管理員，很注意安全。", voice_share: "fisher" },
+    oldhouse_gi: { name: "古厝阿伯", gender: "m", age: "elder", stage: "老年", look: "npc_oldhouse_gi", pitch: 0.82, rate: 0.75, taigi: true, persona: "住在古厝村落的老阿伯，講話溫和。", voice_share: "seaweed_uncle" },
+    ice_shop_gi: { name: "冰店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_ice_shop_gi", pitch: 0.8, rate: 0.84, taigi: true, persona: "綠島冰店老闆，熱情。", voice_share: "bus_driver" },
+    inn_greenisland: { name: "綠島民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.78, rate: 0.75, taigi: true, persona: "綠島民宿老闆，親切。", voice_share: "coldspring_keeper" },
+    tao_guide: { name: "蘭嶼文化解說員", gender: "m", age: "adult", stage: "中年", look: "npc_tao_guide", pitch: 0.74, rate: 1.19, taigi: false, persona: "蘭嶼的達悟族文化解說員，講華語，說話溫和清楚。", voice_share: "sa_fisher" },
+    inn_lanyu: { name: "蘭嶼民宿老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.78, rate: 0.69, taigi: false, persona: "蘭嶼民宿老闆，講華語，親切。", voice_share: "geo_ranger" },
+    station_hl: { name: "車站服務員", gender: "m", age: "adult", stage: "青年", look: "npc_station_hl", pitch: 0.97, rate: 1.06, taigi: true, persona: "花蓮站的年輕服務員，講話有精神。", voice_share: "shopkeeper" },
+    taroko_ranger: { name: "國家公園解說員", gender: "m", age: "adult", stage: "青年", look: "npc_taroko_ranger", pitch: 0.99, rate: 0.88, taigi: true, persona: "國家公園的年輕解說員，講地形很清楚。", voice_share: "rice_guide" },
+    fisher_hl: { name: "海邊的漁夫", gender: "m", age: "elder", stage: "老年", look: "npc_fisher_hl", pitch: 0.84, rate: 0.92, taigi: true, persona: "花蓮海邊的老漁夫，聲音沙沙的。", voice_share: "bookstore" },
+    wxb_whale: { name: "雲鯨霧將", gender: "m", age: "adult", stage: "中年", look: "boss_wxb_whale", pitch: 0.83, rate: 0.7, taigi: false, persona: "低低的、悠長的聲音，清醒後變得溫和。" },
+    road_engineer: { name: "公路工程員", gender: "m", age: "adult", stage: "中年", look: "npc_road_engineer", pitch: 0.68, rate: 1.02, taigi: true, persona: "公路工程員，一直提醒安全。", voice_share: "innkeeper" },
+    stone_carver: { name: "石雕師傅", gender: "m", age: "elder", stage: "老年", look: "npc_stone_carver", pitch: 0.66, rate: 0.76, taigi: true, persona: "做石雕幾十年的老師傅，講話穩重。", voice_share: "calla_farmer" },
+    mochi_shop: { name: "麻糬店老闆", gender: "m", age: "adult", stage: "中年", look: "npc_mochi_shop", pitch: 0.74, rate: 0.82, taigi: true, persona: "麻糬店老闆，愛招呼客人。", voice_share: "inn_shenmu" },
+    inn_hualien: { name: "海岸旅店老闆", gender: "m", age: "adult", stage: "中年", look: null, pitch: 0.8, rate: 0.94, taigi: true, persona: "海岸旅店老闆，說話輕快。", voice_share: "inn_moon" }
   },
 
   // 主角男女（目前沒有台詞，預留）
@@ -286,6 +308,13 @@ window.VOICES = {
     pi_parrot: { family: "bird", size: "s", mood: "頑皮", pitch_shift: 8, cry: "喳喳！看到了！" },
     pi_octo: { family: "aquatic", size: "m", mood: "迷糊", pitch_shift: -2, cry: "咕嚕嚕……" },
     wx_wave: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 5, cry: "嘩啦——" },
-    pib_ship: { family: "spirit", size: "boss", mood: "頑皮", pitch_shift: -6, cry: "嘿呦——升帆！" }
+    pib_ship: { family: "spirit", size: "boss", mood: "頑皮", pitch_shift: -6, cry: "嘿呦——升帆！" },
+    // v4.0 東部新怪物（劇本語音組 VOICES_EAST.monsters）
+    wx_rain_e: { family: "slime", size: "s", mood: "迷糊", pitch_shift: 6, cry: "滴滴答答……" },
+    wx_rainbow: { family: "spirit", size: "s", mood: "頑皮", pitch_shift: 7, cry: "咻——啦啦！" },
+    wx_wave_e: { family: "slime", size: "m", mood: "暴躁", pitch_shift: 2, cry: "嘩啦——！" },
+    an_macaque: { family: "beast", size: "s", mood: "頑皮", pitch_shift: 6, cry: "吱吱吱！" },
+    fob_balloon: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -7, cry: "呼嚕嚕……" },
+    wxb_whale: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -9, cry: "噗——呼——" }
   }
 };

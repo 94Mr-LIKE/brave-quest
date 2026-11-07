@@ -60,8 +60,14 @@
     'M08,M23': ['高雄'],
     'M14,M50,M51,M49': ['宜蘭', '蘭陽', '羅東', '冬山'],
     'M12,M13,M53,M54': ['台北', '臺北'],
+    // v4.0 東部（M26–M29；wip_v40/v40_apply.js，地名照考題設計師 交接_東部補題.md 第二節）
+    M26: ['卑南', '鹿野', '縱谷', '知本', '池上', '三仙台', '小野柳'],
+    M27: ['綠島'],
+    M28: ['蘭嶼', '達悟', '拼板舟'],
+    M29: ['花蓮', '太魯閣', '林田山', '七星潭', '清水斷崖', '燕子口'],
+    'M26,M27,M28': ['台東', '臺東'],
     // 遊戲裡沒有的地方（永遠算外地）
-    OTHER: ['花蓮', '台東', '臺東', '南投', '澎湖', '金門', '馬祖', '日月潭', '太魯閣', '玉山', '淡水', '綠島', '蘭嶼']
+    OTHER: ['南投', '澎湖', '金門', '馬祖', '日月潭', '玉山', '淡水']
   };
   /** 奇幻情境：這些詞（或這些角色當主詞、說話者）＝fantasy，只在奇幻地圖抽 */
   var FANTASY_WORDS = ['地精', '精靈', '獸人', '哥布林', '魔法', '魔王', '咒語', '巫師'];
@@ -177,12 +183,19 @@
     var intro = k === 'home' ? (npcName ? npcName + '：「' + line + '」' : line) : '';   // 委託人說的過場句
     return { text: t, intro: intro };
   }
+  /** v4.0（wip_v40/v40_apply.js；夜班審 v3.0.1 建議②、實玩觀察 O-2）：同一次幫忙連出好幾題家鄉題時，過場句只在第一題家鄉題講。
+   *  memo＝這一次幫忙的紀錄 { q: 講過過場句的題目 id }；同一題（答錯重出）照樣講，換一題就拿掉 intro */
+  function introOnce(view, qid, memo) {
+    if (!view || !view.intro || !memo) return view;
+    if (memo.q === undefined || memo.q === null) memo.q = qid;
+    return memo.q === qid ? view : { text: view.text, intro: '' };
+  }
   /** 委託的嚴格題池下限（遊戲設計師第 2 輪拍板前先用 max(15, 5×題數)）：need＝這一科要答的題數 */
   function minStrict(need) { return Math.max(15, 5 * (need || 1)); }
 
   var SceneFit = {
     HOME_MAP: HOME_MAP, PLACES: PLACES, FANTASY_WORDS: FANTASY_WORDS, FANTASY_SPEAKERS: FANTASY_SPEAKERS, FANTASY_MAPS: FANTASY_MAPS, DEFAULT_HOME_INTRO: DEFAULT_HOME_INTRO, MAP_ID_RE: MAP_ID_RE,
-    scan: scan, scopeOf: scopeOf, fitKind: fitKind, isChest: isChest, helpSubject: helpSubject, needBySubject: needBySubject,
+    introOnce: introOnce, scan: scan, scopeOf: scopeOf, fitKind: fitKind, isChest: isChest, helpSubject: helpSubject, needBySubject: needBySubject,
     baseFits: baseFits, looseFits: looseFits, strictFits: strictFits, pools: pools, helpFilter: helpFilter, sceneView: sceneView, minStrict: minStrict
   };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.SceneFit = SceneFit; }

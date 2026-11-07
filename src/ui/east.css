@@ -1,0 +1,25 @@
+/* v4.0 東部終章（fx/east_fx.js）：洞窟的找路／機關按鈕、借書台密碼盤、疊石盤。
+ * 原則同 style.css：字級 ≥ 20px（小標籤 16px 以上）、按鈕 ≥ 44×44px、對比足夠；沒有動畫（不用另外處理減少動態效果）。 */
+
+/* 洞窟沒有小地圖（no_minimap）：右上角原本是小地圖的位置，改放「🌫️ 沒有地圖」的小圖示和找路、提示、重來按鈕 */
+#hud .east-tools { position: absolute; right: max(8px, env(safe-area-inset-right)); top: 60px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: auto; }
+#hud .east-tools[hidden] { display: none !important; }
+#hud .east-tools .east-nomap { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border-radius: 8px;
+  background: rgba(11, 18, 54, .75); font-size: 24px; line-height: 1; }
+#hud .east-tools .east-btn { min-height: 44px; padding: 4px 12px; font-size: 20px; white-space: nowrap; }
+@media (max-height: 460px) { #hud .east-tools { top: 52px; } #hud .east-tools .east-btn { font-size: 18px; } }
+@media (orientation: portrait) and (max-width: 680px) { #hud .east-tools { top: calc(100% + 4px); } }
+
+/* 借書台密碼盤（P3-3）、疊石盤（P4-3） */
+.east-panel .east-eqs { display: flex; flex-direction: column; gap: 2px; margin: 8px 0; }
+.east-panel .east-eq { margin: 0; font-size: 26px; letter-spacing: 2px; color: var(--accent); }
+.east-panel .east-dial { display: grid; grid-template-columns: repeat(5, minmax(48px, 1fr)); gap: 8px; margin: 10px 0; }
+.east-panel .east-dial button { font-size: 24px; padding: 6px; }
+.east-panel .east-feedback { min-height: 1.6em; color: var(--muted); }
+.east-panel .east-pegs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 10px 0; }
+.east-panel .east-peg { display: flex; flex-direction: column-reverse; align-items: center; justify-content: flex-start; gap: 4px; min-height: 160px; padding: 8px 4px; }
+.east-panel .east-peg-name { font-size: 18px; color: var(--muted); margin-top: 6px; }
+.east-panel .east-disc { display: block; height: 26px; line-height: 26px; border-radius: 6px; border: 2px solid #2a1e22; color: #2a1e22; font-size: 16px; font-weight: bold; text-align: center; }
+.east-panel .east-disc-0 { width: 40%; background: #e0b040; }
+.east-panel .east-disc-1 { width: 65%; background: #c8cfdc; }
+.east-panel .east-disc-2 { width: 90%; background: #c79a6e; }

@@ -76,6 +76,18 @@ window.ART = {
   "M25": {
    "bg": "bg_M25.webp"
   },
+  "M26": {
+   "bg": "bg_M26.webp"
+  },
+  "M27": {
+   "bg": "bg_M27.webp"
+  },
+  "M28": {
+   "bg": "bg_M28.webp"
+  },
+  "M29": {
+   "bg": "bg_M29.webp"
+  },
   "M46": {
    "bg": "bg_M46.webp"
   },
@@ -108,13 +120,16 @@ window.ART = {
   }
  },
  "battle": {
+  "alpine": "bb_alpine.png",
   "anping": "bb_anping.png",
   "badlands": "bb_badlands.png",
   "castle": "bb_castle.png",
   "cave": "bb_cave.png",
   "city": "bb_city.png",
+  "cloudsea": "bb_cloudsea.png",
   "coast": "bb_coast.png",
   "coldspring": "bb_coldspring.png",
+  "fogcave": "bb_fogcave.png",
   "forest": "bb_forest.png",
   "grass": "bb_grass.png",
   "harbor": "bb_harbor.png",
@@ -123,11 +138,13 @@ window.ART = {
   "levee": "bb_levee.png",
   "mine": "bb_mine.png",
   "pacific": "bb_pacific.png",
+  "pacific_east": "bb_pacific_east.png",
   "paddy": "bb_paddy.png",
   "pineapple": "bb_pineapple.png",
   "railway": "bb_railway.png",
   "reservoir": "bb_reservoir.png",
   "rushfield": "bb_rushfield.png",
+  "summit": "bb_summit.png",
   "swamp": "bb_swamp.png",
   "taijiang": "bb_taijiang.png",
   "tea": "bb_tea.png",

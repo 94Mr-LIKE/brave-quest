@@ -40,6 +40,8 @@
     [/^ml_signal$|^mb_train$/, 'armor'], [/^ml_berry$|^dj_rush$/, 'plant'], [/^an_egret$/, 'bird'], [/^dj_taro$/, 'slime'], [/^gh_umbrella$|^gh_geta$|^gh_lantern$|^mb_lantern$/, 'spirit'], [/^gh_civet$/, 'beast'],
     // v3.0 南部（和 voices.js 一致）：plant＝al_cypress、ds_lychee；spirit＝al_cloud、wx_wave、pib_ship；aquatic＝pi_hermit、pi_milkfish、pi_crab、pi_octo；armor＝pi_anchor、pib_anchor；rock＝mm_mudstone；beast＝ds_pineapple；bird＝pi_parrot
     [/^al_cypress$|^ds_lychee$/, 'plant'], [/^al_cloud$|^wx_wave$|^pib_ship$/, 'spirit'], [/^pi_hermit$|^pi_milkfish$|^pi_crab$|^pi_octo$/, 'aquatic'], [/^pi_anchor$|^pib_anchor$/, 'armor'], [/^mm_mudstone$/, 'rock'], [/^ds_pineapple$/, 'beast'], [/^pi_parrot$/, 'bird'],
+    // v4.0 東部（和 voices.js 一致）：slime＝wx_rain_e、wx_wave_e；spirit＝wx_rainbow、fob_balloon、wxb_whale；beast＝an_macaque
+    [/^wx_rain_e$|^wx_wave_e$/, 'slime'], [/^wx_rainbow$|^fob_balloon$|^wxb_whale$/, 'spirit'], [/^an_macaque$/, 'beast'],
     // v1.2 第二章（和 voices.js 一致）：虎紋霧獸＝野獸、金棗彈彈＝史萊姆、蔥稈草甲獸＝植物、冷泉氣泡精與黏黏雨雲王＝精靈、鯖鯖跳刀魚＝水生
     [/^ly_tigerwind$/, 'beast'], [/^ly_kumquat$/, 'slime'], [/^ly_scallion$/, 'plant'], [/^ly_bubble$|^wxb_raincloud$/, 'spirit'], [/^ly_mackerel$/, 'aquatic'],
     [/^wx_rain$|^mn_dust$|^mn_lamp$/, 'spirit'], [/^mn_cart$/, 'armor'], [/^mn_ore$|^mnb_goldjaw$/, 'rock'], [/^mn_drill$|^mn_timber$/, 'beast'],

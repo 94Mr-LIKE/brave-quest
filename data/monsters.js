@@ -467,6 +467,53 @@ window.MONSTERS = {
     wake: "霧閘機將清醒了，水門打開，清水流向田野。"
   },
 
+  // ── v4.0 東部（71 號 7.3；wip_v40/v40_apply.js）BEGIN：台東（M26）縱谷滴滴雨精、彎彎彩虹，台東頭目霧氣球大王；花蓮（M29）東海岸浪花花、搶搶獼猴，東霧將雲鯨霧將 ──
+  // exp、gold＝新經濟規則（V40_ECON.MON_PL；頭目 ×10）；hp、atk 照 71 號 7.3。K3-A 強化版（wx_rain_e、wx_wave_e）用程式改色的圖（art_src\v1\east\processed\recolor）
+  wx_rain_e: {
+    name: "縱谷滴滴雨精", sprite: "mon_wx_rain_e", level: 5, hp: 490, atk: 77, subject: "自然", q_levels: [2, 3],
+    exp: 165, gold: 50, drops: [{ item: "umbrella", rate: 0.3 }], boss: false,
+    desc: "淡青綠色的大雨滴，撐著茶葉當傘。霧讓它在縱谷亂下雨。",
+    wake: "縱谷滴滴雨精清醒了，化成一陣小雨，落進縱谷的田裡。"
+  },
+  wx_rainbow: {
+    name: "彎彎彩虹", sprite: "mon_wx_rainbow", level: 5, hp: 500, atk: 79, subject: "英語", q_levels: [2, 3],
+    exp: 175, gold: 50, drops: [{ item: "rainbow_ribbon", rate: 0.4 }], boss: false,
+    desc: "兩端踩著白雲的小彩虹，霧讓它把顏色排亂了。",
+    wake: "彎彎彩虹清醒了，七種顏色排好，掛回天上。"
+  },
+  wx_wave_e: {
+    name: "東海岸浪花花", sprite: "mon_wx_wave_e", level: 5, hp: 520, atk: 85, subject: "自然", q_levels: [2, 3],
+    exp: 195, gold: 55, drops: [{ item: "sea_glass", rate: 0.3 }], boss: false,
+    desc: "深藍色的浪花，泡沫頭髮閃著金光。霧讓它一直往岸上衝。",
+    wake: "東海岸浪花花清醒了，變回小小的浪，回到太平洋。"
+  },
+  an_macaque: {
+    name: "搶搶獼猴", sprite: "mon_an_macaque", level: 5, hp: 540, atk: 86, subject: "國語", q_levels: [2, 3],
+    exp: 210, gold: 60, drops: [{ item: "herb", rate: 0.3 }], boss: false,
+    dialog_after_once: "D_MACAQUE_AFTER",   // 清醒後第一次播一次旁白（71 號 4.11：野生的猴子不要餵）
+    desc: "毛蓬蓬的灰褐色小猴子，抱著搶來的便當盒，蹲低身子盯著你。",
+    wake: "搶搶獼猴清醒了，把便當還給你，跳回樹林。"
+  },
+  fob_balloon: {
+    name: "台東頭目：霧氣球大王", sprite: "boss_fob_balloon", level: 5, hp: 2270, atk: 72, subject: "混合",
+    subjects: ["自然", "數學"], q_levels: [2, 4],
+    exp: 1850, gold: 550, drops: [{ item: "balloon_knot", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["wx_rain_e", "wx_rainbow"], battle_bg: "grass",
+    dialog_before: "D_BOSS_BALLOON_A", dialog_after: "D_BOSS_BALLOON_B",
+    desc: "台東的頭目。巨大的灰色霧氣球擋住高台的天空，球裡的霧慢慢旋轉。",
+    wake: "霧氣球大王清醒了，霧全部散掉，變回一顆彩色熱氣球。"
+  },
+  wxb_whale: {
+    name: "東霧將：雲鯨霧將", sprite: "boss_wxb_whale", level: 5, hp: 2410, atk: 79, subject: "混合",
+    subjects: ["自然", "英語"], q_levels: [2, 4],
+    exp: 2200, gold: 600, drops: [{ item: "dawn_shard_e", rate: 1 }], boss: true,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["wx_wave_e", "an_macaque"], battle_bg: "pacific_east",
+    dialog_before: "D_BOSS_WHALE_A", dialog_after: "D_BOSS_WHALE_B",
+    desc: "東霧將。白雲和灰霧組成的大鯨魚，在海上的天空游，把霧吹進山谷。",
+    wake: "雲鯨霧將清醒了，變成一朵大白雲，慢慢游向太平洋。"
+  },
+  // ── v4.0 東部 END ──
+
   // ── v3.0 南部（70 號 3.2；71 號 7.2；wip_v30_draft/v30_apply.js）：阿里山系（M04）、海盜系（M21、M22、M25）、月世界系（M08）、大樹系（M23）、風雲系（M25）；精英錨錨大副；屏東頭目霧帆號 ──
   // exp、gold＝新經濟規則（70 號 3.2 的建議 PL；頭目 ×10、精英 ×3）；Z9、Z10 的 hp、atk 照 71 號 7.2（和每區一件新裝備同一版）。錨錨大副是精英（elite，不是頭目）：只在 Q_AP_4 進行中出現
   // 27 號的戰鬥演出（升帆叫出小海盜、轉舵換科目、燈塔照到時防禦下降等）只做演出、不改數值（還沒做）

@@ -1350,7 +1350,9 @@
       }
       this.player.anims.stop();
       g.exitLockedLog = (g.exitLockedLog || []).concat([ex.requires]);   // 測試用
-      g.say(ex.requires_dialog || null, [{ who: 'pet', text: '這條路現在還不能走喔。' }]);
+      var dlg = ex.requires_dialog || null;
+      if (ex.requires_dialogs) [].concat(ex.requires).some(function (q) { var rr = g.state.quests[q]; if (ex.requires_dialogs[q] && !(rr && rr.status === 'done')) { dlg = ex.requires_dialogs[q]; return true; } return false; });   // v4.0 東部（71 號 4.2：M26 北口頭目沒過／島還沒去完各一句）
+      g.say(dlg, [{ who: 'pet', text: '這條路現在還不能走喔。' }]);
     }
 
     // ---------------------------------------------------------------- 互動

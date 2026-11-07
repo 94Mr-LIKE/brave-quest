@@ -2033,5 +2033,209 @@ window.SPRITES = {
   "type": "icon",
   "frameW": 35,
   "frameH": 32
+ },
+ "mon_wx_rain_e": {
+  "file": "assets/monsters/mon_wx_rain_e.png",
+  "type": "single",
+  "frameW": 107,
+  "frameH": 96
+ },
+ "mon_wx_rainbow": {
+  "file": "assets/monsters/mon_wx_rainbow.png",
+  "type": "single",
+  "frameW": 115,
+  "frameH": 96
+ },
+ "mon_wx_wave_e": {
+  "file": "assets/monsters/mon_wx_wave_e.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "mon_an_macaque": {
+  "file": "assets/monsters/mon_an_macaque.png",
+  "type": "single",
+  "frameW": 103,
+  "frameH": 96
+ },
+ "boss_fob_balloon": {
+  "file": "assets/monsters/boss_fob_balloon.png",
+  "type": "single",
+  "frameW": 161,
+  "frameH": 160
+ },
+ "boss_wxb_whale": {
+  "file": "assets/monsters/boss_wxb_whale.png",
+  "type": "single",
+  "frameW": 164,
+  "frameH": 160
+ },
+ "npc_ruins_guide": {
+  "file": "assets/npcs/npc_ruins_guide.png",
+  "type": "single",
+  "frameW": 45,
+  "frameH": 50
+ },
+ "npc_balloon_captain": {
+  "file": "assets/npcs/npc_balloon_captain.png",
+  "type": "single",
+  "frameW": 43,
+  "frameH": 50
+ },
+ "npc_custard_farmer": {
+  "file": "assets/npcs/npc_custard_farmer.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
+ "npc_ticket_seller_fg": {
+  "file": "assets/npcs/npc_ticket_seller_fg.png",
+  "type": "single",
+  "frameW": 42,
+  "frameH": 50
+ },
+ "npc_lighthouse_guide_gi": {
+  "file": "assets/npcs/npc_lighthouse_guide_gi.png",
+  "type": "single",
+  "frameW": 41,
+  "frameH": 50
+ },
+ "npc_onsen_keeper_gi": {
+  "file": "assets/npcs/npc_onsen_keeper_gi.png",
+  "type": "single",
+  "frameW": 33,
+  "frameH": 50
+ },
+ "npc_oldhouse_gi": {
+  "file": "assets/npcs/npc_oldhouse_gi.png",
+  "type": "single",
+  "frameW": 30,
+  "frameH": 50
+ },
+ "npc_ice_shop_gi": {
+  "file": "assets/npcs/npc_ice_shop_gi.png",
+  "type": "single",
+  "frameW": 26,
+  "frameH": 50
+ },
+ "npc_tao_guide": {
+  "file": "assets/npcs/npc_tao_guide.png",
+  "type": "single",
+  "frameW": 34,
+  "frameH": 50
+ },
+ "npc_station_hl": {
+  "file": "assets/npcs/npc_station_hl.png",
+  "type": "single",
+  "frameW": 43,
+  "frameH": 50
+ },
+ "npc_taroko_ranger": {
+  "file": "assets/npcs/npc_taroko_ranger.png",
+  "type": "single",
+  "frameW": 32,
+  "frameH": 50
+ },
+ "npc_fisher_hl": {
+  "file": "assets/npcs/npc_fisher_hl.png",
+  "type": "single",
+  "frameW": 36,
+  "frameH": 50
+ },
+ "npc_road_engineer": {
+  "file": "assets/npcs/npc_road_engineer.png",
+  "type": "single",
+  "frameW": 35,
+  "frameH": 50
+ },
+ "npc_stone_carver": {
+  "file": "assets/npcs/npc_stone_carver.png",
+  "type": "single",
+  "frameW": 34,
+  "frameH": 50
+ },
+ "npc_mochi_shop": {
+  "file": "assets/npcs/npc_mochi_shop.png",
+  "type": "single",
+  "frameW": 32,
+  "frameH": 50
+ },
+ "npc_inn_taitung_m": {
+  "file": "assets/npcs/npc_inn_taitung_m.png",
+  "type": "single",
+  "frameW": 32,
+  "frameH": 50
+ },
+ "npc_inn_greenisland_m": {
+  "file": "assets/npcs/npc_inn_greenisland_m.png",
+  "type": "single",
+  "frameW": 33,
+  "frameH": 50
+ },
+ "npc_inn_lanyu_m": {
+  "file": "assets/npcs/npc_inn_lanyu_m.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
+ "npc_inn_hualien_m": {
+  "file": "assets/npcs/npc_inn_hualien_m.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "item_rainbow_ribbon": {
+  "file": "assets/items/item_rainbow_ribbon.png",
+  "type": "icon",
+  "frameW": 41,
+  "frameH": 32
+ },
+ "item_balloon_knot": {
+  "file": "assets/items/item_balloon_knot.png",
+  "type": "icon",
+  "frameW": 38,
+  "frameH": 32
+ },
+ "item_dawn_shard_e": {
+  "file": "assets/items/item_dawn_shard_e.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
+ "item_ferry_ticket_gi": {
+  "file": "assets/items/item_ferry_ticket_gi.png",
+  "type": "icon",
+  "frameW": 44,
+  "frameH": 32
+ },
+ "item_ferry_ticket_ly": {
+  "file": "assets/items/item_ferry_ticket_ly.png",
+  "type": "icon",
+  "frameW": 35,
+  "frameH": 32
+ },
+ "item_seaweed_ice": {
+  "file": "assets/items/item_seaweed_ice.png",
+  "type": "icon",
+  "frameW": 29,
+  "frameH": 32
+ },
+ "item_mochi": {
+  "file": "assets/items/item_mochi.png",
+  "type": "icon",
+  "frameW": 43,
+  "frameH": 32
+ },
+ "item_gear_z11_cloak": {
+  "file": "assets/items/item_gear_z11_cloak.png",
+  "type": "icon",
+  "frameW": 42,
+  "frameH": 32
+ },
+ "item_gear_z12_marble": {
+  "file": "assets/items/item_gear_z12_marble.png",
+  "type": "icon",
+  "frameW": 34,
+  "frameH": 32
  }
 };

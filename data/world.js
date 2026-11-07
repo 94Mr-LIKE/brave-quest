@@ -62,6 +62,8 @@ window.WORLD = {
     { id: "R_ANPING", name: "安平海港", real_ref: "臺南市安平區（安平古堡、億載金城、劍獅）", map_entry: "M21", tx: 85, ty: 24, x: 0.08, y: 0.676, unlock_quest: null, unlock_visit: "M21" },
     { id: "R_TAIJIANG", name: "鹿耳門台江", real_ref: "臺南市安南區（正統鹿耳門聖母廟、台江國家公園）", map_entry: "M22", tx: 88, ty: 43, x: 0.064, y: 0.657, unlock_quest: null, unlock_visit: "M22" },
     { id: "R_DASHU", name: "大樹鳳梨山", real_ref: "高雄市大樹區（高屏舊鐵橋、鳳梨荔枝、佛光山）", map_entry: "M23", tx: 6, ty: 48, x: 0.223, y: 0.751, unlock_quest: null, unlock_visit: "M23" },
-    { id: "R_PINGTUNG", name: "屏東恆春半島", real_ref: "屏東縣（東港碼頭、恆春古城、鵝鑾鼻燈塔）", map_entry: "M25", tx: 24, ty: 14, x: 0.35, y: 0.912, unlock_quest: null, unlock_visit: "M25" }
+    { id: "R_PINGTUNG", name: "屏東恆春半島", real_ref: "屏東縣（東港碼頭、恆春古城、鵝鑾鼻燈塔）", map_entry: "M25", tx: 24, ty: 14, x: 0.35, y: 0.912, unlock_quest: null, unlock_visit: "M25" },
+    { id: "R_TAITUNG", name: "台東縱谷海港", real_ref: "臺東縣（卑南遺址公園、鹿野高台、富岡漁港）", map_entry: "M26", tx: 10, ty: 43, x: 0.56, y: 0.738, unlock_quest: null, unlock_visit: "M26" },
+    { id: "R_HUALIEN", name: "花蓮太魯閣口", real_ref: "花蓮縣（太魯閣峽谷口、花蓮石雕、太平洋海岸）", map_entry: "M29", tx: 46, ty: 42, x: 0.81, y: 0.335, unlock_quest: null, unlock_visit: "M29" }
   ]
 };

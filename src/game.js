@@ -844,6 +844,7 @@
 
   G.talkTo = function (npc, scene, opts) {
     if (G.blocked()) return;
+    if (npc.ferry && npc.ferry.ids && npc.ferry.ids.length > 1 && J.FerryUI && !npc.__ferryPicked) return G.pickFerryRoute(npc, scene);   // v4.0 東部：富岡漁港售票員賣綠島、蘭嶼兩條航線
     if (npc.ferry && J.FerryUI) return J.FerryUI.interact(G, npc, scene);   // v3.0 船班（codex3）：東港碼頭售票員買票、上船
     opts = opts || {};
     var map = scene.map, st = G.state, Q = G.data.quests;
@@ -998,6 +999,7 @@
       // v3.0（70 號 4.4）拿到自然、社會之光：遠方的金包里自動點燈（QuestLog.complete 已點）；Q_LE_3 霧帆號逃走的過場（q.cutscene）
       if (q.lamp_auto && r.reward.light) { if (scene && scene.updateLamps) scene.updateLamps(); return G.say('D_LAMP_AUTO', [{ who: 'narrator', text: '遠方的金包里，一盞燈亮了。' }]); }
     }).then(function () {
+      if (q.cutscene && Array.isArray(q.cutscene_when) && !q.cutscene_when.every(function (k) { var rr = G.state.quests[k]; return rr && rr.status === 'done'; })) return;   // v4.0 東部：兩座島都做完才播 D_ISLANDS_DONE
       if (q.cutscene) { G.cutsceneLog = (G.cutsceneLog || []).concat([q.cutscene]); return G.say(q.cutscene, []); }   // 測試用 cutsceneLog
     }).then(function () {
       if (q.chapter_end) return G.chapterEnd(q.chapter_end);
@@ -1028,6 +1030,7 @@
     // generic／本地圖／家鄉（外地、不在奇幻地圖的奇幻題不抽）；某一科第一層少於要答的題數才退回第二層（舊規則＋不是寶箱題）。noFallback：不再落到「整科都抽」
     var helpMap = q.map || (scene && scene.mapId), fit = J.SceneFit.helpFilter(G.questions, q, helpMap);
     if (fit.fallback.length && typeof console !== 'undefined') console.warn('[委託情境] ' + id + '：' + fit.fallback.map(function (s) { return s + ' 嚴格題池 ' + fit.pools[s].strict.length + ' 題'; }).join('、') + '，比要答的題數少，退回寬鬆（照樣不抽寶箱題）');
+    var homeMemo = { q: null };   // v4.0（夜班 v3.0.1 建議②）：這一次幫忙講過家鄉題過場句的題目
     var sess = J.Session.create(st, G.questions, J.QuestLog.helpSubject(q, 0), {
       mode: 'free', noPay: true,   // v2.0 新經濟（67 號第二節第 5 項）：答題不給經驗值和金幣，完成委託時一次給
       filter: fit.filter, noFallback: true   // v2.2.1b：scenefit.js（單元、難度、skip_scene 的舊規則也在裡面：SceneFit.baseFits）；noFallback＝篩完沒題不退回整科
@@ -1042,6 +1045,7 @@
         session: sess, mode: 'help', state: st, title: q.title, subtitle: '幫忙 ' + (prog + 1) + '/' + J.QuestLog.helpCount(q) + '・' + G.speaker(npc.id).name,
         speaker: G.speaker(npc.id).name,   // 題目情境的說話者換成委託人（不改題庫）
         sceneView: function (x) { return J.SceneFit.sceneView(x, helpMap, G.speaker(npc.id).name, q, J.DialogText); },   // v2.2.1b：generic 才換說話者；家鄉題在金包里以外先說過場句
+        sceneOnce: homeMemo,   // v4.0（夜班 v3.0.1 建議②）：家鄉題過場句同一次幫忙只講一次（quiz.js 套 SceneFit.introOnce）
         onSave: function () { G.save(); },
         onRewards: function (res) { G.refreshHud(); if (res) G.afterReward(res.levelsGained); },
         onDone: function (r) {
@@ -1146,8 +1150,31 @@
    * v3.0（70 號第七節）碼頭的船（maps.js boat_dock）：有票就上船（codex3 的過場、扣票、換圖）；東港這一端沒票 → 請孩子先找售票員；
    * 小琉球這一端沒票（不應該發生，例如舊資料）→ 免費載回東港，不會被困在島上。G.boatLog 測試用
    */
+  /**
+   * v4.0 東部（71 號 4.2）：富岡漁港一個碼頭兩條航線（往綠島、往蘭嶼）。
+   *   售票員：先選「往綠島／往蘭嶼／不用了」，再照 v3.0 的流程買票或上船。碼頭的船：只列有票的目的地（一條就直接上船；都沒有票＝請孩子先找售票員）。G.ferryPickLog 測試用
+   */
+  G.ferryRouteName = function (id) { var r = J.Ferry.routes(G.data).filter(function (x) { return x.id === id; })[0]; return r ? r.name : id; };
+  G.pickFerryRoute = function (npc, scene) {
+    var opts = npc.ferry.ids.map(function (id) { var r = J.Ferry.routes(G.data).filter(function (x) { return x.id === id; })[0]; return r ? { value: id, text: '⛴️ 往' + r.to.dockLabel } : null; }).filter(Boolean);
+    return J.UI.choose('要搭哪一班船？', opts.concat([{ value: '', text: '不用了' }])).then(function (v) {
+      G.ferryPickLog = (G.ferryPickLog || []).concat([v]);
+      if (!v) return false;
+      return J.FerryUI.interact(G, Object.assign({}, npc, { ferry: { id: v, side: npc.ferry.side }, __ferryPicked: true }), scene);
+    });
+  };
+  G.pickBoatRoute = function (dock, scene) {
+    J.Ferry.ensure(G.state);
+    var have = dock.routes.filter(function (r) { return G.state.ferry.tickets[r.route] > 0; });
+    G.ferryPickLog = (G.ferryPickLog || []).concat([have.map(function (r) { return r.route; }).join('+') || '-']);
+    if (!have.length) return G.say('D_FERRY_PICK_NONE', [{ who: 'pet', text: '要先跟售票員買船票，才能上船喔。' }]);
+    var go = function (r) { return r ? G.boardBoat(Object.assign({}, dock, { route: r.route, to: r.to, routes: null }), scene) : false; };
+    if (have.length === 1) return go(have[0]);
+    return J.UI.choose('要搭哪一班船？', have.map(function (r) { return { value: r.route, text: '⛴️ ' + G.ferryRouteName(r.route) }; }).concat([{ value: '', text: '不搭了' }])).then(function (v) { return go(have.filter(function (r) { return r.route === v; })[0]); });
+  };
   G.boardBoat = function (dock, scene) {
     if (G.blocked() || !J.Ferry || !J.FerryUI || !dock) return Promise.resolve();
+    if (Array.isArray(dock.routes) && dock.routes.length > 1) return G.pickBoatRoute(dock, scene);   // v4.0 東部：富岡漁港兩條航線
     var route = J.Ferry.routes(G.data).filter(function (r) { return r.id === dock.route; })[0];
     if (!route) return Promise.resolve();
     var side = route.from.map === scene.mapId ? 'from' : route.to.map === scene.mapId ? 'to' : null;
@@ -1578,6 +1605,9 @@
     G.save();
     var levels = st.player.level - lvl;
     var after = (mon.boss || mon.elite) && mon.dialog_after ? function () { return G.say(mon.dialog_after, []); } : function () { return Promise.resolve(); };
+    if (!(mon.boss || mon.elite) && mon.dialog_after_once && (G.data.dialogs || {})[mon.dialog_after_once] && !(st.flags && st.flags['seen_' + mon.dialog_after_once])) {   // v4.0 東部（71 號 4.11）：第一次清醒後播一次
+      after = function () { if (!st.flags || typeof st.flags !== 'object') st.flags = {}; st.flags['seen_' + mon.dialog_after_once] = true; G.save(); return G.say(mon.dialog_after_once, []); };
+    }
     var h = J.UI.h;
     ctx.el.cmds.innerHTML = '';
     var btn = h('button.primary', { onclick: function () {

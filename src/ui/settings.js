@@ -159,7 +159,7 @@
       // v1.0（48 號 2.6、F10）技能特效：減少動態效果時只顯示數字
       body.appendChild(radioRow('技能特效（動態效果）', 'motion', [{ value: 'auto', label: '跟裝置設定' }, { value: 'off', label: '播放特效' }, { value: 'on', label: '減少動態（只顯示數字）' }],
         st.settings.reduceMotion || 'auto', function (v) { st.settings.reduceMotion = v; G.save(); }));
-      body.appendChild(h('p.small', { text: '技能特效約 0.4～2 秒，點一下可以跳過；閃光每秒最多 3 次。對光線敏感的孩子請選「減少動態」。' }));
+      body.appendChild(h('p.small', { text: '技能特效約 0.4～2 秒，點一下可以跳過；閃光每秒最多 3 次。對光線敏感的孩子請選「減少動態」。選「減少動態」時，換地圖的葉叢轉場、落葉、樹影飄動和走路時的身體上彈也會一起關掉。' }));
       // v3.0.1 ③戰鬥加速（競品吸收清單第 3 項）：只縮短戰鬥動畫和等待，不縮短答題時間
       body.appendChild(radioRow('戰鬥動畫速度', 'bspeed', [{ value: 'normal', label: '標準' }, { value: 'fast', label: '快' }], st.settings.battleSpeed === 'fast' ? 'fast' : 'normal',
         function (v) { st.settings.battleSpeed = v; G.save(); }));

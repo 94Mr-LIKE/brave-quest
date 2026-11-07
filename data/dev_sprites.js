@@ -276,6 +276,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 27,
   "frameH": 50
  },
+ "npc_balloon_captain": {
+  "file": "assets/npcs/npc_balloon_captain.png",
+  "type": "single",
+  "frameW": 43,
+  "frameH": 50
+ },
  "npc_berry_farmer": {
   "file": "assets/npcs/npc_berry_farmer.png",
   "type": "single",
@@ -354,6 +360,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 31,
   "frameH": 50
  },
+ "npc_custard_farmer": {
+  "file": "assets/npcs/npc_custard_farmer.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
  "npc_dihua_shop": {
   "file": "assets/npcs/npc_dihua_shop.png",
   "type": "single",
@@ -376,6 +388,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/npcs/npc_fisher.png",
   "type": "single",
   "frameW": 37,
+  "frameH": 50
+ },
+ "npc_fisher_hl": {
+  "file": "assets/npcs/npc_fisher_hl.png",
+  "type": "single",
+  "frameW": 36,
   "frameH": 50
  },
  "npc_float_master": {
@@ -480,6 +498,30 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 43,
   "frameH": 50
  },
+ "npc_ice_shop_gi": {
+  "file": "assets/npcs/npc_ice_shop_gi.png",
+  "type": "single",
+  "frameW": 26,
+  "frameH": 50
+ },
+ "npc_inn_greenisland_m": {
+  "file": "assets/npcs/npc_inn_greenisland_m.png",
+  "type": "single",
+  "frameW": 33,
+  "frameH": 50
+ },
+ "npc_inn_hualien_m": {
+  "file": "assets/npcs/npc_inn_hualien_m.png",
+  "type": "single",
+  "frameW": 29,
+  "frameH": 50
+ },
+ "npc_inn_lanyu_m": {
+  "file": "assets/npcs/npc_inn_lanyu_m.png",
+  "type": "single",
+  "frameW": 31,
+  "frameH": 50
+ },
  "npc_inn_port_m": {
   "file": "assets/npcs/npc_inn_port_m.png",
   "type": "single",
@@ -490,6 +532,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/npcs/npc_inn_shenmu_m.png",
   "type": "single",
   "frameW": 37,
+  "frameH": 50
+ },
+ "npc_inn_taitung_m": {
+  "file": "assets/npcs/npc_inn_taitung_m.png",
+  "type": "single",
+  "frameW": 32,
   "frameH": 50
  },
  "npc_innkeeper": {
@@ -546,6 +594,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 25,
   "frameH": 50
  },
+ "npc_lighthouse_guide_gi": {
+  "file": "assets/npcs/npc_lighthouse_guide_gi.png",
+  "type": "single",
+  "frameW": 41,
+  "frameH": 50
+ },
  "npc_lighthouse_keeper": {
   "file": "assets/npcs/npc_lighthouse_keeper.png",
   "type": "single",
@@ -568,6 +622,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/npcs/npc_merchant.png",
   "type": "single",
   "frameW": 37,
+  "frameH": 50
+ },
+ "npc_mochi_shop": {
+  "file": "assets/npcs/npc_mochi_shop.png",
+  "type": "single",
+  "frameW": 32,
   "frameH": 50
  },
  "npc_museum_guide": {
@@ -612,10 +672,22 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 47,
   "frameH": 50
  },
+ "npc_oldhouse_gi": {
+  "file": "assets/npcs/npc_oldhouse_gi.png",
+  "type": "single",
+  "frameW": 30,
+  "frameH": 50
+ },
  "npc_oldhouse_grandpa": {
   "file": "assets/npcs/npc_oldhouse_grandpa.png",
   "type": "single",
   "frameW": 39,
+  "frameH": 50
+ },
+ "npc_onsen_keeper_gi": {
+  "file": "assets/npcs/npc_onsen_keeper_gi.png",
+  "type": "single",
+  "frameW": 33,
   "frameH": 50
  },
  "npc_opera_actor": {
@@ -678,6 +750,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 45,
   "frameH": 50
  },
+ "npc_road_engineer": {
+  "file": "assets/npcs/npc_road_engineer.png",
+  "type": "single",
+  "frameW": 35,
+  "frameH": 50
+ },
+ "npc_ruins_guide": {
+  "file": "assets/npcs/npc_ruins_guide.png",
+  "type": "single",
+  "frameW": 45,
+  "frameH": 50
+ },
  "npc_rush_weaver": {
   "file": "assets/npcs/npc_rush_weaver.png",
   "type": "single",
@@ -713,6 +797,30 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "type": "single",
   "frameW": 99,
   "frameH": 152
+ },
+ "npc_station_hl": {
+  "file": "assets/npcs/npc_station_hl.png",
+  "type": "single",
+  "frameW": 43,
+  "frameH": 50
+ },
+ "npc_stone_carver": {
+  "file": "assets/npcs/npc_stone_carver.png",
+  "type": "single",
+  "frameW": 34,
+  "frameH": 50
+ },
+ "npc_tao_guide": {
+  "file": "assets/npcs/npc_tao_guide.png",
+  "type": "single",
+  "frameW": 34,
+  "frameH": 50
+ },
+ "npc_taroko_ranger": {
+  "file": "assets/npcs/npc_taroko_ranger.png",
+  "type": "single",
+  "frameW": 32,
+  "frameH": 50
  },
  "npc_tea_farmer": {
   "file": "assets/npcs/npc_tea_farmer.png",
@@ -754,6 +862,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/npcs/npc_ticket_seller.png",
   "type": "single",
   "frameW": 36,
+  "frameH": 50
+ },
+ "npc_ticket_seller_fg": {
+  "file": "assets/npcs/npc_ticket_seller_fg.png",
+  "type": "single",
+  "frameW": 42,
   "frameH": 50
  },
  "npc_tofu_shop": {
@@ -876,6 +990,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 166,
   "frameH": 160
  },
+ "boss_fob_balloon": {
+  "file": "assets/monsters/boss_fob_balloon.png",
+  "type": "single",
+  "frameW": 161,
+  "frameH": 160
+ },
  "boss_fog": {
   "file": "assets/monsters/boss_fog.png",
   "type": "single",
@@ -948,6 +1068,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 173,
   "frameH": 160
  },
+ "boss_wxb_whale": {
+  "file": "assets/monsters/boss_wxb_whale.png",
+  "type": "single",
+  "frameW": 164,
+  "frameH": 160
+ },
  "mon_al_cloud": {
   "file": "assets/monsters/mon_al_cloud.png",
   "type": "single",
@@ -964,6 +1090,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/monsters/mon_an_egret.png",
   "type": "single",
   "frameW": 96,
+  "frameH": 96
+ },
+ "mon_an_macaque": {
+  "file": "assets/monsters/mon_an_macaque.png",
+  "type": "single",
+  "frameW": 103,
   "frameH": 96
  },
  "mon_an_magpie": {
@@ -1344,6 +1476,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 107,
   "frameH": 96
  },
+ "mon_wx_rain_e": {
+  "file": "assets/monsters/mon_wx_rain_e.png",
+  "type": "single",
+  "frameW": 107,
+  "frameH": 96
+ },
+ "mon_wx_rainbow": {
+  "file": "assets/monsters/mon_wx_rainbow.png",
+  "type": "single",
+  "frameW": 115,
+  "frameH": 96
+ },
  "mon_wx_thunder": {
   "file": "assets/monsters/mon_wx_thunder.png",
   "type": "single",
@@ -1352,6 +1496,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
  },
  "mon_wx_wave": {
   "file": "assets/monsters/mon_wx_wave.png",
+  "type": "single",
+  "frameW": 97,
+  "frameH": 96
+ },
+ "mon_wx_wave_e": {
+  "file": "assets/monsters/mon_wx_wave_e.png",
   "type": "single",
   "frameW": 97,
   "frameH": 96
@@ -1378,6 +1528,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/items/item_anchor_axe.png",
   "type": "icon",
   "frameW": 28,
+  "frameH": 32
+ },
+ "item_balloon_knot": {
+  "file": "assets/items/item_balloon_knot.png",
+  "type": "icon",
+  "frameW": 38,
   "frameH": 32
  },
  "item_bat_wing": {
@@ -1434,6 +1590,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 31,
   "frameH": 32
  },
+ "item_dawn_shard_e": {
+  "file": "assets/items/item_dawn_shard_e.png",
+  "type": "icon",
+  "frameW": 31,
+  "frameH": 32
+ },
  "item_dawn_shard_n": {
   "file": "assets/items/item_dawn_shard_n.png",
   "type": "icon",
@@ -1458,6 +1620,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 36,
   "frameH": 32
  },
+ "item_ferry_ticket_gi": {
+  "file": "assets/items/item_ferry_ticket_gi.png",
+  "type": "icon",
+  "frameW": 44,
+  "frameH": 32
+ },
+ "item_ferry_ticket_ly": {
+  "file": "assets/items/item_ferry_ticket_ly.png",
+  "type": "icon",
+  "frameW": 35,
+  "frameH": 32
+ },
  "item_gear": {
   "file": "assets/items/item_gear.png",
   "type": "icon",
@@ -1468,6 +1642,18 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/items/item_gear_z10_cutlass.png",
   "type": "icon",
   "frameW": 35,
+  "frameH": 32
+ },
+ "item_gear_z11_cloak": {
+  "file": "assets/items/item_gear_z11_cloak.png",
+  "type": "icon",
+  "frameW": 42,
+  "frameH": 32
+ },
+ "item_gear_z12_marble": {
+  "file": "assets/items/item_gear_z12_marble.png",
+  "type": "icon",
+  "frameW": 34,
   "frameH": 32
  },
  "item_gear_z8_blade": {
@@ -1548,6 +1734,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "frameW": 33,
   "frameH": 32
  },
+ "item_mochi": {
+  "file": "assets/items/item_mochi.png",
+  "type": "icon",
+  "frameW": 43,
+  "frameH": 32
+ },
  "item_mushroom_cap": {
   "file": "assets/items/item_mushroom_cap.png",
   "type": "icon",
@@ -1570,6 +1762,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/items/item_rainbow_piece.png",
   "type": "icon",
   "frameW": 32,
+  "frameH": 32
+ },
+ "item_rainbow_ribbon": {
+  "file": "assets/items/item_rainbow_ribbon.png",
+  "type": "icon",
+  "frameW": 41,
   "frameH": 32
  },
  "item_ribbon_fan": {
@@ -1612,6 +1810,12 @@ if (typeof window.SPRITES === "undefined") window.SPRITES = {
   "file": "assets/items/item_sea_glass.png",
   "type": "icon",
   "frameW": 35,
+  "frameH": 32
+ },
+ "item_seaweed_ice": {
+  "file": "assets/items/item_seaweed_ice.png",
+  "type": "icon",
+  "frameW": 29,
   "frameH": 32
  },
  "item_snack": {
