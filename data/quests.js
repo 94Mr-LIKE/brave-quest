@@ -519,6 +519,7 @@ window.QUESTS = {
   // ═════════════════════ v1.4 桃竹章：石門水庫・大溪、新竹風城（63 號 4.1、4.2 節）═════════════════════
   // 主線：（台北章 Q_LAMPS_MATH）→ Q_TY_1 → Q_TY_2 → 新竹 Q_HC_1 → Q_HC_2（打獵）→ 回石門水庫 Q_TY_5 北霧將（chapter_end: 4，北之曙光碎片）
   // 支線：Q_TY_3、Q_TY_4、Q_HC_3（前置都是 Q_LAMPS_MATH）
+  // v4.0.1（老闆 2026-11-07 選 A）：Q_TY_3、Q_HC_3 拿掉 v1.4.1 的 skip_scene，改由題目適用地點（scenefit.js：外地、奇幻、寶箱題不抽）統一把關
   Q_TY_1: {
     title: "水庫的水", giver: "reservoir_keeper", map: "M15", kind: "help",
     goal: "從台北城往西走到石門水庫，聽管理員介紹水庫：答對 3 題自然。",
@@ -566,7 +567,6 @@ window.QUESTS = {
     goal: "幫大溪老街的豆干店老闆算帳：答對 3 題數學。",
     log_next: "老闆說：大溪老街的豆干最有名。",
     subject: "數學", units: ["5 兩步驟應用問題", "2 10000以內的加減"], count: 3, level_range: [2, 3],
-    skip_scene: ["地精", "寶箱", "寶石", "金山"],   // v1.4.1（v14_畫面審查 缺陷 7）：情境或題目有這些字的不抽（game.js runHelp；題庫不改）
     hunt: null, requires: ["Q_LAMPS_MATH"], reward: { exp: 32, gold: 34, item: "snack", light: null },
     dialog_start: "D_TY_3A", dialog_end: "D_TY_3B"
   },
@@ -583,7 +583,6 @@ window.QUESTS = {
     goal: "聽解說員說迎曦門的故事：答對 2 題社會。",
     log_next: "迎曦門是竹塹城唯一留下來的城門。",
     subject: "社會", units: ["第一單元 我居住的地方"], count: 2, level_range: [1, 3],
-    skip_scene: ["金山", "金包里", "磺港"],   // v1.4.1（v14_畫面審查 缺陷 7）：新竹的解說員不講金山的題（game.js runHelp；題庫不改）
     hunt: null, requires: ["Q_LAMPS_MATH"], reward: { exp: 32, gold: 34, item: null, light: null },
     dialog_start: "D_HC_3A", dialog_end: "D_HC_3B"
   },

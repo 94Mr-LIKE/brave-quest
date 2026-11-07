@@ -3,7 +3,7 @@
  * 由 wip_v20/v221b_scene_apply.js 複製成 docs/src/systems/scenefit.js。node 可以 require（tools/qbank/check_scene_fit.js、測試、validate_world 共用同一份規則）。
  *
  * 題目可以標（questions.js，都可以不寫）：
- *   scene_scope：'home'（金包里／金山＝主角的家鄉）｜'Mxx' 或 ['Mxx', …]（只適合這幾張地圖）｜'fantasy'（地精、精靈這類奇幻情境）；沒寫＝看掃描
+ *   scene_scope：'generic'（通用，不依字詞改判）｜'home'（金包里／金山＝主角的家鄉）｜'Mxx' 或 ['Mxx', …]（只適合這幾張地圖）｜'fantasy'（地精、精靈這類奇幻情境）；沒寫＝看掃描
  *   place_role ：'key'（地名是解題關鍵，不能拿到外地用；預設）｜'decor'（地名只是裝飾，寬鬆層可以用）
  *   speaker    ：情境開頭的說話者（例：「登山阿伯」）；有寫時換說話者用它，不用 QUEST_SPEAKERS 清單猜
  * 沒寫 scene_scope 時現場掃描情境＋題幹（地區不存在題庫裡）：
@@ -111,7 +111,7 @@
     var hits = scan(text(q), q && q.scene, q && q.stem);
     var ss = q && q.scene_scope;
     if (ss !== undefined && ss !== null && ss !== '') {
-      var scope = ss === 'home' || ss === 'fantasy' ? ss : (Array.isArray(ss) ? ss.slice() : [ss]);
+      var scope = ss === 'home' || ss === 'fantasy' || ss === 'generic' ? ss : (Array.isArray(ss) ? ss.slice() : [ss]);
       return { scope: scope, role: role, explicit: true, any: true, hits: hits };
     }
     if (hits.maps.length) {
@@ -139,10 +139,15 @@
     for (var i = 0; i < n; i++) { var s = helpSubject(quest, i); out[s] = (out[s] || 0) + 1; }
     return out;
   }
+  /** 原題池的單元與星等條件，補丁工具也共用；科目由呼叫端判斷。 */
+  function unitLevelFits(x, quest) {
+    var lr = quest.level_range || [1, 4], units = quest.units || [];
+    return (!units.length || units.indexOf(x.unit) >= 0) && x.level >= lr[0] && x.level <= lr[1];
+  }
   /** 舊規則：單元＋難度＋skip_scene（v1.4.1） */
   function baseFits(x, quest) {
-    var lr = quest.level_range || [1, 4], units = quest.units || [], skip = quest.skip_scene || [];
-    return (!units.length || units.indexOf(x.unit) >= 0) && x.level >= lr[0] && x.level <= lr[1] &&
+    var skip = quest.skip_scene || [];
+    return unitLevelFits(x, quest) &&
       !skip.some(function (w) { return String(x.scene || '').indexOf(w) >= 0 || String(x.stem || '').indexOf(w) >= 0; });
   }
   function looseFits(x, quest) { return baseFits(x, quest) && !isChest(x); }
@@ -196,7 +201,7 @@
   var SceneFit = {
     HOME_MAP: HOME_MAP, PLACES: PLACES, FANTASY_WORDS: FANTASY_WORDS, FANTASY_SPEAKERS: FANTASY_SPEAKERS, FANTASY_MAPS: FANTASY_MAPS, DEFAULT_HOME_INTRO: DEFAULT_HOME_INTRO, MAP_ID_RE: MAP_ID_RE,
     introOnce: introOnce, scan: scan, scopeOf: scopeOf, fitKind: fitKind, isChest: isChest, helpSubject: helpSubject, needBySubject: needBySubject,
-    baseFits: baseFits, looseFits: looseFits, strictFits: strictFits, pools: pools, helpFilter: helpFilter, sceneView: sceneView, minStrict: minStrict
+    unitLevelFits: unitLevelFits, baseFits: baseFits, looseFits: looseFits, strictFits: strictFits, pools: pools, helpFilter: helpFilter, sceneView: sceneView, minStrict: minStrict
   };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.SceneFit = SceneFit; }
   if (typeof module !== 'undefined') module.exports = SceneFit;

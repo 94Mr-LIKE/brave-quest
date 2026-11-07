@@ -1,5 +1,5 @@
 /* 勇者大冒險 — 文字介面樣式
- * 原則：字級 ≥ 20px、按鈕 ≥ 44×44px、對比足夠（WCAG 2.2 AA）、手機／平板橫向與桌機都能用。
+ * 原則：字級 ≥ 20px、一般按鈕 ≥ 44×44px（世界地圖紅點為 24×24px）、對比足夠（WCAG 2.2 AA）、手機／平板橫向與桌機都能用。
  * 字型只用系統內建（不連字型服務）。 */
 :root {
   --win-bg: #1d2b5e;
@@ -189,18 +189,22 @@ body.modal-open #pad .bbtn { position: fixed; top: max(8px, env(safe-area-inset-
 /* ---------- 台灣世界地圖 ---------- */
 .worldmap { width: min(1000px, 98vw); max-height: 96vh; overflow: auto; }
 .wm-body { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
-.worldmap .stage { position: relative; flex: none; background: linear-gradient(180deg, #4a90d4, #2a6ab8); border-radius: 10px; }
-/* 直式台灣地圖：整張放得進畫面，用編號圓點標出地區 */
-.worldmap .stage img { display: block; height: calc(96vh - 170px); min-height: 280px; width: auto; max-width: 92vw; border-radius: 10px; }
-.worldmap .noimg-stage { width: 300px; height: 400px; }
+.worldmap .stage { position: relative; flex: none; width: min(400px, calc(98vw - 64px)); max-width: 100%; height: max(280px, calc(96vh - 230px)); background: linear-gradient(180deg, #4a90d4, #2a6ab8); border-radius: 10px; }
+/* 圖片完整置中、不裁切；圓點以 JS 換算 contain 留白後的圖片內容框。 */
+.worldmap .stage img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
+.worldmap .stage { margin-top: 22px; }   /* v4.0.1 夜班：最北的點（金包里）的旗子不凸出到說明文字上 */
 .worldmap .stage .noimg { padding: 18px; color: #e6eeff; }
-.worldmap .dot { position: absolute; transform: translate(-50%, -50%); width: 44px; height: 44px; min-width: 44px; padding: 0; border-radius: 50%; font-size: 22px; background: #b85a17; }   /* v1.3 對比度：同 button.primary */
-.worldmap .dot.here { background: #2f8f4a; }
-.worldmap .dot-line { position: absolute; height: 2px; background: rgba(255, 255, 255, .85); transform-origin: 0 50%; pointer-events: none; box-shadow: 0 0 0 1px rgba(13, 21, 48, .6); }   /* v0.9.6 B04 推開的圓點連回真正的位置 */
-.worldmap .dot.locked { background: #6a6f8a; }
+/* 24px 點擊範圍（WCAG 2.2 2.5.8）；中央紅點含白框的直徑為 14px。 */
+.worldmap .dot { position: absolute; transform: translate(-50%, -50%); width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent; box-shadow: none; }
+.worldmap .dot:hover, .worldmap .dot:active { background: transparent; }
+.worldmap .dot-core { position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border: 2px solid #fff; border-radius: 50%; background: #e52d39; pointer-events: none; }
+.worldmap .dot.locked { opacity: .45; }
+.worldmap .dot.here, .worldmap .dot.goal, .worldmap .dot.goal2 { z-index: 2; }
+.worldmap .dot.here, .worldmap .dot.here:disabled { opacity: 1; }
+.worldmap .dot.here .dot-core { box-shadow: 0 0 0 3px #2f8f4a, 0 0 8px 4px rgba(47, 143, 74, .7); }
 .worldmap .regions { flex: 1; min-width: 260px; max-width: 420px; }
 .worldmap .regions li { flex-direction: column; align-items: stretch; gap: 2px; }
-.worldmap .pin { text-align: left; white-space: nowrap; }
+.worldmap .pin { text-align: left; white-space: normal; }
 .worldmap .pin.here { background: #2f8f4a; }
 .worldmap .pin:disabled { opacity: .75; }
 
@@ -358,7 +362,6 @@ body.modal-open #toasts .toast.bg { display: none; }
 /* ---------------- v0.9 試玩稽核：版面修正 ---------------- */
 /* 直向：遊戲畫面貼在 HUD 下面、滿寬（以前置中，上面空了一大塊） */
 body.portrait #game { align-items: flex-start; padding-top: var(--hud-h, 96px); box-sizing: border-box; }
-body.portrait .worldmap .stage img { height: auto; max-height: 46vh; max-width: 94vw; }
 /* 地名框放到 HUD 下面，不蓋住魔力數字 */
 .map-banner { top: calc(var(--hud-h, 88px) + 10px); }
 /* 提示泡泡放在小地圖下面，不疊在小地圖上 */
@@ -434,8 +437,7 @@ body.portrait.in-battle .battle-ui .cmds button { padding: 8px 2px; font-size: 1
 body.banner-on #toasts .toast { visibility: hidden; }
 /* 9. 地名、地標橫幅不斷行（「竹子湖觀景／台」），太長時自動縮字 */
 .map-banner { white-space: nowrap; max-width: 96vw; font-size: clamp(18px, 6vw, 26px); }
-/* 10. 世界地圖「目前在這裡」的圓點：不套用不能按的半透明，綠色實心加白框 */
-.worldmap .dot.here, .worldmap .dot.here:disabled { opacity: 1; box-shadow: 0 0 0 3px #fff, 0 0 0 5px #2f8f4a; z-index: 2; }
+/* 10. 世界地圖所在地紅點的綠色光環，統一放在前面的世界地圖樣式。 */
 /* 11. 直放排序題：卡片排兩欄，不被底部的確定列蓋住 */
 @media (orientation: portrait) and (max-width: 680px) {
   .ans-order .options { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -593,12 +595,6 @@ jq-nb { white-space: nowrap; }
 @media (orientation: portrait) and (max-width: 680px) {
   body.tall-view:not(.panel-open) #toasts { bottom: max(calc(var(--canvas-gap, 0px) + 8px), calc(max(18px, env(safe-area-inset-bottom)) + 230px)); }
 }
-/* W（v20 缺陷 1；老闆裁示方案 A）世界地圖：手機的「北部」合併圓點（藍色長圓、44px 高）、放大北部時圖跟著放大（不超出框）、左下角「↩ 全台灣」（北部的點都在上半部，不會被它蓋住）收回（≥ 44px） */
-.worldmap .dot.dot-group { width: auto; min-width: 64px; padding: 0 12px; border-radius: 22px; font-size: 18px; font-weight: bold; background: #2a62b8; z-index: 2; }
-.worldmap .stage img { transform-origin: 0 0; transition: transform .25s; }
-@media (prefers-reduced-motion: reduce) { .worldmap .stage img { transition: none; } }
-.worldmap .stage.wm-zoom { overflow: hidden; }
-.worldmap .wm-back { position: absolute; left: 6px; bottom: 6px; min-width: 44px; min-height: 44px; padding: 4px 12px; font-size: 18px; z-index: 3; }
 /* ===== v2.2.1 END ===== */
 
 /* ===== v2.2.1b 委託題目情境（wip_v20/v221b_scene_apply.js 每次重跑都整段重建）BEGIN ===== */
@@ -624,11 +620,16 @@ jq-nb { white-space: nowrap; }
 .collect-grid .cc-pin { font-size: 24px; flex: none; }
 .collect-slots { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
 .collect-slots span { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, .12); display: inline-flex; align-items: center; justify-content: center; color: #9aa6d6; }
-/* ② 目標指引：手帳的「🎯 下一步」、世界地圖下一步的圓點（紅色小旗子；北部合併點也一樣） */
+/* ② 雙旗：紅旗為下一步，橘旗為最早漏接的主線；旗子不攔截點擊。 */
 .guide-next { color: #ffd34d; font-weight: bold; margin: 4px 0 8px; }
-.worldmap .dot.goal { box-shadow: 0 0 0 3px #ff4d6d; }
-.worldmap .dot.goal::before { content: ""; position: absolute; right: 6px; top: -18px; width: 2px; height: 22px; background: #1d2b5e; }
-.worldmap .dot.goal::after { content: ""; position: absolute; right: -8px; top: -19px; width: 0; height: 0; border-left: 14px solid #ff4d6d; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+.guide-second { color: #ffb020; }
+.worldmap .dot.goal::before, .worldmap .dot.goal2::before, .worldmap .secondary-flag::before { content: ""; position: absolute; right: 6px; top: -18px; width: 2px; height: 22px; background: #1d2b5e; pointer-events: none; }
+.worldmap .dot.goal::after, .worldmap .dot.goal2::after, .worldmap .secondary-flag::after { content: ""; position: absolute; right: -8px; top: -19px; width: 0; height: 0; border-left: 14px solid #ff4d6d; border-top: 7px solid transparent; border-bottom: 7px solid transparent; pointer-events: none; }
+.worldmap .dot.goal2::after, .worldmap .secondary-flag::after { border-left-color: #ffb020; }
+/* 同一個圓點的主旗靠左、副旗靠右，兩面旗不相互蓋住。 */
+.worldmap .dot.goal.goal2::before { right: 22px; }
+.worldmap .dot.goal.goal2::after { right: 8px; border-left-color: #ff4d6d; }
+.worldmap .secondary-flag { position: absolute; inset: 0; pointer-events: none; }
 /* ④ 再挑戰一次：每科一顆按鈕 */
 .review-row { flex-wrap: wrap; gap: 8px; }
 .review-btn, .print-report-btn { min-height: 44px; }

@@ -24,7 +24,7 @@
   var LEAF_MAX = 4, LEAF_TREE_COOLDOWN = 2000, LEAF_EVERY_MS = [1200, 2000];
   var SWEEP_OUT_MS = 250, SWEEP_IN_MS = 350, SWEEP_SCALE_H = 1.6, SWEEP_COVER_FRAC = 0, BANYAN_SPEED = 0.7;
   var ART = { broadleaf: 'fx_broadleaf.webp', banyan: 'fx_banyan.webp', shadow: 'fx_shadow.webp', leaves: ['fx_leaf_1.png', 'fx_leaf_2.png', 'fx_leaf_3.png', 'fx_leaf_4.png'] };
-  var WARM_LEAF_MAPS = ['M01', 'M06', 'M04', 'M08', 'M10', 'M11', 'M21', 'M22', 'M23', 'M24', 'M25'];   // 海邊、南部：紅橙欖仁葉、褐色枯葉也會掉
+  var WARM_LEAF_MAPS = ['M01', 'M06', 'M04', 'M08', 'M10', 'M11', 'M21', 'M22', 'M23', 'M24', 'M25', 'M26', 'M27', 'M28', 'M29'];   // 海邊、南部、東部（v4.0.1 老闆 11-07「紅葉都可以」）：紅橙欖仁葉、褐色枯葉也會掉
   var FG_DEPTH_LEAF = 45000, SWEEP_DEPTH = 90000, SHADOW_DEPTH = 1;
 
   function smooth(a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }

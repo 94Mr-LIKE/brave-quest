@@ -165,9 +165,9 @@
         function (v) { st.settings.battleSpeed = v; G.save(); }));
       body.appendChild(h('p.small', { text: '「快」只會讓戰鬥動畫和怪物的回合變快，答題時間不會變短。' }));
       // v3.0.1 ②目標指引（競品吸收清單第 2 項）：小地圖、世界地圖上的紅色小旗子；洞窟、解謎的地方不標
-      body.appendChild(radioRow('目標指引（地圖上的紅色小旗子）', 'guide', [{ value: true, label: '顯示' }, { value: false, label: '不顯示' }], st.settings.guide !== false,
+      body.appendChild(radioRow('目標指引（地圖上的紅旗、橘旗）', 'guide', [{ value: true, label: '顯示' }, { value: false, label: '不顯示' }], st.settings.guide !== false,
         function (v) { st.settings.guide = v; if (J.Guide) J.Guide.reset(); G.save(); }));
-      body.appendChild(h('p.small', { text: '在小地圖和世界地圖上，用紅色小旗子標出委託的下一步。洞窟和解謎的地方不標，寶箱的位置也不標。' }));
+      body.appendChild(h('p.small', { text: '在小地圖和世界地圖上，用紅色小旗子標出委託的下一步，橘色小旗子標出還沒接的委託。洞窟和解謎的地方不標，寶箱的位置也不標。' }));
       // 語音（對話與題目朗讀）：家長可以整個關掉
       var apply = function () { G.save(); G.applySettings(); };
       body.appendChild(radioRow('語音（對話、題目朗讀）', 'tts', [{ value: true, label: '開' }, { value: false, label: '關' }], st.settings.tts, function (v) { st.settings.tts = v; apply(); }));

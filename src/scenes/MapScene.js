@@ -1330,11 +1330,11 @@
       var self = this;
       if (this.transitioning) return;
       this.transitioning = true;
-      J.Audio.play('warp');
       J.HUD.prompt(null);
       if (J.Ambience) J.Ambience.leave();   // v3.0.1（86 號 #7）環境音 0.25 秒淡出
       // v3.0.1（86 號 #6）：失焦前景葉叢從左邊滑進來蓋滿畫面再換地圖；減少動態效果時 sweepOut 回傳 false，照舊淡出
       if (J.TreeFX && J.TreeFX.sweepOut(this, function () { G().leafSweepIn = true; G().changeMap(ex.to, ex.tx, ex.ty, self.p.facing); })) return;
+      J.Audio.play('warp');   // v4.0.1（老闆 11-07「採用新音效」）：有葉叢轉場時只播轉場聲，不再疊 warp；這裡＝減少動態效果的舊淡出
       this.cameras.main.fadeOut(250, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', function () { G().changeMap(ex.to, ex.tx, ex.ty, self.p.facing); });
     }

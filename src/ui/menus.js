@@ -365,8 +365,10 @@
       body.innerHTML = '';
       if (tab === 'quests') {
         var j = J.QuestLog.journal(st, D.quests, D);
-        var gt = J.Guide ? J.Guide.target(st, D) : null;   // v3.0.1 ②目標指引（家長設定可以關）
-        if (gt) body.appendChild(h('p.guide-next', { text: J.Guide.text(gt, D) }));
+        var goals = J.Guide ? J.Guide.targets(st, D) : [];   // v4.0.1 主旗＋漏接提醒（家長設定可以關）
+        goals.forEach(function (gt) {
+          body.appendChild(h('p.guide-next' + (gt.secondary ? '.guide-second' : ''), { text: J.Guide.text(gt, D) }));
+        });
         body.appendChild(h('h3', { text: '進行中（' + j.active.length + '）' }));
         var a = h('ul.list');
         if (!j.active.length) a.appendChild(h('li', { text: '目前沒有進行中的委託。找頭上有「！」的人說話吧！' }));
