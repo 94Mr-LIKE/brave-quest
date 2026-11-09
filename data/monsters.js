@@ -73,6 +73,16 @@
  *   systems 測試 S13-1（tests/v13_ch3.test.js）逐格比對本檔與 62 號 3.2、3.3 節的表。
  */
 window.MONSTERS = {
+  // v4.1 中橫・南投：雪球與小燈籠掉落率 0.7；標準三階段頭目不加變暗效果。
+  wx_snow: {"name":"雪球寶寶","sprite":"mon_wx_snow","level":5,"hp":570,"atk":89,"subject":"英語","q_levels":[2,3],"exp":220,"gold":60,"drops":[{"item":"snow_crystal","rate":0.7}],"boss":false,"dialog_after_once":"D_SNOWBALL_AFTER","desc":"戴紅色毛線帽的圓雪球，霧讓它在雪地裡一直打轉。","wake":"雪球寶寶清醒了，滾回雪地，乖乖不動了。"},
+  fo_puff: {"name":"噗噗霧泡泡","sprite":"mon_fo_puff","level":5,"hp":580,"atk":91,"subject":"自然","q_levels":[2,3],"exp":230,"gold":65,"drops":[{"item":"crystal","rate":0.3}],"boss":false,"desc":"像棉花糖的小霧球，被打到會分成兩隻小的。","wake":"噗噗霧泡泡被光照暖了，小水滴變成水蒸氣，散掉了。"},
+  gh_bamboo: {"name":"筍筍竹筍妖","sprite":"mon_gh_bamboo","level":5,"hp":580,"atk":91,"subject":"自然","q_levels":[2,3],"exp":240,"gold":65,"drops":[{"item":"bamboo_husk","rate":0.4}],"boss":false,"desc":"戴著咖啡色筍殼帽的胖竹筍，霧讓它一直長高。","wake":"筍筍竹筍妖清醒了，縮回竹林的土裡。"},
+  gh_cone: {"name":"毬毬杉果精","sprite":"mon_gh_cone","level":5,"hp":580,"atk":92,"subject":"數學","q_levels":[2,3],"exp":240,"gold":65,"drops":[{"item":"cedar_cone","rate":0.4}],"boss":false,"desc":"圓滾滾的柳杉毬果，小刺軟軟的，被霧弄得滾來滾去撞人。","wake":"毬毬杉果精清醒了，滾回柳杉林的樹下。"},
+  gh_lantern_f: {"name":"森林燈燈小燈籠","sprite":"mon_gh_lantern_f","level":5,"hp":590,"atk":93,"subject":"國語","q_levels":[2,3],"exp":250,"gold":65,"drops":[{"item":"lantern_paper","rate":0.4}],"boss":false,"desc":"深綠色的小燈籠，光是淡黃綠色，霧讓它在夜路亂飄。","wake":"森林燈燈小燈籠清醒了，乖乖掛回樹枝上。"},
+  gh_umbrella_f: {"name":"森林傘傘紙傘妖","sprite":"mon_gh_umbrella_f","level":5,"hp":590,"atk":93,"subject":"英語","q_levels":[2,3],"exp":250,"gold":65,"drops":[{"item":"umbrella_rib","rate":0.4}],"boss":false,"desc":"竹青色的紙傘，傘骨像竹節，霧讓它在夜路亂跳。","wake":"森林傘傘紙傘妖清醒了，收起傘靠回竹林邊。"},
+  gh_geta_f: {"name":"森林喀喀木屐","sprite":"mon_gh_geta_f","level":5,"hp":590,"atk":94,"subject":"數學","q_levels":[2,3],"exp":250,"gold":70,"drops":[{"item":"crystal","rate":0.3}],"boss":false,"desc":"綁著苔綠色帶子的木屐，霧讓它在夜路喀喀亂走。","wake":"森林喀喀木屐清醒了，排好放回屋簷下。"},
+  gh_civet_f: {"name":"森林夜遊白鼻心","sprite":"mon_gh_civet_f","level":5,"hp":590,"atk":94,"subject":"社會","q_levels":[2,3],"exp":250,"gold":70,"drops":[{"item":"small_lantern","rate":0.7}],"boss":false,"dialog_after":"D_CIVET_AFTER","desc":"披著深綠斗篷、提著綠色小燈籠的白鼻心。","wake":"森林夜遊白鼻心清醒了，把小燈籠還給你，跑回樹林。"},
+  ghb_civetboss: {"name":"中橫頭目：夜遊團長","sprite":"boss_ghb_civetboss","level":5,"hp":2620,"atk":84,"subject":"混合","subjects":["國語","自然"],"q_levels":[2,4],"exp":2500,"gold":700,"drops":[{"item":"forest_lantern","rate":1}],"boss":true,"phases":3,"phase_q":2,"last_q_level":4,"ref_mobs":["gh_civet_f","gh_lantern_f"],"battle_bg":"forest","dialog_before":"D_BOSS_CIVET_A","dialog_after":"D_BOSS_CIVET_B","desc":"中橫頭目。把燈籠町的燈全藏起來的大白鼻心，斗篷上掛滿燈籠。","wake":"夜遊團長清醒了，把燈籠一盞盞掛回燈籠町。"},
 
   // ── 地圖等級 1（M02 擎天草原）──
   dango: {

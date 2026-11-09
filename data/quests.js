@@ -30,6 +30,516 @@
  *   （wip_v20/v20_0_econ_apply.js 照規則算；頭目委託另外有頭目本身的經驗值）。
  */
 window.QUESTS = {
+  // v4.1 中橫・南投：Z13 共 16 步，每個委託 120 經驗、81 金幣；寶箱分掉另兩步。
+  Q_CH_1: {
+    "title": "山路要加雪鏈",
+    "giver": "road_engineer_cc",
+    "map": "M30",
+    "kind": "help",
+    "goal": "從花蓮往西進中橫，聽工程員說結冰的山路要加雪鏈：答對 2 題自然。",
+    "log_next": "山莊管理員說：雪地裡有雪球寶寶在打轉。",
+    "subject": "自然",
+    "units": [
+      "三、天氣停看聽"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_HL_3"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CH_1A",
+    "dialog_end": "D_CH_1B"
+  },
+  Q_CH_5: {
+    "title": "雪花結晶",
+    "giver": "lodge_keeper_hh",
+    "map": "M30",
+    "kind": "hunt",
+    "goal": "讓雪地裡打轉的雪球寶寶清醒，帶回 3 片雪花結晶。",
+    "log_next": "再往上爬，就到武嶺了。",
+    "subject": "英語",
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": {
+      "item": "snow_crystal",
+      "n": 3,
+      "monster": "wx_snow",
+      "map": "M30"
+    },
+    "requires": [
+      "Q_CH_1"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": "herb",
+      "light": null
+    },
+    "dialog_start": "D_CH_5A",
+    "dialog_end": "D_CH_5B"
+  },
+  Q_CH_4: {
+    "title": "臺灣公路最高的地方",
+    "giver": "wuling_guide",
+    "map": "M30",
+    "kind": "help",
+    "goal": "爬到武嶺，聽解說員說這裡有多高：答對 2 題數學。",
+    "log_next": "到武嶺了！解說員說：下山往埔里，那裡是臺灣的中心。",
+    "subject": "數學",
+    "units": [
+      "1 10000以內的數"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_CH_5"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CH_4A",
+    "dialog_end": "D_CH_4B"
+  },
+  Q_CH_2: {
+    "title": "高山上的高麗菜",
+    "giver": "veg_farmer",
+    "map": "M30",
+    "kind": "help",
+    "side": true,
+    "goal": "聽蔬菜農說高麗菜為什麼喜歡涼涼的山上：答對 2 題自然。",
+    "log_next": "蔬菜農說：高麗菜喜歡涼涼的天氣。",
+    "subject": "自然",
+    "units": [
+      "一、快樂小農夫"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_CH_1"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CH_2A",
+    "dialog_end": "D_CH_2B"
+  },
+  Q_CH_3: {
+    "title": "穿過大山的公路",
+    "giver": "road_veteran",
+    "map": "M30",
+    "kind": "help",
+    "side": true,
+    "goal": "聽老工班阿伯說以前開這條公路的故事：答對 2 題社會。",
+    "log_next": "阿伯說：這條公路，是以前的人一點一點開出來的。",
+    "subject": "社會",
+    "units": [
+      "第四單元 生活與工作的轉變"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_CH_1"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CH_3A",
+    "dialog_end": "D_CH_3B"
+  },
+  Q_PU_2: {
+    "title": "臺灣的中心",
+    "giver": "center_volunteer",
+    "map": "M31",
+    "kind": "help",
+    "goal": "到埔里的地理中心碑，聽志工說三角點：答對 2 題社會。",
+    "log_next": "霧仔：四片碎片在發光……先到虎子山頂看看！",
+    "subject": "社會",
+    "units": [
+      "第一單元 我居住的地方"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_CH_4"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_PUL_2A",
+    "dialog_end": "D_PUL_2B"
+  },
+  Q_PU_1: {
+    "title": "曙光羅盤",
+    "giver": "dawn_ring_pu",
+    "map": "M31",
+    "kind": "help",
+    "goal": "帶著四片曙光碎片爬上虎子山頂，五科各答對 1 題，做出曙光羅盤。",
+    "log_next": "四片碎片合成了曙光羅盤！指針指向玉山。往南經過溪頭。",
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然",
+      "社會"
+    ],
+    "units": [
+      "第參單元 走進大自然",
+      "第貳單元 解決問題",
+      "第肆單元 美好的祝福",
+      "第壹單元 運用時間",
+      "Lesson 2 How old are you?（數字）",
+      "Lesson 1 What's your name?（名字）",
+      "Lesson 4 Are you tired?（感覺）",
+      "Lesson 3 I'm short.（身材外貌）",
+      "1 10000以內的數",
+      "5 角與形狀",
+      "3 毫米與數線",
+      "7 公斤與公克",
+      "2 10000以內的加減",
+      "8 分數",
+      "9 列表與規律",
+      "4 乘法",
+      "6 除法",
+      "二、磁鐵好好玩",
+      "一、植物大發現",
+      "三、風與空氣",
+      "四、奇妙的溶解",
+      "第四單元 健康成長的快樂童年",
+      "第二單元 校園規範和班級自治",
+      "第三單元 我的校園和家庭生活",
+      "第一單元 升上三年級的新學習",
+      "第五單元 打造更美好的班級",
+      "第壹單元 人物組曲",
+      "第貳單元 臺灣風景畫",
+      "愛閱讀一 熱愛昆蟲的法布爾",
+      "第參單元 生活小智慧",
+      "第肆單元 奇幻故事屋",
+      "愛閱讀二 巨人傳說",
+      "愛閱讀一 靈光一現",
+      "愛閱讀二 老鼠嫁女兒",
+      "Lesson 1 Stationery（文具用品）",
+      "Lesson 2 Colors（顏色）",
+      "Review 1 Fun Things（有趣的事物）",
+      "Lesson 3 Animal（動物）",
+      "Lesson 4 Things you can do（能力）",
+      "Get Ready（開學預備）",
+      "1 除法",
+      "2 公升與毫升",
+      "3 分數與加減",
+      "4 圓",
+      "5 兩步驟應用問題",
+      "6 一位小數",
+      "7 時間",
+      "8 乘與除",
+      "9 面積",
+      "一、快樂小農夫",
+      "二、千變萬化的水",
+      "三、天氣停看聽",
+      "四、動物王國",
+      "第一單元 我居住的地方",
+      "第二單元 多元的生活空間",
+      "第三單元 生活中的各行各業",
+      "第四單元 生活與工作的轉變",
+      "第五單元 儲蓄與消費",
+      "第六單元 小小街道觀察家"
+    ],
+    "count": 5,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_PU_2"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": "dawn_compass",
+      "light": null
+    },
+    "dialog_start": "D_PUL_1A",
+    "dialog_end": "D_PUL_1B"
+  },
+  Q_PU_3: {
+    "title": "手工造紙",
+    "giver": "paper_master",
+    "map": "M31",
+    "kind": "help",
+    "side": true,
+    "goal": "聽紙寮師傅說手工造紙的老手藝：答對 2 題社會。",
+    "log_next": "師傅說：老手藝要有人學，才不會不見。",
+    "subject": "社會",
+    "units": [
+      "第三單元 生活中的各行各業"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_PU_2"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_PUL_3A",
+    "dialog_end": "D_PUL_3B"
+  },
+  Q_PU_4: {
+    "title": "美人腿",
+    "giver": "jiaobai_farmer",
+    "map": "M31",
+    "kind": "help",
+    "side": true,
+    "goal": "聽茭白筍農說為什麼茭白筍叫美人腿：答對 2 題自然。",
+    "log_next": "茭白筍白白的，大家叫它「美人腿」。",
+    "subject": "自然",
+    "units": [
+      "一、快樂小農夫"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_PU_2"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_PUL_4A",
+    "dialog_end": "D_PUL_4B"
+  },
+  Q_XT_1: {
+    "title": "大學池",
+    "giver": "forest_guide_xt",
+    "map": "M32",
+    "kind": "help",
+    "goal": "從埔里往南到溪頭，跟解說員到大學池：答對 2 題自然。",
+    "log_next": "燈籠店老闆說：一路上的鬼怪都迷路了。",
+    "subject": "自然",
+    "units": [
+      "一、植物大發現"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_PU_1"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_XT_1A",
+    "dialog_end": "D_XT_1B"
+  },
+  Q_XT_2: {
+    "title": "送鬼怪回家",
+    "giver": "lantern_shop",
+    "map": "M32",
+    "kind": "help",
+    "goal": "把一路上遇到的鬼怪故事排好，送牠們回家：答對 3 題國語。",
+    "log_next": "可是燈籠被偷走了！林間夜路有白鼻心。",
+    "subject": "國語",
+    "units": [
+      "第肆單元 奇幻故事屋"
+    ],
+    "count": 3,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_XT_1"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_XT_2A",
+    "dialog_end": "D_XT_2B"
+  },
+  Q_XT_3: {
+    "title": "被偷走的燈籠",
+    "giver": "lantern_shop",
+    "map": "M32",
+    "kind": "hunt",
+    "goal": "讓林間夜路的森林夜遊白鼻心清醒，拿回 3 盞小燈籠。",
+    "log_next": "把燈籠藏起來的是夜遊團長！去廣場找牠。",
+    "subject": "社會",
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": {
+      "item": "small_lantern",
+      "n": 3,
+      "monster": "gh_civet_f",
+      "map": "M32"
+    },
+    "requires": [
+      "Q_XT_2"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": "herb",
+      "light": null
+    },
+    "dialog_start": "D_XT_3A",
+    "dialog_end": "D_XT_3B"
+  },
+  Q_XT_4: {
+    "title": "中橫頭目：夜遊團長",
+    "giver": "lantern_shop",
+    "map": "M32",
+    "kind": "boss",
+    "goal": "讓把燈籠藏起來的夜遊團長清醒。",
+    // V41_STUB_BEGIN（v4.2 還原委託完成提示）
+    "log_next": "夜遊團長清醒了，送你一盞森林燈籠。往塔塔加的路之後開放喔！",
+    // V41_STUB_END
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "自然"
+    ],
+    "units": [
+      "第參單元 走進大自然",
+      "第貳單元 解決問題",
+      "第肆單元 美好的祝福",
+      "第壹單元 運用時間",
+      "二、磁鐵好好玩",
+      "一、植物大發現",
+      "三、風與空氣",
+      "四、奇妙的溶解",
+      "第壹單元 人物組曲",
+      "第貳單元 臺灣風景畫",
+      "愛閱讀一 熱愛昆蟲的法布爾",
+      "第參單元 生活小智慧",
+      "第肆單元 奇幻故事屋",
+      "愛閱讀二 巨人傳說",
+      "愛閱讀一 靈光一現",
+      "愛閱讀二 老鼠嫁女兒",
+      "一、快樂小農夫",
+      "二、千變萬化的水",
+      "三、天氣停看聽",
+      "四、動物王國"
+    ],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "ghb_civetboss",
+    "boss_map": "M32",
+    "requires": [
+      "Q_XT_3"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": "forest_lantern",
+      "light": null
+    },
+    "dialog_start": "D_XT_4A",
+    "dialog_end": "D_XT_4B"
+  },
+  Q_XT_5: {
+    "title": "凍頂烏龍茶",
+    "giver": "tea_farmer_lg",
+    "map": "M32",
+    "kind": "help",
+    "side": true,
+    "goal": "聽鹿谷茶農說凍頂烏龍茶：答對 2 題社會。",
+    "log_next": "茶農說：凍頂茶原本種在鹿谷的山上。",
+    "subject": "社會",
+    "units": [
+      "第二單元 多元的生活空間"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_XT_1"
+    ],
+    "reward": {
+      "exp": 120,
+      "gold": 81,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_XT_5A",
+    "dialog_end": "D_XT_5B"
+  },
 
   // ═════════════════════ 金包里教學（M01）═════════════════════
   Q_TUT_1: {

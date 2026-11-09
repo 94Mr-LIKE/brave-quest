@@ -519,7 +519,57 @@
         var img = self.add.image(l.x * T + T / 2, l.y * T + T, self.tex, self.frameOf(lit ? 'lamp_on' : 'lamp_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T);
         self.lamps.push({ data: l, img: img });
       });
+      this.buildMapProps();   // v4.1 中橫：小車與雪鏈圖案告示牌
       this.buildSouth();   // v3.0 南部：友善動物、碼頭的船
+    }
+
+    /** v4.1 中橫小物：只畫既有 props，碰撞完全沿用來源地圖格子。 */
+    buildMapProps() {
+      var self = this;
+      this.mapProps = [];
+      (this.map.props || []).forEach(function (p) {
+        if (p.id !== 'car_snow_chain' && p.id !== 'sign_snow_chain') return;
+        if (!Array.isArray(p.cells) || !p.cells.length) return;
+        var x = Math.min.apply(null, p.cells.map(function (c) { return c[0]; }));
+        var y = Math.max.apply(null, p.cells.map(function (c) { return c[1]; }));
+        var key = self.mapPropTexture(p.id);
+        var img = self.add.image(x * T, (y + 1) * T, key).setOrigin(0, 1).setDepth((y + 1) * T);
+        self.mapProps.push({ data: p, img: img });
+      });
+    }
+
+    /** 小車兩格寬；牌面用輪胎＋交叉雪鏈，不寫品牌或文字。 */
+    mapPropTexture(id) {
+      var car = id === 'car_snow_chain';
+      var key = 'ui:prop:' + id;
+      if (this.textures.exists(key)) return key;
+      var c = document.createElement('canvas'); c.width = car ? 64 : 32; c.height = 32;
+      var x = c.getContext('2d');
+      function tire(cx, cy, r) {
+        x.fillStyle = '#26313b';
+        x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill();
+        x.strokeStyle = '#dce5eb'; x.lineWidth = 1.5;
+        // 兩條斜鏈交叉覆在胎面，與普通輪胎區別。
+        x.beginPath(); x.moveTo(cx - r * 0.7, cy - r * 0.7); x.lineTo(cx + r * 0.7, cy + r * 0.7);
+        x.moveTo(cx + r * 0.7, cy - r * 0.7); x.lineTo(cx - r * 0.7, cy + r * 0.7); x.stroke();
+      }
+      if (car) {
+        // 無品牌的淺色小車：車頂、前後車窗、車身與兩個裝雪鏈的輪胎。
+        x.fillStyle = '#27404c'; x.fillRect(4, 13, 56, 14);
+        x.fillStyle = '#e8eceb'; x.fillRect(5, 14, 54, 11); x.fillRect(17, 4, 28, 14);
+        x.fillStyle = '#93c6d8'; x.fillRect(20, 7, 10, 9); x.fillRect(33, 7, 9, 9);
+        x.fillStyle = '#fff4bf'; x.fillRect(54, 16, 5, 4);
+        x.fillStyle = '#c35245'; x.fillRect(5, 16, 3, 4);
+        x.fillStyle = '#6d8490'; x.fillRect(31, 7, 2, 16);
+        tire(15, 25, 6); tire(49, 25, 6);
+      } else {
+        x.fillStyle = '#695744'; x.fillRect(14, 22, 4, 10);
+        x.fillStyle = '#294951'; x.fillRect(2, 1, 28, 25);
+        x.fillStyle = '#f2d77e'; x.fillRect(4, 3, 24, 21);
+        tire(16, 13, 8);
+      }
+      this.textures.addCanvas(key, c);
+      return key;
     }
 
     /**

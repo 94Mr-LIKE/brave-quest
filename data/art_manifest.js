@@ -1,4 +1,4 @@
-/* 由 tools/pack_assets.py 自動產生：已放好的 GPT 美術清單（地圖背景 bg_/fg_、戰鬥背景 bb_、介面圖）。請勿手動修改。 */
+/* 已放好的 GPT 美術清單；v4.1 直接同步地圖背景與新增精靈。 */
 window.ART = {
  "maps": {
   "M01": {
@@ -117,6 +117,15 @@ window.ART = {
   },
   "MT1": {
    "bg": "bg_MT1.webp"
+  },
+  "M30": {
+   "bg": "bg_M30.webp"
+  },
+  "M31": {
+   "bg": "bg_M31.webp"
+  },
+  "M32": {
+   "bg": "bg_M32.webp"
   }
  },
  "battle": {
@@ -171,5 +180,41 @@ window.ART = {
   "sign_weapon": "assets/ui/sign_weapon.png",
   "title": "assets/ui/title.png",
   "world_taiwan": "assets/ui/world_taiwan.png"
+ },
+ "sprites": {
+  "mon_wx_snow": "assets/monsters/mon_wx_snow.png",
+  "mon_fo_puff": "assets/monsters/mon_fo_puff.png",
+  "mon_gh_bamboo": "assets/monsters/mon_gh_bamboo.png",
+  "mon_gh_cone": "assets/monsters/mon_gh_cone.png",
+  "boss_ghb_civetboss": "assets/monsters/boss_ghb_civetboss.png",
+  "mon_gh_lantern_f": "assets/monsters/mon_gh_lantern_f.png",
+  "mon_gh_umbrella_f": "assets/monsters/mon_gh_umbrella_f.png",
+  "mon_gh_geta_f": "assets/monsters/mon_gh_geta_f.png",
+  "mon_gh_civet_f": "assets/monsters/mon_gh_civet_f.png",
+  "boss_ghb_civetboss_s2": "assets/monsters/boss_ghb_civetboss_s2.png",
+  "npc_road_engineer_cc": "assets/npcs/npc_road_engineer_cc.png",
+  "npc_lodge_keeper_hh": "assets/npcs/npc_lodge_keeper_hh.png",
+  "npc_wuling_guide": "assets/npcs/npc_wuling_guide.png",
+  "npc_veg_farmer": "assets/npcs/npc_veg_farmer.png",
+  "npc_road_veteran": "assets/npcs/npc_road_veteran.png",
+  "npc_center_volunteer": "assets/npcs/npc_center_volunteer.png",
+  "npc_paper_master": "assets/npcs/npc_paper_master.png",
+  "npc_jiaobai_farmer": "assets/npcs/npc_jiaobai_farmer.png",
+  "npc_inn_puli_m": "assets/npcs/npc_inn_puli_m.png",
+  "npc_forest_guide_xt": "assets/npcs/npc_forest_guide_xt.png",
+  "npc_lantern_shop": "assets/npcs/npc_lantern_shop.png",
+  "npc_tea_farmer_lg": "assets/npcs/npc_tea_farmer_lg.png",
+  "npc_inn_xitou_m": "assets/npcs/npc_inn_xitou_m.png",
+  "item_snow_crystal": "assets/items/item_snow_crystal.png",
+  "item_bamboo_husk": "assets/items/item_bamboo_husk.png",
+  "item_cedar_cone": "assets/items/item_cedar_cone.png",
+  "item_small_lantern": "assets/items/item_small_lantern.png",
+  "item_forest_lantern": "assets/items/item_forest_lantern.png",
+  "item_dawn_compass": "assets/items/item_dawn_compass.png",
+  "item_gear_z13_coat": "assets/items/item_gear_z13_coat.png",
+  "npc_dawn_ring_pu": "assets/npcs/npc_dawn_ring_pu.png",
+  "item_dawn_shard_c": "assets/items/item_dawn_shard_c.png",
+  "item_dawn_shard_s": "assets/items/item_dawn_shard_s.png",
+  "item_dawn_shard_e": "assets/items/item_dawn_shard_e.png"
  }
 };

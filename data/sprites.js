@@ -1537,11 +1537,11 @@ window.SPRITES = {
   "frameH": 50
  },
  "item_dawn_shard_c": {
-  "file": "assets/items/item_dawn_shard_c.png",
-  "type": "icon",
-  "frameW": 31,
-  "frameH": 32
- },
+ "file": "assets/items/item_dawn_shard_c.png",
+ "type": "icon",
+ "frameW": 31,
+ "frameH": 32
+},
  "item_lantern_paper": {
   "file": "assets/items/item_lantern_paper.png",
   "type": "icon",
@@ -2011,11 +2011,11 @@ window.SPRITES = {
   "frameH": 32
  },
  "item_dawn_shard_s": {
-  "file": "assets/items/item_dawn_shard_s.png",
-  "type": "icon",
-  "frameW": 31,
-  "frameH": 32
- },
+ "file": "assets/items/item_dawn_shard_s.png",
+ "type": "icon",
+ "frameW": 31,
+ "frameH": 32
+},
  "item_gear_z8_blade": {
   "file": "assets/items/item_gear_z8_blade.png",
   "type": "icon",
@@ -2197,11 +2197,11 @@ window.SPRITES = {
   "frameH": 32
  },
  "item_dawn_shard_e": {
-  "file": "assets/items/item_dawn_shard_e.png",
-  "type": "icon",
-  "frameW": 31,
-  "frameH": 32
- },
+ "file": "assets/items/item_dawn_shard_e.png",
+ "type": "icon",
+ "frameW": 31,
+ "frameH": 32
+},
  "item_ferry_ticket_gi": {
   "file": "assets/items/item_ferry_ticket_gi.png",
   "type": "icon",
@@ -2237,5 +2237,192 @@ window.SPRITES = {
   "type": "icon",
   "frameW": 34,
   "frameH": 32
- }
+ } ,
+ // v4.1 中橫・南投：現有圖接線與兩倍最近鄰羅盤。
+ "mon_wx_snow": {
+ "file": "assets/monsters/mon_wx_snow.png",
+ "type": "single",
+ "frameW": 90,
+ "frameH": 90
+},
+ "mon_fo_puff": {
+ "file": "assets/monsters/mon_fo_puff.png",
+ "type": "single",
+ "frameW": 88,
+ "frameH": 80
+},
+ "mon_gh_bamboo": {
+ "file": "assets/monsters/mon_gh_bamboo.png",
+ "type": "single",
+ "frameW": 84,
+ "frameH": 96
+},
+ "mon_gh_cone": {
+ "file": "assets/monsters/mon_gh_cone.png",
+ "type": "single",
+ "frameW": 92,
+ "frameH": 80
+},
+ "boss_ghb_civetboss": {
+ "file": "assets/monsters/boss_ghb_civetboss.png",
+ "type": "single",
+ "frameW": 175,
+ "frameH": 160
+},
+ "mon_gh_lantern_f": {
+ "file": "assets/monsters/mon_gh_lantern_f.png",
+ "type": "single",
+ "frameW": 90,
+ "frameH": 96
+},
+ "mon_gh_umbrella_f": {
+ "file": "assets/monsters/mon_gh_umbrella_f.png",
+ "type": "single",
+ "frameW": 93,
+ "frameH": 96
+},
+ "mon_gh_geta_f": {
+ "file": "assets/monsters/mon_gh_geta_f.png",
+ "type": "single",
+ "frameW": 103,
+ "frameH": 96
+},
+ "mon_gh_civet_f": {
+ "file": "assets/monsters/mon_gh_civet_f.png",
+ "type": "single",
+ "frameW": 101,
+ "frameH": 96
+},
+ "boss_ghb_civetboss_s2": {
+ "file": "assets/monsters/boss_ghb_civetboss_s2.png",
+ "type": "single",
+ "frameW": 175,
+ "frameH": 160
+},
+ "npc_road_engineer_cc": {
+ "file": "assets/npcs/npc_road_engineer_cc.png",
+ "type": "single",
+ "frameW": 29,
+ "frameH": 50
+},
+ "npc_lodge_keeper_hh": {
+ "file": "assets/npcs/npc_lodge_keeper_hh.png",
+ "type": "single",
+ "frameW": 29,
+ "frameH": 50
+},
+ "npc_wuling_guide": {
+ "file": "assets/npcs/npc_wuling_guide.png",
+ "type": "single",
+ "frameW": 32,
+ "frameH": 50
+},
+ "npc_veg_farmer": {
+ "file": "assets/npcs/npc_veg_farmer.png",
+ "type": "single",
+ "frameW": 30,
+ "frameH": 50
+},
+ "npc_road_veteran": {
+ "file": "assets/npcs/npc_road_veteran.png",
+ "type": "single",
+ "frameW": 36,
+ "frameH": 50
+},
+ "npc_center_volunteer": {
+ "file": "assets/npcs/npc_center_volunteer.png",
+ "type": "single",
+ "frameW": 40,
+ "frameH": 50
+},
+ "npc_paper_master": {
+ "file": "assets/npcs/npc_paper_master.png",
+ "type": "single",
+ "frameW": 29,
+ "frameH": 50
+},
+ "npc_jiaobai_farmer": {
+ "file": "assets/npcs/npc_jiaobai_farmer.png",
+ "type": "single",
+ "frameW": 37,
+ "frameH": 50
+},
+ "npc_inn_puli_m": {
+ "file": "assets/npcs/npc_inn_puli_m.png",
+ "type": "single",
+ "frameW": 29,
+ "frameH": 50
+},
+ "npc_forest_guide_xt": {
+ "file": "assets/npcs/npc_forest_guide_xt.png",
+ "type": "single",
+ "frameW": 36,
+ "frameH": 50
+},
+ "npc_lantern_shop": {
+ "file": "assets/npcs/npc_lantern_shop.png",
+ "type": "single",
+ "frameW": 31,
+ "frameH": 50
+},
+ "npc_tea_farmer_lg": {
+ "file": "assets/npcs/npc_tea_farmer_lg.png",
+ "type": "single",
+ "frameW": 32,
+ "frameH": 50
+},
+ "npc_inn_xitou_m": {
+ "file": "assets/npcs/npc_inn_xitou_m.png",
+ "type": "single",
+ "frameW": 40,
+ "frameH": 50
+},
+ "item_snow_crystal": {
+ "file": "assets/items/item_snow_crystal.png",
+ "type": "icon",
+ "frameW": 29,
+ "frameH": 32
+},
+ "item_bamboo_husk": {
+ "file": "assets/items/item_bamboo_husk.png",
+ "type": "icon",
+ "frameW": 28,
+ "frameH": 32
+},
+ "item_cedar_cone": {
+ "file": "assets/items/item_cedar_cone.png",
+ "type": "icon",
+ "frameW": 27,
+ "frameH": 32
+},
+ "item_small_lantern": {
+ "file": "assets/items/item_small_lantern.png",
+ "type": "icon",
+ "frameW": 22,
+ "frameH": 32
+},
+ "item_forest_lantern": {
+ "file": "assets/items/item_forest_lantern.png",
+ "type": "icon",
+ "frameW": 26,
+ "frameH": 32
+},
+ "item_dawn_compass": {
+ "file": "assets/items/item_dawn_compass.png",
+ "type": "icon",
+ "frameW": 29,
+ "frameH": 32
+},
+ "item_gear_z13_coat": {
+ "file": "assets/items/item_gear_z13_coat.png",
+ "type": "icon",
+ "frameW": 36,
+ "frameH": 32
+},
+ "npc_dawn_ring_pu": {
+ "file": "assets/npcs/npc_dawn_ring_pu.png",
+ "type": "single",
+ "frameW": 58,
+ "frameH": 64
+}
 };

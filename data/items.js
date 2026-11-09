@@ -11,6 +11,14 @@
  * 本檔只賣道具與裝備，不賣真錢、沒有轉蛋。
  */
 window.ITEMS = {
+  // v4.1 中橫・南投：素材不收購；兩件關鍵道具留在包包。防寒衣定價 3900。
+  snow_crystal: {"name":"雪花結晶","sprite":"item_snow_crystal","kind":"material","price":0,"desc":"雪球寶寶清醒後留下的雪花結晶。"},
+  bamboo_husk: {"name":"筍殼","sprite":"item_bamboo_husk","kind":"material","price":0,"desc":"筍筍竹筍妖清醒後留下的筍殼。"},
+  cedar_cone: {"name":"杉樹毬果","sprite":"item_cedar_cone","kind":"material","price":0,"desc":"毬毬杉果精清醒後留下的杉樹毬果。"},
+  small_lantern: {"name":"小燈籠","sprite":"item_small_lantern","kind":"material","price":0,"desc":"森林夜遊白鼻心清醒後還回的小燈籠。"},
+  forest_lantern: {"name":"森林燈籠","sprite":"item_forest_lantern","kind":"key","price":0,"precious":true,"desc":"夜遊團長清醒後送你的森林燈籠。"},
+  dawn_compass: {"name":"曙光羅盤","sprite":"item_dawn_compass","kind":"key","price":0,"precious":true,"desc":"四片曙光碎片合成的羅盤，指針指向玉山。"},
+  gear_z13_coat: {"name":"高山防寒衣","sprite":"item_gear_z13_coat","kind":"armor","fam":"gen","price":3900,"atk":0,"def":14,"mp":0,"jobs":null,"desc":"上山保暖的防寒衣。大家都能穿。"},
   // ── 消耗品與答題卡 ──
   herb:   { name: "藥草",       sprite: "item_herb",        kind: "consumable", price: 12, effect: { hp: 20 },           desc: "吃了可以回復 20 點體力。" },
   snack:  { name: "番薯仔點心", sprite: "item_snack",       kind: "consumable", price: 15, effect: { hp: 10, pet: 1 },   desc: "番薯仔最愛的烤地瓜點心，回復 10 點體力。" },
@@ -118,6 +126,8 @@ window.ITEMS = {
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */
 window.SHOPS = {
+  // v4.1 埔里旅店老闆兼賣高山防寒衣。
+  gear_puli: {"name":"鎮上旅店（兼賣裝備）","items":["gear_z13_coat"]},
   general: { name: "老街雜貨店",   items: ["herb", "snack", "eraser", "guide", "wood_sword", "leather"] },
   item:    { name: "山城市場道具攤",     items: ["herb", "snack", "eraser", "guide"] },
   // v1.1 第一章（59 號 2.4 節）：基隆港廟口道具攤，品項同山城市場道具攤

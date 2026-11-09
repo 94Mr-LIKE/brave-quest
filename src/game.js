@@ -1604,7 +1604,8 @@
     ctx.won = true;
     G.save();
     var levels = st.player.level - lvl;
-    var after = (mon.boss || mon.elite) && mon.dialog_after ? function () { return G.say(mon.dialog_after, []); } : function () { return Promise.resolve(); };
+    // v4.1：一般怪也可指定每場勝利後的提醒（白鼻心沿用劇本組現有句子）。
+    var after = mon.dialog_after ? function () { return G.say(mon.dialog_after, []); } : function () { return Promise.resolve(); };
     if (!(mon.boss || mon.elite) && mon.dialog_after_once && (G.data.dialogs || {})[mon.dialog_after_once] && !(st.flags && st.flags['seen_' + mon.dialog_after_once])) {   // v4.0 東部（71 號 4.11）：第一次清醒後播一次
       after = function () { if (!st.flags || typeof st.flags !== 'object') st.flags = {}; st.flags['seen_' + mon.dialog_after_once] = true; G.save(); return G.say(mon.dialog_after_once, []); };
     }

@@ -64,6 +64,10 @@ window.WORLD = {
     { id: "R_DASHU", name: "大樹鳳梨山", real_ref: "高雄市大樹區（高屏舊鐵橋、鳳梨荔枝、佛光山）", map_entry: "M23", tx: 6, ty: 48, x: 0.297, y: 0.750, unlock_quest: null, unlock_visit: "M23" },
     { id: "R_PINGTUNG", name: "屏東恆春半島", real_ref: "屏東縣（東港碼頭、恆春古城、鵝鑾鼻燈塔）", map_entry: "M25", tx: 24, ty: 14, x: 0.469, y: 0.922, unlock_quest: null, unlock_visit: "M25" },
     { id: "R_TAITUNG", name: "台東縱谷海港", real_ref: "臺東縣（卑南遺址公園、鹿野高台、富岡漁港）", map_entry: "M26", tx: 10, ty: 43, x: 0.633, y: 0.769, unlock_quest: null, unlock_visit: "M26" },
-    { id: "R_HUALIEN", name: "花蓮太魯閣口", real_ref: "花蓮縣（太魯閣峽谷口、花蓮石雕、太平洋海岸）", map_entry: "M29", tx: 46, ty: 42, x: 0.81, y: 0.335, unlock_quest: null, unlock_visit: "M29" }
+    { id: "R_HUALIEN", name: "花蓮太魯閣口", real_ref: "花蓮縣（太魯閣峽谷口、花蓮石雕、太平洋海岸）", map_entry: "M29", tx: 46, ty: 42, x: 0.81, y: 0.335, unlock_quest: null, unlock_visit: "M29" },
+    // v4.1 定案座標；先走路到訪，再開放搭車。既有地區座標維持原值。
+    { id: "R_ZHONGHENG", name: "中橫・合歡山", real_ref: "南投縣（大禹嶺、武嶺、合歡山）", map_entry: "M30", tx: 48, ty: 23, x: 0.655, y: 0.329, unlock_quest: null, unlock_visit: "M30" },
+    { id: "R_PULI", name: "埔里・臺灣的中心", real_ref: "南投縣埔里鎮（虎子山、臺灣地理中心碑）", map_entry: "M31", tx: 56, ty: 39, x: 0.505, y: 0.385, unlock_quest: null, unlock_visit: "M31" },
+    { id: "R_XITOU", name: "溪頭森林・燈籠町", real_ref: "南投縣鹿谷鄉（溪頭、大學池、茶園）", map_entry: "M32", tx: 43, ty: 33, x: 0.385, y: 0.436, unlock_quest: null, unlock_visit: "M32" }
   ]
 };

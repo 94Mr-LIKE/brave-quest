@@ -28,6 +28,22 @@
  */
 window.VOICES = {
   speakers: {
+    // v4.1 中橫・南投：沿用草稿聲音，依 v4.0 規則避開重複音高與語速。
+    road_engineer_cc: {"name":"管制站工程員","gender":"m","age":"adult","stage":"中年","look":"npc_road_engineer_cc","pitch":0.9,"rate":0.84,"taigi":true,"persona":"大禹嶺管制站的工程員，一直提醒行車安全。","voice_share":"inn_fucheng"},
+    lodge_keeper_hh: {"name":"山莊管理員","gender":"m","age":"adult","stage":"中年","look":"npc_lodge_keeper_hh","pitch":0.76,"rate":1.06,"taigi":true,"persona":"高山山莊的管理員，熱心、怕客人著涼。","voice_share":"inn_keelung"},
+    wuling_guide: {"name":"武嶺解說員","gender":"m","age":"adult","stage":"青年","look":"npc_wuling_guide","pitch":1,"rate":1.2,"taigi":true,"persona":"武嶺的年輕解說員，講數字很清楚。","voice_share":"opera_actor"},
+    veg_farmer: {"name":"高冷蔬菜農","gender":"m","age":"elder","stage":"老年","look":"npc_veg_farmer","pitch":0.74,"rate":0.74,"taigi":true,"persona":"種高冷蔬菜的老農夫，講話慢慢的。","voice_share":"trail_volunteer"},
+    road_veteran: {"name":"老工班阿伯","gender":"m","age":"elder","stage":"老年","look":"npc_road_veteran","pitch":0.55,"rate":0.86,"taigi":true,"persona":"以前開公路的老工班，講古很有味道。","voice_share":"levee_uncle"},
+    center_volunteer: {"name":"觀景台志工","gender":"m","age":"elder","stage":"老年","look":"npc_center_volunteer","pitch":0.74,"rate":0.68,"taigi":true,"persona":"中心碑廣場的老志工，客氣。","voice_share":"tea_farmer"},
+    paper_master: {"name":"紙寮師傅","gender":"m","age":"elder","stage":"老年","look":"npc_paper_master","pitch":0.68,"rate":0.7,"taigi":true,"persona":"做手工紙的老師傅，講話仔細。","voice_share":"tea_farmer_mk"},
+    jiaobai_farmer: {"name":"茭白筍農","gender":"m","age":"adult","stage":"中年","look":"npc_jiaobai_farmer","pitch":0.63,"rate":0.8,"taigi":true,"persona":"種茭白筍的農夫，爽朗。","voice_share":"inn_jinguashi"},
+    inn_puli: {"name":"鎮上旅店老闆","gender":"m","age":"adult","stage":"中年","look":"npc_inn_puli_m","pitch":0.75,"rate":1.12,"taigi":true,"persona":"埔里鎮上的旅店老闆，親切。","voice_share":"stall_yilan"},
+    forest_guide_xt: {"name":"森林解說員","gender":"m","age":"adult","stage":"青年","look":"npc_forest_guide_xt","pitch":0.88,"rate":1.21,"taigi":true,"persona":"溪頭的年輕森林解說員，愛樹。","voice_share":"gondola_staff"},
+    lantern_shop: {"name":"燈籠店老闆","gender":"m","age":"adult","stage":"中年","look":"npc_lantern_shop","pitch":0.69,"rate":1.08,"taigi":true,"persona":"燈籠町燈籠店老闆，熱情、有點緊張。","voice_share":"inn_sanxing"},
+    tea_farmer_lg: {"name":"鹿谷茶農","gender":"m","age":"elder","stage":"老年","look":"npc_tea_farmer_lg","pitch":0.74,"rate":0.62,"taigi":true,"persona":"鹿谷的老茶農，講茶很得意。","voice_share":"traffic_volunteer"},
+    inn_xitou: {"name":"燈籠町旅店老闆","gender":"m","age":"adult","stage":"中年","look":"npc_inn_xitou_m","pitch":0.68,"rate":0.86,"taigi":true,"persona":"燈籠町旅店老闆，說話輕快。","voice_share":"inn_maokong"},
+    ghb_civetboss: {"name":"夜遊團長","gender":"m","age":"adult","stage":"中年","look":"boss_ghb_civetboss","pitch":0.5,"rate":1.05,"taigi":false,"persona":"得意又調皮的聲音，清醒後變得不好意思。"},
+    dawn_ring_pu: {"name":"曙光碎片","gender":"m","age":"child","stage":"小孩","look":null,"pitch":1.45,"rate":0.88,"taigi":false,"persona":"虎子山頂的曙光碎片互動物件；台詞由霧仔說華語。","voice_share":"fog_kid"},
     // ── 金包里 ──
     // 語音組 2026-10-10：stage＝外觀年齡、look＝精靈圖（對照表 tools/voice/npc_looks.js）；有改的行在行尾註明原值
     chief:          { name: "里長伯",         gender: "m", age: "elder", stage: "老年", look: "npc_chief",         pitch: 0.78, rate: 0.85, taigi: true,  persona: "熱心又愛照顧人，說話慢慢的，常夾台語，「好啦好啦」掛在嘴邊。" },
@@ -223,6 +239,16 @@ window.VOICES = {
   pet: { name: "番薯仔", gender: "m", age: "child", pitch: 1.62, rate: 1.12, taigi: false, persona: "元氣十足、愛吃，說話短短的，常加「喔！」。" },
 
   monsters: {
+    // v4.1 中橫・南投怪物的戰鬥音效。
+    wx_snow: {"family":"slime","size":"s","mood":"頑皮","pitch_shift":7,"cry":"咕嚕咕嚕！"},
+    fo_puff: {"family":"spirit","size":"s","mood":"迷糊","pitch_shift":5,"cry":"噗噗……"},
+    gh_bamboo: {"family":"plant","size":"s","mood":"頑皮","pitch_shift":5,"cry":"啵！啵！"},
+    gh_cone: {"family":"plant","size":"s","mood":"迷糊","pitch_shift":6,"cry":"刺刺刺……"},
+    gh_lantern_f: {"family":"spirit","size":"s","mood":"神祕","pitch_shift":6,"cry":"呼……呼……"},
+    gh_umbrella_f: {"family":"spirit","size":"s","mood":"頑皮","pitch_shift":7,"cry":"啪啦啪啦！"},
+    gh_geta_f: {"family":"spirit","size":"s","mood":"頑皮","pitch_shift":4,"cry":"喀喀！喀喀！"},
+    gh_civet_f: {"family":"beast","size":"m","mood":"頑皮","pitch_shift":3,"cry":"吱吱！"},
+    ghb_civetboss: {"family":"beast","size":"boss","mood":"頑皮","pitch_shift":-5,"cry":"嘿嘿嘿——！"},
     dango:       { family: "slime",   size: "s",    mood: "迷糊", pitch_shift: 7,   cry: "噗嚕噗嚕～" },
     rabbit:      { family: "beast",   size: "s",    mood: "頑皮", pitch_shift: 9,   cry: "啾啾！" },
     mushroom:    { family: "plant",   size: "s",    mood: "迷糊", pitch_shift: 4,   cry: "噗咻～" },

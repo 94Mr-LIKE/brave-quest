@@ -21,6 +21,22 @@
  * who：NPC id（對應 maps.js）、怪物 id（對應 monsters.js）、"hero"（主角）、"pet"（番薯仔）、"narrator"（旁白）。
  */
 window.SPEAKERS = {
+  // v4.1 中橫・南投：名稱與說話者沿用劇本草稿；羅盤由霧仔講。
+  road_engineer_cc: "管制站工程員",
+  lodge_keeper_hh: "山莊管理員",
+  wuling_guide: "武嶺解說員",
+  veg_farmer: "高冷蔬菜農",
+  road_veteran: "老工班阿伯",
+  center_volunteer: "觀景台志工",
+  paper_master: "紙寮師傅",
+  jiaobai_farmer: "茭白筍農",
+  inn_puli: "鎮上旅店老闆",
+  forest_guide_xt: "森林解說員",
+  lantern_shop: "燈籠店老闆",
+  ghb_civetboss: "夜遊團長",
+  tea_farmer_lg: "鹿谷茶農",
+  inn_xitou: "燈籠町旅店老闆",
+  dawn_ring_pu: "曙光碎片",
   // v4.0 東部（71 號 4.9；人類台語角色全部男性；蘭嶼解說員、蘭嶼民宿老闆講華語；頭目霧氣球大王、雲鯨霧將）
   ruins_guide: "遺址公園解說員", balloon_captain: "熱氣球隊長", fob_balloon: "霧氣球大王", custard_farmer: "釋迦農", ticket_seller_fg: "富岡漁港售票員", inn_taitung: "縱谷民宿老闆", lighthouse_guide_gi: "燈塔解說員", onsen_keeper_gi: "溫泉管理員", oldhouse_gi: "古厝阿伯", ice_shop_gi: "冰店老闆", inn_greenisland: "綠島民宿老闆", tao_guide: "蘭嶼文化解說員", inn_lanyu: "蘭嶼民宿老闆", station_hl: "車站服務員", taroko_ranger: "國家公園解說員", fisher_hl: "海邊的漁夫", wxb_whale: "雲鯨霧將", road_engineer: "公路工程員", stone_carver: "石雕師傅", mochi_shop: "麻糬店老闆", inn_hualien: "海岸旅店老闆",
   // v3.0 南部（70 號；人類 NPC 全部男性、講台語（佛光山志工也講台語）；霧仔講華語；墾丁的國家公園解說員 id 是 park_ranger_kt）
@@ -56,6 +72,233 @@ window.SPEAKERS = {
 };
 
 window.DIALOGS = {
+  // v4.1 中橫・南投：草稿台詞套用定案補文，句序從 0 起算。
+  D_CH_1A: [
+    {"who":"road_engineer_cc","emotion":"開心","text":"歡迎來到山上的公路！這裡冬天會下雪。","taigi":{"hanji":"歡迎來山頂的公路！遮寒天會落雪。","tailo":"Huan-gîng lâi suann-tíng ê kong-lōo! Tsia kuânn-thinn ē lo̍h-seh.","huayu":"歡迎來到山上的公路！這裡冬天會下雪。"}},
+    {"who":"pet","emotion":"開心","text":"這裡是合歡山，大家叫它「雪鄉」！"},
+    {"who":"road_engineer_cc","emotion":"平靜","text":"路面結冰的時候，車子要照公告加雪鏈。","taigi":{"hanji":"路面結冰的時，車愛照公告加鍊仔。","tailo":"Lōo-bīn kiat-ping ê sî, tshia ài tsiàu kong-kò ka liān-á.","huayu":"路面結冰的時候，車子要照公告加雪鏈。"}},
+    {"who":"road_engineer_cc","emotion":"平靜","text":"上山要穿暖，出門前先看路況和天氣。","taigi":{"hanji":"上山愛穿予燒，出門先看路況佮天氣。","tailo":"Tsiūnn-suann ài tshīng hōo sio, tshut-mn̂g sing khuànn lōo-hóng kah thinn-khì.","huayu":"上山要穿暖，出門前先看路況和天氣。"}},
+    {"who":"road_engineer_cc","emotion":"擔心","text":"霧讓我忘了天氣的事，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得天氣的代誌，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit thinn-khì ê tāi-tsì, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了天氣的事，幫我想 2 題好嗎？"}}
+  ],
+  D_CH_1B: [
+    {"who":"road_engineer_cc","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"road_engineer_cc","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}},
+    {"who":"pet","emotion":"平靜","text":"山莊的管理員，好像需要幫忙！"}
+  ],
+  D_ENGINEER_CC_IDLE: [
+    {"who":"road_engineer_cc","emotion":"平靜","text":"上山要穿暖，出門前先看路況和天氣。","taigi":{"hanji":"上山愛穿予燒，出門先看路況佮天氣。","tailo":"Tsiūnn-suann ài tshīng hōo sio, tshut-mn̂g sing khuànn lōo-hóng kah thinn-khì.","huayu":"上山要穿暖，出門前先看路況和天氣。"}}
+  ],
+  D_CH_5A: [
+    {"who":"lodge_keeper_hh","emotion":"擔心","text":"雪地上有幾顆雪球怪物，一直打轉。","taigi":{"hanji":"雪頂有幾粒雪球的怪物，一直踅。","tailo":"Seh tíng ū kuí lia̍p seh-kiû ê kuài-bu̍t, it-ti̍t se̍h.","huayu":"雪地上有幾顆雪球怪物，一直打轉。"}},
+    {"who":"lodge_keeper_hh","emotion":"平靜","text":"讓怪物清醒，把 3 片雪花結晶找回來。","taigi":{"hanji":"予怪物清醒，共三片雪花揣轉來。","tailo":"Hōo kuài-bu̍t tshing-tshínn, kā sann phìnn seh-hue tshuē tńg--lâi.","huayu":"讓怪物清醒，把 3 片雪花結晶找回來。"}}
+  ],
+  D_CH_5B: [
+    {"who":"lodge_keeper_hh","emotion":"開心","text":"雪花找回來了，謝謝你！","taigi":{"hanji":"雪花揣轉來矣，多謝你！","tailo":"Seh-hue tshuē tńg--lâi--ah, to-siā--lí!","huayu":"雪花找回來了，謝謝你！"}},
+    {"who":"lodge_keeper_hh","emotion":"開心","text":"這些金幣和藥草送你。","taigi":{"hanji":"這寡金幣佮藥草送你。","tailo":"Tsit-kuá kim-pè kah io̍h-tsháu sàng lí.","huayu":"這些金幣和藥草送你。"}},
+    {"who":"pet","emotion":"開心","text":"再往上爬，就到武嶺了！"}
+  ],
+  D_SNOWBALL_AFTER: [
+    {"who":"narrator","emotion":"平靜","text":"山上下雪要穿暖，車子要照公告加雪鏈。"}
+  ],
+  D_CH_4A: [
+    {"who":"wuling_guide","emotion":"開心","text":"這裡海拔 3,275 公尺！","taigi":{"hanji":"遮海拔三千兩百七十五公尺！","tailo":"Tsia hái-pua̍t sann-tshing nn̄g-pah tshit-tsa̍p-gōo kong-tshioh!","huayu":"這裡海拔 3,275 公尺！"}},
+    {"who":"wuling_guide","emotion":"平靜","text":"這是開車能到的最高的地方。","taigi":{"hanji":"這是駛車會到的上懸的所在。","tailo":"Tse sī sái-tshia ē kàu ê siōng kuân ê sóo-tsāi.","huayu":"這是開車能到的最高的地方。"}},
+    {"who":"pet","emotion":"驚訝","text":"這裡是武嶺，在合歡山主峰和東峰的中間！"},
+    {"who":"wuling_guide","emotion":"平靜","text":"幫我算 2 題好嗎？","taigi":{"hanji":"共我算兩題，好無？","tailo":"Kā guá sǹg nn̄g tê, hó--bô?","huayu":"幫我算 2 題好嗎？"}}
+  ],
+  D_CH_4B: [
+    {"who":"wuling_guide","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"wuling_guide","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}},
+    {"who":"wuling_guide","emotion":"平靜","text":"下山往埔里，那裡是臺灣的地理中心。","taigi":{"hanji":"落山往埔里，遐是臺灣的地理中心。","tailo":"Lo̍h-suann óng Poo-lí, hia sī Tâi-uân ê tē-lí tiong-sim.","huayu":"下山往埔里，那裡是臺灣的地理中心。"}}
+  ],
+  D_WULING_IDLE: [
+    {"who":"wuling_guide","emotion":"平靜","text":"東邊有看風景的地方，風很大，要站好喔。","taigi":{"hanji":"東爿有看風景的所在，風真透，愛徛予好。","tailo":"Tang-pîng ū khuànn hong-kíng ê sóo-tsāi, hong tsin thàu, ài khiā hōo hó.","huayu":"東邊有看風景的地方，風很大，要站好喔。"}}
+  ],
+  D_CH_2A: [
+    {"who":"veg_farmer","emotion":"開心","text":"高麗菜喜歡涼涼的天氣，才長得好。","taigi":{"hanji":"高麗菜愛冷冷的天氣，才會大。","tailo":"Ko-lê-tshài ài líng-líng ê thinn-khì, tsiah ē tuā.","huayu":"高麗菜喜歡涼涼的天氣，才長得好。"}},
+    {"who":"veg_farmer","emotion":"平靜","text":"一千到兩千公尺高的山上，最適合種。","taigi":{"hanji":"一千到兩千公尺懸的山頂，上適合種。","tailo":"Tsi̍t-tshing kàu nn̄g-tshing kong-tshioh kuân ê suann-tíng, siōng sik-ha̍p tsìng.","huayu":"一千到兩千公尺高的山上，最適合種。"}},
+    {"who":"veg_farmer","emotion":"擔心","text":"霧讓我忘了種菜的事，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得種菜的代誌，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit tsìng tshài ê tāi-tsì, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了種菜的事，幫我想 2 題好嗎？"}}
+  ],
+  D_CH_2B: [
+    {"who":"veg_farmer","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"veg_farmer","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}}
+  ],
+  D_CH_3A: [
+    {"who":"road_veteran","emotion":"平靜","text":"這條公路，是以前的人一點一點開出來的。","taigi":{"hanji":"這條公路，是較早的人一點仔一點仔開出來的。","tailo":"Tsit tiâu kong-lōo, sī khah-tsá ê lâng tsi̍t-tiám-á tsi̍t-tiám-á khui--tshut-lâi--ê.","huayu":"這條公路，是以前的人一點一點開出來的。"}},
+    {"who":"pet","emotion":"平靜","text":"中橫公路 1956 年開工，1960 年通車喔！"},
+    {"who":"road_veteran","emotion":"平靜","text":"它把東邊和西邊連起來了。","taigi":{"hanji":"伊共東爿佮西爿連起來矣。","tailo":"I kā tang-pîng kah sai-pîng liân--khí-lâi--ah.","huayu":"它把東邊和西邊連起來了。"}},
+    {"who":"road_veteran","emotion":"擔心","text":"霧讓我忘了開路的故事，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得開路的故事，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit khui-lōo ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了開路的故事，幫我想 2 題好嗎？"}}
+  ],
+  D_CH_3B: [
+    {"who":"road_veteran","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"road_veteran","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}}
+  ],
+  D_INN_HEHUAN: [
+    {"who":"lodge_keeper_hh","emotion":"開心","text":"歡迎來高山山莊！晚上很冷，要蓋暖一點。","taigi":{"hanji":"歡迎來山頂的山莊！暗時真寒，愛蓋予燒。","tailo":"Huan-gîng lâi suann-tíng ê san-tsong! Àm-sî tsin kuânn, ài kah hōo sio.","huayu":"歡迎來高山山莊！晚上很冷，要蓋暖一點。"}}
+  ],
+  D_INN_HEHUAN_NOCOIN: [
+    {"who":"lodge_keeper_hh","emotion":"擔心","text":"金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。","taigi":{"hanji":"金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。","tailo":"Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.","huayu":"金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。"}}
+  ],
+  D_PUL_2A: [
+    {"who":"center_volunteer","emotion":"開心","text":"歡迎來埔里！你看，這是地理中心的碑。","taigi":{"hanji":"歡迎來埔里！你看，這是地理中心的碑。","tailo":"Huan-gîng lâi Poo-lí! Lí khuànn, tse sī tē-lí tiong-sim ê pi.","huayu":"歡迎來埔里！你看，這是地理中心的碑。"}},
+    {"who":"pet","emotion":"驚訝","text":"它的樣子像一朵半開的百合花！"},
+    {"who":"center_volunteer","emotion":"平靜","text":"碑後面的石階，走四百多階就到山頂。","taigi":{"hanji":"碑後壁的石階，行四百外階就到山頂。","tailo":"Pi āu-piah ê tsio̍h-kai, kiânn sì-pah guā kai tō kàu suann-tíng.","huayu":"碑後面的石階，走四百多階就到山頂。"}},
+    {"who":"center_volunteer","emotion":"平靜","text":"山頂有全臺最大的三角點。","taigi":{"hanji":"山頂有全臺灣上大的三角點。","tailo":"Suann-tíng ū tsuân Tâi-uân siōng tuā ê sann-kak-tiám.","huayu":"山頂有全臺最大的三角點。"}},
+    {"who":"center_volunteer","emotion":"擔心","text":"霧讓我忘了這裡的故事，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得遮的故事，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit tsia ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了這裡的故事，幫我想 2 題好嗎？"}}
+  ],
+  D_PUL_2B: [
+    {"who":"center_volunteer","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"center_volunteer","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}},
+    {"who":"fog_kid","emotion":"驚訝","text":"四片碎片在發光……我們爬上山頂看看！"}
+  ],
+  D_CENTER_IDLE: [
+    {"who":"center_volunteer","emotion":"平靜","text":"從山頂看得到整個埔里。","taigi":{"hanji":"對山頂看會著規个埔里。","tailo":"Tuì suann-tíng khuànn ē tio̍h kui-ê Poo-lí.","huayu":"從山頂看得到整個埔里。"}}
+  ],
+  D_V1_COMPASS: [
+    {"who":"narrator","emotion":"神祕","text":"四片曙光碎片從手帳飛出來，繞成一圈。"}
+  ],
+  D_PUL_1A: [
+    {"who":"fog_kid","emotion":"驚訝","text":"到山頂了！四片碎片繞成一圈了……"},
+    {"who":"fog_kid","emotion":"平靜","text":"五科各答對 1 題，把碎片合在一起吧！"}
+  ],
+  D_PUL_1B: [
+    {"who":"fog_kid","emotion":"開心","text":"做出曙光羅盤了！針指向南邊的玉山！"},
+    {"who":"pet","emotion":"開心","text":"往南經過溪頭，去玉山吧！"}
+  ],
+  D_PUL_3A: [
+    {"who":"paper_master","emotion":"平靜","text":"這裡是手工造紙的地方，現在很少了。","taigi":{"hanji":"遮是手工做紙的所在，這馬真少矣。","tailo":"Tsia sī tshiú-kang tsò tsuá ê sóo-tsāi, tsit-má tsin tsió--ah.","huayu":"這裡是手工造紙的地方，現在很少了。"}},
+    {"who":"paper_master","emotion":"平靜","text":"我們還用傳統的方法做紙。","taigi":{"hanji":"阮猶閣用傳統的方法做紙。","tailo":"Guán iáu-koh īng thuân-thóng ê hong-huat tsò tsuá.","huayu":"我們還用傳統的方法做紙。"}},
+    {"who":"paper_master","emotion":"擔心","text":"霧讓我忘了做紙的工作，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得做紙的工課，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit tsò tsuá ê khang-khuè, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了做紙的工作，幫我想 2 題好嗎？"}}
+  ],
+  D_PUL_3B: [
+    {"who":"paper_master","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"paper_master","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}}
+  ],
+  D_PUL_4A: [
+    {"who":"jiaobai_farmer","emotion":"開心","text":"茭白筍白白的，大家叫它「美人腿」。","taigi":{"hanji":"茭白筍白鑠鑠，逐家叫伊「美人腿」。","tailo":"Kha-pe̍h-sún pe̍h-siak-siak, ta̍k-ke kiò i “bí-jîn-thuí”.","huayu":"茭白筍白白的，大家叫它「美人腿」。"}},
+    {"who":"jiaobai_farmer","emotion":"平靜","text":"這是埔里的名產喔！","taigi":{"hanji":"這是埔里的名產喔！","tailo":"Tse sī Poo-lí ê bîng-sán--ooh!","huayu":"這是埔里的名產喔！"}},
+    {"who":"jiaobai_farmer","emotion":"擔心","text":"霧讓我忘了種茭白筍的事，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得種茭白筍的代誌，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit tsìng kha-pe̍h-sún ê tāi-tsì, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了種茭白筍的事，幫我想 2 題好嗎？"}}
+  ],
+  D_PUL_4B: [
+    {"who":"jiaobai_farmer","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"jiaobai_farmer","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}}
+  ],
+  D_INN_PULI: [
+    {"who":"inn_puli","emotion":"開心","text":"歡迎來埔里的旅店！好好休息喔。","taigi":{"hanji":"歡迎來埔里的旅社！好好仔歇睏喔。","tailo":"Huan-gîng lâi Poo-lí ê lí-siā! Hó-hó-á hioh-khùn--ooh.","huayu":"歡迎來埔里的旅店！好好休息喔。"}}
+  ],
+  D_INN_PULI_NOCOIN: [
+    {"who":"inn_puli","emotion":"擔心","text":"金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。","taigi":{"hanji":"金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。","tailo":"Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.","huayu":"金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。"}}
+  ],
+  D_XT_1A: [
+    {"who":"forest_guide_xt","emotion":"開心","text":"歡迎來溪頭！這裡有一片樹林，已經五十多年了。","taigi":{"hanji":"歡迎來溪頭！遮有一片樹林，已經五十外年矣。","tailo":"Huan-gîng lâi Khe-thâu! Tsia ū tsi̍t phìnn tshiū-nâ, í-king gōo-tsa̍p guā nî--ah.","huayu":"歡迎來溪頭！這裡有一片樹林，已經五十多年了。"}},
+    {"who":"pet","emotion":"平靜","text":"溪頭是臺灣大學的實驗林喔！"},
+    {"who":"forest_guide_xt","emotion":"平靜","text":"大學池上有一座竹子搭的拱橋。","taigi":{"hanji":"大學池頂有一座竹仔搭的橋。","tailo":"Tāi-ha̍k-tî tíng ū tsi̍t tsō tik-á tah ê kiô.","huayu":"大學池上有一座竹子搭的拱橋。"}},
+    {"who":"forest_guide_xt","emotion":"平靜","text":"有時候池面會飄著薄薄的霧。","taigi":{"hanji":"有時陣池面會飄薄薄的霧。","tailo":"Ū-sî-tsūn tî-bīn ē phiau po̍h-po̍h ê bū.","huayu":"有時候池面會飄著薄薄的霧。"}},
+    {"who":"forest_guide_xt","emotion":"擔心","text":"霧讓我忘了樹林的故事，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得樹林的故事，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit tshiū-nâ ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了樹林的故事，幫我想 2 題好嗎？"}}
+  ],
+  D_XT_1B: [
+    {"who":"forest_guide_xt","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"forest_guide_xt","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}},
+    {"who":"pet","emotion":"平靜","text":"燈籠町的燈籠店老闆，好像需要幫忙！"}
+  ],
+  D_FORESTXT_IDLE: [
+    {"who":"forest_guide_xt","emotion":"平靜","text":"這裡的神木已經倒下了，樹林要好好照顧。","taigi":{"hanji":"遮的神木已經倒去矣，樹林愛好好仔顧。","tailo":"Tsia ê sîn-bo̍k í-king tó--khì--ah, tshiū-nâ ài hó-hó-á kòo.","huayu":"這裡的神木已經倒下了，樹林要好好照顧。"}}
+  ],
+  D_XT_2A: [
+    {"who":"lantern_shop","emotion":"開心","text":"歡迎來燈籠町！每間屋簷下都掛著燈籠。","taigi":{"hanji":"歡迎來鼓燈町！逐間厝的簾簷跤攏掛鼓仔燈。","tailo":"Huan-gîng lâi Kóo-ting-ting! Ta̍k king tshù ê nî-tsînn-kha lóng kuà kóo-á-ting.","huayu":"歡迎來燈籠町！每間屋簷下都掛著燈籠。"}},
+    {"who":"pet","emotion":"平靜","text":"真的溪頭有個松林町，大家叫它妖怪村。"},
+    {"who":"lantern_shop","emotion":"擔心","text":"一路上的妖怪迷路了，要送牠們回家。","taigi":{"hanji":"一路的妖怪攏揣無路，欲送𪜶轉去厝。","tailo":"Tsi̍t-lōo ê iau-kuài lóng tshuē-bô lōo, beh sàng in tńg-khì tshù.","huayu":"一路上的妖怪迷路了，要送牠們回家。"}},
+    {"who":"lantern_shop","emotion":"平靜","text":"幫我把故事排好，答對 3 題好嗎？","taigi":{"hanji":"共故事排予好，回答三題，好無？","tailo":"Kā kòo-sū pâi hōo hó, huê-tap sann tê, hó--bô?","huayu":"幫我把故事排好，答對 3 題好嗎？"}}
+  ],
+  D_XT_2B: [
+    {"who":"lantern_shop","emotion":"開心","text":"故事排好了！牠們都回家了。","taigi":{"hanji":"故事排好矣！𪜶攏轉去厝矣。","tailo":"Kòo-sū pâi-hó--ah! In lóng tńg-khì tshù--ah.","huayu":"故事排好了！牠們都回家了。"}},
+    {"who":"lantern_shop","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}}
+  ],
+  D_XT_3A: [
+    {"who":"lantern_shop","emotion":"擔心","text":"可是有怪物把我們的燈籠偷走了！","taigi":{"hanji":"毋過有怪物共阮的鼓仔燈偷提去矣！","tailo":"M̄-koh ū kuài-bu̍t kā guán ê kóo-á-ting thau-the̍h--khì--ah!","huayu":"可是有怪物把我們的燈籠偷走了！"}},
+    {"who":"lantern_shop","emotion":"平靜","text":"讓怪物清醒，把 3 盞小燈籠找回來。","taigi":{"hanji":"予怪物清醒，共三葩鼓仔燈揣轉來。","tailo":"Hōo kuài-bu̍t tshing-tshínn, kā sann pha kóo-á-ting tshuē tńg--lâi.","huayu":"讓怪物清醒，把 3 盞小燈籠找回來。"}},
+    {"who":"pet","emotion":"驚訝","text":"是林間夜路的森林夜遊白鼻心！"}
+  ],
+  D_XT_3B: [
+    {"who":"lantern_shop","emotion":"開心","text":"燈籠找回來了，謝謝你！","taigi":{"hanji":"鼓仔燈揣轉來矣，多謝你！","tailo":"Kóo-á-ting tshuē tńg--lâi--ah, to-siā--lí!","huayu":"燈籠找回來了，謝謝你！"}},
+    {"who":"lantern_shop","emotion":"開心","text":"這些金幣和藥草送你。","taigi":{"hanji":"這寡金幣佮藥草送你。","tailo":"Tsit-kuá kim-pè kah io̍h-tsháu sàng lí.","huayu":"這些金幣和藥草送你。"}}
+  ],
+  D_XT_4A: [
+    {"who":"lantern_shop","emotion":"擔心","text":"還有一隻大的，把整條街的燈籠都藏起來了！","taigi":{"hanji":"閣有一隻足大的，共規條街的鼓仔燈攏藏起來！","tailo":"Koh ū tsi̍t tsiah tsiok tuā--ê, kā kui tiâu ke ê kóo-á-ting lóng tshàng--khí-lâi!","huayu":"還有一隻大的，把整條街的燈籠都藏起來了！"}},
+    {"who":"lantern_shop","emotion":"平靜","text":"去廣場讓牠清醒！","taigi":{"hanji":"去廣場予伊清醒！","tailo":"Khì kóng-tiûnn hōo i tshing-tshínn!","huayu":"去廣場讓牠清醒！"}},
+    {"who":"pet","emotion":"驚訝","text":"是夜遊團長！答對題目，把燈籠拿回來！"}
+  ],
+  D_BOSS_CIVET_A: [
+    {"who":"ghb_civetboss","emotion":"開心","text":"嘿嘿嘿……燈籠都是我的！今晚整條街都要黑漆漆！"},
+    {"who":"pet","emotion":"驚訝","text":"答對題目，讓夜遊團長把燈籠還回來！"}
+  ],
+  D_BOSS_CIVET_B: [
+    {"who":"ghb_civetboss","emotion":"平靜","text":"好啦好啦……燈籠一盞盞掛回去。這盞森林燈籠送你。"}
+  ],
+  D_XT_4B: [
+    {"who":"lantern_shop","emotion":"開心","text":"燈籠又亮了！謝謝你，勇者！","taigi":{"hanji":"鼓仔燈閣光矣！多謝你，勇者！","tailo":"Kóo-á-ting koh kng--ah! To-siā lí, ióng-tsiá!","huayu":"燈籠又亮了！謝謝你，勇者！"}},
+    {"who":"lantern_shop","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}},
+    // V41_STUB_BEGIN（v4.2 還原第 3 句）
+    {"who":"pet","emotion":"開心","text":"拿到森林燈籠了！往塔塔加的山路，要等之後開放喔！"}
+    // V41_STUB_END
+  ],
+  D_CIVET_AFTER: [
+    {"who":"narrator","emotion":"平靜","text":"野生動物不要餵，也不要抓喔。"}
+  ],
+  D_LANTERN_IDLE: [
+    {"who":"lantern_shop","emotion":"平靜","text":"燈籠要小心，不可以玩火。","taigi":{"hanji":"鼓仔燈愛細膩，毋通耍火。","tailo":"Kóo-á-ting ài sè-jī, m̄-thang sńg hué.","huayu":"燈籠要小心，不可以玩火。"}}
+  ],
+  D_XT_5A: [
+    {"who":"tea_farmer_lg","emotion":"開心","text":"我們的茶，原本是在鹿谷的山上種的。","taigi":{"hanji":"阮的茶，原底是佇鹿谷的山頂種的。","tailo":"Guán ê tê, guân-té sī tī Lo̍k-kok ê suann-tíng tsìng--ê.","huayu":"我們的茶，原本是在鹿谷的山上種的。"}},
+    {"who":"pet","emotion":"平靜","text":"這是凍頂烏龍茶，原產在鹿谷鄉的山區！"},
+    {"who":"tea_farmer_lg","emotion":"平靜","text":"那裡的山大約五百到八百公尺高。","taigi":{"hanji":"遐的山大約五百到八百公尺懸。","tailo":"Hia ê suann tāi-iok gōo-pah kàu peh-pah kong-tshioh kuân.","huayu":"那裡的山大約五百到八百公尺高。"}},
+    {"who":"tea_farmer_lg","emotion":"擔心","text":"霧讓我忘了種茶的事，幫我想 2 題好嗎？","taigi":{"hanji":"霧予我袂記得種茶的代誌，共我想兩題，好無？","tailo":"Bū hōo guá bē-kì-tit tsìng tê ê tāi-tsì, kā guá siūnn nn̄g tê, hó--bô?","huayu":"霧讓我忘了種茶的事，幫我想 2 題好嗎？"}}
+  ],
+  D_XT_5B: [
+    {"who":"tea_farmer_lg","emotion":"開心","text":"你都答對了，聽得真認真！","taigi":{"hanji":"你攏回答著矣，聽甲真認真！","tailo":"Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!","huayu":"你都答對了，聽得真認真！"}},
+    {"who":"tea_farmer_lg","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}}
+  ],
+  D_INN_XITOU: [
+    {"who":"inn_xitou","emotion":"開心","text":"歡迎來燈籠町的旅店！好好休息喔。","taigi":{"hanji":"歡迎來鼓燈町的旅社！好好仔歇睏喔。","tailo":"Huan-gîng lâi Kóo-ting-ting ê lí-siā! Hó-hó-á hioh-khùn--ooh.","huayu":"歡迎來燈籠町的旅店！好好休息喔。"}}
+  ],
+  D_INN_XITOU_NOCOIN: [
+    {"who":"inn_xitou","emotion":"擔心","text":"金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。","taigi":{"hanji":"金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。","tailo":"Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.","huayu":"金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。"}}
+  ],
+  D_VEG_IDLE: [
+    {"who":"veg_farmer","emotion":"平靜","text":"宜蘭、南投、臺中的山上，都有種高麗菜。","taigi":{"hanji":"宜蘭、南投、臺中的山頂，攏有種高麗菜。","tailo":"Gî-lân, Lâm-tâu, Tâi-tiong ê suann-tíng, lóng ū tsìng ko-lê-tshài.","huayu":"宜蘭、南投、臺中的山上，都有種高麗菜。"}}
+  ],
+  D_VETERAN_IDLE: [
+    {"who":"road_veteran","emotion":"平靜","text":"以前開路很辛苦，走這條路要謝謝他們。","taigi":{"hanji":"較早開路真辛苦，行這條路愛感謝𪜶。","tailo":"Khah-tsá khui-lōo tsin sin-khóo, kiânn tsit tiâu lōo ài kám-siā in.","huayu":"以前開路很辛苦，走這條路要謝謝他們。"}}
+  ],
+  D_PAPER_IDLE: [
+    {"who":"paper_master","emotion":"平靜","text":"我們也教大家認識手工紙。","taigi":{"hanji":"阮嘛教逐家認捌手工紙。","tailo":"Guán mā kà ta̍k-ke jīn-bat tshiú-kang-tsuá.","huayu":"我們也教大家認識手工紙。"}}
+  ],
+  D_JIAOBAI_IDLE: [
+    {"who":"jiaobai_farmer","emotion":"開心","text":"茭白筍白白的，大家叫它「美人腿」。","taigi":{"hanji":"茭白筍白鑠鑠，逐家叫伊「美人腿」。","tailo":"Kha-pe̍h-sún pe̍h-siak-siak, ta̍k-ke kiò i “bí-jîn-thuí”.","huayu":"茭白筍白白的，大家叫它「美人腿」。"}}
+  ],
+  D_TEA_LG_IDLE: [
+    {"who":"tea_farmer_lg","emotion":"平靜","text":"泡茶的水很燙，要請大人幫忙喔。","taigi":{"hanji":"泡茶的水真燒，愛請大人鬥相共喔。","tailo":"Phàu tê ê tsuí tsin sio, ài tshiánn tuā-lâng tàu-sann-kāng--ooh.","huayu":"泡茶的水很燙，要請大人幫忙喔。"}}
+  ],
+  D_INN_PULI_IDLE: [
+    {"who":"inn_puli","emotion":"開心","text":"累了就來休息，睡飽才有力氣喔。","taigi":{"hanji":"忝矣就來歇睏，睏飽才有氣力喔。","tailo":"Thiám--ah tō lâi hioh-khùn, khùn pá tsiah ū khuì-la̍t--ooh.","huayu":"累了就來休息，睡飽才有力氣喔。"}}
+  ],
+  D_INN_XITOU_IDLE: [
+    {"who":"inn_xitou","emotion":"平靜","text":"晚上山上比較涼，記得多穿一件外套喔。","taigi":{"hanji":"暗時山頂較冷，會記得加穿一領外套喔。","tailo":"Àm-sî suann-tíng khah líng, ē-kì-tit ka tshīng tsi̍t niá guā-thò--ooh.","huayu":"晚上山上比較涼，記得多穿一件外套喔。"}}
+  ],
+  D_EXIT_LOCK_ZH: [
+    {"who":"pet","emotion":"平靜","text":"先爬到武嶺看看路況吧！"},
+    {"who":"pet","emotion":"平靜","text":"看完路況，再下山往埔里吧！"}
+  ],
+  D_EXIT_LOCK_PU: [
+    {"who":"pet","emotion":"驚訝","text":"四片曙光碎片在發光……"},
+    {"who":"pet","emotion":"平靜","text":"先爬上虎子山頂，看看它們想做什麼！"}
+  ],
+  // V41_STUB_BEGIN（v4.2 移除南口路牌台詞）
+  D_SIGN_TATAKA_XT: [
+    {"who":"pet","emotion":"平靜","text":"往南就是塔塔加，玉山就在前面了！"},
+    {"who":"pet","emotion":"平靜","text":"這條路之後開放，現在還不能走喔！"}
+  ],
+  // V41_STUB_END
 
   // ═════════════ 系統與主線 ═════════════
   D_INTRO: [
