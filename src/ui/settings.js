@@ -183,7 +183,7 @@
         body.appendChild(radioRow('允許使用雲端高品質語音（不會傳送名字）', 'vcloud', [{ value: true, label: '允許' }, { value: false, label: '只用本機語音' }],
           st.settings.voiceCloud !== false, function (v) { st.settings.voiceCloud = v; apply(); }));
         body.appendChild(h('p.small', { text: '朗讀是裝置內建的電腦合成語音（不是真人錄音）。選「華語」時，台語台詞會先響一聲提示音，再念華語翻譯；對話框照常顯示台語漢字和台羅。' }));
-        body.appendChild(h('p.small.voice-credit', { text: '台語語音：以 Meta MMS-TTS 閩南語模型（facebook/mms-tts-nan，CC BY-NC 4.0）依教育部台羅合成，非真人錄音' }));
+        body.appendChild(h('p.small.voice-credit', { text: '台語語音：以 Meta MMS-TTS 閩南語模型（facebook/mms-tts-nan，CC BY-NC 4.0）依教育部台羅合成；玉山篇和頒獎時有部分句子是真人錄音，其餘非真人錄音' }));
         body.appendChild(h('details.voice-tips', {}, [h('summary', { text: '🎧 讓聲音更自然' }),
           h('ul', {}, [
             h('li', { text: 'iPad：設定 → 輔助使用 → 朗讀與說話（舊版叫「朗讀內容」）→ 聲音 → 中文（台灣）→ 下載標示「增強版」的聲音（請用 Wi-Fi，約 100 MB 以上）。下載後重新打開遊戲就會自動使用。' }),
@@ -202,6 +202,9 @@
       body.appendChild(h('h3', { text: '🎬 片頭動畫' }));
       body.appendChild(h('div.row', {}, [h('button.replay-opening', { onclick: function () { handle.close(); G.replayOpening(); } }, ['▶ 重看片頭動畫']),
         h('span.small', { text: '（約 45 秒，右下角可以跳過）' })]));
+      // v4.2 重看結局（破關後才出現）：每一段都可以跳過；不改存檔、不再發證書
+      if (st.flags && st.flags.ending_done && G.replayEnding) body.appendChild(h('div.row', {}, [h('button.replay-ending', { onclick: function () { handle.close(); G.replayEnding(); } }, ['▶ 重看結局']),
+        h('span.small', { text: '（約 4 分鐘，每一段都可以跳過）' })]));
       body.appendChild(radioRow('台語對話的小字', 'taigi', [{ value: 'both', label: '台羅＋華語' }, { value: 'huayu', label: '只有華語翻譯' }, { value: 'tailo', label: '只有台羅' }, { value: 'none', label: '不顯示' }],
         st.settings.taigiSub || 'both', function (v) { st.settings.taigiSub = v; G.save(); }));
 

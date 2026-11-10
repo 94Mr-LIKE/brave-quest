@@ -336,7 +336,13 @@
     return jobLevel(state, 'novice') >= masterLevel(data, jobOf(data, 'novice'));
   }
 
-  var Character = { FAM_NAME: FAM_NAME, famNames: famNames, equipFams: equipFams, GROWTH: GROWTH, baseStats: baseStats, ensureJobs: ensureJobs, jobLevel: jobLevel, needsJobHint: needsJobHint, mastered: mastered, usable: usable, usableJobs: usableJobs, isOpen: isOpen, gearValue: gearValue, autoEquip: autoEquip, learnedSkills: learnedSkills, slotSkills: slotSkills, setSkillSlots: setSkillSlots, compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
+  /** 戰力 B 案：目前職業等級、出師加成與保底；不含職業倍率及裝備。 */
+  function pl(state, data) {
+    var p = state.player;
+    return (Math.max(Math.round((6 + 2 * (p.level - 1)) * (1 + 0.2 * mastered(state, data))), Number((p.floor || {}).atk) || 0) - 6) / 2 + 1;
+  }
+
+  var Character = { pl: pl, FAM_NAME: FAM_NAME, famNames: famNames, equipFams: equipFams, GROWTH: GROWTH, baseStats: baseStats, ensureJobs: ensureJobs, jobLevel: jobLevel, needsJobHint: needsJobHint, mastered: mastered, usable: usable, usableJobs: usableJobs, isOpen: isOpen, gearValue: gearValue, autoEquip: autoEquip, learnedSkills: learnedSkills, slotSkills: slotSkills, setSkillSlots: setSkillSlots, compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
   Character.recipeStatus = recipeStatus;   // v2.1 中級職業的配方進度
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Character = Character; }
   if (typeof module !== 'undefined') module.exports = Character;

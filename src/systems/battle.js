@@ -83,11 +83,25 @@
   }
 
   // ---------------------------------------------------------------- 戰鬥狀態
+  /**
+   * 第 ph 階段要答對幾題：怪物資料 phase_q_by（{ 階段: 題數 }）有寫就照它，沒寫用 phase_q（預設 2）；不是頭目 0。
+   * v4.2 第 4c 批（執行長裁定）：遺忘霧王‧佛格第 4 階段＝phase_q_by {4:1}＋exact_phases [4]（和 D_FOG_KING_P4「最後一題」一致）。
+   */
+  function perPhaseOf(monster, ph) {
+    if (!monster || !monster.boss) return 0;
+    var by = monster.phase_q_by, n = by && Number(by[ph]);
+    return n > 0 ? n : (monster.phase_q || PER_PHASE);
+  }
+  /** 這一階段是不是「答夠題數就過」（不看傷害）：怪物資料 exact_phases 含目前階段 */
+  function exactPhase(b) {
+    var list = b && b.monster && b.monster.exact_phases;
+    return !!(b && b.boss && Array.isArray(list) && list.indexOf(Math.min(b.phase, b.phases)) >= 0);
+  }
   function create(monster) {
     var phases = monster.boss ? (monster.phases || BOSS_PHASES) : 1;
     return {
       monster: monster, hp: monster.hp, maxHp: monster.hp, boss: !!monster.boss,
-      phases: phases, perPhase: monster.boss ? (monster.phase_q || PER_PHASE) : 0,
+      phases: phases, perPhase: perPhaseOf(monster, 1),
       phase: 1, phaseCorrect: 0, over: false, result: null, turns: 0, timeBuff: 1, fx: newFx()
     };
   }
@@ -336,6 +350,7 @@
       b.phaseCorrect += 1;
       var th = threshold(b, b.phase);
       var hp = b.hp - dmg, held = false;
+      if (exactPhase(b) && b.phaseCorrect >= b.perPhase) hp = Math.min(hp, th);   // v4.2 4c：exact_phases 答夠題數一定過門檻（佛格第 4 階段＝最後一題）
       // 上一擊是被「撐住」的（體力是刻意留下的那一段）：這一擊答夠題數就一定過門檻，不會因為傷害小又卡住
       if (b.held && b.phaseCorrect >= b.perPhase) hp = Math.min(hp, th);
       if (b.phaseCorrect < b.perPhase && hp <= th) { hp = Math.max(hp, Math.min(before, th + holdMargin(b))); held = true; }
@@ -343,7 +358,7 @@
       if (hp <= th) {
         hp = th;
         b.phase += 1; b.phaseCorrect = 0;
-        if (b.phase > b.phases) { defeated = true; hp = 0; } else phaseUp = true;
+        if (b.phase > b.phases) { defeated = true; hp = 0; } else { phaseUp = true; b.perPhase = perPhaseOf(b.monster, b.phase); }
       }
       b.hp = Math.max(0, hp);
       b.held = held;   // 體力停在門檻上方、等答夠題數（畫面顯示「再答對 N 題」）
@@ -362,6 +377,7 @@
    */
   function needsFinalL4(b, estL4Dmg) {
     if (!b.boss || b.phase !== b.phases || b.phaseCorrect < b.perPhase - 1) return false;
+    if (exactPhase(b)) return true;   // v4.2 4c：答對這一題就結束（不看傷害），一定出 L4
     return estL4Dmg === undefined ? true : b.hp - estL4Dmg <= 0;
   }
 
@@ -420,6 +436,15 @@
   /** 家長把答題時間設成「關閉」（不計時） */
   function timerOff(mode) { return MODE_MULT[mode] === 0; }
   /**
+   * v4.2（裁定 K8）頭目的某些階段不計時：怪物資料 untimed_phases（遺忘霧王‧佛格＝[3]）含目前階段 → true。
+   * 呼叫的人把這一題當成「家長關掉時間條」處理：timerMs 0、prepareQuestion／useSkill 的 timerOff 傳 true（鼓舞之歌改走不計時分支）。
+   * 傷害公式在 limitMs 0 時用標準時間當基準（damage），不用另外改。
+   */
+  function untimedPhase(b) {
+    var m = b && b.monster, list = m && m.untimed_phases;
+    return !!(b && b.boss && Array.isArray(list) && list.indexOf(Math.min(b.phase, b.phases)) >= 0);
+  }
+  /**
    * 「關閉時間條」時，和時間條有關的職業特色改成替代效果（不讓孩子白扣魔力）：
    * - 吟遊詩人「鼓舞之歌」：平常＝下一題時間條 ×1.5；不計時＝下一次答對的傷害 ×1.3（OFF_SONG_POWER）
    * - 弓箭手（時間條 ×1.2）：不計時＝每場戰鬥可以閃過一次「答錯後怪物的攻擊」（不扣體力）
@@ -439,11 +464,11 @@
     recoverSkill: recoverSkill, isFavored: isFavored, prepareQuestion: prepareQuestion,
     newFx: newFx, ATTACK_EFFECTS: ATTACK_EFFECTS, skillPower: skillPower, canUseSkill: canUseSkill, countCorrect: countCorrect, useSkill: useSkill, attack: attack,
     nextTimeMult: nextTimeMult, monsterTurn: monsterTurn, tryRevive: tryRevive, stealItem: stealItem, victoryTraits: victoryTraits,
-    hitMessage: hitMessage, canPreempt: canPreempt, timerOff: timerOff, OFF_SONG_POWER: OFF_SONG_POWER, songEffect: songEffect, dodgeOnWrong: dodgeOnWrong, takePowerBuff: takePowerBuff,
+    hitMessage: hitMessage, canPreempt: canPreempt, timerOff: timerOff, untimedPhase: untimedPhase, OFF_SONG_POWER: OFF_SONG_POWER, songEffect: songEffect, dodgeOnWrong: dodgeOnWrong, takePowerBuff: takePowerBuff,
     DIFF: DIFF, TIME_SEC: TIME_SEC, MODE_MULT: MODE_MULT, CRIT_MULT: CRIT_MULT, FAVORED_MULT: FAVORED_MULT, FLEE_RATE: FLEE_RATE,
     BOSS_PHASES: BOSS_PHASES, PER_PHASE: PER_PHASE, PHASE_DMG_STEP: PHASE_DMG_STEP, BOND_MAX: BOND_MAX,
     timeLimitMs: timeLimitMs, damage: damage, monsterAttack: monsterAttack, phaseMult: phaseMult, bond: bond, bondExp: bondExp, tryFlee: tryFlee,
-    create: create, hit: hit, holdMargin: holdMargin, needCorrect: needCorrect, needsFinalL4: needsFinalL4, heroHurt: heroHurt,
+    create: create, perPhaseOf: perPhaseOf, exactPhase: exactPhase, hit: hit, holdMargin: holdMargin, needCorrect: needCorrect, needsFinalL4: needsFinalL4, heroHurt: heroHurt,
     dropRate: dropRate, rollDrops: rollDrops, victoryReward: victoryReward,
     createTimer: createTimer, tick: tick, tickFree: tickFree, expired: expired, remainingFrac: remainingFrac, pause: pause, resume: resume
   };

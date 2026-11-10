@@ -10,18 +10,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="勇者大冒險：給國小三年級的學習冒險遊戲">
 <title>勇者大冒險</title>
-<link rel="icon" href="assets/ui/icon-192.png?v=edd21d633e" type="image/png">
+<link rel="icon" href="assets/ui/icon-192.png?v=fbb9588d99" type="image/png">
 <!-- 加入主畫面：Android／Chrome 用 manifest；iPad／iPhone Safari 用下面的 apple-* 設定 -->
-<link rel="manifest" href="manifest.webmanifest?v=edd21d633e">
+<link rel="manifest" href="manifest.webmanifest?v=fbb9588d99">
 <meta name="theme-color" content="#1d2b5e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="勇者大冒險">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="assets/ui/icon-180.png?v=edd21d633e">
-<link rel="stylesheet" href="src/ui/style.css?v=edd21d633e">
-<link rel="stylesheet" href="src/ui/east.css?v=edd21d633e">
-<link rel="stylesheet" href="src/ui/ferry.css?v=edd21d633e">
+<link rel="apple-touch-icon" href="assets/ui/icon-180.png?v=fbb9588d99">
+<link rel="stylesheet" href="src/ui/style.css?v=fbb9588d99">
+<link rel="stylesheet" href="src/ui/east.css?v=fbb9588d99">
+<link rel="stylesheet" href="src/ui/ending.css?v=fbb9588d99">
+<link rel="stylesheet" href="src/ui/ferry.css?v=fbb9588d99">
 </head>
 <body>
 <!-- 遊戲畫面（Phaser 畫布會放在這裡） -->
@@ -39,131 +40,136 @@
 <noscript><p class="noscript">這個遊戲需要開啟 JavaScript 才能玩。</p></noscript>
 
 <!-- 遊戲引擎：Phaser 4.2.1（MIT，本機保存一份，不連 CDN） -->
-<script src="data/version.js?v=edd21d633e"></script>
-<script src="lib/phaser.min.js?v=edd21d633e"></script>
+<script src="data/version.js?v=fbb9588d99"></script>
+<script src="lib/phaser.min.js?v=fbb9588d99"></script>
 <!-- QR Code：qrcode-generator 2.0.4（MIT，本機保存一份） -->
-<script src="lib/qrcode.js?v=edd21d633e"></script>
+<script src="lib/qrcode.js?v=fbb9588d99"></script>
 
 <!-- 題庫：正式題庫 → 範例題庫（只在正式題庫沒載入時生效） -->
-<script src="data/questions.js?v=edd21d633e"></script>
-<script src="data/qdict.js?v=edd21d633e"></script>
-<script src="data/sample_questions.js?v=edd21d633e"></script>
+<script src="data/questions.js?v=fbb9588d99"></script>
+<script src="data/qdict.js?v=fbb9588d99"></script>
+<script src="data/sample_questions.js?v=fbb9588d99"></script>
 
 <!-- 世界資料（劇情設計師、CTO 撰寫） -->
-<script src="data/tilesets.js?v=edd21d633e"></script>
-<script src="data/tile_frames.js?v=edd21d633e"></script>
-<script src="data/maps.js?v=edd21d633e"></script>
-<script src="data/quests.js?v=edd21d633e"></script>
-<script src="data/dialogs.js?v=edd21d633e"></script>
-<script src="data/proverbs.js?v=edd21d633e"></script>
-<script src="data/monsters.js?v=edd21d633e"></script>
-<script src="data/items.js?v=edd21d633e"></script>
-<script src="data/ferries.js?v=edd21d633e"></script>
-<script src="data/ferries_east.js?v=edd21d633e"></script>
-<script src="data/jobs.js?v=edd21d633e"></script>
-<script src="data/world.js?v=edd21d633e"></script>
-<script src="data/puzzles.js?v=edd21d633e"></script>
-<script src="data/sprites.js?v=edd21d633e"></script>
-<script src="data/followers.js?v=edd21d633e"></script>
-<script src="data/dev_world.js?v=edd21d633e"></script>
-<script src="data/art_manifest.js?v=edd21d633e"></script>
+<script src="data/tilesets.js?v=fbb9588d99"></script>
+<script src="data/tile_frames.js?v=fbb9588d99"></script>
+<script src="data/maps.js?v=fbb9588d99"></script>
+<script src="data/quests.js?v=fbb9588d99"></script>
+<script src="data/dialogs.js?v=fbb9588d99"></script>
+<script src="data/proverbs.js?v=fbb9588d99"></script>
+<script src="data/monsters.js?v=fbb9588d99"></script>
+<script src="data/items.js?v=fbb9588d99"></script>
+<script src="data/ferries.js?v=fbb9588d99"></script>
+<script src="data/ferries_east.js?v=fbb9588d99"></script>
+<script src="data/jobs.js?v=fbb9588d99"></script>
+<script src="data/ending_awards.js?v=fbb9588d99"></script>
+<script src="data/world.js?v=fbb9588d99"></script>
+<script src="data/puzzles.js?v=fbb9588d99"></script>
+<script src="data/sprites.js?v=fbb9588d99"></script>
+<script src="data/followers.js?v=fbb9588d99"></script>
+<script src="data/dev_world.js?v=fbb9588d99"></script>
+<script src="data/art_manifest.js?v=fbb9588d99"></script>
 <!-- 語音：說話者音色設定（劇情設計師）、預錄音檔清單（tools/pack_assets.py 產生） -->
-<script src="data/voices.js?v=edd21d633e"></script>
-<script src="data/voice_manifest.js?v=edd21d633e"></script>
-<script src="data/dev_sprites.js?v=edd21d633e"></script>
+<script src="data/voices.js?v=fbb9588d99"></script>
+<script src="data/voice_manifest.js?v=fbb9588d99"></script>
+<script src="data/dev_sprites.js?v=fbb9588d99"></script>
 
 <!-- 可調參數 -->
-<script src="src/config.js?v=edd21d633e"></script>
+<script src="src/config.js?v=fbb9588d99"></script>
 
 <!-- 系統邏輯（可在 node 測試） -->
-<script src="src/systems/exp.js?v=edd21d633e"></script>
-<script src="src/systems/answer.js?v=edd21d633e"></script>
-<script src="src/systems/rewards.js?v=edd21d633e"></script>
-<script src="src/systems/adaptive.js?v=edd21d633e"></script>
-<script src="src/systems/hints.js?v=edd21d633e"></script>
-<script src="src/systems/guard.js?v=edd21d633e"></script>
-<script src="src/systems/daily.js?v=edd21d633e"></script>
-<script src="src/systems/playtime.js?v=edd21d633e"></script>
-<script src="src/systems/state.js?v=edd21d633e"></script>
-<script src="src/systems/jobmigrate.js?v=edd21d633e"></script>
-<script src="src/systems/ch1migrate.js?v=edd21d633e"></script>
-<script src="src/systems/ch3migrate.js?v=edd21d633e"></script>
-<script src="src/systems/southmigrate.js?v=edd21d633e"></script>
-<script src="src/systems/bestiary.js?v=edd21d633e"></script>
-<script src="src/systems/parentgate.js?v=edd21d633e"></script>
-<script src="src/systems/econmigrate.js?v=edd21d633e"></script>
-<script src="src/systems/save.js?v=edd21d633e"></script>
-<script src="src/systems/savecode.js?v=edd21d633e"></script>
-<script src="src/systems/saveprovider.js?v=edd21d633e"></script>
-<script src="src/systems/counter.js?v=edd21d633e"></script>
-<script src="src/systems/savetip.js?v=edd21d633e"></script>
-<script src="src/systems/quest.js?v=edd21d633e"></script>
-<script src="src/systems/report.js?v=edd21d633e"></script>
-<script src="src/systems/session.js?v=edd21d633e"></script>
-<script src="src/systems/shop.js?v=edd21d633e"></script>
-<script src="src/systems/testmode.js?v=edd21d633e"></script>
-<script src="src/systems/world.js?v=edd21d633e"></script>
-<script src="src/systems/ferry.js?v=edd21d633e"></script>
-<script src="src/systems/character.js?v=edd21d633e"></script>
-<script src="src/systems/battle.js?v=edd21d633e"></script>
-<script src="src/systems/bossfx.js?v=edd21d633e"></script>
-<script src="src/systems/jobtrial.js?v=edd21d633e"></script>
-<script src="src/systems/questlog.js?v=edd21d633e"></script>
-<script src="src/systems/proverbs.js?v=edd21d633e"></script>
-<script src="src/systems/chests.js?v=edd21d633e"></script>
-<script src="src/systems/scenefit.js?v=edd21d633e"></script>
-<script src="src/systems/collect.js?v=edd21d633e"></script>
-<script src="src/systems/guide.js?v=edd21d633e"></script>
-<script src="src/systems/review.js?v=edd21d633e"></script>
-<script src="src/systems/pathfind.js?v=edd21d633e"></script>
-<script src="src/systems/move8.js?v=edd21d633e"></script>
-<script src="src/systems/worldmap.js?v=edd21d633e"></script>
-<script src="src/systems/dialogtext.js?v=edd21d633e"></script>
-<script src="src/systems/rarechars.js?v=edd21d633e"></script>
-<script src="src/systems/zoom.js?v=edd21d633e"></script>
-<script src="src/systems/feedback.js?v=edd21d633e"></script>
-<script src="src/systems/mapinfo.js?v=edd21d633e"></script>
-<script src="src/systems/cave_puzzle.js?v=edd21d633e"></script>
-<script src="src/systems/ice.js?v=edd21d633e"></script>
-<script src="src/systems/east_fields.js?v=edd21d633e"></script>
-<script src="src/systems/petfollow.js?v=edd21d633e"></script>
-<script src="src/systems/followers.js?v=edd21d633e"></script>
-<script src="src/systems/keepaway.js?v=edd21d633e"></script>
-<script src="src/systems/treefx.js?v=edd21d633e"></script>
-<script src="src/systems/motion.js?v=edd21d633e"></script>
+<script src="src/systems/exp.js?v=fbb9588d99"></script>
+<script src="src/systems/answer.js?v=fbb9588d99"></script>
+<script src="src/systems/rewards.js?v=fbb9588d99"></script>
+<script src="src/systems/adaptive.js?v=fbb9588d99"></script>
+<script src="src/systems/hints.js?v=fbb9588d99"></script>
+<script src="src/systems/guard.js?v=fbb9588d99"></script>
+<script src="src/systems/daily.js?v=fbb9588d99"></script>
+<script src="src/systems/playtime.js?v=fbb9588d99"></script>
+<script src="src/systems/state.js?v=fbb9588d99"></script>
+<script src="src/systems/jobmigrate.js?v=fbb9588d99"></script>
+<script src="src/systems/ch1migrate.js?v=fbb9588d99"></script>
+<script src="src/systems/ch3migrate.js?v=fbb9588d99"></script>
+<script src="src/systems/southmigrate.js?v=fbb9588d99"></script>
+<script src="src/systems/eastmigrate.js?v=fbb9588d99"></script>
+<script src="src/systems/bestiary.js?v=fbb9588d99"></script>
+<script src="src/systems/parentgate.js?v=fbb9588d99"></script>
+<script src="src/systems/econmigrate.js?v=fbb9588d99"></script>
+<script src="src/systems/save.js?v=fbb9588d99"></script>
+<script src="src/systems/savecode.js?v=fbb9588d99"></script>
+<script src="src/systems/saveprovider.js?v=fbb9588d99"></script>
+<script src="src/systems/counter.js?v=fbb9588d99"></script>
+<script src="src/systems/savetip.js?v=fbb9588d99"></script>
+<script src="src/systems/quest.js?v=fbb9588d99"></script>
+<script src="src/systems/report.js?v=fbb9588d99"></script>
+<script src="src/systems/session.js?v=fbb9588d99"></script>
+<script src="src/systems/shop.js?v=fbb9588d99"></script>
+<script src="src/systems/testmode.js?v=fbb9588d99"></script>
+<script src="src/systems/world.js?v=fbb9588d99"></script>
+<script src="src/systems/ferry.js?v=fbb9588d99"></script>
+<script src="src/systems/character.js?v=fbb9588d99"></script>
+<script src="src/systems/battle.js?v=fbb9588d99"></script>
+<script src="src/systems/bossfx.js?v=fbb9588d99"></script>
+<script src="src/systems/jobtrial.js?v=fbb9588d99"></script>
+<script src="src/systems/questlog.js?v=fbb9588d99"></script>
+<script src="src/systems/ending.js?v=fbb9588d99"></script>
+<script src="src/systems/proverbs.js?v=fbb9588d99"></script>
+<script src="src/systems/chests.js?v=fbb9588d99"></script>
+<script src="src/systems/scenefit.js?v=fbb9588d99"></script>
+<script src="src/systems/collect.js?v=fbb9588d99"></script>
+<script src="src/systems/guide.js?v=fbb9588d99"></script>
+<script src="src/systems/review.js?v=fbb9588d99"></script>
+<script src="src/systems/pathfind.js?v=fbb9588d99"></script>
+<script src="src/systems/move8.js?v=fbb9588d99"></script>
+<script src="src/systems/worldmap.js?v=fbb9588d99"></script>
+<script src="src/systems/dialogtext.js?v=fbb9588d99"></script>
+<script src="src/systems/rarechars.js?v=fbb9588d99"></script>
+<script src="src/systems/zoom.js?v=fbb9588d99"></script>
+<script src="src/systems/feedback.js?v=fbb9588d99"></script>
+<script src="src/systems/mapinfo.js?v=fbb9588d99"></script>
+<script src="src/systems/cave_puzzle.js?v=fbb9588d99"></script>
+<script src="src/systems/ice.js?v=fbb9588d99"></script>
+<script src="src/systems/east_fields.js?v=fbb9588d99"></script>
+<script src="src/systems/petfollow.js?v=fbb9588d99"></script>
+<script src="src/systems/followers.js?v=fbb9588d99"></script>
+<script src="src/systems/keepaway.js?v=fbb9588d99"></script>
+<script src="src/systems/treefx.js?v=fbb9588d99"></script>
+<script src="src/systems/motion.js?v=fbb9588d99"></script>
 
 <!-- 引擎與畫面 -->
-<script src="src/engine/audio.js?v=edd21d633e"></script>
-<script src="src/engine/sfx.js?v=edd21d633e"></script>
-<script src="src/engine/voice.js?v=edd21d633e"></script>
+<script src="src/engine/audio.js?v=fbb9588d99"></script>
+<script src="src/engine/sfx.js?v=fbb9588d99"></script>
+<script src="src/engine/voice.js?v=fbb9588d99"></script>
 <!-- 音樂（作曲家）：music.js 還沒完成時，遊戲用 typeof JQ.Music 檢查後略過 -->
-<script src="data/music.js?v=edd21d633e"></script>
-<script src="src/engine/music.js?v=edd21d633e"></script>
-<script src="data/ambience.js?v=edd21d633e"></script>
-<script src="data/ambience_east.js?v=edd21d633e"></script>
-<script src="data/ambience_nantou.js?v=edd21d633e"></script>
-<script src="src/engine/ambience.js?v=edd21d633e"></script>
-<script src="src/engine/assets.js?v=edd21d633e"></script>
-<script src="src/engine/bigpilot.js?v=edd21d633e"></script>
-<script src="src/ui/dom.js?v=edd21d633e"></script>
-<script src="src/ui/ferry.js?v=edd21d633e"></script>
-<script src="src/ui/quiz.js?v=edd21d633e"></script>
-<script src="src/ui/trial.js?v=edd21d633e"></script>
-<script src="src/ui/hud.js?v=edd21d633e"></script>
-<script src="src/ui/menus.js?v=edd21d633e"></script>
-<script src="src/ui/settings.js?v=edd21d633e"></script>
-<script src="src/ui/opening.js?v=edd21d633e"></script>
-<script src="src/ui/title.js?v=edd21d633e"></script>
-<script src="src/ui/title_anim.js?v=edd21d633e"></script>
-<script src="src/ui/qr.js?v=edd21d633e"></script>
-<script src="src/ui/worldmap.js?v=edd21d633e"></script>
-<script src="src/ui/minimap.js?v=edd21d633e"></script>
-<script src="src/scenes/MapScene.js?v=edd21d633e"></script>
-<script src="src/fx/east_fx.js?v=edd21d633e"></script>
-<script src="src/scenes/BattleScene.js?v=edd21d633e"></script>
-<script src="src/fx/skillfx.js?v=edd21d633e"></script>
-<script src="src/game.js?v=edd21d633e"></script>
-<script src="src/fx/bossfx_scene.js?v=edd21d633e"></script>
-<script src="src/main.js?v=edd21d633e"></script>
+<script src="data/music.js?v=fbb9588d99"></script>
+<script src="src/engine/music.js?v=fbb9588d99"></script>
+<script src="data/ambience.js?v=fbb9588d99"></script>
+<script src="data/ambience_east.js?v=fbb9588d99"></script>
+<script src="data/ambience_nantou.js?v=fbb9588d99"></script>
+<script src="src/engine/ambience.js?v=fbb9588d99"></script>
+<script src="src/engine/assets.js?v=fbb9588d99"></script>
+<script src="src/engine/bigpilot.js?v=fbb9588d99"></script>
+<script src="src/ui/dom.js?v=fbb9588d99"></script>
+<script src="src/ui/ferry.js?v=fbb9588d99"></script>
+<script src="src/ui/quiz.js?v=fbb9588d99"></script>
+<script src="src/ui/trial.js?v=fbb9588d99"></script>
+<script src="src/ui/hud.js?v=fbb9588d99"></script>
+<script src="src/ui/menus.js?v=fbb9588d99"></script>
+<script src="src/ui/settings.js?v=fbb9588d99"></script>
+<script src="src/ui/opening.js?v=fbb9588d99"></script>
+<script src="src/ui/title.js?v=fbb9588d99"></script>
+<script src="src/ui/title_anim.js?v=fbb9588d99"></script>
+<script src="src/ui/qr.js?v=fbb9588d99"></script>
+<script src="src/ui/worldmap.js?v=fbb9588d99"></script>
+<script src="src/ui/minimap.js?v=fbb9588d99"></script>
+<script src="src/scenes/MapScene.js?v=fbb9588d99"></script>
+<script src="src/fx/east_fx.js?v=fbb9588d99"></script>
+<script src="src/fx/ending_mv.js?v=fbb9588d99"></script>
+<script src="src/fx/ending_flow.js?v=fbb9588d99"></script>
+<script src="src/scenes/BattleScene.js?v=fbb9588d99"></script>
+<script src="src/fx/skillfx.js?v=fbb9588d99"></script>
+<script src="src/game.js?v=fbb9588d99"></script>
+<script src="src/fx/bossfx_scene.js?v=fbb9588d99"></script>
+<script src="src/main.js?v=fbb9588d99"></script>
 </body>
 </html>

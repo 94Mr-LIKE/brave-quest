@@ -82,7 +82,7 @@ window.TILESETS = (function () {
     // 霧之沼澤：'~' 是沼澤水、'%' 是泥地
     swamp: extend({ '~': { tile: 'swamp_a', walk: false, anim: true, water: true }, '%': { tile: 'mud', walk: true } }),
     // 回音洞窟、哥布林部落：'.' 洞窟地面、',' 碎石地、'*' 鐘乳石、'T' 石筍
-    cave: extend({ ',': { tile: 'path', walk: true }, '*': { tile: 'stalagmite', walk: false }, 'T': { tile: 'stalagmite', walk: false } }),
+    cave: extend({ ',': { tile: 'path', walk: true }, '*': { tile: 'stalagmite', walk: false }, 'T': { tile: 'stalagmite', walk: false }, 'I': { tile: 'path', walk: true } }),   // v4.2 冰格 I（霜晶迴廊冰房間；滑行由 ice.js 管）
     // 港口市集城：'.' 石板廣場、'#' 磚造城牆、'*' 盆栽灌木
     town: extend({ '.': { tile: 'floor_stone', walk: true }, '#': { tile: 'wall', walk: false }, '*': { tile: 'bush', walk: false } }),
     // 王城：'.' 石地板、'#' 城牆、'T' 石柱、'K' 王座、'*' 石像、'~' 噴水池

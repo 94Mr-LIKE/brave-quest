@@ -121,7 +121,78 @@ window.ITEMS = {
   mochi: { name: "麻糬", sprite: "item_mochi", kind: "consumable", price: 15, effect: { hp: 10, pet: 1 }, desc: "軟軟 QQ 的花蓮麻糬。回復 10 點體力，番薯仔也愛吃。" },
   // v4.0（71 號第九節，每區一件新裝備）：通用款，Z11 防具、Z12 武器；價錢＝新經濟v30擴充_設計確認.md 8.2 公式 ×1.6（老闆 11-02 後期裝備漲價）
   gear_z11_cloak: { name: "縱谷風斗篷", sprite: "item_gear_z11_cloak", kind: "armor", fam: "gen", price: 2750, atk: 0, def: 12, mp: 0, jobs: null, desc: "花東縱谷在兩條山脈中間。這件斗篷擋得住谷裡的風。大家都能穿。" },
-  gear_z12_marble: { name: "大理石劍", sprite: "item_gear_z12_marble", kind: "weapon", fam: "gen", price: 4300, atk: 29, def: 0, mp: 0, jobs: null, desc: "用花蓮的大理石，請石雕師傅磨亮的劍。大家都能用。" }
+  gear_z12_marble: { name: "大理石劍", sprite: "item_gear_z12_marble", kind: "weapon", fam: "gen", price: 4300, atk: 29, def: 0, mp: 0, jobs: null, desc: "用花蓮的大理石，請石雕師傅磨亮的劍。大家都能用。" },
+  // ═══ v4.2 第 4a 批 ITEMS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  climb_permit: {
+    "name": "登山報到證",
+    "type": "key",
+    "price": 0,
+    "desc": "上山前完成報到的證明。",
+    "sprite": "item_climb_permit"
+  },
+  mountain_fruit: {
+    "name": "山果",
+    "type": "material",
+    "price": 20,
+    "desc": "山林裡的小果實。",
+    "sprite": "item_mountain_fruit"
+  },
+  grass_jelly: {
+    "name": "仙草露",
+    "type": "consumable",
+    "price": 140,
+    "heal": 400,
+    "desc": "清涼的仙草露，回復 400 點體力。",
+    "sprite": "item_grass_jelly"
+  },
+  gear_z14_dawn: {
+    "name": "曙光之劍",
+    "type": "weapon",
+    "fam": "gen",
+    "atk": 34,
+    "price": 6200,
+    "desc": "迎著曙光的劍，物攻增加 34。",
+    "sprite": "item_gear_z14_dawn"
+  },
+  // ═══ v4.2 第 4a 批 ITEMS END ═══
+  // ═══ v4.2 第 4c 批 ITEMS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  gear_z15_cloud: {
+    "name": "晨光雲衣",
+    "sprite": "item_gear_z15_cloud",
+    "kind": "armor",
+    "fam": "gen",
+    "price": 13050,
+    "atk": 0,
+    "def": 16,
+    "mp": 0,
+    "jobs": null,
+    "desc": "晨光染成淡金色的雲做成的衣服，又輕又暖。大家都能穿。"
+  },
+  gear_z16_star: {
+    "name": "星光劍",
+    "sprite": "item_gear_z16_star",
+    "kind": "weapon",
+    "fam": "gen",
+    "price": 25600,
+    "atk": 49,
+    "def": 0,
+    "mp": 0,
+    "jobs": null,
+    "desc": "劍身閃著銀色星點的劍。大家都能用。"
+  },
+  gear_z17_dawn: {
+    "name": "曙光之鎧",
+    "sprite": "item_gear_z17_dawn",
+    "kind": "armor",
+    "fam": "gen",
+    "price": 27400,
+    "atk": 0,
+    "def": 31,
+    "mp": 0,
+    "jobs": null,
+    "desc": "發著曙光的鎧甲，穿上就覺得暖暖的。大家都能穿。"
+  },
+  // ═══ v4.2 第 4c 批 ITEMS END ═══
 };
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */
@@ -149,5 +220,33 @@ window.SHOPS = {
   gear_taitung: { name: "縱谷民宿（兼賣裝備）", items: ["gear_z11_cloak"] },
   gear_hualien: { name: "海岸旅店（兼賣裝備）", items: ["gear_z12_marble"] },
   ice_gi: { name: "綠島冰店", items: ["seaweed_ice", "herb"] },
-  mochi_hl: { name: "花蓮麻糬店", items: ["mochi", "herb"] }
+  mochi_hl: { name: "花蓮麻糬店", items: ["mochi", "herb"] },
+  // ═══ v4.2 第 4a 批 SHOPS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  gear_tataka: {
+    "name": "山屋裝備",
+    "items": [
+      "gear_z14_dawn"
+    ]
+  },
+  // ═══ v4.2 第 4a 批 SHOPS END ═══
+  // ═══ v4.2 第 4c 批 SHOPS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  cloud_m42: {
+    "name": "雲上小舖",
+    "items": [
+      "gear_z15_cloud"
+    ]
+  },
+  cloud_m43: {
+    "name": "雲上小舖",
+    "items": [
+      "gear_z16_star"
+    ]
+  },
+  cloud_m44: {
+    "name": "雲上小舖",
+    "items": [
+      "gear_z17_dawn"
+    ]
+  },
+  // ═══ v4.2 第 4c 批 SHOPS END ═══
 };

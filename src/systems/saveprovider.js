@@ -60,7 +60,7 @@
   /** which：省略＝v2 備份（v1.0.1 家長設定的還原按鈕）；'v3'＝v1.1 升級前備份 */
   function backupKeyFor(slot, which) {
     slot = slot || DEFAULT_SLOT;
-    var base = which === BACKUP_SOUTH_WHICH ? BACKUP_SOUTH_KEY : which === 'v5' ? BACKUP_V5_KEY : which === 'v4' ? BACKUP_V4_KEY : which === 'v3' ? BACKUP_V3_KEY : BACKUP_KEY;   // v1.3：'v4'＝v1.3 升級前備份
+    var base = which === 'v7' ? Save.SAVE_KEY + '_v7_backup' : which === BACKUP_SOUTH_WHICH ? BACKUP_SOUTH_KEY : which === 'v5' ? BACKUP_V5_KEY : which === 'v4' ? BACKUP_V4_KEY : which === 'v3' ? BACKUP_V3_KEY : BACKUP_KEY;   // v1.3：'v4'＝v1.3 升級前備份
     return slot === DEFAULT_SLOT ? base : base + ':' + slot;
   }
 
@@ -141,6 +141,9 @@
         }
         if (obj.version === BACKUP_SOUTH_FROM) {   // v3.0：SouthMigrate（6 → 7）之前也備份一份
           try { if (st.getItem(backupKeyFor(slot, BACKUP_SOUTH_WHICH)) === null) st.setItem(backupKeyFor(slot, BACKUP_SOUTH_WHICH), raw); } catch (e) { /* 空間不足：不擋讀檔 */ }
+        }
+        if (obj.version === 7) {
+          try { if (st.getItem(backupKeyFor(slot, 'v7')) === null) st.setItem(backupKeyFor(slot, 'v7'), raw); } catch (e) { /* 空間不足不阻擋讀檔，原存檔仍保留 */ }
         }
         return Save.migrate(obj);
       } catch (e) { return null; }   // 升級失敗：回傳 null，loadError 會說明原因；原本的存檔不動

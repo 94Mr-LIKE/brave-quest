@@ -460,9 +460,7 @@ window.QUESTS = {
     "map": "M32",
     "kind": "boss",
     "goal": "讓把燈籠藏起來的夜遊團長清醒。",
-    // V41_STUB_BEGIN（v4.2 還原委託完成提示）
-    "log_next": "夜遊團長清醒了，送你一盞森林燈籠。往塔塔加的路之後開放喔！",
-    // V41_STUB_END
+    "log_next": "夜遊團長清醒了，送你一盞森林燈籠。往塔塔加的山路亮起來了。",
     "subject": "混合",
     "subjects": [
       "國語",
@@ -1673,4 +1671,882 @@ window.QUESTS = {
     dialog_start: "D_HL_5A", dialog_end: "D_HL_5B"
   },
   // ═════════════════════ v4.0 東部委託 END（wip_v40/v40_apply.js 每次照表整段重建）═════════════════════
+  // ═══ v4.2 第 4a 批 QUESTS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  Q_TK_1: {
+    "title": "上山前的申請",
+    "giver": "paiyun_volunteer",
+    "map": "M33",
+    "kind": "help",
+    "goal": "志工說：上山要先申請、當天報到。答對 3 題，完成登山報到。",
+    "log_next": "報到好了，可以上山了！從東邊的登山口出發。",
+    "subject": "自然",
+    "units": [
+      "三、天氣停看聽"
+    ],
+    "count": 3,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_XT_4"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": "climb_permit",
+      "light": null
+    },
+    "dialog_start": "D_TK_1A",
+    "dialog_end": "D_TK_1B"
+  },
+  Q_TK_2: {
+    "title": "第二座國家公園",
+    "giver": "ysnp_ranger",
+    "map": "M33",
+    "kind": "help",
+    "goal": "聽解說員說玉山國家公園：答對 2 題社會。",
+    "log_next": "解說員說：玉山國家公園是臺灣第二座國家公園。",
+    "subject": "社會",
+    "units": [
+      "第一單元 我居住的地方"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_TK_1"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_TK_2A",
+    "dialog_end": "D_TK_2B",
+    "dialog_locked": "D_TK_2_LOCK"
+  },
+  Q_TK_3: {
+    "title": "安靜看帝雉",
+    "giver": "bird_guide",
+    "map": "M33",
+    "kind": "help",
+    "goal": "跟鳥類解說員安靜地看帝雉，不靠近、不打擾：答對 2 題自然。",
+    "log_next": "解說員說：清早和傍晚，比較有機會看到帝雉。",
+    "subject": "自然",
+    "units": [
+      "四、動物王國"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "side": true,
+    "requires": [
+      "Q_TK_1"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_TK_3A",
+    "dialog_end": "D_TK_3B",
+    "dialog_locked": "D_TK_3_LOCK"
+  },
+  Q_YS_1: {
+    "title": "森林的交界",
+    "giver": "trail_ranger",
+    "map": "M34",
+    "kind": "help",
+    "goal": "在孟祿亭聽巡山員說溫帶林和寒帶林的交界：答對 2 題自然。",
+    "log_next": "前面的步道好像有動靜，走路要小心。",
+    "subject": "自然",
+    "units": [
+      "一、植物大發現"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_TK_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_YS_1A",
+    "dialog_end": "D_YS_1B"
+  },
+  Q_YS_2: {
+    "title": "遇到臺灣黑熊",
+    "giver": "fog_kid",
+    "map": "M34",
+    "kind": "event",
+    "goal": "步道前面有一隻臺灣黑熊。答對 3 題『遇到熊要怎麼辦』。",
+    "log_next": "黑熊回森林了。要記得告訴巡山員。",
+    "subject": "自然",
+    "units": [],
+    "count": 3,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "trigger": {
+      "map": "M34",
+      "cells": [
+        [
+          38,
+          23
+        ],
+        [
+          38,
+          24
+        ]
+      ]
+    },
+    "fixed_questions": [
+      {
+        "id": "FX-YS2-1",
+        "subject": "自然",
+        "level": 2,
+        "type": "choice",
+        "scene": "霧仔小聲說：「是臺灣黑熊！胸前有黃白色的 V 字……我們不要靠近。」",
+        "stem": "走在玉山步道上，帶什麼可以讓黑熊早一點知道有人來了？",
+        "options": [
+          "熊鈴或哨子",
+          "一包餅乾",
+          "一面小鏡子",
+          "一根樹枝"
+        ],
+        "answer": 0,
+        "hints": [
+          "第1層：熊聽到什麼，就會知道有人來了？",
+          "第2層：要選會發出聲音的東西。",
+          "第3層：走路時會叮叮噹噹響，或是吹了會響的東西是什麼？"
+        ],
+        "explanation": "熊鈴、哨子會發出聲音，熊聽到就知道有人來了，會自己避開。去山上還要和大人結伴同行。",
+        "option_why": [
+          "正確：熊鈴、哨子會發出聲音，熊聽到就會避開。",
+          "餅乾不會發出聲音，食物的味道反而會吸引動物。",
+          "鏡子不會發出聲音，熊聽不到。",
+          "樹枝不會發出聲音，熊聽不到。"
+        ],
+        "tts_lang": "zh-TW",
+        "shuffled": true
+      },
+      {
+        "id": "FX-YS2-2",
+        "subject": "自然",
+        "level": 2,
+        "type": "choice",
+        "scene": "霧仔：「黑熊正在吃果子。我們帶的食物，也要好好收著。」",
+        "stem": "在山上吃完東西，垃圾和吃剩的食物要怎麼辦？",
+        "options": [
+          "放在步道旁邊",
+          "丟進樹林裡",
+          "全部帶下山",
+          "留給動物吃"
+        ],
+        "answer": 2,
+        "hints": [
+          "第1層：垃圾和食物留在山上，會引來誰？",
+          "第2層：熊和其他野生動物，可能會跑來吃。",
+          "第3層：要讓山上什麼都不留下，該怎麼做？"
+        ],
+        "explanation": "垃圾和吃剩的食物會吸引熊等野生動物來吃，改變牠們本來的生活習慣，所以要全部帶下山。",
+        "option_why": [
+          "放在步道旁，會吸引熊等野生動物來吃。",
+          "丟進樹林裡一樣會吸引動物，也弄髒山林。",
+          "正確：垃圾和食物全部帶下山，就不會吸引動物、改變牠們的生活習慣。",
+          "餵動物會改變牠們的生活習慣，也可能讓牠們靠近人。"
+        ],
+        "tts_lang": "zh-TW",
+        "shuffled": true
+      },
+      {
+        "id": "FX-YS2-3",
+        "subject": "自然",
+        "level": 2,
+        "type": "choice",
+        "scene": "霧仔小聲說：「牠還沒發現我們……」",
+        "stem": "如果在步道上看到黑熊，應該怎麼做？",
+        "options": [
+          "大聲叫，跑過去拍照",
+          "安靜離開，告訴巡山員",
+          "拿出零食，丟給牠吃",
+          "慢慢走近，摸摸牠的頭"
+        ],
+        "answer": 1,
+        "hints": [
+          "第1層：看到黑熊，要靠近還是離開？",
+          "第2層：要保持冷靜，不吵、不餵、不靠近。",
+          "第3層：離開以後，還要告訴誰？"
+        ],
+        "explanation": "看到黑熊要保持冷靜，安靜地離開，不要靠近、不要餵牠。離開以後，要告訴巡山員（管理國家公園的人）。",
+        "option_why": [
+          "大叫、跑過去會驚嚇黑熊，靠近牠很危險。",
+          "正確：保持冷靜、安靜離開，再告訴巡山員。",
+          "餵食會讓熊靠近人，也會改變牠的生活習慣。",
+          "黑熊是野生動物，靠近、摸牠都很危險。"
+        ],
+        "tts_lang": "zh-TW",
+        "shuffled": true
+      }
+    ],
+    "noRecord": true,
+    "requires": [
+      "Q_YS_1"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_YS_2A",
+    "dialog_end": "D_BEAR_LEAVE"
+  },
+  Q_YS_3: {
+    "title": "玉山步道頭目：山嵐霧精",
+    "giver": "trail_ranger",
+    "map": "M34",
+    "kind": "boss",
+    "goal": "白木林前的步道被一大團霧堵住了，讓山嵐霧精清醒。",
+    "log_next": "山嵐霧精清醒，霧散開了。前面就是排雲山莊。",
+    "subject": "混合",
+    "subjects": [
+      "自然",
+      "社會"
+    ],
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "fob_mist",
+    "boss_map": "M34",
+    "requires": [
+      "Q_YS_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_YS_3A",
+    "dialog_end": "D_YS_3B",
+    "dialog_locked": "D_YS_3_LOCK"
+  },
+  Q_PY_1: {
+    "title": "晚上才有電",
+    "giver": "lodge_manager_py",
+    "map": "M35",
+    "kind": "help",
+    "goal": "管理員說山莊下午 6 時到 8 時才有電：答對 2 題數學。",
+    "log_next": "霧仔看著雲海，好像有話想說。",
+    "subject": "數學",
+    "units": [
+      "7 時間"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "requires": [
+      "Q_YS_3"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_PY_1A",
+    "dialog_end": "D_PY_1B"
+  },
+  Q_PY_2: {
+    "title": "霧王的身世",
+    "giver": "fog_kid",
+    "map": "M35",
+    "kind": "event",
+    "goal": "在山莊前的廣場，聽霧仔說霧王的故事：答對 2 題自然。",
+    "log_next": "霧仔說：霧王只是怕被忘記……我們去找它。",
+    "subject": "自然",
+    "units": [
+      "二、千變萬化的水"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "trigger": {
+      "map": "M35",
+      "cells": [
+        [
+          24,
+          24
+        ]
+      ]
+    },
+    "requires": [
+      "Q_PY_1"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_PY_2A",
+    "dialog_end": "D_FOG_ORIGIN"
+  },
+  Q_FK_1: {
+    "title": "霧中入口",
+    "giver": "fog_kid",
+    "map": "M36",
+    "kind": "event",
+    "goal": "風口上方被霧牆擋住了，拿出曙光羅盤：答對 2 題，照出洞窟。",
+    "log_next": "霧牆裡出現了一個洞口。霧之洞窟！",
+    "subject": "自然",
+    "units": [
+      "三、天氣停看聽"
+    ],
+    "count": 2,
+    "level_range": [
+      2,
+      3
+    ],
+    "hunt": null,
+    "trigger": {
+      "map": "M36",
+      "cells": [
+        [
+          29,
+          4
+        ],
+        [
+          30,
+          4
+        ]
+      ],
+      "requires": "item:dawn_compass"
+    },
+    "requires": [
+      "Q_PY_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_FK_1A",
+    "dialog_end": "D_FK_1B"
+  },
+  Q_CV_1: {
+    "title": "回音謎門",
+    "giver": "fog_kid",
+    "map": "M37",
+    "kind": "event",
+    "goal": "石門上的大嘴巴會重複你說的話。答對 3 題國語，門就會開。",
+    "log_next": "門開了！往洞窟深處走。",
+    "subject": "國語",
+    "units": [
+      "第貳單元 臺灣風景畫",
+      "第肆單元 奇幻故事屋"
+    ],
+    "count": 3,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "trigger": {
+      "map": "M37",
+      "echo_door": true
+    },
+    "requires": [
+      "Q_FK_1"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_ECHO_DOOR",
+    "dialog_end": "D_CV_1B"
+  },
+  Q_CV_2: {
+    "title": "送回遺失物",
+    "giver": "fog_kid",
+    "map": "M39",
+    "kind": "event",
+    "goal": "書庫裡飄著大家弄丟的東西。送回 6 件，北門就會開。",
+    "log_next": "北門開了！前面就是五燈試煉。",
+    "subject": "英語",
+    "units": [],
+    "count": 6,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "trigger": {
+      "map": "M39",
+      "lost_item": true
+    },
+    "requires": [
+      "Q_CV_1"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CV_2A",
+    "dialog_end": "D_CV_2B"
+  },
+  Q_CV_3A: {
+    "title": "五燈試煉：國語燈",
+    "giver": "fog_kid",
+    "map": "M40",
+    "kind": "boss",
+    "goal": "讓燈座上的霧影清醒，點亮國語燈。",
+    "log_next": "國語燈亮了！五盞燈全亮，最後的門就會開。",
+    "subject": "國語",
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "fob_shadow_bat",
+    "boss_map": "M40",
+    "auto_accept": true,
+    "requires": [
+      "Q_CV_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CV_3A",
+    "dialog_end": "D_LAMP_TRIAL_KO",
+    "cutscene": "D_LAMP_TRIAL_ALL",
+    "cutscene_when": [
+      "Q_CV_3A",
+      "Q_CV_3B",
+      "Q_CV_3C",
+      "Q_CV_3D",
+      "Q_CV_3E"
+    ]
+  },
+  Q_CV_3B: {
+    "title": "五燈試煉：英語燈",
+    "giver": "fog_kid",
+    "map": "M40",
+    "kind": "boss",
+    "goal": "讓燈座上的霧影清醒，點亮英語燈。",
+    "log_next": "英語燈亮了！五盞燈全亮，最後的門就會開。",
+    "subject": "英語",
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "fob_shadow_octo",
+    "boss_map": "M40",
+    "auto_accept": true,
+    "requires": [
+      "Q_CV_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CV_3A",
+    "dialog_end": "D_LAMP_TRIAL_EN",
+    "cutscene": "D_LAMP_TRIAL_ALL",
+    "cutscene_when": [
+      "Q_CV_3A",
+      "Q_CV_3B",
+      "Q_CV_3C",
+      "Q_CV_3D",
+      "Q_CV_3E"
+    ]
+  },
+  Q_CV_3C: {
+    "title": "五燈試煉：數學燈",
+    "giver": "fog_kid",
+    "map": "M40",
+    "kind": "boss",
+    "goal": "讓燈座上的霧影清醒，點亮數學燈。",
+    "log_next": "數學燈亮了！五盞燈全亮，最後的門就會開。",
+    "subject": "數學",
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "fob_shadow_frog",
+    "boss_map": "M40",
+    "auto_accept": true,
+    "requires": [
+      "Q_CV_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CV_3A",
+    "dialog_end": "D_LAMP_TRIAL_MA",
+    "cutscene": "D_LAMP_TRIAL_ALL",
+    "cutscene_when": [
+      "Q_CV_3A",
+      "Q_CV_3B",
+      "Q_CV_3C",
+      "Q_CV_3D",
+      "Q_CV_3E"
+    ]
+  },
+  Q_CV_3D: {
+    "title": "五燈試煉：自然燈",
+    "giver": "fog_kid",
+    "map": "M40",
+    "kind": "boss",
+    "goal": "讓燈座上的霧影清醒，點亮自然燈。",
+    "log_next": "自然燈亮了！五盞燈全亮，最後的門就會開。",
+    "subject": "自然",
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "fob_shadow_tree",
+    "boss_map": "M40",
+    "auto_accept": true,
+    "requires": [
+      "Q_CV_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CV_3A",
+    "dialog_end": "D_LAMP_TRIAL_NA",
+    "cutscene": "D_LAMP_TRIAL_ALL",
+    "cutscene_when": [
+      "Q_CV_3A",
+      "Q_CV_3B",
+      "Q_CV_3C",
+      "Q_CV_3D",
+      "Q_CV_3E"
+    ]
+  },
+  Q_CV_3E: {
+    "title": "五燈試煉：社會燈",
+    "giver": "fog_kid",
+    "map": "M40",
+    "kind": "boss",
+    "goal": "讓燈座上的霧影清醒，點亮社會燈。",
+    "log_next": "社會燈亮了！五盞燈全亮，最後的門就會開。",
+    "subject": "社會",
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "fob_shadow_golem",
+    "boss_map": "M40",
+    "auto_accept": true,
+    "requires": [
+      "Q_CV_2"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_CV_3A",
+    "dialog_end": "D_LAMP_TRIAL_SO",
+    "cutscene": "D_LAMP_TRIAL_ALL",
+    "cutscene_when": [
+      "Q_CV_3A",
+      "Q_CV_3B",
+      "Q_CV_3C",
+      "Q_CV_3D",
+      "Q_CV_3E"
+    ]
+  },
+  // ═══ v4.2 第 4a 批 QUESTS END ═══
+  // ═══ v4.2 第 4b 批 QUESTS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  Q_END_1: {
+    "title": "最終頭目：遺忘霧王‧佛格",
+    "giver": "fog_kid",
+    "map": "M41",
+    "kind": "boss",
+    "goal": "玉山之巔的霧裡，遺忘霧王在等你。",
+    "log_next": "霧散了！第一道曙光就要來了。",
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然",
+      "社會"
+    ],
+    "units": [],
+    "count": null,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "boss": "fob_king",
+    "boss_map": "M41",
+    "auto_accept": true,
+    "final": true,
+    "chapter_end": 9,
+    "requires": [
+      "Q_CV_3A",
+      "Q_CV_3B",
+      "Q_CV_3C",
+      "Q_CV_3D",
+      "Q_CV_3E"
+    ],
+    "reward": {
+      "exp": 90,
+      "gold": 58,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_SUMMIT_ARRIVE",
+    "dialog_end": "D_FOG_KING_END"
+  },
+  Q_END_2: {
+    "title": "第一道曙光",
+    "giver": "fog_kid",
+    "map": "M41",
+    "kind": "event",
+    "goal": "看第一道曙光照亮玉山，再回金包里點亮第六盞燈。",
+    "log_next": "你是點亮曙光的人！雲上好像還有路……",
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然",
+      "社會"
+    ],
+    "units": [],
+    "count": 1,
+    "level_range": [
+      2,
+      4
+    ],
+    "hunt": null,
+    "ending": true,
+    "trigger": {
+      "map": "M41",
+      "ending": true
+    },
+    "requires": [
+      "Q_END_1"
+    ],
+    "reward": {
+      "exp": 0,
+      "gold": 0,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_END_E1",
+    "dialog_end": "D_END_E6"
+  },
+  // ═══ v4.2 第 4b 批 QUESTS END ═══
+  // ═══ v4.2 第 4c 批 QUESTS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  Q_POST_1: {
+    "title": "晨光雲階",
+    "giver": "fog_kid",
+    "map": "M42",
+    "kind": "event",
+    "goal": "答對題目讓軟雲變硬，開出一條路，走到雲階最北邊。",
+    "log_next": "雲階走完了！下一層是星光雲庭。",
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然",
+      "社會"
+    ],
+    "units": [],
+    "count": 1,
+    "level_range": [
+      3,
+      4
+    ],
+    "hunt": null,
+    "trigger": {
+      "map": "M42",
+      "enter": true
+    },
+    "finish": {
+      "map": "M42",
+      "cells": [
+        [
+          28,
+          0
+        ],
+        [
+          29,
+          0
+        ]
+      ]
+    },
+    "requires": [
+      "Q_END_2"
+    ],
+    "reward": {
+      "exp": 2880,
+      "gold": 1700,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_POST_1A",
+    "dialog_end": "D_POST_1B"
+  },
+  Q_POST_2: {
+    "title": "星光雲庭",
+    "giver": "fog_kid",
+    "map": "M43",
+    "kind": "event",
+    "goal": "撿起星星、答對題目，讓 15 顆星星飛回星座。",
+    "log_next": "星星都回到星座了！最後一層是曙光源頭。",
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然",
+      "社會"
+    ],
+    "units": [],
+    "count": 15,
+    "level_range": [
+      3,
+      4
+    ],
+    "hunt": null,
+    "trigger": {
+      "map": "M43",
+      "enter": true
+    },
+    "requires": [
+      "Q_POST_1"
+    ],
+    "reward": {
+      "exp": 4000,
+      "gold": 2000,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_POST_2A",
+    "dialog_end": "D_POST_2B"
+  },
+  Q_POST_3: {
+    "title": "曙光源頭",
+    "giver": "fog_kid",
+    "map": "M44",
+    "kind": "boss",
+    "goal": "讓四位發著曙光的霧將清醒，走進光柱。",
+    "log_next": "你走到了曙光的源頭！",
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然",
+      "社會"
+    ],
+    "units": [],
+    "count": null,
+    "level_range": [
+      3,
+      4
+    ],
+    "hunt": null,
+    "boss": "mb_floodgate_s3",
+    "bosses": [
+      "mb_floodgate_s3",
+      "mb_lantern_s3",
+      "fog_demon_s3",
+      "wxb_whale_s3"
+    ],
+    "boss_map": "M44",
+    "auto_accept": true,
+    "finish": {
+      "map": "M44",
+      "pillar": true,
+      "cells": [
+        [
+          24,
+          16
+        ]
+      ]
+    },
+    "requires": [
+      "Q_POST_2"
+    ],
+    "reward": {
+      "exp": 4960,
+      "gold": 2300,
+      "item": null,
+      "light": null
+    },
+    "dialog_start": "D_POST_3A",
+    "dialog_end": "D_POST_END"
+  },
+  // ═══ v4.2 第 4c 批 QUESTS END ═══
 };

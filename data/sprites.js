@@ -2424,5 +2424,335 @@ window.SPRITES = {
  "type": "single",
  "frameW": 58,
  "frameH": 64
+},
+ "npc_paiyun_volunteer": {
+ "file": "assets/npcs/npc_paiyun_volunteer.png",
+ "type": "single",
+ "frameW": 38,
+ "frameH": 50
+},
+ "npc_ysnp_ranger": {
+ "file": "assets/npcs/npc_ysnp_ranger.png",
+ "type": "single",
+ "frameW": 32,
+ "frameH": 50
+},
+ "npc_bird_guide": {
+ "file": "assets/npcs/npc_bird_guide.png",
+ "type": "single",
+ "frameW": 35,
+ "frameH": 50
+},
+ "npc_inn_tataka": {
+ "file": "assets/npcs/npc_inn_tataka.png",
+ "type": "single",
+ "frameW": 37,
+ "frameH": 50
+},
+ "npc_trail_ranger": {
+ "file": "assets/npcs/npc_trail_ranger.png",
+ "type": "single",
+ "frameW": 31,
+ "frameH": 50
+},
+ "npc_lodge_manager_py": {
+ "file": "assets/npcs/npc_lodge_manager_py.png",
+ "type": "single",
+ "frameW": 28,
+ "frameH": 50
+},
+ "npc_pheasant": {
+ "file": "assets/npcs/npc_pheasant.png",
+ "type": "single",
+ "frameW": 93,
+ "frameH": 144
+},
+ "npc_bear": {
+ "file": "assets/npcs/npc_bear.png",
+ "type": "single",
+ "frameW": 35,
+ "frameH": 44
+},
+ "mon_an_muntjac": {
+ "file": "assets/monsters/mon_an_muntjac.png",
+ "type": "single",
+ "frameW": 101,
+ "frameH": 96
+},
+ "mon_fo_puff_cave": {
+ "file": "assets/monsters/mon_fo_puff_cave.png",
+ "type": "single",
+ "frameW": 88,
+ "frameH": 80
+},
+ "mon_fo_echo": {
+ "file": "assets/monsters/mon_fo_echo.png",
+ "type": "single",
+ "frameW": 106,
+ "frameH": 90
+},
+ "mon_fo_frost": {
+ "file": "assets/monsters/mon_fo_frost.png",
+ "type": "single",
+ "frameW": 90,
+ "frameH": 90
+},
+ "mon_fo_eraser": {
+ "file": "assets/monsters/mon_fo_eraser.png",
+ "type": "single",
+ "frameW": 87,
+ "frameH": 80
+},
+ "mon_fo_umbrella": {
+ "file": "assets/monsters/mon_fo_umbrella.png",
+ "type": "single",
+ "frameW": 91,
+ "frameH": 90
+},
+ "boss_fob_shadow_bat": {
+ "file": "assets/monsters/boss_fob_shadow_bat.png",
+ "type": "single",
+ "frameW": 170,
+ "frameH": 164
+},
+ "boss_fob_shadow_octo": {
+ "file": "assets/monsters/boss_fob_shadow_octo.png",
+ "type": "single",
+ "frameW": 173,
+ "frameH": 164
+},
+ "boss_fob_shadow_frog": {
+ "file": "assets/monsters/boss_fob_shadow_frog.png",
+ "type": "single",
+ "frameW": 173,
+ "frameH": 164
+},
+ "boss_fob_shadow_tree": {
+ "file": "assets/monsters/boss_fob_shadow_tree.png",
+ "type": "single",
+ "frameW": 164,
+ "frameH": 164
+},
+ "boss_fob_shadow_golem": {
+ "file": "assets/monsters/boss_fob_shadow_golem.png",
+ "type": "single",
+ "frameW": 171,
+ "frameH": 164
+},
+ "boss_fob_mist": {
+ "file": "assets/monsters/boss_fob_mist.png",
+ "type": "single",
+ "frameW": 166,
+ "frameH": 160
+},
+ "item_climb_permit": {
+ "file": "assets/items/item_climb_permit.png",
+ "type": "icon",
+ "frameW": 36,
+ "frameH": 32
+},
+ "item_mountain_fruit": {
+ "file": "assets/items/item_mountain_fruit.png",
+ "type": "icon",
+ "frameW": 36,
+ "frameH": 32
+},
+ "item_grass_jelly": {
+ "file": "assets/items/item_grass_jelly.png",
+ "type": "icon",
+ "frameW": 24,
+ "frameH": 32
+},
+ "item_gear_z14_dawn": {
+ "file": "assets/items/item_gear_z14_dawn.png",
+ "type": "icon",
+ "frameW": 33,
+ "frameH": 32
+},
+ "boss_fob_king": {
+ "file": "assets/monsters/boss_fob_king.png",
+ "type": "single",
+ "frameW": 218,
+ "frameH": 220
+},
+ "boss_fob_king_p2": {
+ "file": "assets/monsters/boss_fob_king_p2.png",
+ "type": "single",
+ "frameW": 218,
+ "frameH": 220
+},
+ "boss_fob_king_p4": {
+ "file": "assets/monsters/boss_fob_king_p4.png",
+ "type": "single",
+ "frameW": 220,
+ "frameH": 220
+},
+ "npc_fog_cloud": {
+ "file": "assets/npcs/npc_fog_cloud.png",
+ "type": "single",
+ "frameW": 87,
+ "frameH": 120
+},
+ "lamp_dawn_on": {
+ "file": "assets/ui/lamp_dawn_on.png",
+ "type": "single",
+ "frameW": 16,
+ "frameH": 16
+},
+ "lamp_dawn_off": {
+ "file": "assets/ui/lamp_dawn_off.png",
+ "type": "single",
+ "frameW": 16,
+ "frameH": 16
+},
+ "mon_fo_puff_s1": {
+ "file": "assets/monsters/mon_fo_puff_s1.png",
+ "type": "single",
+ "frameW": 88,
+ "frameH": 80
+},
+ "mon_fo_echo_s1": {
+ "file": "assets/monsters/mon_fo_echo_s1.png",
+ "type": "single",
+ "frameW": 106,
+ "frameH": 90
+},
+ "mon_fo_frost_s1": {
+ "file": "assets/monsters/mon_fo_frost_s1.png",
+ "type": "single",
+ "frameW": 90,
+ "frameH": 90
+},
+ "mon_fo_eraser_s1": {
+ "file": "assets/monsters/mon_fo_eraser_s1.png",
+ "type": "single",
+ "frameW": 87,
+ "frameH": 80
+},
+ "mon_fo_umbrella_s1": {
+ "file": "assets/monsters/mon_fo_umbrella_s1.png",
+ "type": "single",
+ "frameW": 91,
+ "frameH": 90
+},
+ "boss_wxb_raincloud_s2": {
+ "file": "assets/monsters/boss_wxb_raincloud_s2.png",
+ "type": "single",
+ "frameW": 173,
+ "frameH": 160
+},
+ "boss_mb_train_s2": {
+ "file": "assets/monsters/boss_mb_train_s2.png",
+ "type": "single",
+ "frameW": 161,
+ "frameH": 160
+},
+ "boss_fob_balloon_s2": {
+ "file": "assets/monsters/boss_fob_balloon_s2.png",
+ "type": "single",
+ "frameW": 161,
+ "frameH": 160
+},
+ "boss_mnb_goldjaw_s2": {
+ "file": "assets/monsters/boss_mnb_goldjaw_s2.png",
+ "type": "single",
+ "frameW": 164,
+ "frameH": 160
+},
+ "boss_pib_ship_s2": {
+ "file": "assets/monsters/boss_pib_ship_s2.png",
+ "type": "single",
+ "frameW": 160,
+ "frameH": 160
+},
+ "boss_mb_floodgate_s3": {
+ "file": "assets/monsters/boss_mb_floodgate_s3.png",
+ "type": "single",
+ "frameW": 171,
+ "frameH": 166
+},
+ "boss_mb_lantern_s3": {
+ "file": "assets/monsters/boss_mb_lantern_s3.png",
+ "type": "single",
+ "frameW": 167,
+ "frameH": 166
+},
+ "boss_fog_demon_s3": {
+ "file": "assets/monsters/boss_fog_demon_s3.png",
+ "type": "single",
+ "frameW": 184,
+ "frameH": 182
+},
+ "boss_wxb_whale_s3": {
+ "file": "assets/monsters/boss_wxb_whale_s3.png",
+ "type": "single",
+ "frameW": 170,
+ "frameH": 166
+},
+ "item_gear_z15_cloud": {
+ "file": "assets/items/item_gear_z15_cloud.png",
+ "type": "icon",
+ "frameW": 36,
+ "frameH": 32
+},
+ "item_gear_z16_star": {
+ "file": "assets/items/item_gear_z16_star.png",
+ "type": "icon",
+ "frameW": 30,
+ "frameH": 32
+},
+ "item_gear_z17_dawn": {
+ "file": "assets/items/item_gear_z17_dawn.png",
+ "type": "icon",
+ "frameW": 38,
+ "frameH": 32
+},
+ "npc_tao_fisher": {
+ "file": "assets/npcs/npc_tao_fisher.png",
+ "type": "single",
+ "frameW": 34,
+ "frameH": 50
+},
+ "npc_tao_taro": {
+ "file": "assets/npcs/npc_tao_taro.png",
+ "type": "single",
+ "frameW": 34,
+ "frameH": 50
+},
+ "npc_tao_elder": {
+ "file": "assets/npcs/npc_tao_elder.png",
+ "type": "single",
+ "frameW": 34,
+ "frameH": 50
+},
+ "npc_tao_owner": {
+ "file": "assets/npcs/npc_tao_owner.png",
+ "type": "single",
+ "frameW": 34,
+ "frameH": 50
+},
+ "npc_tao_boatman": {
+ "file": "assets/npcs/npc_tao_boatman.png",
+ "type": "single",
+ "frameW": 34,
+ "frameH": 50
+},
+ "npc_tao_kid": {
+ "file": "assets/npcs/npc_tao_kid.png",
+ "type": "single",
+ "frameW": 34,
+ "frameH": 50
+},
+ "npc_goat_ly": {
+ "file": "assets/npcs/npc_goat_ly.png",
+ "type": "walk",
+ "frameW": 37,
+ "frameH": 36,
+ "rows": [
+  "down",
+  "left",
+  "right",
+  "up"
+ ]
 }
 };

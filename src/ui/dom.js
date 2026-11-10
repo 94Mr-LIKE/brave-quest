@@ -432,5 +432,5 @@
   }
 
   window.JQ = window.JQ || {};
-  window.JQ.UI = { wordRanges: wordRanges, wrapWords: wwNode, choose: choose, init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, blocksMove: blocksMove, closePassMove: closePassMove, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
+  window.JQ.UI = { wordRanges: wordRanges, wrapWords: wwNode, choose: choose, init: init, h: h, esc: esc, open: open, closeAll: closeAll, isOpen: isOpen, blocksMove: blocksMove, closePassMove: closePassMove, top: top, toast: toast, progress: progress, closeLoadBars: closeLoadBars, banner: banner, announce: announce, dialog: dialog, fill: fill, confirm: confirmBox };
 })();

@@ -135,7 +135,8 @@ window.MAPS = {
       { subject: "英語", x: 29, y: 37 },
       { subject: "數學", x: 43, y: 45 },
       { subject: "自然", x: 19, y: 45 },
-      { subject: "社會", x: 29, y: 45 }
+      { subject: "社會", x: 29, y: 45 },
+      { subject: "曙光", x: 33, y: 40 }   // v4.2 第六盞曙光燈（lamps['曙光']）：flags.ending_done 之前不顯示、不擋路
     ],
     chests: [
       { id: "C_M01_1", x: 20, y: 10, subject: "數學", level: 1, reward: { gold: 1, exp: 1, item: "herb" } },
@@ -360,10 +361,15 @@ window.MAPS = {
 
   // ───────────────────────────── M04 神木森林（精靈族）─────────────────────────────
   M04: {
-    name: "神木森林", type: "tribe", level: 5, bgm: "elf", battle_bg: "forest", tileset: "forest",
-    real_ref: "嘉義阿里山森林（巨木群、森林小火車）",
-    art_note: "高大的檜木林。最北邊是一棵巨大的千年神木（'K'），周圍是花草圍成的空地；左右各有精靈樹屋；中段是密林小徑；最南邊是森林小火車的小車站與月台。",
-    grid: [
+    "name": "神木森林",
+    "type": "tribe",
+    "level": 5,
+    "bgm": "elf",
+    "battle_bg": "forest",
+    "tileset": "forest",
+    "real_ref": "嘉義阿里山森林（巨木群、森林小火車）",
+    "art_note": "高大的檜木林。最北邊是一棵巨大的千年神木（'K'），周圍是花草圍成的空地；左右各有精靈樹屋；中段是密林小徑；最南邊是森林小火車的小車站與月台。",
+    "grid": [
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
@@ -391,8 +397,8 @@ window.MAPS = {
       "=============================TTT..****.*TTTT===TTTTTTTTTTTTTTTTTTTTTTTT.....T..**T.==TTTTT",
       "TTTKUUUUUUUU......UUUUUUUUUK.TTT..****.*TTTT===TTTTTTTTTTTTTTTTTTTTTTTT........**..==TTTTT",
       "TTT.KKKKKKKK......KKKK=KKKK.UTTT.......*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.U*..........==TTTTT",
-      "TTT.KKKKKKKK......KKKKKKKKK.UTTT....**.*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.*..........=======K",
-      "TTT.........................UTTTT*TTTTT*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.......TUUU.=======T",
+      "TTT.KKKKKKKK......KKKKKKKKK.UTTT....**.*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.*..........========",
+      "TTT.........................UTTTT*TTTTT*TTTT===TTTTTTTTTTTTTTTTTTTTTTT.......TUUU.========",
       "TTTUUUUUUUUU......UUUUUUUUU.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTTTT....*U.*TTUUUUU..TTT",
       "TTTKKKKKKKKK......KKKKKKKKK.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTTT.U..UU*..T*TTTTTU.TTT",
       "TTTKKKKKKKKK*.....KKKKKKKKK.UTTTTTTTTTTTTTTT===TTTTTTTTTTTTTTTTTTTTT..**.***....T*TTTT.TTT",
@@ -425,61 +431,351 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
-    start: { x: 34, y: 53 },
-    station: { x: 30, y: 53, name: "神木森林站", shelter: { x: 27, y: 52 } },
-    exits: [
-      { x: 44, y: 59, to: "M10", tx: 82, ty: 16 },
-      { x: 45, y: 59, to: "M10", tx: 82, ty: 17 },
-      { x: 0, y: 22, to: "M20", tx: 70, ty: 55 },
-      { x: 0, y: 23, to: "M20", tx: 71, ty: 55 },
-      { x: 0, y: 24, to: "M20", tx: 72, ty: 55 }
+    "start": {
+      "x": 34,
+      "y": 53
+    },
+    "station": {
+      "x": 30,
+      "y": 53,
+      "name": "神木森林站",
+      "shelter": {
+        "x": 27,
+        "y": 52
+      }
+    },
+    "exits": [
+      {
+        "x": 44,
+        "y": 59,
+        "to": "M10",
+        "tx": 82,
+        "ty": 16
+      },
+      {
+        "x": 45,
+        "y": 59,
+        "to": "M10",
+        "tx": 82,
+        "ty": 17
+      },
+      {
+        "x": 0,
+        "y": 22,
+        "to": "M20",
+        "tx": 70,
+        "ty": 55
+      },
+      {
+        "x": 0,
+        "y": 23,
+        "to": "M20",
+        "tx": 71,
+        "ty": 55
+      },
+      {
+        "x": 0,
+        "y": 24,
+        "to": "M20",
+        "tx": 72,
+        "ty": 55
+      },
+      {
+        "x": 89,
+        "y": 27,
+        "to": "M33",
+        "tx": 1,
+        "ty": 22,
+        "requires": "Q_XT_4",
+        "requires_dialog": "D_EXIT_LOCK_XT"
+      },
+      {
+        "x": 89,
+        "y": 28,
+        "to": "M33",
+        "tx": 1,
+        "ty": 23,
+        "requires": "Q_XT_4",
+        "requires_dialog": "D_EXIT_LOCK_XT"
+      }
     ],
-    npcs: [
-      { id: "elf_elder", x: 8, y: 9, sprite: "npc_elf_elder", dialog: "D_ELDER_IDLE", quest: "Q_ELF_1", quests: ["Q_ELF_1", "Q_ELF_3", "Q_ELF_4"] },
-      { id: "elf_kid", x: 15, y: 42, sprite: "npc_elf_kid", dialog: "D_ELFKID_IDLE", quest: "Q_ELF_2", quests: ["Q_ELF_2"] },
-      { id: "elf_kid_lost", x: 76, y: 28, sprite: "npc_elf_kid", dialog: "D_LOST_IDLE", quest: "Q_SIDE_LOST", quests: ["Q_SIDE_LOST"] },
-      { id: "forest_rail", x: 37, y: 54, sprite: "npc_forest_rail", dialog: "D_FORESTRAIL_IDLE", quest: "Q_AL_1", quests: ["Q_AL_1"] }
+    "npcs": [
+      {
+        "id": "elf_elder",
+        "x": 8,
+        "y": 9,
+        "sprite": "npc_elf_elder",
+        "dialog": "D_ELDER_IDLE",
+        "quest": "Q_ELF_1",
+        "quests": [
+          "Q_ELF_1",
+          "Q_ELF_3",
+          "Q_ELF_4"
+        ]
+      },
+      {
+        "id": "elf_kid",
+        "x": 15,
+        "y": 42,
+        "sprite": "npc_elf_kid",
+        "dialog": "D_ELFKID_IDLE",
+        "quest": "Q_ELF_2",
+        "quests": [
+          "Q_ELF_2"
+        ]
+      },
+      {
+        "id": "elf_kid_lost",
+        "x": 76,
+        "y": 28,
+        "sprite": "npc_elf_kid",
+        "dialog": "D_LOST_IDLE",
+        "quest": "Q_SIDE_LOST",
+        "quests": [
+          "Q_SIDE_LOST"
+        ]
+      },
+      {
+        "id": "forest_rail",
+        "x": 37,
+        "y": 54,
+        "sprite": "npc_forest_rail",
+        "dialog": "D_FORESTRAIL_IDLE",
+        "quest": "Q_AL_1",
+        "quests": [
+          "Q_AL_1"
+        ]
+      }
     ],
-    roadsigns: [
-      { id: "sign_tataka", x: 89, y: 27, dialog: "D_SIGN_TATAKA" }
+    "roadsigns": [],
+    "chests": [
+      {
+        "id": "C_M04_1",
+        "x": 28,
+        "y": 12,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 6,
+          "exp": 7,
+          "item": null
+        }
+      },
+      {
+        "id": "C_M04_2",
+        "x": 2,
+        "y": 11,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 6,
+          "exp": 7,
+          "item": "herb"
+        }
+      },
+      {
+        "id": "C_M04_3",
+        "x": 53,
+        "y": 4,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 6,
+          "exp": 7,
+          "item": "herb"
+        }
+      },
+      {
+        "id": "C_M04_4",
+        "x": 81,
+        "y": 26,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 7,
+          "exp": 7,
+          "item": null
+        }
+      },
+      {
+        "id": "C_M04_5",
+        "x": 85,
+        "y": 53,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 7,
+          "exp": 7,
+          "item": "eraser"
+        }
+      }
     ],
-    chests: [
-      { id: "C_M04_1", x: 28, y: 12, subject: "數學", level: 3, reward: { gold: 6, exp: 7, item: null } },
-      { id: "C_M04_2", x: 2, y: 11, subject: "數學", level: 3, reward: { gold: 6, exp: 7, item: "herb" } },
-      { id: "C_M04_3", x: 53, y: 4, subject: "數學", level: 3, reward: { gold: 6, exp: 7, item: "herb" } },
-      { id: "C_M04_4", x: 81, y: 26, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: null } },
-      { id: "C_M04_5", x: 85, y: 53, subject: "數學", level: 3, reward: { gold: 7, exp: 7, item: "eraser" } }
+    "spawns": [
+      {
+        "monster": "mushroom",
+        "count": 2,
+        "area": [
+          3,
+          38,
+          27,
+          15
+        ]
+      },
+      {
+        "monster": "owl",
+        "count": 2,
+        "area": [
+          30,
+          13,
+          14,
+          16
+        ]
+      },
+      {
+        "monster": "al_cypress",
+        "count": 3,
+        "area": [
+          57,
+          8,
+          30,
+          19
+        ]
+      },
+      {
+        "monster": "al_cloud",
+        "count": 3,
+        "area": [
+          47,
+          46,
+          40,
+          10
+        ]
+      },
+      {
+        "monster": "tree_king",
+        "count": 1,
+        "area": [
+          45,
+          9,
+          1,
+          1
+        ],
+        "boss": true,
+        "quest": "Q_ELF_4"
+      }
     ],
-    spawns: [
-      { monster: "mushroom", count: 2, area: [3, 38, 27, 15] },
-      { monster: "owl", count: 2, area: [30, 13, 14, 16] },
-      { monster: "al_cypress", count: 3, area: [57, 8, 30, 19] },
-      { monster: "al_cloud", count: 3, area: [47, 46, 40, 10] },
-      { monster: "tree_king", count: 1, area: [45, 9, 1, 1], boss: true, quest: "Q_ELF_4" }
-    ],
-    inn: { npc: null, price: 18, x: 23, y: 9, name: "神木樹屋旅店", sign: "樹屋", dialog: "D_INN_SHENMU", dialog_nocoin: "D_INN_SHENMU_NOCOIN" },
-    shop: null,
-    lights: [
-      { x: 5, y: 4, r: 1.2 },
-      { x: 9, y: 4, r: 1.2 },
-      { x: 20, y: 4, r: 1.2 },
-      { x: 24, y: 4, r: 1.2 },
-      { x: 5, y: 16, r: 1.2 },
-      { x: 9, y: 16, r: 1.2 },
-      { x: 4, y: 19, r: 1.2 },
-      { x: 19, y: 16, r: 1.2 },
-      { x: 24, y: 16, r: 1.2 },
-      { x: 3, y: 25, r: 1.2 },
-      { x: 27, y: 25, r: 1.2 },
-      { x: 28, y: 35, r: 1.2 },
-      { x: 7, y: 26, r: 1.2 },
-      { x: 18, y: 26, r: 1.2 },
-      { x: 9, y: 35, r: 1.2 },
-      { x: 20, y: 35, r: 1.2 },
-      { x: 31, y: 49, r: 1.2 },
-      { x: 34, y: 48, r: 1.2 },
-      { x: 39, y: 48, r: 1.2 },
-      { x: 3, y: 52, r: 1.2 }
+    "inn": {
+      "npc": null,
+      "price": 18,
+      "x": 23,
+      "y": 9,
+      "name": "神木樹屋旅店",
+      "sign": "樹屋",
+      "dialog": "D_INN_SHENMU",
+      "dialog_nocoin": "D_INN_SHENMU_NOCOIN"
+    },
+    "shop": null,
+    "lights": [
+      {
+        "x": 5,
+        "y": 4,
+        "r": 1.2
+      },
+      {
+        "x": 9,
+        "y": 4,
+        "r": 1.2
+      },
+      {
+        "x": 20,
+        "y": 4,
+        "r": 1.2
+      },
+      {
+        "x": 24,
+        "y": 4,
+        "r": 1.2
+      },
+      {
+        "x": 5,
+        "y": 16,
+        "r": 1.2
+      },
+      {
+        "x": 9,
+        "y": 16,
+        "r": 1.2
+      },
+      {
+        "x": 4,
+        "y": 19,
+        "r": 1.2
+      },
+      {
+        "x": 19,
+        "y": 16,
+        "r": 1.2
+      },
+      {
+        "x": 24,
+        "y": 16,
+        "r": 1.2
+      },
+      {
+        "x": 3,
+        "y": 25,
+        "r": 1.2
+      },
+      {
+        "x": 27,
+        "y": 25,
+        "r": 1.2
+      },
+      {
+        "x": 28,
+        "y": 35,
+        "r": 1.2
+      },
+      {
+        "x": 7,
+        "y": 26,
+        "r": 1.2
+      },
+      {
+        "x": 18,
+        "y": 26,
+        "r": 1.2
+      },
+      {
+        "x": 9,
+        "y": 35,
+        "r": 1.2
+      },
+      {
+        "x": 20,
+        "y": 35,
+        "r": 1.2
+      },
+      {
+        "x": 31,
+        "y": 49,
+        "r": 1.2
+      },
+      {
+        "x": 34,
+        "y": 48,
+        "r": 1.2
+      },
+      {
+        "x": 39,
+        "y": 48,
+        "r": 1.2
+      },
+      {
+        "x": 3,
+        "y": 52,
+        "r": 1.2
+      }
     ]
   },
 
@@ -3814,75 +4110,385 @@ window.MAPS = {
 
   // ───────────────────────────── M28 蘭嶼（v4.0 新增；來源 tools/bigmaps/M28.txt／.json）─────────────────────────────
   M28: {
-    name: "蘭嶼", type: "field", level: 5, bgm: "field", battle_bg: "grass", tileset: "field",
-    real_ref: "火山島與黑潮（T12、T13）、拼板舟（T14）、禮儀（T15、T16）、飛魚季與飛魚乾（T17、T18）、傳統屋（T19）、水芋田（T20）",
-    art_note: "灰黑色火山岩海岸、清澈的海與珊瑚；西邊開元港碼頭（船由程式畫）與木造小解說處、旁邊一個掛飛魚乾的木架；中間水芋田；南邊蘭嶼民宿；東南沙灘上 3 艘拼板舟（白底黑紅、簡化的太陽紋三角紋水波紋，不畫人形紋）；北岸遠遠一排屋頂貼近地面、石牆圍著的房子（只看外觀，路在外面經過）。背景 tools/bigmaps/M28_bg.webp（q0–q2 地圖師B、q3 本組；島中間地圖師B 畫的 4 間紅瓦圍牆屋已用草地蓋掉，傳統屋只留北岸遠景）。",
-    grid: [
+    "name": "蘭嶼",
+    "type": "field",
+    "level": 5,
+    "bgm": "field",
+    "battle_bg": "grass",
+    "tileset": "field",
+    "real_ref": "火山島與黑潮（T12、T13）、拼板舟（T14）、禮儀（T15、T16）、飛魚季與飛魚乾（T17、T18）、傳統屋（T19）、水芋田（T20）",
+    "art_note": "v4.2 新背景（GPT 四塊延續法，A5 2026-11-09；老闆 2026-11-10 核可）：北岸灰黑火山岩礁；北部落 4 組家屋（後排木造工作房＋木柱涼台，前排往下凹、卵石砌三層石階的地下屋），家屋前一條草地巷道；3 排曬飛魚架掛銀藍色飛魚乾＋1 座斜放的曬魚台；水芋田小塊＋水圳＋2 座小木橋，東邊一塊不規則水芋田；中央東大片草坡＋龍眼樹、麵包樹叢＋1 塊火山岩；東海岸黑色礁岩平台、珊瑚礁潮池、奇岩；南灘頭白沙灘、卵石矮牆木屋頂的船屋、3 艘拼板舟（白底、紅黑太陽紋三角紋水波紋，不畫人形紋）；環島路沿海岸彎。西邊開元港碼頭＋解說處、民宿兩塊是舊圖原像素貼回（K3／K4）。圖上沒有字、人物、動物、祭典、雪、霧。背景 wip_v42/art/m28/M28_new_bg.webp（換上線的 docs/assets/maps/bg_M28.webp 由 Codex 做）。",
+    "grid": [
       "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
-      "~~~~*******~~~~~~~~~~~~~~~~~*****************************************~~~",
-      "~~~~*****************************************************************~~~",
-      "~~~~*****************************************************************~~~",
-      "~~~~*****************************************************************~~~",
-      "~~~~*******.................*****************************************~~~",
-      "~~~~*******.................*****************************************~~~",
-      "~~~~*******==================================================********~~~",
-      "~~~~*******==..............................................==********~~~",
-      "~~~~*******==..............................................==********~~~",
-      "~~~~*******==......~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==......~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==......~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==......~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==RRRRR.~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==RRRRR.~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==HHHHH.~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==HHDHH.~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~*******==......~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~~~~~~~~~~~==KKKK..~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~============......~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~============.....~~~~~~~~~~~~~~~~~~~~~~~~~~...............==********~~~",
-      "~============.....~~~~~~~~~~~~~~~~~~~~~~~~~~.............====********~~~",
-      "~~~~~~~~~~~==.....~~~~~~~~~~~~~~~~~~~~~~~~~~.............==..********~~~",
-      "~~~~~~~~~~~==.....~~~~~~~~~~~~~~~~~~~~~~~~~~.............==..********~~~",
-      "~~~~~~~~~~~==.........~~~~~~~~~~~~~~~~~~~~~~.............==..********~~~",
-      "~~~~~~~~~~~==.........~~~~~~~~~~~~~~~~~~~~~~.............==..********~~~",
-      "~~~~~~~~~~~==.........~~~~~~~~~~~~~~~~~~~~~~.............==..********~~~",
-      "~~~~~~~****==.........~~~~~~~~~~~~~~~~~~~~~~.............==..********~~~",
-      "~~~~~~~****==.................TTTTTTTT~~~................==..********~~~",
-      "~~~~~~~****==.................RRRRRRRR...................==..********~~~",
-      "~~~~~~~****==.................RRRRRRRR...................==..********~~~",
-      "~~~~~~~****==.................RRRRRRRR...................==..********~~~",
-      "~~~~~~~****==.................HHHHHHHH...................==..********~~~",
-      "~~~~~~~****==.................HHHHHHHH...................==..********~~~",
-      "~~~~~~~****==.................HHHDHHHH...................==..********~~~",
-      "~~~~~~~****================================================..********~~~",
-      "~~~~~~~****================================================..***********",
-      "~~~~~~~****UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU%%%%%%%%%%%%%%%%%%%%%%%********",
-      "~~~~~~~***********************************%%%%%%%%%%%%%%%%%%%%%%********",
-      "~~~~~~~***********************************%%%%%%%UUU%%UUU%%%UUU%********",
-      "~~~~~~~***********************************%%%%%%%KKK%%KKK%%%KKK%********",
-      "~~~~~~~************************************%%%%%%%%%%%%%%%%%%%%%********",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*****~~~~~~~~~~~~~~~~~~~~~~~********",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~********",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~********",
-      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~***~~~*~~~********~~****~~~***~~~~~",
+      "************************~*******************************************~~~~",
+      "~~~~~***************************************..==..........==.,,,****~~~~",
+      "~~~~*******=================================................=,,,,,**~~~~",
+      "~~~~*******==...............................................=,,~~~~*~~~~",
+      "~~~*~**~***==RRRKKK.RRKKK..RRKKK.RRKKKKTT*............TTTT..=,,~~~~*~~~~",
+      "~~~~*******==HHHKKK.HHKKK..HHKKK.HHKKKKTT*............TTTT...,,,,,**~~~~",
+      "~~~~*******==######.######.#####.#####................TTTT..=.,,,,***~~*",
+      "~~~~***~~**==RRRRRR.RRRRRR.RRRRR.RRRRR........................,,,****~~*",
+      "~~*********==######.######.#####.#####.......................=,,,***~~~~",
+      "~~~********==................................................=,,,,**~~~~",
+      "~~*********==..................................***...........,,~~~~~*~~*",
+      "~~~********==....................,,,,,.........***............,~~~~~****",
+      "~~~~*******==......~~~~~~~~~~~~~.,,,,,......................=,,~~~~~**~*",
+      "~~~~*******==RRRRR.~~~~~~~~~~~~~.,KKKK.......................,,*,,**~~~~",
+      "~~~~*******==RRRRR.~~~~~~~~~~~~~.,KKKK.................TTT...,,**,*~~~~~",
+      "~~~~*******==HHHHH....BB.........,,,,,.................TTT...,,*,,*~~~~~",
+      "~~~~*******==HHDHH.~~~~~~~~~~~~~.,KKK,.................TTT...,,,,,**~~~~",
+      "~~~~*******==......~~~~~~~~~~~~~.,KKK,*......................,,,,,**~~~~",
+      "~~~~~~~~~~~==KKKK..~~~~~~~~~~~~~.,,,,,~~~~~~~..............=,,,,,*~~~~~~",
+      "~============.........BB.........,,,,,~~~~~~~~..............,,~~~**~~~~~",
+      "~============.....~.**********...,KKKK~~~~~~~~..............,~~~~,*~~~~~",
+      "~============.....~.*************KKKKK~~~~~~~~............=.,,,,,,~~~~~~",
+      "~~~~~~~~~~~==.....~..............KKKKK~~~~~~~~............=.,,,,,,**~~~~",
+      "~~~~~~~~~~~==.....~..............,,,,,~~~~~~~~............=.,,,~~~~*~~~~",
+      "~~~~~~~~~~~==......*~~~~~~.~~~~~~,,,,,~~~~~~~~~~~.........=.,,,~~~~***~~",
+      "~~~~~~~~~~~==.......~~~~~~.~~~~~~,,,,,~~~~~~~~~~~.........=.,,,~~~~*~~~~",
+      "~~~~~~~~~~~==.......~~~~~~.~~~~~~.....*~~~~~~~~~..........=.,,,,,,**~~~~",
+      "~~~~~~~****==...............***********.......TTTT........=.,~~,,*~~~~~~",
+      "~~~~~~~**.=.................***********.......TTTT........=.,~~,,,*~~~~~",
+      "~~~~~****.=...................RRRRRRRR........TTTT....TTT.=.,,,,,,***~~~",
+      "~~~~~*****=..**...............RRRRRRRR................TTT.=.,,,,,**~~~~~",
+      "~~~~~~~***=..**...............RRRRRRRR...TTT..........TTT.=.,,,,,~~~~~~~",
+      "~~~~~~***.=...................HHHHHHHH...TTT..............=.,~~,,,*~~~~~",
+      "~~~~~****.=............**.....HHHHHHHH...TTT.......TTT....=.,~~,,,**~~~~",
+      "~~~~~****.=............**.....HHHDHHHH.............TTT....=.,,,,,,*~~~~~",
+      "~~~~~****.=.................=============..........TTT....=.,,,,,~~~~~~~",
+      "~~~~******========.===.===..=============.................=.,,,~~***~~~~",
+      "~~~~~~***.............................=====================.,,,~~**~~~~~",
+      "~~~~~******UUUUUUUUUUUUUUUUUUUUUUUUUU%%%%%%%%%%%%%%%%%%%%%%%%**********~",
+      "~~~~~************~****************~*.***RRRRRRR%%%%%%%%%%%%%%%%*********",
+      "~~********~*****************~**********%RRRRRRR%%%%%%%%%%%%%%%%*********",
+      "~~******~********~~*************~******%HHHHHHH%KKKKK%KKKKK%KKKK********",
+      "~*******~*****************************%%HHHHHHH%KKKKK%KKKKK%KKKK********",
+      "~~***~************~*******************%%HHHHHHH%%%%%%%%%%%%%%%%%********",
+      "~~~~~~~**~~~~~*~~*~~~~~~~~~*****~~****%%%%%%%%%%%%%%%%%%%%%%%%%%********",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~****~*~~***************************"
     ],
-    start: { x: 9, y: 22 },
-    landmarks: [
-      { name: "開元港", area: [0, 20, 11, 9] },
-      { name: "水芋田", area: [18, 11, 26, 19] },
-      { name: "拼板舟沙灘", area: [41, 39, 23, 6] },
-      { name: "傳統屋（遠景）", area: [28, 2, 41, 6] }
+    "start": {
+      "x": 9,
+      "y": 22
+    },
+    "landmarks": [
+      {
+        "name": "開元港",
+        "area": [
+          0,
+          20,
+          11,
+          9
+        ]
+      },
+      {
+        "name": "拼板舟沙灘",
+        "area": [
+          40,
+          40,
+          25,
+          7
+        ]
+      }
     ],
-    exits: [],
-    npcs: [
-      { id: "tao_guide", x: 17, y: 20, sprite: "npc_tao_guide", dialog: "D_TAO_IDLE", quest: "Q_LY_1", quests: ["Q_LY_1", "Q_LY_2", "Q_LY_3"] }
+    "exits": [],
+    "npcs": [
+      {
+        "id": "tao_guide",
+        "x": 17,
+        "y": 20,
+        "sprite": "npc_tao_guide",
+        "dialog": "D_TAO_IDLE",
+        "quest": "Q_LY_1",
+        "quests": [
+          "Q_LY_1",
+          "Q_LY_2",
+          "Q_LY_3"
+        ],
+        "note": "解說員（既有，位置與台詞不動；西塊裡）"
+      },
+      {
+        "id": "tao_fisher",
+        "x": 38,
+        "y": 15,
+        "sprite": "npc_tao_fisher",
+        "dialog": "D_TAO_FISHER_IDLE",
+        "quest": null,
+        "quests": [],
+        "note": "漁夫：第 1 排飛魚架 (34–37,15–16) 東端旁（K24；新背景架子在 x33.5–38、y14.6–16.6）"
+      },
+      {
+        "id": "tao_taro",
+        "x": 26,
+        "y": 27,
+        "sprite": "npc_tao_taro",
+        "dialog": "D_TAO_TARO_IDLE",
+        "quest": null,
+        "quests": [],
+        "note": "種芋頭的婦女：下排兩塊水芋田中間的田埂（x26.16–26.87）"
+      },
+      {
+        "id": "tao_elder",
+        "x": 32,
+        "y": 7,
+        "sprite": "npc_tao_elder",
+        "dialog": "D_TAO_ELDER_IDLE",
+        "quest": null,
+        "quests": [],
+        "note": "長者：第 3 組涼台 (29–31,6–7) 東側的小徑（新背景涼台在後排，原 (34,12) 是第 4 組主屋前巷道）"
+      },
+      {
+        "id": "tao_owner",
+        "x": 23,
+        "y": 12,
+        "sprite": "npc_tao_owner",
+        "dialog": "D_TAO_OWNER_IDLE",
+        "quest": null,
+        "quests": [],
+        "note": "屋主：第 2 組地下屋（主屋 x20–25）正前方的巷道（A5 建議）"
+      },
+      {
+        "id": "tao_boatman",
+        "x": 47,
+        "y": 43,
+        "sprite": "npc_tao_boatman",
+        "dialog": "D_TAO_BOATMAN_IDLE",
+        "quest": null,
+        "quests": [],
+        "note": "船主：船屋 (40–46,41–45) 東側沙灘"
+      },
+      {
+        "id": "tao_kid",
+        "x": 57,
+        "y": 45,
+        "sprite": "npc_tao_kid",
+        "dialog": "D_TAO_KID_IDLE",
+        "quest": null,
+        "quests": [],
+        "note": "孩子：沙灘上、第 2 艘拼板舟 (54–58,43–44) 南邊（原 (57,44) 會壓在舟上）"
+      }
     ],
-    chests: [],
-    spawns: [],
-    inn: { x: 34, y: 38, npc: null, price: 24, name: "蘭嶼民宿", sign: "民宿", dialog: "D_INN_LANYU", dialog_nocoin: "D_INN_LANYU_NOCOIN" },
-    shop: null,
-    boat_dock: { route: "F_FUGANG_LANYU", to: "M26", board: { x: 4, y: 23 }, ship_area: [0, 24, 10, 5], arrive: { x: 9, y: 22 } }
+    "chests": [
+      {
+        "id": "C_M28_1",
+        "x": 57,
+        "y": 30,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 1,
+          "exp": 0,
+          "item": "guide"
+        },
+        "note": "山坡（東段環島路 x58 西邊的草地；原 (58,30) 在路上）；B3 A 案：引導卡＋1 金、經驗 0、不算步"
+      },
+      {
+        "id": "C_M28_2",
+        "x": 65,
+        "y": 24,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 1,
+          "exp": 0,
+          "item": "eraser"
+        },
+        "note": "東海岸礁岩平台、潮池 (63–66,25–27) 北邊；B3 A 案：刪去卡＋1 金、經驗 0、不算步"
+      }
+    ],
+    "spawns": [],
+    "inn": {
+      "x": 34,
+      "y": 38,
+      "npc": null,
+      "price": 24,
+      "name": "蘭嶼民宿",
+      "sign": "民宿",
+      "dialog": "D_INN_LANYU",
+      "dialog_nocoin": "D_INN_LANYU_NOCOIN"
+    },
+    "shop": null,
+    "boat_dock": {
+      "route": "F_FUGANG_LANYU",
+      "to": "M26",
+      "board": {
+        "x": 4,
+        "y": 23
+      },
+      "ship_area": [
+        0,
+        24,
+        10,
+        5
+      ],
+      "arrive": {
+        "x": 9,
+        "y": 22
+      }
+    },
+    "animals": [
+      {
+        "id": "goat_ly",
+        "sprite": "npc_goat_ly",
+        "area": [
+          48,
+          14,
+          14,
+          14
+        ],
+        "count": 3,
+        "name": "山羊",
+        "say": "咩～（山羊都有主人，不要追喔！）",
+        "dialog": "D_ANIMAL_GOAT_LY",
+        "note": "animals（會走動、碰到會走開）；圖 walk 3×4 每格 37×36（A5）；不另加 keepaway"
+      }
+    ],
+    "scenery": [
+      {
+        "id": "canoe",
+        "area": [
+          48,
+          43,
+          5,
+          2
+        ],
+        "interact": false,
+        "note": "拼板舟（新背景 x48.3–52.4、y42.75–44.8；格子 K，不能走、不能碰）"
+      },
+      {
+        "id": "canoe",
+        "area": [
+          54,
+          43,
+          5,
+          2
+        ],
+        "interact": false
+      },
+      {
+        "id": "canoe",
+        "area": [
+          60,
+          43,
+          4,
+          2
+        ],
+        "interact": false
+      },
+      {
+        "id": "boat_house",
+        "area": [
+          40,
+          41,
+          7,
+          5
+        ],
+        "interact": false,
+        "note": "船屋（不能進去；格子 R／H）"
+      },
+      {
+        "id": "flying_fish_rack",
+        "area": [
+          13,
+          20,
+          4,
+          1
+        ],
+        "interact": false,
+        "note": "舊飛魚架（西塊，照 v4.1）"
+      },
+      {
+        "id": "flying_fish_rack",
+        "area": [
+          34,
+          15,
+          4,
+          2
+        ],
+        "interact": false,
+        "note": "飛魚架底下不能走（格子 K）"
+      },
+      {
+        "id": "flying_fish_rack",
+        "area": [
+          34,
+          18,
+          3,
+          2
+        ],
+        "interact": false
+      },
+      {
+        "id": "flying_fish_rack",
+        "area": [
+          34,
+          22,
+          4,
+          1
+        ],
+        "interact": false
+      },
+      {
+        "id": "flying_fish_rack",
+        "area": [
+          33,
+          23,
+          5,
+          2
+        ],
+        "interact": false,
+        "note": "斜放的曬魚台"
+      },
+      {
+        "id": "tao_house",
+        "area": [
+          13,
+          6,
+          6,
+          5
+        ],
+        "interact": false,
+        "note": "家屋第 1 組（工作房＋涼台在後排 y6–7、卵石砌的地下屋在前排 y8–10）；只看外觀"
+      },
+      {
+        "id": "tao_house",
+        "area": [
+          20,
+          6,
+          6,
+          5
+        ],
+        "interact": false
+      },
+      {
+        "id": "tao_house",
+        "area": [
+          27,
+          6,
+          5,
+          5
+        ],
+        "interact": false
+      },
+      {
+        "id": "tao_house",
+        "area": [
+          33,
+          6,
+          5,
+          5
+        ],
+        "interact": false,
+        "note": "第 4 組的涼台往東多一格到 x38（y6–7）"
+      },
+      {
+        "id": "etiquette_sign",
+        "x": 18,
+        "y": 19,
+        "note": "圖案告示牌（跟著解說員），程式畫，不寫字"
+      }
+    ]
   },
 
   // ───────────────────────────── M29 花蓮太魯閣口（v4.0 新增；來源 tools/bigmaps/M29.txt／.json）─────────────────────────────
@@ -4893,11 +5499,9 @@ window.MAPS = {
       "TTTTT=================================.UUU..==TTTTT~T~~TTTTTTTTT~T~TTT~TTT~~TTT~TTTTTTTT~~",
       "~T~~T.UU...UU.U....T....UUU...T........TTT.T==..TT~~TTTTTTT~~TT~TT~~TTTTT~TTT~~TTT~TTTTTTT",
       "TTTT~UTTUUUTUUTUUU..TTUUTTT.UU..............==.TTTTTT~T~~T~TTTTT~~TTTTTTTTTT~TTT~~TTT~TTTT",
-      // V41_STUB_BEGIN：v4.2 路牌格 (44,54) 與南口兩個擋路格一起還原
-      "TTTTTTTTTT~TTTTTTTTTTTTTTTTUTTUUUU..TUU...U.K=..TTTT~TTTTTTT~~~TTTT~TTT~~TTTTTTTTTT~TTTT~~",
+      "TTTTTTTTTT~TTTTTTTTTTTTTTTTUTTUUUU..TUU...U.==..TTTT~TTTTTTT~~~TTTT~TTT~~TTTTTTTTTT~TTTT~~",
       "~~T~~TTT~~TTTTTT~TTTTTTTTTTUTTUUUUU..UU.UUUU==U.TTTTTT~~TTTTTTTTTT~TTTTTTTTTTTTTTTTTTTT~~T",
-      "TTTTTT~TTTT~TTTTTT~TTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTTTT~TTTTTT~TTTT~TTTT~TTTTTTTTTTT~TTT"
-      // V41_STUB_END
+      "TTTTTT~TTTT~TTTTTT~TTTTTTTT~~TTTTTTTTTTTTTTT==TTTTTTTTTTT~TTTTTT~TTTT~TTTT~TTTTTTTTTTT~TTT"
     ],
     "start": {
       "x": 43,
@@ -4950,24 +5554,15 @@ window.MAPS = {
       },
       {
         "id": "inn_xitou",
-        "x": 70,
-        "y": 37,
+        "x": 66,
+        "y": 36,
         "sprite": "npc_inn_xitou_m",
         "dialog": "D_INN_XITOU_IDLE",
         "quests": []
       }
     ],
     "props": [],
-    "roadsigns": [
-      // V41_STUB_BEGIN：v4.2 移除南口路牌
-      {
-        "id": "sign_tataka_xt",
-        "x": 44,
-        "y": 54,
-        "dialog": "D_SIGN_TATAKA_XT"
-      }
-      // V41_STUB_END
-    ],
+    "roadsigns": [],
     "chests": [
       {
         "id": "C_M32_1",
@@ -5125,8 +5720,8 @@ window.MAPS = {
       ]
     },
     "inn": {
-      "x": 70,
-      "y": 37,
+      "x": 66,
+      "y": 36,
       "npc": "inn_xitou",
       "price": 28,
       "speaker": "inn_xitou",
@@ -5149,6 +5744,24 @@ window.MAPS = {
         "to": "M31",
         "tx": 37,
         "ty": 46
+      },
+      {
+        "x": 44,
+        "y": 56,
+        "to": "M33",
+        "tx": 41,
+        "ty": 1,
+        "requires": "Q_XT_4",
+        "requires_dialog": "D_EXIT_LOCK_XT"
+      },
+      {
+        "x": 45,
+        "y": 56,
+        "to": "M33",
+        "tx": 42,
+        "ty": 1,
+        "requires": "Q_XT_4",
+        "requires_dialog": "D_EXIT_LOCK_XT"
       }
     ],
     "landmarks": [
@@ -5319,5 +5932,4062 @@ window.MAPS = {
       47,
       51
     ]
+  },
+  M33: {
+    "name": "塔塔加鞍部",
+    "type": "field",
+    "level": 5,
+    "bgm": "field",
+    "battle_bg": "alpine",
+    "tileset": "field",
+    "suggest": "Lv51–54",
+    "real_ref": "塔塔加鞍部（玉山國家公園管理處：「位於塔塔加鞍部，海拔約2,610公尺」「為南北向之狹長草原稜線腹地廣大」「可東眺玉山山塊、西望阿里山山脈」；71 號 6.3、6.8.1，V1、V3、V9）",
+    "art_note": "中間一條南北向的狹長草原稜線（淺黃綠箭竹草原），兩側往下是針葉林；西北、西南角是遠方山脈，東北、東南角是遠方大山（玉山山塊）；稜線上一棟木造服務中心、一間山屋（招牌不寫字）；西側林下一塊空地（帝雉由程式放）；東邊登山口木棧道。背景不畫動物。背景 tools/bigmaps/M33_bg.webp（GPT 四塊延續法＋v13_align 對齊＋最小誤差接縫）。",
+    "grid": [
+      "############TTTTTTTTTTTTTTTTTTTTTTTTTTTTT=.TTTTTTTTTTTTTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTT.T.........=.TT..TT....TTTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTT........TT.=....T..T...TTTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTT...........=..TT.......TTTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTTT..........=.T.........TTTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTT..T.U......=..T...T....TTTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTT...TT......=...T.T......TTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTTU..........=..U.....U.TTTTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTTT..........=.TT.....T...TTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTT......T....=...U........TTTTTTTTTTTTTTTT##############",
+      "############TTTTTTTTTTTTTTTTTTTT.....T...=.UUTU.......TTTTTTTTTTTTTTTT##############",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...........=.RRRRRRR....TTTTTTTTTTTTTTTT##############",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.T........=.RRRRRRR....TTTTTTTTTTTTTTTT##############",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...U.......=.RRRRRRR....UTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTU..TTT.....=.HHHHHHHT...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTT.........T........TTTTT......TTU.=.HHHHHHH.T...TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTT.........T........TTTTT........T.=.............TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTT..............T...TTTTTTT........=..T..........TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTT..TT..........T...TTTTT......UT..=...UU...T..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTT.............TT..TTTTT.....TT.T.=.UUTT...T....TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTT..................TTTTT..T.......=.TT.....TTT..TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTT..................TTTTTT.....T...=...T...T.....TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "==============================..==..==.======.T.......TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "=============================================.....TT...TTTTTTTTTTTTTTTTTFFFFFFFFFFFT",
+      "TUUUUUUU...................TUU.........===..============================BBBBBBBBBBBB",
+      "TTTTTTTTT.T.........T..T..TTTT...T.T....==...===========================BBBBBBBBBBBB",
+      "TTTTTTTT..................TTTTU.......T.==..TTT...T...TUUUUUUUUUUUUUUUTUUUUUUUUUUUUT",
+      "TTTTTTTTTUT...TTTTTT.T.TTUTTTTTT...T....==.....TT......TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTT.TT........T...TTTTT..........==.TU....T.TTT.TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTT.........TTTT...TTTTU.........==..TUTT......TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTT.................TTTT.........===UTT...UUT...TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTT...............T.TTTTT.TU.T...==.RRRRRRRU...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTT.....T........TTTTTTT...T...T.===RRRRRRRT..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTT....TT.........TTTTTTTT.......===RRRRRRR....TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTU................TTTT....U...T==.HHHHHHHU.T.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTUUUUUUUUUUUUUUUUTTT.....U....===HHHHHHHU..TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...TTUT..==....TTT.T...TTTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTT......T..T===...TTT......TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTUT.T......===.TU.......TTTTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTT.........===..TUU.......TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTT...TT....==.UUTTT...T...TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTT.UT....UU==.UUT....TTU..TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTTTT....TTT==.TTTT.....T..TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTT...TUU...==.....TTT.....TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTT....TT........U....TT...TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTTTT...........TT.U.....T.TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTT....UUU..U....TUU.......TTTTTTTTTTTTTTTTT############",
+      "############TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT############"
+    ],
+    "exits": [
+      {
+        "x": 41,
+        "y": 0,
+        "to": "M32",
+        "tx": 44,
+        "ty": 55
+      },
+      {
+        "x": 42,
+        "y": 0,
+        "to": "M32",
+        "tx": 45,
+        "ty": 55
+      },
+      {
+        "x": 0,
+        "y": 22,
+        "to": "M04",
+        "tx": 88,
+        "ty": 27
+      },
+      {
+        "x": 0,
+        "y": 23,
+        "to": "M04",
+        "tx": 88,
+        "ty": 28
+      },
+      {
+        "x": 83,
+        "y": 24,
+        "to": "M34",
+        "tx": 1,
+        "ty": 23,
+        "requires": "Q_TK_1",
+        "requires_dialog": "D_EXIT_LOCK_TK"
+      },
+      {
+        "x": 83,
+        "y": 25,
+        "to": "M34",
+        "tx": 1,
+        "ty": 24,
+        "requires": "Q_TK_1",
+        "requires_dialog": "D_EXIT_LOCK_TK"
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 40,
+      "y": 6,
+      "note": "塔塔加站旁（北端稜線）"
+    },
+    "station": {
+      "x": 39,
+      "y": 6,
+      "name": "塔塔加站",
+      "note": "稜線北段步道西側草地（71 號建議 (40,6)）",
+      "noShelter": "高山步道旁的簡易站牌，旁邊沒有空地放候車亭"
+    },
+    "npcs": [
+      {
+        "id": "paiyun_volunteer",
+        "x": 46,
+        "y": 16,
+        "sprite": "npc_paiyun_volunteer",
+        "dialog": "D_PAIYUN_IDLE",
+        "quest": "Q_TK_1",
+        "quests": [
+          "Q_TK_1"
+        ],
+        "note": "服務中心門前（71 號建議 (44,18)）"
+      },
+      {
+        "id": "ysnp_ranger",
+        "x": 38,
+        "y": 28,
+        "sprite": "npc_ysnp_ranger",
+        "dialog": "D_YSNP_IDLE",
+        "quest": "Q_TK_2",
+        "quests": [
+          "Q_TK_2"
+        ],
+        "note": "稜線中段"
+      },
+      {
+        "id": "bird_guide",
+        "x": 24,
+        "y": 24,
+        "sprite": "npc_bird_guide",
+        "dialog": "D_BIRDGUIDE_IDLE",
+        "quest": "Q_TK_3",
+        "quests": [
+          "Q_TK_3"
+        ],
+        "note": "西側林下空地東緣"
+      }
+    ],
+    "spawns": [
+      {
+        "monster": "an_muntjac",
+        "count": 2,
+        "area": [
+          31,
+          36,
+          23,
+          11
+        ],
+        "note": "稜線南段（離帝雉 5 格以上）"
+      },
+      {
+        "monster": "an_muntjac",
+        "count": 1,
+        "area": [
+          46,
+          37,
+          8,
+          8
+        ],
+        "note": "稜線東南"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M33_1",
+        "x": 36,
+        "y": 4,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 9,
+          "exp": 15,
+          "item": null
+        },
+        "note": "稜線北段西側（獎勵照 71 號 8.2 填）"
+      },
+      {
+        "id": "C_M33_2",
+        "x": 52,
+        "y": 4,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 9,
+          "exp": 15,
+          "item": null
+        },
+        "note": "稜線北段東側"
+      },
+      {
+        "id": "C_M33_3",
+        "x": 9,
+        "y": 16,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "林下空地西北角"
+      },
+      {
+        "id": "C_M33_4",
+        "x": 12,
+        "y": 32,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "林下空地西南角；2026-10-26 關卡設計師：從 (12,34) 移到 (12,32)（原位置畫在松樹上；77 號 B9）"
+      },
+      {
+        "id": "C_M33_5",
+        "x": 34,
+        "y": 42,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "稜線南段西側"
+      },
+      {
+        "id": "C_M33_6",
+        "x": 52,
+        "y": 44,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "稜線南段東側"
+      }
+    ],
+    "inn": {
+      "x": 43,
+      "y": 36,
+      "npc": null,
+      "price": 30,
+      "speaker": "inn_tataka",
+      "note": "山屋門口西側（門 x46 前畫了一棵樹，站櫃放在旁邊）；虛擬店員",
+      "name": "塔塔加山屋",
+      "sign": "山屋",
+      "dialog": "D_INN_TATAKA",
+      "dialog_nocoin": "D_INN_TATAKA_NOCOIN",
+      "sells": "gear_tataka"
+    },
+    "landmarks": [
+      {
+        "name": "塔塔加鞍部",
+        "area": [
+          30,
+          0,
+          25,
+          48
+        ]
+      }
+    ],
+    "lights": [],
+    "friendly": [
+      {
+        "id": "pheasant_npc_0",
+        "x": 14,
+        "y": 20,
+        "sprite": "npc_pheasant",
+        "name": "帝雉"
+      },
+      {
+        "id": "pheasant_npc_1",
+        "x": 18,
+        "y": 30,
+        "sprite": "npc_pheasant",
+        "name": "帝雉"
+      }
+    ],
+    "keepaway": [
+      {
+        "id": "pheasant_npc_0",
+        "x": 14,
+        "y": 20,
+        "radius": 5,
+        "hint": "安靜地看帝雉，不靠近、不打擾喔！"
+      },
+      {
+        "id": "pheasant_npc_1",
+        "x": 18,
+        "y": 30,
+        "radius": 5,
+        "hint": "安靜地看帝雉，不靠近、不打擾喔！"
+      }
+    ]
+  },
+  M34: {
+    "name": "玉山步道",
+    "type": "field",
+    "level": 5,
+    "bgm": "field",
+    "battle_bg": "alpine",
+    "tileset": "field",
+    "suggest": "Lv51–54",
+    "real_ref": "玉山主峰線步道（玉山國家公園管理處：孟祿亭「為溫帶林及寒帶林之交界處」；白木林「鐵杉及冷杉樹幹白化」；與熊共存；71 號 6.4、6.8.2，V6、V7、V8、V10）",
+    "art_note": "登山步道從西往東爬：西段孟祿亭小木亭與空地（亭子西邊是傘形的臺灣鐵杉、東邊是尖塔形的冷杉＝森林交界）；中段步道貼著北側一大片灰色岩壁；東段白木林（樹幹銀白、沒有葉子的枯樹，地上矮草；不畫火、不畫燒焦）；步道旁 3 塊圖案告示牌（熊鈴、兩人結伴、垃圾帶下山，不寫字）。背景不畫黑熊。背景 tools/bigmaps/M34_bg.webp（GPT 四塊延續法＋v13_align＋最小誤差接縫）。",
+    "grid": [
+      "################################################################################################",
+      "################################################################################################",
+      "################################################################################################",
+      "################################################################################################",
+      "################################################################################################",
+      "################################################################################################",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TT.T....T....T........TT....T.TTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TT.TT...T....T...UT....T...TT...TTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TT...............T....TTT...T..TTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TTT..K....K...TU....U.....K.....TTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TT...T....T....UK...TK...T....U.TTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TTT..T....T....T....T...TTTT..U......T",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTT#############################TT........TT.K..T...TT........TT.....T",
+      "TTTTTTTTTTTTTTT...........TTT#############################TT.....TT....KK....K........K........T",
+      "TTTTTTTTTTTTTT...RRRRR......T#############################TT...........T....KT........T........T",
+      "TTTTTTTTTTTTTT...RRRRR......T#############################TTTT.........TU....T........TU.......T",
+      "TTTTTTTTTTTTT....RRRRR......TTTTTTTTT...............TTTTTTTTT.TT.K....TTTT...TT...T...TTT......T",
+      "TTTTTTTTTTTTT....HHHHH......TTTTTTTTT...............TTTTTTTT=====K==============================",
+      "TTTTTTTTTTTTT....HHHHH......TTTTTTTTTUU=========================================================",
+      "TTTTTTTTTTTTT...............TTTTTTTTTTT===UUUUUUUUUUUUUUUUUUUT...................U.............T",
+      "===============.............==============TTTTTTTTTTTTTTTTTTU..........K....K....K....K..T.....T",
+      "===============............K==============TTTTTTTTTTTTTTTTTTTKT...K....T...KT....TK...T........T",
+      "TUUUUUUUUUUUUK..............UUUUUUUUUUUUUUTTTTTTTTTTTTTTTTTTTTT...TK...T....T....T....TK.......T",
+      "TTTTTTTTTTTTT...............TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...KT...T....T....T....TTT......T",
+      "TTTTTTTTTTTTT...............TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.........TT...T....T....T........T",
+      "TTTTTTTTTTTTT...............TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.....K........K..........K.....UUUUUT",
+      "TTTTTTTTTTTTTUUUUUUUUUUUUUUUTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...T..T........TK..TT.....TK....TTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUT...T........T..........T..TTUTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...TTT......TTT.....TT..TT...TTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTUU..........................TTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUUUUUUUUUUUUUUUUUUUUUUUUUTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "************************************************************************************************",
+      "************************************************************************************************",
+      "************************************************************************************************",
+      "************************************************************************************************",
+      "************************************************************************************************",
+      "************************************************************************************************",
+      "************************************************************************************************"
+    ],
+    "exits": [
+      {
+        "x": 0,
+        "y": 23,
+        "to": "M33",
+        "tx": 82,
+        "ty": 24
+      },
+      {
+        "x": 0,
+        "y": 24,
+        "to": "M33",
+        "tx": 82,
+        "ty": 25
+      },
+      {
+        "x": 95,
+        "y": 20,
+        "to": "M35",
+        "tx": 1,
+        "ty": 19,
+        "requires": "Q_YS_3",
+        "requires_dialog": "D_EXIT_LOCK_YS"
+      },
+      {
+        "x": 95,
+        "y": 21,
+        "to": "M35",
+        "tx": 1,
+        "ty": 20,
+        "requires": "Q_YS_3",
+        "requires_dialog": "D_EXIT_LOCK_YS"
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 1,
+      "y": 23,
+      "note": "從塔塔加登山口過來的到達站"
+    },
+    "npcs": [
+      {
+        "id": "trail_ranger",
+        "x": 22,
+        "y": 23,
+        "sprite": "npc_trail_ranger",
+        "dialog": "D_TRAILRANGER_IDLE",
+        "quest": "Q_YS_1",
+        "quests": [
+          "Q_YS_1",
+          "Q_YS_3"
+        ],
+        "note": "孟祿亭前（71 號建議 (22,25)）"
+      }
+    ],
+    "spawns": [
+      {
+        "monster": "fo_puff",
+        "count": 3,
+        "area": [
+          62,
+          22,
+          26,
+          10
+        ],
+        "note": "白木林南半（起霧的地方）"
+      },
+      {
+        "monster": "an_muntjac",
+        "count": 3,
+        "area": [
+          13,
+          16,
+          15,
+          13
+        ],
+        "note": "西段（孟祿亭空地；71 號寫西段林子，但林子是連續樹冠，改放空地南半，離亭子 3 格以上待前端處理）"
+      },
+      {
+        "monster": "fob_mist",
+        "count": 1,
+        "area": [
+          66,
+          20,
+          1,
+          1
+        ],
+        "boss": true,
+        "quest": "Q_YS_3",
+        "note": "山嵐霧精：白木林前的步道 (66,20)（Q_YS_3 進行中才出現）"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M34_1",
+        "x": 14,
+        "y": 18,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 9,
+          "exp": 15,
+          "item": null
+        },
+        "note": "孟祿亭空地西北角（獎勵照 71 號 8.2 填）"
+      },
+      {
+        "id": "C_M34_2",
+        "x": 26,
+        "y": 28,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 9,
+          "exp": 15,
+          "item": null
+        },
+        "note": "孟祿亭空地東南角"
+      },
+      {
+        "id": "C_M34_3",
+        "x": 49,
+        "y": 19,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "岩壁腳下東端；2026-10-26 關卡設計師：從 (56,19) 移到 (49,19)（原位置在松樹林裡，移到岩壁腳下的草地；77 號 B10）"
+      },
+      {
+        "id": "C_M34_4",
+        "x": 62,
+        "y": 9,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "白木林西北"
+      },
+      {
+        "id": "C_M34_5",
+        "x": 63,
+        "y": 32,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "白木林西南"
+      },
+      {
+        "id": "C_M34_6",
+        "x": 93,
+        "y": 15,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": null
+        },
+        "note": "東口北側草地"
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "孟祿亭",
+        "area": [
+          13,
+          16,
+          15,
+          13
+        ]
+      },
+      {
+        "name": "白木林",
+        "area": [
+          56,
+          8,
+          34,
+          26
+        ]
+      }
+    ],
+    "lights": [],
+    "props": [
+      {
+        "id": "sign_safety",
+        "cells": [
+          [
+            13,
+            25
+          ],
+          [
+            27,
+            24
+          ],
+          [
+            65,
+            20
+          ]
+        ],
+        "note": "圖案告示牌：熊鈴、結伴、垃圾帶下山（V10）；格子 K"
+      }
+    ],
+    "friendly": [
+      {
+        "id": "bear_npc",
+        "x": 44,
+        "y": 20,
+        "sprite": "npc_bear",
+        "name": "臺灣黑熊",
+        "show": {
+          "after": "Q_YS_1",
+          "until": "Q_YS_2"
+        }
+      }
+    ],
+    "keepaway": [
+      {
+        "id": "bear_npc",
+        "x": 44,
+        "y": 20,
+        "radius": 6,
+        "hint": "請停下腳步，和黑熊保持距離喔！",
+        "show": {
+          "after": "Q_YS_1",
+          "until": "Q_YS_2"
+        }
+      }
+    ]
+  },
+  M35: {
+    "name": "排雲山莊",
+    "type": "town",
+    "level": 5,
+    "bgm": "town",
+    "battle_bg": "alpine",
+    "tileset": "town",
+    "no_monsters": true,
+    "real_ref": "玉山主峰山腰的排雲山莊（玉山國家公園管理處：「位於玉山主峰山腰為一南向鋼骨結構山莊」「太陽能供電為主」；兒童版：「站在排雲山莊前的廣場，可以看到千奇萬變的雲海」；71 號 6.5、6.8.3，V2、V3）",
+    "art_note": "山腰上一棟朝南的長方形兩層山莊（灰色鋼骨、深色木板牆、屋頂三排太陽能板，招牌不寫字）；前面一塊石板廣場，廣場南緣一道石砌矮牆，牆外是一大片雲海；西邊一條步道往玉山步道；山莊東側一條碎石路往東北上山（往風口）。安全區，不出怪。背景 tools/bigmaps/M35_bg.webp（GPT 一張畫完，v13_single.py fit）。",
+    "grid": [
+      "######################################==########",
+      "######################################==########",
+      "######################################==########",
+      "######################################==########",
+      "######################################==########",
+      "#####################################*==########",
+      "************************************====********",
+      "************RRRRRRRRRRRRRRRRRRRRRR**====********",
+      "************RRRRRRRRRRRRRRRRRRRRRR**==**********",
+      "************RRRRRRRRRRRRRRRRRRRRRR**==**********",
+      "************RRRRRRRRRRRRRRRRRRRRRR**==**********",
+      "************RRRRRRRRRRRRRRRRRRRRRR**==**********",
+      "************HHHHHHHHHHHHHHHHHHHHHH**==**********",
+      "************HHHHHHHHHHHHHHHHHHHHHH**==**********",
+      "************HHHHHHHHHHHHHHHHHHHHHH**==**********",
+      "************HHHHHHHHHHHHHHHHHHHHHH**==**********",
+      "************HHHHHHHHHHHHHHHHHHHHHH**==**********",
+      "**********=============================*********",
+      "*********==============================*********",
+      "=======================================*********",
+      "=======================================*********",
+      "*********==============================*********",
+      "*********==============================*********",
+      "*********==============================*********",
+      "*********==============================*********",
+      "*********==============================*********",
+      "*********==============================*********",
+      "**********=============================*********",
+      "*********FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF*********",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    "exits": [
+      {
+        "x": 0,
+        "y": 19,
+        "to": "M34",
+        "tx": 94,
+        "ty": 20
+      },
+      {
+        "x": 0,
+        "y": 20,
+        "to": "M34",
+        "tx": 94,
+        "ty": 21
+      },
+      {
+        "x": 38,
+        "y": 0,
+        "to": "M36",
+        "tx": 28,
+        "ty": 43,
+        "requires": "Q_PY_2",
+        "requires_dialog": "D_EXIT_LOCK_PY"
+      },
+      {
+        "x": 39,
+        "y": 0,
+        "to": "M36",
+        "tx": 29,
+        "ty": 43,
+        "requires": "Q_PY_2",
+        "requires_dialog": "D_EXIT_LOCK_PY"
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 2,
+      "y": 20,
+      "note": "從玉山步道上來的到達站"
+    },
+    "npcs": [
+      {
+        "id": "lodge_manager_py",
+        "x": 25,
+        "y": 18,
+        "sprite": "npc_lodge_manager_py",
+        "dialog": "D_LODGE_PY_IDLE",
+        "quest": "Q_PY_1",
+        "quests": [
+          "Q_PY_1"
+        ],
+        "note": "山莊門口（門 (23–24,16)）東側"
+      }
+    ],
+    "spawns": [],
+    "chests": [],
+    "inn": {
+      "x": 25,
+      "y": 18,
+      "npc": "lodge_manager_py",
+      "price": 0,
+      "free": true,
+      "speaker": "lodge_manager_py",
+      "note": "免費休息（全滿＋存檔）；旅店座標＝山莊管理員 lodge_manager_py 站的位置 (25,18)（山莊門口台階東南側，不擋台階前 (22–24,17)）。2026-11-09 A1：原 (22,17) 是台階正前方左側，改成和管理員同一格（validate_world 要求 inn 座標＝管理員 NPC 座標；4a 實作用 (25,18)）",
+      "name": "排雲山莊",
+      "sign": "山莊",
+      "dialog": "D_INN_PAIYUN",
+      "dialog_nocoin": "D_INN_PAIYUN"
+    },
+    "landmarks": [
+      {
+        "name": "排雲山莊",
+        "area": [
+          9,
+          7,
+          30,
+          21
+        ]
+      }
+    ],
+    "lights": []
+  },
+  M36: {
+    "name": "風口",
+    "type": "field",
+    "level": 5,
+    "bgm": "field",
+    "battle_bg": "alpine",
+    "tileset": "field",
+    "suggest": "Lv51–54",
+    "real_ref": "玉山主峰風口（玉山國家公園管理處：「玉山主峰風口為碎石坡，坡滑且風勢大」「尤其起霧下雨時，請注意指標小心行走」；71 號 6.6、6.8.4，Y6、Y7）",
+    "art_note": "整片灰色頁岩碎石坡，一條之字形碎石路往北爬；路邊 4 根木樁路標只畫箭頭圖案、不寫字；坡上方一道白色霧牆（霧王的霧，虛構），中間一小段路通到霧牆前（霧中入口）。不畫山頂、石碑、欄杆、鐵鍊、雪。背景 tools/bigmaps/M36_bg.webp（GPT 四塊延續法＋v13_align＋最小誤差接縫；兩處路面斷開用 v13_patch copy 以同圖路面補接）。",
+    "grid": [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "***************************K===*****************************",
+      "******************=============*****************************",
+      "******************=*****************************************",
+      "******************=*****************************************",
+      "******************=*****************************************",
+      "*****************K=*****************************************",
+      "******************=**********=====**************************",
+      "******************=**********=====**************************",
+      "******************=**********=***=============**************",
+      "******************============**************==**************",
+      "********************************************==**************",
+      "********************************************==**************",
+      "********************************************==**************",
+      "********************************************==K*************",
+      "********************************************==**************",
+      "**************************************========**************",
+      "**************************************=*********************",
+      "**************************************=*********************",
+      "**************************************=*********************",
+      "**************************************=*********************",
+      "**************************************=*********************",
+      "******************======================********************",
+      "******************=*****************************************",
+      "******************=*****************************************",
+      "******************=*****************************************",
+      "****************K*=*****************************************",
+      "******************=*****************************************",
+      "******************=*****************************************",
+      "*****************==*****************************************",
+      "******************============******************************",
+      "***************************K==******************************",
+      "****************************==******************************",
+      "****************************==******************************",
+      "****************************==******************************",
+      "****************************==******************************",
+      "****************************==******************************",
+      "****************************==******************************",
+      "****************************==******************************",
+      "****************************==******************************",
+      "****************************==******************************"
+    ],
+    "exits": [
+      {
+        "x": 28,
+        "y": 44,
+        "to": "M35",
+        "tx": 38,
+        "ty": 1
+      },
+      {
+        "x": 29,
+        "y": 44,
+        "to": "M35",
+        "tx": 39,
+        "ty": 1
+      },
+      {
+        "x": 29,
+        "y": 3,
+        "to": "M37",
+        "tx": 29,
+        "ty": 43,
+        "requires": [
+          "Q_FK_1",
+          "item:dawn_compass"
+        ],
+        "requires_dialog": "D_EXIT_LOCK_FK",
+        "warp": true
+      },
+      {
+        "x": 30,
+        "y": 3,
+        "to": "M37",
+        "tx": 30,
+        "ty": 43,
+        "requires": [
+          "Q_FK_1",
+          "item:dawn_compass"
+        ],
+        "requires_dialog": "D_EXIT_LOCK_FK",
+        "warp": true
+      }
+    ],
+    "roadsigns": [
+      {
+        "id": "sign_fengkou",
+        "x": 27,
+        "y": 5,
+        "dialog": "D_SIGN_FENGKOU",
+        "note": "風口路標（2026-11-09 A1，4a 實作後補）：霧中入口前小平台 (28–30,5) 西側的岩邊；格子 K；從 (27,6)、(28,5) 都能按 A 讀；不擋路（原本就是礁岩 *）。台詞 D_SIGN_FENGKOU「起霧的時候，要看清楚路標，慢慢走。」（Y7）"
+      }
+    ],
+    "start": {
+      "x": 28,
+      "y": 43,
+      "note": "從排雲山莊上來的到達站"
+    },
+    "npcs": [],
+    "spawns": [
+      {
+        "monster": "fo_puff",
+        "count": 2,
+        "area": [
+          18,
+          6,
+          13,
+          9
+        ],
+        "note": "碎石坡上段"
+      },
+      {
+        "monster": "fo_puff",
+        "count": 2,
+        "area": [
+          18,
+          26,
+          22,
+          9
+        ],
+        "note": "碎石坡下段"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M36_1",
+        "x": 30,
+        "y": 6,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 14,
+          "exp": 22,
+          "item": null
+        },
+        "note": "霧牆前（獎勵照 71 號 8.2 填）"
+      },
+      {
+        "id": "C_M36_2",
+        "x": 33,
+        "y": 11,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 14,
+          "exp": 22,
+          "item": null
+        },
+        "note": "之字路上段的小岔"
+      },
+      {
+        "id": "C_M36_3",
+        "x": 39,
+        "y": 26,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 15,
+          "exp": 23,
+          "item": null
+        },
+        "note": "中段轉角"
+      },
+      {
+        "id": "C_M36_4",
+        "x": 17,
+        "y": 33,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 15,
+          "exp": 23,
+          "item": null
+        },
+        "note": "下段路邊"
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "風口",
+        "area": [
+          0,
+          0,
+          60,
+          45
+        ]
+      }
+    ],
+    "lights": [],
+    "props": [
+      {
+        "id": "trail_marker",
+        "cells": [
+          [
+            17,
+            10
+          ],
+          [
+            46,
+            18
+          ],
+          [
+            16,
+            30
+          ],
+          [
+            27,
+            35
+          ]
+        ],
+        "note": "圖案路標（箭頭，不寫字；格子 K）"
+      }
+    ]
+  },
+  M37: {
+    "name": "回音霧廊",
+    "type": "dungeon",
+    "level": 5,
+    "bgm": "dungeon",
+    "battle_bg": "fogcave",
+    "tileset": "cave",
+    "real_ref": "虛構（霧之洞窟）",
+    "art_note": "灰藍色岩洞：北邊往下的石階與刻著大嘴巴的回音謎門 (29–30,7)；中間洞室；三岔大廳往左、右各一條死路小洞室；地上淡藍綠發光苔蘚標出真正的路（中間那條）；牆邊淡藍水晶、小水窪。 背景 tools/bigmaps/<ID>_bg.webp（GPT 四塊延續法＋最小誤差接縫）。",
+    "grid": [
+      "#############################SS#############################",
+      "############################SSS#############################",
+      "############################%==%############################",
+      "############################%==%############################",
+      "#############################==%############################",
+      "#############################==%############################",
+      "#############################==#############################",
+      "#############################==#############################",
+      "#############################==#############################",
+      "##########################%%%%%%%###########################",
+      "##########################%%%%%%%################%%%%%%%%###",
+      "####*#%%%%%###############%%%%%%%###############%%%%%%%%*###",
+      "###%%%%%%%%%%#############%%%%%%################%%%%%%%%%###",
+      "###%%%%%%%%%%############%%%%%##################~~%%%%%%%###",
+      "###%%%%%%%~~%##########%%%%%####################~~%%%%%%%###",
+      "###%%%%%%%~~%#########%%%%%%####################%%%%%%%%%%##",
+      "###%%%%%%%%%##########%%%%%#####################%%%%%%%%%%##",
+      "#####%%%%%%###########%%%%%######################%%%%*%%%%##",
+      "######%*%%############%%%%%%#####################%%%%%%%%###",
+      "######%%%%############%%%%%%%%%%################%%%%%%%#####",
+      "######%%%##############%%%%%%%%%################%%%%%#######",
+      "######%%%###################%%%%################%%%#########",
+      "######%%#####################%%%###############%%%%#########",
+      "######%%#####################%%%###############%%%##########",
+      "#####%%%#####################%%%###############%%%##########",
+      "######%%#####################%%%###############%%%##########",
+      "######%%#####################%%%%##############%%%##########",
+      "#######%%####################%%%%#~~###########%%%##########",
+      "######%%%%%%%%%%%%#~~#######%%%%##~~%##########%%%##########",
+      "######%%%%%%%%%%%%%~~%%####%%%%###%%%%%%%%####%%%%##########",
+      "#######%%%%%%%%%%%%%%%%%%#%%%%%%#%%%%%%%%%%%%%%%%%%#########",
+      "########%%%%%%%%%%%%%%%%%%%%%%%%#%%%%%%%%%%%%%%%%%##########",
+      "#########%%%%%%%###%%%%%%%##%%%%%%%%%%%##%%##%%%#%##########",
+      "############%%%######%#######==%%%%%########################",
+      "#############%%#############%==%%%%#########################",
+      "#############%%########%%%%%%==%K%%#########################",
+      "#############%%#######%%%%%%%==%%%%%########################",
+      "############%%%#######%%%%%%%==%%%%%########################",
+      "#############%#########%%%%%%==%%%%%########################",
+      "#########################%%%%==##%%%########################",
+      "############################%==%%%%%########################",
+      "#############################==%%%%%########################",
+      "#############################==%%%%%########################",
+      "#############################==%#%%#########################",
+      "#############################==#############################"
+    ],
+    "exits": [
+      {
+        "x": 29,
+        "y": 0,
+        "to": "M38",
+        "tx": 29,
+        "ty": 43
+      },
+      {
+        "x": 30,
+        "y": 0,
+        "to": "M38",
+        "tx": 30,
+        "ty": 43
+      },
+      {
+        "x": 29,
+        "y": 44,
+        "to": "M36",
+        "tx": 29,
+        "ty": 5
+      },
+      {
+        "x": 30,
+        "y": 44,
+        "to": "M36",
+        "tx": 30,
+        "ty": 5
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 30,
+      "y": 42,
+      "note": "南口上來的苔蘚路"
+    },
+    "npcs": [],
+    "spawns": [
+      {
+        "monster": "fo_puff_cave",
+        "count": 2,
+        "area": [
+          6,
+          27,
+          19,
+          6
+        ],
+        "note": "三岔大廳西半"
+      },
+      {
+        "monster": "fo_puff_cave",
+        "count": 2,
+        "area": [
+          36,
+          27,
+          14,
+          6
+        ],
+        "note": "三岔大廳東半"
+      },
+      {
+        "monster": "fo_echo",
+        "count": 2,
+        "area": [
+          22,
+          9,
+          11,
+          9
+        ],
+        "note": "回音謎門前的中間洞室"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M37_1",
+        "x": 4,
+        "y": 12,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 29,
+          "exp": 45,
+          "item": "grass_jelly"
+        },
+        "note": "P1-2 解開後出現（金幣、經驗等第二段數值）",
+        "no_question": true
+      },
+      {
+        "id": "C_M37_2",
+        "x": 56,
+        "y": 12,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 29,
+          "exp": 45,
+          "item": "grass_jelly"
+        },
+        "note": "P1-3 解開後出現（金幣、經驗等第二段數值）",
+        "no_question": true
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "回音謎門",
+        "area": [
+          26,
+          6,
+          8,
+          2
+        ]
+      },
+      {
+        "name": "三岔大廳",
+        "area": [
+          6,
+          27,
+          44,
+          6
+        ]
+      }
+    ],
+    "lights": [],
+    "no_minimap": true,
+    "fog_mask": true,
+    "lodge_lamps": [
+      {
+        "id": "obj_lodge_lamp",
+        "x": 32,
+        "y": 35,
+        "kind": "lodge",
+        "note": "入口山屋小燈（71 號寫 (30,41)；畫面上的石台在 (32,35)）"
+      }
+    ],
+    "echo_door": {
+      "cells": [
+        [
+          29,
+          7
+        ],
+        [
+          30,
+          7
+        ]
+      ],
+      "dialog": "D_ECHO_DOOR",
+      "note": "答對 3 題國語才開（2.3 節）"
+    },
+    "puzzles": [
+      {
+        "id": "P1-1",
+        "type": "lights",
+        "required": true,
+        "area": [
+          28,
+          21,
+          32,
+          25
+        ],
+        "door": [
+          [
+            29,
+            21
+          ],
+          [
+            30,
+            21
+          ],
+          [
+            31,
+            21
+          ]
+        ],
+        "plates": {
+          "A": [
+            29,
+            24
+          ],
+          "B": [
+            30,
+            24
+          ],
+          "C": [
+            31,
+            24
+          ]
+        },
+        "note": "71 號寫石門 (29–30,18)、踏板 y22；畫面上中間走廊 3 格寬、在 x29–31，石門改 (29–31,21)、踏板 (29–31,24)；連線與答案不變"
+      },
+      {
+        "id": "P1-2",
+        "type": "pattern",
+        "required": false,
+        "area": [
+          3,
+          11,
+          12,
+          19
+        ],
+        "wall_slabs": [
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ]
+        ],
+        "answer_floors": [
+          [
+            5,
+            16
+          ],
+          [
+            7,
+            16
+          ],
+          [
+            9,
+            16
+          ],
+          [
+            11,
+            16
+          ]
+        ],
+        "reward_chest": "C_M37_1",
+        "note": "左邊死路的洞室（71 號 x6–14 y18–26；畫面上的死路洞室在 x3–12 y11–19）"
+      },
+      {
+        "id": "P1-3",
+        "type": "memory",
+        "required": false,
+        "area": [
+          48,
+          10,
+          57,
+          19
+        ],
+        "cards": [
+          [
+            51,
+            15
+          ],
+          [
+            52,
+            15
+          ],
+          [
+            53,
+            15
+          ],
+          [
+            54,
+            15
+          ],
+          [
+            51,
+            16
+          ],
+          [
+            52,
+            16
+          ],
+          [
+            53,
+            16
+          ],
+          [
+            54,
+            16
+          ]
+        ],
+        "reward_chest": "C_M37_2",
+        "note": "右邊死路的洞室（71 號 x46–54 y18–26；畫面上在 x48–57 y10–19）"
+      }
+    ]
+  },
+  M38: {
+    "name": "霜晶迴廊",
+    "type": "dungeon",
+    "level": 5,
+    "bgm": "dungeon",
+    "battle_bg": "fogcave",
+    "tileset": "cave",
+    "real_ref": "虛構（霧之洞窟）",
+    "art_note": "淡藍白冰洞：三間冰地板滑行房（冰面重鋪成和格子對齊的方格，冰石由程式畫）；冰房間二、三之間的霜地走道；推冰箱小房間（71 號的 7×7 地圖原樣畫在背景）；西邊入口大廳。 背景 tools/bigmaps/<ID>_bg.webp（GPT 四塊延續法＋最小誤差接縫）。",
+    "grid": [
+      "#############################SS#SS##########################",
+      "#############################SS#SS##########################",
+      "#############################SS#SS##########################",
+      "############################%%%%%%%%########################",
+      "############################%%%%%%%*%%%%%%%%%%%#############",
+      "############################%%%%%%%%%%%%%%%%%%%#############",
+      "#############################################%%#############",
+      "#############################################%##############",
+      "############################################*II*IIIII*III###",
+      "############################################*IIIIIIIIIIII###",
+      "############################################IIII*IIIIIIII###",
+      "############################################IIIII*IIIIIII###",
+      "############################################III*IIIII*I*I###",
+      "############################################II*IIIIIIIIII###",
+      "############################################IIIIIIIII*III###",
+      "############################################IIIIIII*IIIII###",
+      "############################################IIIIIIIIIIIII###",
+      "####################################################%#######",
+      "####################################################%#######",
+      "#########################################%%%%%%%%%%%%%%%%%%#",
+      "#########################################*%%%%%%%%%%%%%%%%%#",
+      "#############################IIIIIIIIIII%%%%%%%%%%%%%%%%%%%#",
+      "#############################IIIIIIIII*I#%K%%%%%%%%%%%%%%%%#",
+      "#############################IIII*II*III##########%%%%%%%%%#",
+      "#############################IIIIIIII*II##########%%******%#",
+      "#######**I*IIIII#############III***IIIII##########%%******%#",
+      "#####%%IIIIIIIII#############II*IIIIIIII###%%%%%##%%******%#",
+      "#####%#IIIIIIII*#############*IIIIIII*II###%##%%##%%%%%%%*%#",
+      "#######I*II*IIII##%%%########IIIII*IIIII###%%%%%##%%%%%%%%%#",
+      "#######IIIIIIIII%%%%%##########%###########%%#%%##%%%%%%%%%#",
+      "#######IIIIIIIII##%%%########%%%###########%%%%%##%%%%%%%%%#",
+      "#######I*IIIIIII##%%%########==############%######%%%%%%%%%#",
+      "##################%%%########==##########%%%%%%%%%%%%%%%%%%#",
+      "##################%%%########==##########%%%%%%%%%%%%%%%%*%#",
+      "###########%%%%%%%%%%%%%#####==###################%%%%%%%%%#",
+      "#########%%%*%%%%%%%%%%%%%%%%=K###################%%%%%%%%%#",
+      "#########%%%%%%%%%%%%%%%%%%%%==#############################",
+      "#########%%%%%%%%%%%%%%%*%%%%==#############################",
+      "###########%%%%%%%%%*%#######==#############################",
+      "#############################==#############################",
+      "#############################==#############################",
+      "#############################==#############################",
+      "#############################==#############################",
+      "#############################==#############################",
+      "#############################==#############################"
+    ],
+    "exits": [
+      {
+        "x": 29,
+        "y": 0,
+        "to": "M39",
+        "tx": 28,
+        "ty": 43
+      },
+      {
+        "x": 30,
+        "y": 0,
+        "to": "M39",
+        "tx": 29,
+        "ty": 43
+      },
+      {
+        "x": 32,
+        "y": 0,
+        "to": "M39",
+        "tx": 30,
+        "ty": 43
+      },
+      {
+        "x": 33,
+        "y": 0,
+        "to": "M39",
+        "tx": 31,
+        "ty": 43
+      },
+      {
+        "x": 29,
+        "y": 44,
+        "to": "M37",
+        "tx": 29,
+        "ty": 1
+      },
+      {
+        "x": 30,
+        "y": 44,
+        "to": "M37",
+        "tx": 30,
+        "ty": 1
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 29,
+      "y": 42,
+      "note": "南口上來的石板路"
+    },
+    "npcs": [],
+    "spawns": [
+      {
+        "monster": "fo_frost",
+        "count": 3,
+        "area": [
+          52,
+          27,
+          7,
+          8
+        ],
+        "note": "東廳（冰房間外）"
+      },
+      {
+        "monster": "fo_puff_cave",
+        "count": 2,
+        "area": [
+          20,
+          33,
+          8,
+          6
+        ],
+        "note": "入口大廳東半（P2-2 的 3 格外）"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M38_1",
+        "x": 9,
+        "y": 35,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 19,
+          "exp": 30,
+          "item": "grass_jelly"
+        },
+        "note": "P2-2 天平平衡後出現（金幣、經驗等第二段數值）",
+        "no_question": true
+      },
+      {
+        "id": "C_M38_2",
+        "x": 44,
+        "y": 33,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 19,
+          "exp": 30,
+          "item": "grass_jelly"
+        },
+        "note": "P2-1 冰箱推到發光格子後出現（金幣、經驗等第二段數值）",
+        "no_question": true
+      },
+      {
+        "id": "C_M38_3",
+        "x": 5,
+        "y": 27,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 20,
+          "exp": 30,
+          "item": "grass_jelly"
+        },
+        "note": "冰房間一出口外的小凹室（金幣、經驗等第二段數值）",
+        "no_question": true
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "冰房間一",
+        "area": [
+          6,
+          24,
+          11,
+          9
+        ]
+      },
+      {
+        "name": "冰房間二",
+        "area": [
+          28,
+          20,
+          13,
+          10
+        ]
+      },
+      {
+        "name": "冰房間三",
+        "area": [
+          43,
+          7,
+          15,
+          11
+        ]
+      }
+    ],
+    "lights": [],
+    "no_minimap": true,
+    "lodge_lamps": [
+      {
+        "id": "obj_lodge_lamp",
+        "x": 30,
+        "y": 35,
+        "kind": "lodge",
+        "note": "入口山屋小燈（石台）"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 42,
+        "y": 22,
+        "kind": "marker",
+        "note": "記號燈 F（71 號寫 (41,23)，那格是冰岩壁；放在冰房間二出口旁的走道上）"
+      }
+    ],
+    "puzzles": [
+      {
+        "id": "P2-3",
+        "type": "numseq",
+        "required": true,
+        "area": [
+          46,
+          18,
+          53,
+          21
+        ],
+        "pillars": [
+          [
+            47,
+            18
+          ],
+          [
+            48,
+            18
+          ],
+          [
+            49,
+            18
+          ],
+          [
+            50,
+            18
+          ],
+          [
+            51,
+            18
+          ]
+        ],
+        "number_floors": [
+          [
+            47,
+            20
+          ],
+          [
+            48,
+            20
+          ],
+          [
+            50,
+            20
+          ],
+          [
+            51,
+            20
+          ]
+        ],
+        "ice_gate": [
+          [
+            52,
+            18
+          ]
+        ],
+        "note": "71 號寫 x37–41 y14–24（畫面上是冰岩壁）；改到冰房間三入口前：冰柱畫在南牆、冰門擋在入口 (52,18)"
+      },
+      {
+        "id": "P2-2",
+        "type": "balance",
+        "required": false,
+        "area": [
+          9,
+          34,
+          16,
+          38
+        ],
+        "scale": [
+          12,
+          35
+        ],
+        "stones": [
+          [
+            10,
+            37
+          ],
+          [
+            12,
+            37
+          ],
+          [
+            14,
+            37
+          ],
+          [
+            16,
+            37
+          ]
+        ],
+        "reward_chest": "C_M38_1",
+        "note": "改到西邊入口大廳（CTO 同意）"
+      },
+      {
+        "id": "P2-1",
+        "type": "sokoban",
+        "required": false,
+        "area": [
+          42,
+          25,
+          48,
+          31
+        ],
+        "door": [
+          43,
+          31
+        ],
+        "enter_to": [
+          43,
+          30
+        ],
+        "box": [
+          45,
+          28
+        ],
+        "goal": [
+          43,
+          26
+        ],
+        "reward_chest": "C_M38_2",
+        "note": "71 號的 7×7 地圖原樣，左上 (42,25)；門在下牆 (43,31)，進門就站在起點 @ (43,30)"
+      }
+    ],
+    "ice_rooms": [
+      {
+        "id": "ice1",
+        "box": [
+          6,
+          24,
+          16,
+          32
+        ],
+        "entrance": [
+          16,
+          29
+        ],
+        "exit": [
+          6,
+          26
+        ],
+        "reset": [
+          17,
+          29
+        ],
+        "min_steps": 3,
+        "solution": "LUL",
+        "rocks": [
+          [
+            7,
+            25
+          ],
+          [
+            8,
+            25
+          ],
+          [
+            8,
+            28
+          ],
+          [
+            8,
+            31
+          ],
+          [
+            10,
+            25
+          ],
+          [
+            11,
+            28
+          ],
+          [
+            15,
+            27
+          ]
+        ],
+        "dots": 1,
+        "note": "選做：出口外的小凹室有寶箱 C_M38_3"
+      },
+      {
+        "id": "ice2",
+        "box": [
+          28,
+          20,
+          40,
+          29
+        ],
+        "entrance": [
+          31,
+          29
+        ],
+        "exit": [
+          40,
+          21
+        ],
+        "reset": [
+          31,
+          30
+        ],
+        "min_steps": 4,
+        "solution": "ULUR",
+        "rocks": [
+          [
+            29,
+            27
+          ],
+          [
+            31,
+            26
+          ],
+          [
+            32,
+            25
+          ],
+          [
+            33,
+            23
+          ],
+          [
+            33,
+            25
+          ],
+          [
+            34,
+            25
+          ],
+          [
+            34,
+            28
+          ],
+          [
+            36,
+            23
+          ],
+          [
+            37,
+            24
+          ],
+          [
+            37,
+            27
+          ],
+          [
+            38,
+            22
+          ]
+        ],
+        "dots": 2,
+        "note": "必經"
+      },
+      {
+        "id": "ice3",
+        "box": [
+          43,
+          7,
+          57,
+          17
+        ],
+        "entrance": [
+          52,
+          17
+        ],
+        "exit": [
+          45,
+          7
+        ],
+        "reset": [
+          52,
+          18
+        ],
+        "min_steps": 5,
+        "solution": "ULDLU",
+        "rocks": [
+          [
+            44,
+            8
+          ],
+          [
+            44,
+            9
+          ],
+          [
+            46,
+            13
+          ],
+          [
+            47,
+            8
+          ],
+          [
+            47,
+            12
+          ],
+          [
+            48,
+            10
+          ],
+          [
+            49,
+            11
+          ],
+          [
+            51,
+            15
+          ],
+          [
+            53,
+            8
+          ],
+          [
+            53,
+            12
+          ],
+          [
+            53,
+            14
+          ],
+          [
+            55,
+            12
+          ]
+        ],
+        "dots": 3,
+        "note": "必經；出口往北到樓梯"
+      }
+    ],
+    "decals": [
+      {
+        "type": "ice_pillar_dots",
+        "x": 16,
+        "y": 28,
+        "dots": 1
+      },
+      {
+        "type": "ice_pillar_dots",
+        "x": 32,
+        "y": 29,
+        "dots": 2
+      },
+      {
+        "type": "ice_pillar_dots",
+        "x": 53,
+        "y": 17,
+        "dots": 3
+      },
+      {
+        "type": "frost_arrow",
+        "x": 20,
+        "y": 34,
+        "dir": "N",
+        "note": "入口大廳 → 冰房間一"
+      },
+      {
+        "type": "frost_arrow",
+        "x": 29,
+        "y": 33,
+        "dir": "N",
+        "note": "入口 → 冰房間二"
+      },
+      {
+        "type": "frost_arrow",
+        "x": 44,
+        "y": 20,
+        "dir": "E",
+        "note": "冰房間二出口 → 冰房間三"
+      },
+      {
+        "type": "frost_arrow",
+        "x": 40,
+        "y": 5,
+        "dir": "W",
+        "note": "冰房間三出口 → 樓梯"
+      }
+    ]
+  },
+  M39: {
+    "name": "遺失物書庫",
+    "type": "dungeon",
+    "level": 5,
+    "bgm": "dungeon",
+    "battle_bg": "fogcave",
+    "tileset": "cave",
+    "real_ref": "虛構（霧之洞窟）",
+    "art_note": "暖灰色的霧中書庫：8 座深木色高書架（圖案分類牌放大），中央紅地毯、西區藍地毯、東區綠地毯；書架區南緣矮木欄，中央是借書台的木柵；北邊木門與石階。 背景 tools/bigmaps/<ID>_bg.webp（GPT 四塊延續法＋最小誤差接縫）。",
+    "grid": [
+      "#############################SS#############################",
+      "#############################SS#############################",
+      "#############################==#############################",
+      "##############%%%%%%%%%%%%%%====%%##########################",
+      "##############%%%%%%%%%%%%%%====%%##########################",
+      "##############%%%%%%%%%%%%%%====%%##########################",
+      "##############%%%%%%%%%%%%%%====%%##########################",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%K%###",
+      "####KK%%%%%%%%%%%%%%%%%%%%%%====%%RRRRRRRRR%%RRRRRRRRR%%%###",
+      "####%%RRRRRRRRR%%RRRRRRRRR%%====%%RRRRRRRRR%%RRRRRRRRR%%%###",
+      "####%%RRRRRRRRR%%RRRRRRRRR%%====%%HHHHHHHHH%%HHHHHHHHH%%%###",
+      "####%%HHHHHHHHH%%HHHHHHHHH%%====%%HHHHHHHHH%%HHHHHHHHH%%%###",
+      "####%%HHHHHHHHH%%HHHHHHHHH%%====%%HHHHHHHHH%%HHHHHHHHH%%%###",
+      "####%%HHHHHHHHH%%HHHHHHHHH%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####K%%%K%KK%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%K%%%%%%%%%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%K%%%%%%%%%%%%###",
+      "####%%KK%%%%%%KK%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%K%%K%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%%%%%%%K%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%U%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%K%%%%%%%%%%%%###",
+      "####%RRRRRRRRRR%%RRRRRRRR%%%====%%RRRRRRRRR%%RRRRRRRRR%%%###",
+      "####%RRRRRRRRRR%%RRRRRRRR%%%====%%RRRRRRRRR%%RRRRRRRRR%%%###",
+      "####%HHHHHHHHHH%%HHHHHHHH%%%====%%HHHHHHHHH%%HHHHHHHHH%%%###",
+      "####%HHHHHHHHHH%%HHHHHHHH%%%====%%HHHHHHHHH%%HHHHHHHHH%%%###",
+      "####%HHHHHHHHHH%%HHHHHHHH%%%====%%HHHHHHHHH%%HHHHHHHHH%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####FFFFFFFFFFFFFFFFFFFFFFFF====FFFFFFFFFFFFFFFFFFFFFFFFF###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====K%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "####%%%%%%%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%%%%%%%###",
+      "##########%%%%%%%%%%%%%%%%%%====%%%%%%%%%%%%%%%%%%%#########",
+      "################%%%%%=%%%=%%====%%%%%%%%%%%%%%%%############",
+      "##################%%%%K%%%%%====%%%%%%%%%%%%%%##############",
+      "###################%%%%%%%%%====%%%%K%%%%%%%################",
+      "####################%%%%%%%%====%%%%%%%%%%%#################",
+      "#####################%%%%%%%====%%%%%%%%%%##################",
+      "######################%%%%%%====%%%%%%%%%###################",
+      "######################%%%%%%====%%%%%%%%####################",
+      "#######################%%%%%====%%%%%%%#####################",
+      "#######################%%%%%====%%%%%%######################",
+      "############################====############################"
+    ],
+    "exits": [
+      {
+        "x": 29,
+        "y": 0,
+        "to": "M40",
+        "tx": 30,
+        "ty": 43,
+        "requires": "lost_items>=6",
+        "requires_dialog": "D_EXIT_LOCK_LIB"
+      },
+      {
+        "x": 30,
+        "y": 0,
+        "to": "M40",
+        "tx": 31,
+        "ty": 43,
+        "requires": "lost_items>=6",
+        "requires_dialog": "D_EXIT_LOCK_LIB"
+      },
+      {
+        "x": 28,
+        "y": 44,
+        "to": "M38",
+        "tx": 29,
+        "ty": 1
+      },
+      {
+        "x": 29,
+        "y": 44,
+        "to": "M38",
+        "tx": 30,
+        "ty": 1
+      },
+      {
+        "x": 30,
+        "y": 44,
+        "to": "M38",
+        "tx": 32,
+        "ty": 1
+      },
+      {
+        "x": 31,
+        "y": 44,
+        "to": "M38",
+        "tx": 33,
+        "ty": 1
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 29,
+      "y": 42,
+      "note": "南口上來的地毯"
+    },
+    "npcs": [],
+    "spawns": [
+      {
+        "monster": "fo_eraser",
+        "count": 2,
+        "area": [
+          15,
+          14,
+          12,
+          8
+        ],
+        "note": "西區走道（P3-1 的 3 格外）"
+      },
+      {
+        "monster": "fo_eraser",
+        "count": 1,
+        "area": [
+          5,
+          29,
+          19,
+          6
+        ],
+        "note": "西南閱覽區"
+      },
+      {
+        "monster": "fo_umbrella",
+        "count": 2,
+        "area": [
+          32,
+          14,
+          11,
+          8
+        ],
+        "note": "東區走道（P3-2 的 3 格外）"
+      },
+      {
+        "monster": "fo_umbrella",
+        "count": 1,
+        "area": [
+          37,
+          29,
+          18,
+          6
+        ],
+        "note": "東南閱覽區"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M39_1",
+        "x": 32,
+        "y": 26,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 58,
+          "exp": 90,
+          "item": "grass_jelly"
+        },
+        "note": "2026-10-26 關卡設計師 新增（71 號 8.2：C_M39_1 不答題、P3-3 的獎勵；77 號 D）：借書台木柵 (28–31,28) 北邊、地毯東側；獎勵建議值見 wip_v40_draft/east_chest_rewards.json（90 經驗、58 金幣、仙草露）",
+        "no_question": true
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "借書台",
+        "area": [
+          28,
+          28,
+          5,
+          3
+        ]
+      }
+    ],
+    "lights": [],
+    "no_minimap": true,
+    "fog_mask": true,
+    "lodge_lamps": [
+      {
+        "id": "obj_lodge_lamp",
+        "x": 30,
+        "y": 40,
+        "kind": "lodge",
+        "note": "入口山屋小燈（程式畫；71 號寫 (30,41)）"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 14,
+        "y": 20,
+        "kind": "marker",
+        "note": "記號燈：西北，文具書架旁（木牌畫鉛筆）",
+        "shelf": "文具"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 44,
+        "y": 21,
+        "kind": "marker",
+        "note": "記號燈：東北，天氣書架旁（木牌畫雲和太陽）；71 號寫 (46,22)，那格是書架",
+        "shelf": "天氣"
+      }
+    ],
+    "puzzles": [
+      {
+        "id": "P3-3",
+        "type": "symbol",
+        "required": true,
+        "area": [
+          27,
+          28,
+          33,
+          31
+        ],
+        "desk": [
+          32,
+          30
+        ],
+        "gate": [
+          [
+            28,
+            28
+          ],
+          [
+            29,
+            28
+          ],
+          [
+            30,
+            28
+          ],
+          [
+            31,
+            28
+          ]
+        ],
+        "note": "借書台 71 號寫 (30,30)（在地毯上），改放地毯東邊 (32,30)；木柵是整條地毯寬 x28–31",
+        "reward_chest": "C_M39_1"
+      },
+      {
+        "id": "P3-1",
+        "type": "mirror",
+        "required": false,
+        "area": [
+          4,
+          15,
+          11,
+          19
+        ],
+        "origin": [
+          5,
+          15
+        ],
+        "source": [
+          4,
+          16
+        ],
+        "mirrors": [
+          [
+            8,
+            16
+          ],
+          [
+            8,
+            19
+          ],
+          [
+            11,
+            16
+          ]
+        ],
+        "pillars": [
+          [
+            10,
+            16
+          ],
+          [
+            6,
+            18
+          ],
+          [
+            7,
+            18
+          ]
+        ],
+        "crystal": [
+          11,
+          19
+        ],
+        "note": "改到西區書架之間的走道（CTO 同意）；71 號 7×5 的相對座標不變，左上角 (5,15)"
+      },
+      {
+        "id": "P3-2",
+        "type": "euler",
+        "required": false,
+        "area": [
+          46,
+          14,
+          55,
+          21
+        ],
+        "stones": {
+          "A": [
+            47,
+            21
+          ],
+          "B": [
+            55,
+            21
+          ],
+          "C": [
+            55,
+            16
+          ],
+          "D": [
+            47,
+            16
+          ],
+          "E": [
+            51,
+            14
+          ]
+        },
+        "note": "改到東區書架之間（CTO 同意的 x44–54 y14–21 再往東移 2 格，避開畫面上的書堆與閱讀燈 (44–45,16–17)）；形狀與連線不變"
+      }
+    ],
+    "shelves": [
+      {
+        "cat": "文具",
+        "icon": "pencil",
+        "area": [
+          6,
+          9,
+          14,
+          13
+        ]
+      },
+      {
+        "cat": "雨具",
+        "icon": "umbrella",
+        "area": [
+          17,
+          9,
+          25,
+          13
+        ]
+      },
+      {
+        "cat": "衣服",
+        "icon": "shirt",
+        "area": [
+          34,
+          8,
+          42,
+          12
+        ]
+      },
+      {
+        "cat": "玩具",
+        "icon": "blocks",
+        "area": [
+          45,
+          8,
+          53,
+          12
+        ]
+      },
+      {
+        "cat": "食物",
+        "icon": "apple",
+        "area": [
+          5,
+          22,
+          14,
+          26
+        ]
+      },
+      {
+        "cat": "動物",
+        "icon": "fish",
+        "area": [
+          17,
+          22,
+          24,
+          26
+        ]
+      },
+      {
+        "cat": "植物",
+        "icon": "flower",
+        "area": [
+          34,
+          22,
+          42,
+          26
+        ]
+      },
+      {
+        "cat": "天氣",
+        "icon": "cloud_sun",
+        "area": [
+          45,
+          22,
+          53,
+          26
+        ]
+      }
+    ],
+    "lost_items": [
+      {
+        "id": "eraser",
+        "x": 20,
+        "y": 16
+      },
+      {
+        "id": "pencil",
+        "x": 9,
+        "y": 7
+      },
+      {
+        "id": "umbrella",
+        "x": 38,
+        "y": 15
+      },
+      {
+        "id": "raincoat",
+        "x": 50,
+        "y": 19
+      },
+      {
+        "id": "hat",
+        "x": 24,
+        "y": 20
+      },
+      {
+        "id": "workbook",
+        "x": 36,
+        "y": 19
+      },
+      {
+        "id": "handkerchief",
+        "x": 9,
+        "y": 15,
+        "hidden": "P3-1"
+      },
+      {
+        "id": "blocks",
+        "x": 51,
+        "y": 18,
+        "hidden": "P3-2"
+      }
+    ],
+    "carpets": [
+      {
+        "color": "blue",
+        "area": [
+          4,
+          15,
+          27,
+          16
+        ],
+        "zone": "西（背景已鋪）"
+      },
+      {
+        "color": "red",
+        "area": [
+          28,
+          3,
+          31,
+          44
+        ],
+        "zone": "中"
+      },
+      {
+        "color": "green",
+        "area": [
+          32,
+          19,
+          56,
+          20
+        ],
+        "zone": "東（背景已鋪）"
+      }
+    ]
+  },
+  M40: {
+    "name": "五燈試煉",
+    "type": "dungeon",
+    "level": 5,
+    "bgm": "dungeon",
+    "battle_bg": "fogcave",
+    "tileset": "cave",
+    "real_ref": "虛構（霧之洞窟）",
+    "art_note": "深藍紫色圓形大廳，地上刻大五角星；五座白石燈座；北邊兩根白石柱夾著刻五盞燈圖案的巨大石門；西南疊石盤小石室、東南推兩個石箱小石室。 背景 tools/bigmaps/<ID>_bg.webp（GPT 四塊延續法＋最小誤差接縫）。",
+    "grid": [
+      "###############################==###########################",
+      "###############################==###########################",
+      "###############################==###########################",
+      "#########################%%%%##==###########################",
+      "#########################%%%%##===##########################",
+      "#########################%%%%##===##########################",
+      "#########################%%%%##===##%%######################",
+      "#########################%%%%##===##%%%%####################",
+      "########################%%%%%##===##%%%%####################",
+      "######################%%%%%%%##===##%%%%%%##################",
+      "###################%%%%%%%%%%%%%%%%%%%%%%%%#################",
+      "################%%%%%%%%%%%%%UUU%%%%%%%%%%%%%%##############",
+      "##############%%%%%%%%%%%%%%%KKK%%%%%%%%%%%%%%%#############",
+      "#############%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%###########",
+      "###########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%##########",
+      "##########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#########",
+      "#########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%########",
+      "#########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#######",
+      "########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#######",
+      "#######%%%%UUU%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%######",
+      "#######%%%%KKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%UUU%%%######",
+      "#######%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%KKK%%%######",
+      "#######%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%######",
+      "#######%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#######",
+      "#######%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%########",
+      "########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#########",
+      "#########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%########",
+      "##########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%########",
+      "###########%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#######",
+      "############%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%######",
+      "#############%%%%%%UUU%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%######",
+      "###############%%%%KKK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#######",
+      "################%%%%%%%%%%%%%%%%%%%%%%%%%%%%%UUU%%%%%#######",
+      "##############%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%KKK%%%#########",
+      "##############%%##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#####",
+      "##############%%#####%%%%%%%%%U=%%%%%%%%%%%%%%%%#%%%%%%#####",
+      "###########%%%%%%######%%%%%%%K=%%%%%%%%%%%%%%%######%%#####",
+      "###########%%%%%%#######%%%%%%==%%%%%%%%%%%%%%#######%%#####",
+      "###########%%%%%%#########%%%#==%%%%%%%%%%%%%########=######",
+      "###########%K%K%K#############==%%%%%%%%%%%########%%%#%%%##",
+      "###########%%%%%%#############==%%%%%%%%###########%%%%%%%##",
+      "###########%%%%%%#############==###################%%###%%##",
+      "##############################==###################%%%%%%%##",
+      "##############################==############################",
+      "##############################==############################"
+    ],
+    "exits": [
+      {
+        "x": 31,
+        "y": 0,
+        "to": "M41",
+        "tx": 34,
+        "ty": 29,
+        "requires": [
+          "trial_lamps_all",
+          "puzzle.P4-2",
+          "pl>=60",
+          "item:dawn_compass"
+        ],
+        "requires_dialog": "D_EXIT_LOCK_CV",
+        "first_dialog": "D_SUMMIT_GATE"
+      },
+      {
+        "x": 32,
+        "y": 0,
+        "to": "M41",
+        "tx": 35,
+        "ty": 29,
+        "requires": [
+          "trial_lamps_all",
+          "puzzle.P4-2",
+          "pl>=60",
+          "item:dawn_compass"
+        ],
+        "requires_dialog": "D_EXIT_LOCK_CV",
+        "first_dialog": "D_SUMMIT_GATE"
+      },
+      {
+        "x": 30,
+        "y": 44,
+        "to": "M39",
+        "tx": 29,
+        "ty": 1
+      },
+      {
+        "x": 31,
+        "y": 44,
+        "to": "M39",
+        "tx": 30,
+        "ty": 1
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 30,
+      "y": 42,
+      "note": "南口上來的石板路"
+    },
+    "npcs": [],
+    "spawns": [
+      {
+        "monster": "fob_shadow_bat",
+        "count": 1,
+        "area": [
+          30,
+          13,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "霧影站在國語燈座前",
+        "quest": "Q_CV_3A"
+      },
+      {
+        "monster": "fob_shadow_golem",
+        "count": 1,
+        "area": [
+          12,
+          21,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "霧影站在社會燈座前",
+        "quest": "Q_CV_3E"
+      },
+      {
+        "monster": "fob_shadow_octo",
+        "count": 1,
+        "area": [
+          49,
+          22,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "霧影站在英語燈座前",
+        "quest": "Q_CV_3B"
+      },
+      {
+        "monster": "fob_shadow_tree",
+        "count": 1,
+        "area": [
+          20,
+          32,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "霧影站在自然燈座前",
+        "quest": "Q_CV_3D"
+      },
+      {
+        "monster": "fob_shadow_frog",
+        "count": 1,
+        "area": [
+          46,
+          34,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "霧影站在數學燈座前",
+        "quest": "Q_CV_3C"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M40_1",
+        "x": 54,
+        "y": 36,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 29,
+          "exp": 45,
+          "item": "grass_jelly"
+        },
+        "note": "P4-1 兩個石箱都推到格子後出現（金幣、經驗等第二段數值）",
+        "no_question": true
+      },
+      {
+        "id": "C_M40_2",
+        "x": 14,
+        "y": 37,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 29,
+          "exp": 45,
+          "item": "grass_jelly"
+        },
+        "note": "P4-3 疊完石盤後出現（金幣、經驗等第二段數值）",
+        "no_question": true
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "五燈大廳",
+        "area": [
+          7,
+          10,
+          47,
+          30
+        ]
+      },
+      {
+        "name": "最後的門",
+        "area": [
+          29,
+          0,
+          7,
+          10
+        ]
+      }
+    ],
+    "lights": [],
+    "no_minimap": true,
+    "lodge_lamps": [
+      {
+        "id": "obj_lodge_lamp",
+        "x": 30,
+        "y": 35,
+        "kind": "lodge",
+        "note": "入口山屋小燈（石台）"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 31,
+        "y": 4,
+        "kind": "final",
+        "note": "最後的山屋小燈（71 號寫 (30,4)；那格是白石柱）"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 30,
+        "y": 14,
+        "kind": "lodge",
+        "note": "國語燈座前"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 12,
+        "y": 22,
+        "kind": "lodge",
+        "note": "社會燈座前"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 49,
+        "y": 23,
+        "kind": "lodge",
+        "note": "英語燈座前"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 20,
+        "y": 33,
+        "kind": "lodge",
+        "note": "自然燈座前"
+      },
+      {
+        "id": "obj_lodge_lamp",
+        "x": 46,
+        "y": 35,
+        "kind": "lodge",
+        "note": "數學燈座前"
+      }
+    ],
+    "puzzles": [
+      {
+        "id": "P4-2",
+        "type": "lights",
+        "required": true,
+        "area": [
+          26,
+          20,
+          34,
+          28
+        ],
+        "stones": {
+          "1": [
+            30,
+            21
+          ],
+          "2": [
+            33,
+            23
+          ],
+          "3": [
+            32,
+            27
+          ],
+          "4": [
+            28,
+            27
+          ],
+          "5": [
+            27,
+            23
+          ]
+        },
+        "appears_after": "trial_lamps_all"
+      },
+      {
+        "id": "P4-1",
+        "type": "sokoban",
+        "required": false,
+        "area": [
+          50,
+          38,
+          58,
+          43
+        ],
+        "door": [
+          53,
+          38
+        ],
+        "enter_to": [
+          54,
+          42
+        ],
+        "boxes": [
+          [
+            52,
+            40
+          ],
+          [
+            56,
+            40
+          ]
+        ],
+        "goals": [
+          [
+            51,
+            42
+          ],
+          [
+            57,
+            42
+          ]
+        ],
+        "reward_chest": "C_M40_1",
+        "note": "71 號的 9×6 地圖原樣，左上 (50,38)（71 號寫 x40–48，畫面上的東南石室在 x50–58）；門在上牆 (53,38)，進門就站在起點 @ (54,42)（CTO 裁定）；內牆 (54,39)、(53–55,41) 背景沒畫，程式畫成石塊"
+      },
+      {
+        "id": "P4-3",
+        "type": "hanoi",
+        "required": false,
+        "area": [
+          10,
+          35,
+          17,
+          42
+        ],
+        "door": [
+          14,
+          35
+        ],
+        "pillars": [
+          [
+            12,
+            39
+          ],
+          [
+            14,
+            39
+          ],
+          [
+            16,
+            39
+          ]
+        ],
+        "reward_chest": "C_M40_2",
+        "note": "71 號寫 x10–20 y38–43，畫面上的西南石室在 x10–17 y35–42；三根石柱 (12,39)、(14,39)、(16,39)"
+      }
+    ],
+    "trial_lamps": [
+      {
+        "subject": "國語",
+        "seat": [
+          29,
+          11,
+          31,
+          12
+        ],
+        "boss": "fob_shadow_bat"
+      },
+      {
+        "subject": "社會",
+        "seat": [
+          11,
+          19,
+          13,
+          20
+        ],
+        "boss": "fob_shadow_golem"
+      },
+      {
+        "subject": "英語",
+        "seat": [
+          48,
+          20,
+          50,
+          21
+        ],
+        "boss": "fob_shadow_octo"
+      },
+      {
+        "subject": "自然",
+        "seat": [
+          19,
+          30,
+          21,
+          31
+        ],
+        "boss": "fob_shadow_tree"
+      },
+      {
+        "subject": "數學",
+        "seat": [
+          45,
+          32,
+          47,
+          33
+        ],
+        "boss": "fob_shadow_frog"
+      }
+    ]
+  },
+  M41: {
+    "name": "玉山之巔",
+    "type": "field",
+    "level": 9,
+    "bgm": "final",
+    "battle_bg": "summit",
+    "tileset": "field",
+    "no_monsters": true,
+    "real_ref": "玉山主峰山頂（玉山國家公園管理處官網 Y1–Y4：頁岩裸岩重疊、南北峭壁、西為絕壑陡溝、東坡滾礫石堆；71 號 2.7，2026-10-26 開頁核對）",
+    "art_note": "霧散後的玉山主峰山頂（背景一張兩用：決戰前由程式疊半透明濃霧，結局後拿掉霧層）：中上方是層層疊起的灰色頁岩裸岩，最高處一塊較大的頁岩岩塊；前面一片平整的岩台；東側碎石坡上一條之字形碎石路從霧中石縫往上接到岩台；北、南是峭壁，崖下是霧；西側深溝被雲海填滿；天快亮前的深藍灰天空，東方天邊一條淡亮線。不畫石碑、碑文、銅像、告示牌、欄杆、鐵鍊、人物、雪。v4.x 新增，背景 tools/bigmaps/M41_bg.webp（GPT 一張畫完，v13_single.py fit）。",
+    "grid": [
+      "~~~~~~~~~~~~~###################################",
+      "~~~~~~~~~~~~~###################################",
+      "~~~~~~~~~~~~~###################################",
+      "~~~~~~~~~~~~~###################################",
+      "~~~~~~~~~~~~~***********************************",
+      "~~~~~~~~~~~~~*****##########********************",
+      "~~~~~~~~~~~~~*****##########********************",
+      "~~~~~~~~~~~~~*****##########********************",
+      "~~~~~~~~~~~~~*****####KK####********************",
+      "~~~~~~~~~~~%%%%***####KK####********************",
+      "~~~~~~~~~~~%%%%%%%%%%%%%%%%%%%%*****************",
+      "~~~~~~~~~~~###%%%%%%%%%%%%%%%%%*****************",
+      "~~~~~~~~~~~~~*%%%%%%%%%%%%%%%%%*****************",
+      "~~~~~~~~~~~~~*##%%%%%%%%%%%%%%%*****************",
+      "~~~~~~~~~~~~~*###%%%%%%%%%%%%%%*****************",
+      "~~~~~~~~~~~~~*############%%%%%*****************",
+      "~~~~~~~~~~~~~*############=============*********",
+      "~~~~~~~~~~~~~************************==*********",
+      "~~~~~~~~~~~~~************************==*********",
+      "~~~~~~~~~~~~~************************==*********",
+      "~~~~~~~~~~~~~************************==*********",
+      "~~~~~~~~~~~~~***************===========*********",
+      "~~~~~~~~~~~~~***************==******************",
+      "~~~~~~~~~~~~~***************==******************",
+      "~~~~~~~~~~~~~***************==******************",
+      "~~~~~~~~~~~~~***************==******************",
+      "~~~~~~~~~~~~~****************=======************",
+      "~~~~~~~~~~~~~*********************==************",
+      "~~~~~~~~~~~~~*********************==************",
+      "~~~~~~~~~~~~~*********************==************",
+      "~~~~~~~~~~~~~********************....***********",
+      "~~~~~~~~~~~~~***********************************",
+      "~~~~~~~~~~~~~###################################",
+      "~~~~~~~~~~~~~###################################",
+      "~~~~~~~~~~~~~###################################",
+      "~~~~~~~~~~~~~###################################"
+    ],
+    "exits": [
+      {
+        "x": 34,
+        "y": 30,
+        "to": "M40",
+        "tx": 31,
+        "ty": 2,
+        "warp": true
+      },
+      {
+        "x": 35,
+        "y": 30,
+        "to": "M40",
+        "tx": 32,
+        "ty": 2,
+        "warp": true
+      },
+      {
+        "x": 9,
+        "y": 10,
+        "to": "M42",
+        "tx": 30,
+        "ty": 43,
+        "requires": "ending_done",
+        "warp": true
+      },
+      {
+        "x": 10,
+        "y": 10,
+        "to": "M42",
+        "tx": 31,
+        "ty": 43,
+        "requires": "ending_done",
+        "warp": true
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 34,
+      "y": 29,
+      "note": "從 M40 最後的門上來的到達站（71 號 2.7 A 區）"
+    },
+    "station": {
+      "x": 13,
+      "y": 9,
+      "name": "玉山站",
+      "requires": "ending_done",
+      "noShelter": "山頂岩台很窄、旁邊是雲海，放不下候車亭，只放站牌",
+      "note": "世界地圖 R_YUSHAN 的回程；下車點 (12,10)"
+    },
+    "npcs": [],
+    "spawns": [
+      {
+        "monster": "fob_king",
+        "count": 1,
+        "area": [
+          22,
+          12,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "遺忘霧王‧佛格：站立圖 3×3 飄在山頂上空 (21–23,5–7)（岩塊正上方的霧裡，程式畫）；走到岩塊前 (22–23,12) 觸發（播 D_FOG_KING_MEET）",
+        "quest": "Q_END_1"
+      }
+    ],
+    "chests": [],
+    "landmarks": [
+      {
+        "name": "玉山之巔",
+        "area": [
+          13,
+          4,
+          35,
+          28
+        ]
+      }
+    ],
+    "lights": [],
+    "cloud_stairs": {
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          10
+        ]
+      ],
+      "requires": "ending_done"
+    }
+  },
+  M42: {
+    "name": "雲之深層・一　晨光雲階",
+    "type": "field",
+    "level": 9,
+    "bgm": "field",
+    "battle_bg": "cloudsea",
+    "tileset": "field",
+    "real_ref": null,
+    "art_note": "破關後的虛構地圖（71 號 2.8）：淡金橘的晨光天空與雲海上，一層層白色厚雲平台與雲階梯。三條路（左、中、右）＋橫向連接；12 處軟雲（json soft_clouds）由程式畫成半透明、邊緣飄動的雲，答對 1 題才變硬。背景 tools/bigmaps/M42_bg.webp（GPT 四塊延續法＋v13_align 對齊＋最小誤差接縫）。",
+    "rec_level": [
+      58,
+      65
+    ],
+    "grid": [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~....==....~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~....==....~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~....==....~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~.............~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~...~~~~SS~~~......~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~...~~~~SS~~~......~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~..................~~~~SS~~~......~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~...................~~~SS~~~~~....................~~~~~",
+      "~~~~~~....~~..~.~.~~.~...~~~SS~~~~~....................~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~SS~~~~~....................~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~SS~~~~~~~~~~~~~~~~~~~~~SS~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~SS~~~~~~~~~~~~~~~~~~~~~SS~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~SS~~~~~~~~~~~~~~~~~~~~~SS~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~SS~~~~~~~~~~~~~~~~~~~~~SS~~~~~~~",
+      "~~~~~~~SS..........SSSSS.............~~~~~~~~~~~~~~SS~~~~~~~",
+      "~~~~~~~SS..........SSSSS.............~~~~...........~~~~~~~~",
+      "~~~~~~~SS..........~~~~~.............SSSS...........~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~.............SSSS...........~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~............~~~~~...........~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~............~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~...........~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~SS~~~~~~~~~~~~~~~~~~~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~.....................~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~.....................~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~....~...~~~~~~~~~~~~~~~~SS~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~...................~~~~....~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~...........................~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~...........................~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~......==...................~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~.......==..~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~.......==..~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~.......==..~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~.......==..~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~.......==..~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~.....==..~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~....~~.==.~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    "exits": [
+      {
+        "x": 28,
+        "y": 0,
+        "to": "M43",
+        "tx": 29,
+        "ty": 43
+      },
+      {
+        "x": 29,
+        "y": 0,
+        "to": "M43",
+        "tx": 30,
+        "ty": 43
+      },
+      {
+        "x": 30,
+        "y": 44,
+        "to": "M41",
+        "tx": 12,
+        "ty": 10
+      },
+      {
+        "x": 31,
+        "y": 44,
+        "to": "M41",
+        "tx": 12,
+        "ty": 10
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 30,
+      "y": 42,
+      "note": "2026-11-04 關卡設計師：從 (30,41) 移到 (30,42)——原位置和 heal_points 的山屋小燈同一格（前端山屋小燈會擋路，人會生在燈裡）；(30,42) 是 71 號 2.2「從 M41 下來站在 (30,42)」的到達位置。原 note：回復點（71 號 2.2：入口 (30,41)）"
+    },
+    "npcs": [
+      {
+        "id": "cloud_shop_m42",
+        "x": 27,
+        "y": 40,
+        "sprite": "npc_innkeeper_m",
+        "name": "雲上小舖老闆",
+        "dialog": "D_SHOP_CLOUD",
+        "quest": null,
+        "quests": [],
+        "note": "雲上小舖（一般 NPC，裁定 K23）：圖用既有旅館老闆圖 npc_innkeeper（C docs/data/sprites.js:183；要換別張旅館老闆圖由 Codex 開工時定）；顯示名稱「雲上小舖老闆」；shop.npc 指向這位"
+      }
+    ],
+    "spawns": [
+      {
+        "monster": "fo_puff_s1",
+        "count": 2,
+        "area": [
+          6,
+          4,
+          19,
+          6
+        ]
+      },
+      {
+        "monster": "fo_echo_s1",
+        "count": 1,
+        "area": [
+          24,
+          15,
+          13,
+          7
+        ]
+      },
+      {
+        "monster": "fo_frost_s1",
+        "count": 2,
+        "area": [
+          35,
+          5,
+          20,
+          6
+        ]
+      },
+      {
+        "monster": "fo_eraser_s1",
+        "count": 2,
+        "area": [
+          6,
+          26,
+          21,
+          6
+        ]
+      },
+      {
+        "monster": "fo_umbrella_s1",
+        "count": 2,
+        "area": [
+          24,
+          31,
+          27,
+          6
+        ]
+      }
+    ],
+    "chests": [],
+    "shop": {
+      "x": 27,
+      "y": 40,
+      "shop_id": "cloud_m42",
+      "npc": "cloud_shop_m42"
+    },
+    "landmarks": [
+      {
+        "name": "晨光雲階",
+        "area": [
+          0,
+          0,
+          60,
+          45
+        ]
+      }
+    ],
+    "lights": [],
+    "heal_points": [
+      {
+        "x": 30,
+        "y": 41,
+        "kind": "lodge_lamp"
+      }
+    ],
+    "soft_clouds": [
+      {
+        "id": "SC1",
+        "cells": [
+          [
+            7,
+            20
+          ],
+          [
+            8,
+            20
+          ]
+        ],
+        "note": "左雲階中段"
+      },
+      {
+        "id": "SC2",
+        "cells": [
+          [
+            23,
+            32
+          ],
+          [
+            24,
+            32
+          ],
+          [
+            25,
+            32
+          ],
+          [
+            26,
+            32
+          ]
+        ],
+        "note": "入口 → 左下雲帶"
+      },
+      {
+        "id": "SC3",
+        "cells": [
+          [
+            28,
+            30
+          ],
+          [
+            29,
+            30
+          ],
+          [
+            30,
+            30
+          ],
+          [
+            28,
+            31
+          ],
+          [
+            29,
+            31
+          ],
+          [
+            30,
+            31
+          ],
+          [
+            28,
+            32
+          ],
+          [
+            29,
+            32
+          ],
+          [
+            30,
+            32
+          ]
+        ],
+        "note": "中路下段"
+      },
+      {
+        "id": "SC4",
+        "cells": [
+          [
+            28,
+            26
+          ],
+          [
+            29,
+            26
+          ],
+          [
+            30,
+            26
+          ],
+          [
+            28,
+            27
+          ],
+          [
+            29,
+            27
+          ],
+          [
+            30,
+            27
+          ],
+          [
+            28,
+            28
+          ],
+          [
+            29,
+            28
+          ],
+          [
+            30,
+            28
+          ],
+          [
+            28,
+            29
+          ],
+          [
+            29,
+            29
+          ],
+          [
+            30,
+            29
+          ]
+        ],
+        "note": "中路中段"
+      },
+      {
+        "id": "SC5",
+        "cells": [
+          [
+            28,
+            22
+          ],
+          [
+            29,
+            22
+          ],
+          [
+            30,
+            22
+          ],
+          [
+            28,
+            23
+          ],
+          [
+            29,
+            23
+          ],
+          [
+            30,
+            23
+          ],
+          [
+            28,
+            24
+          ],
+          [
+            29,
+            24
+          ],
+          [
+            30,
+            24
+          ],
+          [
+            28,
+            25
+          ],
+          [
+            29,
+            25
+          ],
+          [
+            30,
+            25
+          ]
+        ],
+        "note": "中路上段"
+      },
+      {
+        "id": "SC6",
+        "cells": [
+          [
+            47,
+            20
+          ],
+          [
+            48,
+            20
+          ],
+          [
+            47,
+            21
+          ],
+          [
+            48,
+            21
+          ]
+        ],
+        "note": "右下雲階頂"
+      },
+      {
+        "id": "SC7",
+        "cells": [
+          [
+            19,
+            15
+          ],
+          [
+            20,
+            15
+          ],
+          [
+            19,
+            16
+          ],
+          [
+            20,
+            16
+          ]
+        ],
+        "note": "左中雲台 → 中央"
+      },
+      {
+        "id": "SC8",
+        "cells": [
+          [
+            37,
+            17
+          ],
+          [
+            38,
+            17
+          ],
+          [
+            37,
+            18
+          ],
+          [
+            38,
+            18
+          ]
+        ],
+        "note": "中央 → 右中"
+      },
+      {
+        "id": "SC9",
+        "cells": [
+          [
+            28,
+            13
+          ],
+          [
+            29,
+            13
+          ],
+          [
+            28,
+            14
+          ],
+          [
+            29,
+            14
+          ]
+        ],
+        "note": "中央雲階下端"
+      },
+      {
+        "id": "SC10",
+        "cells": [
+          [
+            51,
+            11
+          ],
+          [
+            52,
+            11
+          ],
+          [
+            51,
+            12
+          ],
+          [
+            52,
+            12
+          ]
+        ],
+        "note": "右雲階上端"
+      },
+      {
+        "id": "SC11",
+        "cells": [
+          [
+            21,
+            5
+          ],
+          [
+            22,
+            5
+          ],
+          [
+            23,
+            5
+          ],
+          [
+            21,
+            6
+          ],
+          [
+            22,
+            6
+          ],
+          [
+            23,
+            6
+          ]
+        ],
+        "note": "左上雲帶 → 北台"
+      },
+      {
+        "id": "SC12",
+        "cells": [
+          [
+            33,
+            5
+          ],
+          [
+            34,
+            5
+          ],
+          [
+            33,
+            6
+          ],
+          [
+            34,
+            6
+          ]
+        ],
+        "note": "右上 → 北台"
+      }
+    ]
+  },
+  M43: {
+    "name": "雲之深層・二　星光雲庭",
+    "type": "field",
+    "level": 9,
+    "bgm": "field",
+    "battle_bg": "cloudsea",
+    "tileset": "field",
+    "real_ref": null,
+    "art_note": "破關後的虛構地圖（71 號 2.9）：深藍夜空、銀色星點下的淡紫灰雲庭園，雲花圃發著淡藍白微光；北邊石板星座台上一排圓形星座底座（星星的凹槽是空的），最北一道星光拱門（5 個星座完成才開，程式擋）。15 顆星星由程式散放在庭園裡（json stars）。背景 tools/bigmaps/M43_bg.webp（GPT 四塊延續法＋v13_align 對齊＋最小誤差接縫）。",
+    "rec_level": [
+      79,
+      99
+    ],
+    "grid": [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~.K..==.K~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~.K..==.K~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~K~~~~~.....==..~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~K..........==...~..~~~~K~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~KKK.KKKKKKKKKKK........K.~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~KKK.KKKKKKKKKKKKKKK.KKKK.~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~KKK.KKKKKKKKKKKKKKK.KKKK.~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~K...............KKKK.KKKK.~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~K..........................~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~.~~..............***............K~~~~~~~~~~~~~",
+      "~~~~...........................***............K..~~~~~~~~~~~",
+      "~~~~...........................***................~.~~~~~~~~",
+      "~~~~....********........................................~~~~",
+      "~~~.....********.........................................~~~",
+      "~~~.....********............................********....~~~~",
+      "~~~.....********............................********.....~~~",
+      "~~~~........~...............................********.....~~~",
+      "~~~.........................................********~.....~~",
+      "~~~............................***..........********......~~",
+      "~~~............................***.........................~",
+      "~~.............................***........................~~",
+      "~~...................................................~~...~~",
+      "~~...................................................~~....~",
+      "~~..................................***....................~",
+      "~~~................*******..........***~..................~~",
+      "~~~~~~~............*******.........~***~............~~....~~",
+      "~~~~~~~............*******..........***~............~~.....~",
+      "~~~~~~...********......~............***~..................~~",
+      "~~~~~~...********...................***~.................~~~",
+      "~~~~~....********...................***~~.............~~~~~~",
+      "~~~~~....********...................~~~~.....~~......~~~~~~~",
+      "~~~~~....********....................~~......~......~~~~~~~~",
+      "~~~~.........~...................~~...............~~~~~~~~~~",
+      "~~~..................~..........~~~.............~~~~~~~~~~~~",
+      "~~~~................~~..........~~..............~~~~~~~~~~~~",
+      "~~~~~~~......................==........~.~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~..................==........~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~..~............==.....~..~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~...........==.....~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~...........==.~~..~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~.......K==K~~..~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~.....K==K....~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~.....==.....~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    "exits": [
+      {
+        "x": 29,
+        "y": 0,
+        "to": "M44",
+        "tx": 23,
+        "ty": 34,
+        "requires": "constellations_done",
+        "requires_dialog": "D_EXIT_LOCK_POST2"
+      },
+      {
+        "x": 30,
+        "y": 0,
+        "to": "M44",
+        "tx": 24,
+        "ty": 34,
+        "requires": "constellations_done",
+        "requires_dialog": "D_EXIT_LOCK_POST2"
+      },
+      {
+        "x": 29,
+        "y": 44,
+        "to": "M42",
+        "tx": 28,
+        "ty": 1
+      },
+      {
+        "x": 30,
+        "y": 44,
+        "to": "M42",
+        "tx": 29,
+        "ty": 1
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 30,
+      "y": 42,
+      "note": "2026-11-04 關卡設計師：從 (30,41) 移到 (30,42)——原位置和 heal_points 的山屋小燈同一格（前端山屋小燈會擋路，人會生在燈裡）；入口石板路上、山屋小燈正下方。原 note：入口回復點 (30,41)"
+    },
+    "npcs": [
+      {
+        "id": "cloud_shop_m43",
+        "x": 26,
+        "y": 42,
+        "sprite": "npc_innkeeper_m",
+        "name": "雲上小舖老闆",
+        "dialog": "D_SHOP_CLOUD",
+        "quest": null,
+        "quests": [],
+        "note": "雲上小舖（一般 NPC，裁定 K23）：圖用既有旅館老闆圖 npc_innkeeper（C docs/data/sprites.js:183；要換別張旅館老闆圖由 Codex 開工時定）；顯示名稱「雲上小舖老闆」；shop.npc 指向這位"
+      }
+    ],
+    "spawns": [
+      {
+        "monster": "wxb_raincloud_s2",
+        "count": 1,
+        "area": [
+          3,
+          18,
+          12,
+          9
+        ]
+      },
+      {
+        "monster": "mb_train_s2",
+        "count": 1,
+        "area": [
+          16,
+          10,
+          12,
+          8
+        ]
+      },
+      {
+        "monster": "fob_balloon_s2",
+        "count": 1,
+        "area": [
+          37,
+          11,
+          12,
+          8
+        ]
+      },
+      {
+        "monster": "ghb_civetboss_s2",
+        "count": 1,
+        "area": [
+          45,
+          20,
+          12,
+          8
+        ]
+      },
+      {
+        "monster": "mnb_goldjaw_s2",
+        "count": 1,
+        "area": [
+          3,
+          32,
+          14,
+          6
+        ]
+      },
+      {
+        "monster": "pib_ship_s2",
+        "count": 1,
+        "area": [
+          38,
+          30,
+          12,
+          7
+        ]
+      }
+    ],
+    "chests": [],
+    "shop": {
+      "x": 26,
+      "y": 42,
+      "shop_id": "cloud_m43",
+      "npc": "cloud_shop_m43"
+    },
+    "landmarks": [
+      {
+        "name": "星光雲庭",
+        "area": [
+          0,
+          0,
+          60,
+          45
+        ]
+      }
+    ],
+    "lights": [],
+    "heal_points": [
+      {
+        "x": 30,
+        "y": 41,
+        "kind": "lodge_lamp"
+      },
+      {
+        "x": 30,
+        "y": 22,
+        "kind": "lodge_lamp"
+      }
+    ],
+    "constellations": [
+      {
+        "id": "CS_NORTH",
+        "x": 19,
+        "y": 6,
+        "region": "北",
+        "note": "星座底座（3 顆星）；圖上的圓形底座"
+      },
+      {
+        "id": "CS_CENTRAL",
+        "x": 23,
+        "y": 6,
+        "region": "中"
+      },
+      {
+        "id": "CS_SOUTH",
+        "x": 27,
+        "y": 6,
+        "region": "南"
+      },
+      {
+        "id": "CS_EAST",
+        "x": 34,
+        "y": 7,
+        "region": "東"
+      },
+      {
+        "id": "CS_JINBAOLI",
+        "x": 39,
+        "y": 7,
+        "region": "金包里"
+      }
+    ],
+    "stars": [
+      [
+        5,
+        20
+      ],
+      [
+        10,
+        24
+      ],
+      [
+        14,
+        35
+      ],
+      [
+        22,
+        30
+      ],
+      [
+        27,
+        36
+      ],
+      [
+        36,
+        34
+      ],
+      [
+        38,
+        36
+      ],
+      [
+        42,
+        32
+      ],
+      [
+        47,
+        28
+      ],
+      [
+        53,
+        24
+      ],
+      [
+        56,
+        20
+      ],
+      [
+        49,
+        13
+      ],
+      [
+        40,
+        13
+      ],
+      [
+        22,
+        12
+      ],
+      [
+        11,
+        19
+      ]
+    ]
+  },
+  M44: {
+    "name": "雲之深層・三　曙光源頭",
+    "type": "field",
+    "level": 9,
+    "bgm": "field",
+    "battle_bg": "cloudsea",
+    "tileset": "field",
+    "real_ref": null,
+    "art_note": "破關後最後的虛構地圖（71 號 2.10）：白金色發光的天空與雲海上，一座圓形大雲平台，正中央一道向上的金白色光柱（底部金色紋路）；四角四座雲小島，中央都有一圈淡金色光紋（四位發著曙光的霧將站的位置），雲橋相連；南邊入口雲路。背景 tools/bigmaps/M44_bg.webp（GPT 一張畫完，v13_single.py fit）。",
+    "rec_level": [
+      99,
+      99
+    ],
+    "grid": [
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~.........~~~~~~~~~~~~~~~~~~~~~~~.........~~~",
+      "~~~~.........~~~~~~~~~~~~~~~~~~~~~~~.........~~~",
+      "~~~~.........~~~~~~~~~~~~~~~~~~~~~~~.........~~~",
+      "~~~~.........~~~~~~~~~~~~~~~~~~~~~~~.........~~~",
+      "~~~~.........~~~~~~~~~~~~~~~~~~~~~~~.........~~~",
+      "~~~~.............~~~~~~~~~~~~~~..............~~~",
+      "~~~~.........................................~~~",
+      "~~~~.........~~~................~~~~.........~~~",
+      "~~~~.........~~~................~~~~.........~~~",
+      "~~~~~~~~~~~~~~....................~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~....................~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~....................~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~.........UUU........~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~.........UUU........~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~.........UUU........~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~....................~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~....................~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~....................~~~~~~~~~~~~~~",
+      "~~~~.........~....................~~.........~~~",
+      "~~~~.........~~..................~~~.........~~~",
+      "~~~~.........~~..................~~~.........~~~",
+      "~~~~.........................................~~~",
+      "~~~~.........................................~~~",
+      "~~~~.........~~~~~~~~......~~~~~~~~~.........~~~",
+      "~~~~.........~~~~~~~~......~~~~~~~~~.........~~~",
+      "~~~~.........~~~~~~~~......~~~~~~~~~.........~~~",
+      "~~~~.........~~~~~~~~......~~~~~~~~~.........~~~",
+      "~~~~~~~~~~~~~~~~~~~~~......~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~......~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~..==..~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~..==..~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~..==..~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    "exits": [
+      {
+        "x": 23,
+        "y": 35,
+        "to": "M43",
+        "tx": 29,
+        "ty": 1
+      },
+      {
+        "x": 24,
+        "y": 35,
+        "to": "M43",
+        "tx": 30,
+        "ty": 1
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 24,
+      "y": 33,
+      "note": "2026-11-04 關卡設計師：從 (24,32) 移到 (24,33)——原位置和 heal_points 的山屋小燈同一格（前端山屋小燈會擋路，人會生在燈裡）；入口石板路上、山屋小燈正下方。原 note：入口回復點 (24,32)"
+    },
+    "npcs": [
+      {
+        "id": "cloud_shop_m44",
+        "x": 25,
+        "y": 33,
+        "sprite": "npc_innkeeper_m",
+        "name": "雲上小舖老闆",
+        "dialog": "D_SHOP_CLOUD",
+        "quest": null,
+        "quests": [],
+        "note": "雲上小舖（一般 NPC，裁定 K23）：圖用既有旅館老闆圖 npc_innkeeper（C docs/data/sprites.js:183；要換別張旅館老闆圖由 Codex 開工時定）；顯示名稱「雲上小舖老闆」；shop.npc 指向這位"
+      }
+    ],
+    "spawns": [
+      {
+        "monster": "mb_floodgate_s3",
+        "count": 1,
+        "area": [
+          8,
+          7,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "西北小島（光紋中央）",
+        "quest": "Q_POST_3"
+      },
+      {
+        "monster": "mb_lantern_s3",
+        "count": 1,
+        "area": [
+          40,
+          7,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "東北小島",
+        "quest": "Q_POST_3"
+      },
+      {
+        "monster": "fog_demon_s3",
+        "count": 1,
+        "area": [
+          8,
+          25,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "西南小島",
+        "quest": "Q_POST_3"
+      },
+      {
+        "monster": "wxb_whale_s3",
+        "count": 1,
+        "area": [
+          40,
+          25,
+          1,
+          1
+        ],
+        "boss": true,
+        "note": "東南小島",
+        "quest": "Q_POST_3"
+      }
+    ],
+    "chests": [],
+    "shop": {
+      "x": 25,
+      "y": 33,
+      "shop_id": "cloud_m44",
+      "npc": "cloud_shop_m44"
+    },
+    "landmarks": [
+      {
+        "name": "曙光源頭",
+        "area": [
+          0,
+          0,
+          48,
+          36
+        ]
+      }
+    ],
+    "lights": [],
+    "heal_points": [
+      {
+        "x": 24,
+        "y": 32,
+        "kind": "lodge_lamp"
+      }
+    ],
+    "signs": [
+      {
+        "id": "sign_challenge",
+        "x": 22,
+        "y": 31,
+        "note": "入口木牌「給想挑戰更高的冒險者」（27 號 3.2；圖案木牌，程式畫字）",
+        "dialog": "D_SIGN_CHALLENGE"
+      }
+    ],
+    "light_pillar": {
+      "cells": [
+        [
+          23,
+          15
+        ],
+        [
+          24,
+          15
+        ],
+        [
+          25,
+          15
+        ],
+        [
+          23,
+          16
+        ],
+        [
+          24,
+          16
+        ],
+        [
+          25,
+          16
+        ],
+        [
+          23,
+          17
+        ],
+        [
+          24,
+          17
+        ],
+        [
+          25,
+          17
+        ]
+      ],
+      "note": "四隻都打倒後走進光柱 → 稱號「曙光的源頭」，播 D_POST_END"
+    }
   }
 };

@@ -51,7 +51,7 @@
       body.innerHTML = '';
       body.appendChild(h('p', { text: '等級 ' + st.player.level + '　職業：' + s.jobName + (s.favored ? '（拿手科目：' + [].concat(s.favored).join('、') + '，傷害 ×' + s.favoredMult + '）' : '') }));
       // v1.0（48 號 2.1、B7）：力量＝能力的攻擊（不含武器）、物攻＝力量＋武器攻擊，兩個都顯示
-      body.appendChild(h('p.status-line', { text: '體力 ' + st.player.hp + '/' + s.maxHp + '　魔力 ' + st.player.mp + '/' + s.maxMp + '　力量 ' + s.power + '　物攻 ' + s.atk + '　防禦力 ' + s.def +
+      body.appendChild(h('p.status-line', { text: '體力 ' + st.player.hp + '/' + s.maxHp + '　魔力 ' + st.player.mp + '/' + s.maxMp + '　力量 ' + s.power + '　物攻 ' + s.atk + '　防禦力 ' + s.def + '　戰力 ' + Math.floor(J.Character.pl(st, D)) +
         (s.dmgMult > 1 ? '　（武器特效：攻擊傷害 +' + Math.round((s.dmgMult - 1) * 100) + '%）' : '') }));
       var w = st.equipment.weapon && D.items[st.equipment.weapon], a = st.equipment.armor && D.items[st.equipment.armor];
       body.appendChild(h('p', { text: '武器：' + (w ? w.name : '（沒有）') + '　防具：' + (a ? a.name : '（沒有）') }));
@@ -318,7 +318,9 @@
     // ---------- v3.0.1 ①收集冊：上面 5 張卡片（N／M、還差 N 個；證書冊、記憶卡先留位子），下面是選到的那一種（剪影格子＋小知識）
     function renderCollection() {
       if (!J.Collect) { if (colSec === 'proverbs') renderProverbs(); else renderBook(); return; }   // collect.js 沒載入（只測手帳的舊測試）：照舊顯示那一頁
-      var sum = J.Collect.summary(st, D, { proverbs: window.PROVERBS || [], quizzes: window.PROVERB_QUIZ || [], world: window.WORLD });
+      // v4.2 第 4b 批：大結局後證書冊打開（certsOpen；格數照 CERT_BOOK_RULE_4B 只數顯示的職業）
+      var certsOpen = !!(st.flags && st.flags.ending_done), book = certsOpen && J.EndingRules ? J.EndingRules.certBook(st, D.jobs) : null;
+      var sum = J.Collect.summary(st, D, { proverbs: window.PROVERBS || [], quizzes: window.PROVERB_QUIZ || [], world: window.WORLD, certsOpen: certsOpen, certBook: book });
       body.appendChild(h('p.collect-total', { text: '收集冊：一共收集 ' + sum.got + '／' + sum.total + (sum.left ? '，還差 ' + sum.left + ' 個' : '，全部完成！') }));
       var cards = h('div.collect-cards', { role: 'group', 'aria-label': '收集冊的種類' });
       sum.items.forEach(function (it) {
@@ -345,8 +347,32 @@
         body.appendChild(ul);
       } else {
         body.appendChild(h('p', { text: cur.note + '。' }));
-        if (cur.id === 'certs') { var slots = h('div.collect-slots', { 'aria-hidden': 'true' }); for (var k = 0; k < cur.total; k++) slots.appendChild(h('span', { text: '？' })); body.appendChild(slots); }
+        if (cur.id === 'certs' && book) renderCertBook(book);
+        else if (cur.id === 'certs') { var slots = h('div.collect-slots', { 'aria-hidden': 'true' }); for (var k = 0; k < cur.total; k++) slots.appendChild(h('span', { text: '？' })); body.appendChild(slots); }
       }
+    }
+    // ---------- v4.2 第 4b 批：證書冊（大結局腳本 5.6）：「已領 N／M」、四組（見習／初級／中級／高級）；領過＝勳章小圖（G8 64 px）＋職業名＋金屬名＋日期，點開全螢幕證書；
+    //   沒領過＝灰色剪影、不顯示金屬名、寫「轉職成○○後，再去找里長伯」；不顯示金屬統計、不排名
+    function renderCertBook(book) {
+      body.appendChild(h('p.collect-total', { text: '證書冊　已領 ' + book.got + '／' + book.shown }));
+      var grid = h('div.cert-book', { role: 'group', 'aria-label': '證書冊' });   // 4b 夜班修正 2：裡面有標題和按鈕，不是清單（role list 的子項只能是 listitem）
+      var TIERS = [['novice', '見習'], ['basic', '初級'], ['inter', '中級'], ['adv', '高級']];
+      TIERS.forEach(function (t) {
+        var list = book.slots.filter(function (s) { return s.tier === t[0]; });
+        if (!list.length) return;
+        grid.appendChild(h('h4', { text: t[1] }));
+        list.forEach(function (s) {
+          var img = h('img', { src: (J.Assets && J.Assets.resolveUrl(s.icon64)) || s.icon64, alt: '', width: 64, height: 64 });
+          var kids = [img, h('b', { text: s.name })];
+          if (s.got) { kids.push(h('span.small', { text: s.metalName })); if (s.date) kids.push(h('span.small', { text: s.date.replace(/-/g, '/') })); }
+          else kids.push(h('span.small', { text: '轉職成' + s.name + '後，再去找里長伯' }));
+          grid.appendChild(h('button.cert-slot' + (s.got ? '.got' : '.locked') + (s.special ? '.hero' : ''), {
+            'data-job': s.id, 'aria-label': s.got ? s.name + '的勇者之證（' + s.metalName + '）' : s.name + '：還沒領',
+            disabled: !s.got, onclick: function () { if (s.got && J.Ending) J.Ending.viewCert(G, s.id); }
+          }, kids));
+        });
+      });
+      body.appendChild(grid);
     }
     function claim(id) {
       var r = J.Bestiary.claim(st, D.monsters, id, D.maps);
@@ -396,7 +422,7 @@
         // v1.4 桃竹章（63 號 4.3）：曙光碎片（打倒各地區的霧將拿到；有一片以上才顯示）
         var ds = J.QuestLog.dawnShards ? J.QuestLog.dawnShards(st, D.items) : { have: 0, total: 4 };
         if (ds.have) { body.appendChild(h('h3', { text: '曙光碎片' })); body.appendChild(h('div.lights.dawn-shards', {}, [h('span.on', { text: '✧ 曙光碎片 ' + ds.have + '／' + ds.total })])); }
-        var bosses = Object.keys(st.bosses).filter(function (k) { return st.bosses[k]; });
+        var bosses = Object.keys(st.bosses).filter(function (k) { return st.bosses[k] && (D.monsters[k] || {}).boss; });   // v4.2（K7）只列怪物資料是頭目的（五燈霧影、精英不列）
         var bk = (st.stickers || []).filter(function (x) { return J.Bestiary.STICKER_NAME[x]; });
         if (bk.length) { body.appendChild(h('h3', { text: '貼紙' })); body.appendChild(h('div.lights', {}, bk.map(function (x) { return h('span.on', { text: '⭐ ' + J.Bestiary.STICKER_NAME[x] }); }))); }
         body.appendChild(h('h3', { text: '清醒過來的頭目' }));

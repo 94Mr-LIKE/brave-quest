@@ -33,7 +33,7 @@
    */
   function split(monsters, maps) {
     var mobs = [], bosses = [], on = maps ? onMaps(maps) : null;
-    Object.keys(monsters || {}).forEach(function (id) { if (on && !on[id]) return; (monsters[id].boss ? bosses : mobs).push(id); });
+    Object.keys(monsters || {}).forEach(function (id) { if (on && !on[id]) return; (monsters[id].boss || monsters[id].trial ? bosses : mobs).push(id); });   // v4.2：五燈霧影只打得到一次，不算「小怪各打倒 3 次」
     return { mobs: mobs, bosses: bosses, all: mobs.concat(bosses) };
   }
 

@@ -15,6 +15,7 @@
   var Ch1Migrate = isNode ? require('./ch1migrate.js') : window.JQ.Ch1Migrate;
   var Ch3Migrate = isNode ? require('./ch3migrate.js') : window.JQ.Ch3Migrate;
   var SouthMigrate = isNode ? require('./southmigrate.js') : window.JQ.SouthMigrate;   // v3.0 南部（70 號第五節）
+  var EastMigrate = isNode ? require('./eastmigrate.js') : window.JQ.EastMigrate;
   var EconMigrate = isNode ? require('./econmigrate.js') : window.JQ.EconMigrate;
 
   var KEY_PREFIX = 'bq_';
@@ -189,6 +190,7 @@
     if (SouthMigrate.needs(s)) SouthMigrate.migrate(s);
     // v2.0 新經濟（67 號第五節）：v5 → v6（等級不變、照進度比例換算經驗值、金幣全部保留）；也要在補預設值之前
     if (EconMigrate.needs(s)) EconMigrate.migrate(s);
+    EastMigrate.migrate(s);
     State.migrateAudio(s.settings);   // v0.9.3 語速：舊的預設 1 倍 → 新的預設「稍快」（要在補預設值之前）
     var defaults = State.createNewState(s.player && s.player.name, s.player && s.player.gender, s.createdAt || 0);
     State.fillDefaults(s, defaults);

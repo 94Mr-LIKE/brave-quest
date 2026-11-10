@@ -28,6 +28,28 @@
  */
 window.VOICES = {
   speakers: {
+  // ═══ v4.2 第 4c 批 VOICES.speakers BEGIN（tools/v42_apply.js 每次整段重建）═══
+    cloud_shop_m42: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":false,"persona":"雲上小舖的老闆，講華語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
+    cloud_shop_m43: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":false,"persona":"雲上小舖的老闆，講華語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
+    cloud_shop_m44: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":false,"persona":"雲上小舖的老闆，講華語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
+    tao_fisher: {"name":"蘭嶼的漁夫","gender":"m","age":"adult","stage":"中年","look":"npc_tao_fisher","pitch":0.69,"rate":0.92,"taigi":false,"persona":"在飛魚架旁曬魚的達悟族漁夫，講話慢、很親切。","voice_share":"harbor_uncle"},
+    tao_taro: {"name":"種芋頭的阿姨","gender":"f","age":"adult","stage":"中年","look":"npc_tao_taro","pitch":0.96,"rate":1.02,"taigi":false,"persona":"在水芋田工作的達悟族阿姨，笑咪咪的。"},
+    tao_elder: {"name":"部落的長者","gender":"m","age":"elder","stage":"老年","look":"npc_tao_elder","pitch":0.66,"rate":0.76,"taigi":false,"persona":"坐在涼台上休息的部落長者，聲音穩、說話慢。","voice_share":"calla_farmer"},
+    tao_owner: {"name":"地下屋的屋主","gender":"m","age":"adult","stage":"青年","look":"npc_tao_owner","pitch":0.89,"rate":0.76,"taigi":false,"persona":"住在地下屋的屋主，有禮貌地提醒客人。","voice_share":"museum_guide"},
+    tao_boatman: {"name":"船屋的船主","gender":"m","age":"adult","stage":"中年","look":"npc_tao_boatman","pitch":0.63,"rate":0.8,"taigi":false,"persona":"照顧拼板舟的船主，聲音低沉。","voice_share":"inn_jinguashi"},
+    tao_kid: {"name":"蘭嶼的孩子","gender":"m","age":"child","stage":"小孩","look":"npc_tao_kid","pitch":1.39,"rate":1.2,"taigi":false,"persona":"在灘頭玩的蘭嶼孩子，活潑、愛打招呼。"},
+  // ═══ v4.2 第 4c 批 VOICES.speakers END ═══
+  // ═══ v4.2 第 4a 批 VOICES.speakers BEGIN（tools/v42_apply.js 每次整段重建）═══
+    paiyun_volunteer: {"name":"登山服務中心志工","gender":"m","age":"adult","stage":"青年","look":"npc_paiyun_volunteer","pitch":0.95,"rate":0.74,"taigi":true,"persona":"排雲登山服務中心的年輕志工，一直提醒安全。","voice_share":"culture_guide"},
+    ysnp_ranger: {"name":"國家公園解說員","gender":"m","age":"adult","stage":"青年","look":"npc_ysnp_ranger","pitch":0.95,"rate":0.8,"taigi":true,"persona":"玉山國家公園的年輕解說員，講話清楚。","voice_share":"innkeeper_port"},
+    bird_guide: {"name":"鳥類解說員","gender":"m","age":"adult","stage":"中年","look":"npc_bird_guide","pitch":0.84,"rate":0.64,"taigi":true,"persona":"戴眼鏡的鳥類解說員，講話輕聲慢慢的。","voice_share":"pastry_lk"},
+    inn_tataka: {"name":"山屋管理員","gender":"m","age":"adult","stage":"中年","look":"npc_inn_tataka","pitch":0.72,"rate":0.76,"taigi":true,"persona":"塔塔加山屋的管理員，熱心、怕客人著涼。","voice_share":"inn_taipei"},
+    trail_ranger: {"name":"步道巡山員","gender":"m","age":"adult","stage":"中年","look":"npc_trail_ranger","pitch":0.6,"rate":0.66,"taigi":true,"persona":"玉山步道的巡山員，聲音沉穩，很懂山。","voice_share":"reservoir_keeper"},
+    lodge_manager_py: {"name":"排雲山莊管理員","gender":"m","age":"elder","stage":"老年","look":"npc_lodge_manager_py","pitch":0.64,"rate":0.92,"taigi":true,"persona":"排雲山莊的老管理員，笑咪咪、愛叮嚀。","voice_share":"taro_seller"},
+    fo_echo: {"name":"喂喂回音霧","gender":"m","age":"child","stage":"小孩","look":"mon_fo_echo","pitch":1.68,"rate":1.26,"taigi":false,"persona":"會重複別人說的話的小霧團，聲音細細的、有回音。"},
+    fob_mist: {"name":"山嵐霧精","gender":"m","age":"adult","stage":"中年","look":"boss_fob_mist","pitch":0.53,"rate":0.62,"taigi":false,"persona":"低低貼著地面流動的大霧團，講話慢、輕輕的，其實很溫柔。"},
+    fob_king: {"name":"遺忘霧王‧佛格","gender":"m","age":"adult","stage":"中年","look":"boss_fob_king","pitch":0.5,"rate":0.87,"taigi":false,"persona":"像一本攤開的大書的霧雲，聲音低沉、溫柔又寂寞；最後變得暖暖的。"},
+  // ═══ v4.2 第 4a 批 VOICES.speakers END ═══
     // v4.1 中橫・南投：沿用草稿聲音，依 v4.0 規則避開重複音高與語速。
     road_engineer_cc: {"name":"管制站工程員","gender":"m","age":"adult","stage":"中年","look":"npc_road_engineer_cc","pitch":0.9,"rate":0.84,"taigi":true,"persona":"大禹嶺管制站的工程員，一直提醒行車安全。","voice_share":"inn_fucheng"},
     lodge_keeper_hh: {"name":"山莊管理員","gender":"m","age":"adult","stage":"中年","look":"npc_lodge_keeper_hh","pitch":0.76,"rate":1.06,"taigi":true,"persona":"高山山莊的管理員，熱心、怕客人著涼。","voice_share":"inn_keelung"},
@@ -239,6 +261,40 @@ window.VOICES = {
   pet: { name: "番薯仔", gender: "m", age: "child", pitch: 1.62, rate: 1.12, taigi: false, persona: "元氣十足、愛吃，說話短短的，常加「喔！」。" },
 
   monsters: {
+  // ═══ v4.2 第 4c 批 VOICES.monsters BEGIN（tools/v42_apply.js 每次整段重建）═══
+    fo_puff_s1: {"family":"spirit","size":"s","mood":"迷糊","pitch_shift":4,"cry":"噗噗……"},
+    fo_echo_s1: {"family":"spirit","size":"s","mood":"頑皮","pitch_shift":6,"cry":"喂——喂——"},
+    fo_frost_s1: {"family":"spirit","size":"s","mood":"神祕","pitch_shift":4,"cry":"叮……叮叮……"},
+    fo_eraser_s1: {"family":"spirit","size":"s","mood":"迷糊","pitch_shift":2,"cry":"擦擦……擦擦……"},
+    fo_umbrella_s1: {"family":"spirit","size":"s","mood":"頑皮","pitch_shift":3,"cry":"啪！撐開！"},
+    wxb_raincloud_s2: {"family":"spirit","size":"l","mood":"迷糊","pitch_shift":-9,"cry":"嘩啦啦……"},
+    mb_train_s2: {"family":"armor","size":"l","mood":"暴躁","pitch_shift":-10,"cry":"嘟嘟——！"},
+    fob_balloon_s2: {"family":"spirit","size":"l","mood":"神祕","pitch_shift":-8,"cry":"呼嚕嚕……"},
+    ghb_civetboss_s2: {"family":"beast","size":"l","mood":"頑皮","pitch_shift":-6,"cry":"嘿嘿嘿——！"},
+    mnb_goldjaw_s2: {"family":"rock","size":"l","mood":"暴躁","pitch_shift":-12,"cry":"轟隆隆！"},
+    pib_ship_s2: {"family":"spirit","size":"l","mood":"頑皮","pitch_shift":-7,"cry":"嘿呦——升帆！"},
+    mb_floodgate_s3: {"family":"armor","size":"boss","mood":"暴躁","pitch_shift":-9,"cry":"喀啦喀啦——！"},
+    mb_lantern_s3: {"family":"spirit","size":"boss","mood":"神祕","pitch_shift":-7,"cry":"呼嗚嗚……"},
+    fog_demon_s3: {"family":"spirit","size":"boss","mood":"神祕","pitch_shift":-6,"cry":"呼嗚嗚……"},
+    wxb_whale_s3: {"family":"spirit","size":"boss","mood":"神祕","pitch_shift":-10,"cry":"噗——呼——"},
+  // ═══ v4.2 第 4c 批 VOICES.monsters END ═══
+  // ═══ v4.2 第 4b 批 VOICES.monsters BEGIN（tools/v42_apply.js 每次整段重建）═══
+    fob_king: {"family":"spirit","size":"boss","mood":"神祕","pitch_shift":-9,"cry":"嗚……（書頁翻動）"},
+  // ═══ v4.2 第 4b 批 VOICES.monsters END ═══
+  // ═══ v4.2 第 4a 批 VOICES.monsters BEGIN（tools/v42_apply.js 每次整段重建）═══
+    fo_puff_cave: {"family":"spirit","size":"s","mood":"迷糊","pitch_shift":4,"cry":"噗噗……噗……"},
+    fo_echo: {"family":"spirit","size":"s","mood":"頑皮","pitch_shift":7,"cry":"喂——喂——"},
+    fo_frost: {"family":"spirit","size":"s","mood":"神祕","pitch_shift":5,"cry":"叮……叮叮……"},
+    fo_eraser: {"family":"spirit","size":"s","mood":"迷糊","pitch_shift":3,"cry":"擦擦……擦擦……"},
+    fo_umbrella: {"family":"spirit","size":"s","mood":"頑皮","pitch_shift":4,"cry":"啪！撐開！"},
+    an_muntjac: {"family":"beast","size":"s","mood":"暴躁","pitch_shift":5,"cry":"汪！汪！"},
+    fob_mist: {"family":"spirit","size":"boss","mood":"神祕","pitch_shift":-6,"cry":"呼嗚嗚……"},
+    fob_shadow_bat: {"family":"bat","size":"boss","mood":"神祕","pitch_shift":-3,"cry":"吱……（霧影）"},
+    fob_shadow_octo: {"family":"aquatic","size":"boss","mood":"神祕","pitch_shift":-5,"cry":"咕嚕……（霧影）"},
+    fob_shadow_frog: {"family":"frog","size":"boss","mood":"神祕","pitch_shift":-4,"cry":"呱……（霧影）"},
+    fob_shadow_tree: {"family":"plant","size":"boss","mood":"神祕","pitch_shift":-6,"cry":"沙沙……（霧影）"},
+    fob_shadow_golem: {"family":"rock","size":"boss","mood":"神祕","pitch_shift":-7,"cry":"咚……（霧影）"},
+  // ═══ v4.2 第 4a 批 VOICES.monsters END ═══
     // v4.1 中橫・南投怪物的戰鬥音效。
     wx_snow: {"family":"slime","size":"s","mood":"頑皮","pitch_shift":7,"cry":"咕嚕咕嚕！"},
     fo_puff: {"family":"spirit","size":"s","mood":"迷糊","pitch_shift":5,"cry":"噗噗……"},

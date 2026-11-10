@@ -68,6 +68,7 @@ window.WORLD = {
     // v4.1 定案座標；先走路到訪，再開放搭車。既有地區座標維持原值。
     { id: "R_ZHONGHENG", name: "中橫・合歡山", real_ref: "南投縣（大禹嶺、武嶺、合歡山）", map_entry: "M30", tx: 48, ty: 23, x: 0.655, y: 0.329, unlock_quest: null, unlock_visit: "M30" },
     { id: "R_PULI", name: "埔里・臺灣的中心", real_ref: "南投縣埔里鎮（虎子山、臺灣地理中心碑）", map_entry: "M31", tx: 56, ty: 39, x: 0.505, y: 0.385, unlock_quest: null, unlock_visit: "M31" },
-    { id: "R_XITOU", name: "溪頭森林・燈籠町", real_ref: "南投縣鹿谷鄉（溪頭、大學池、茶園）", map_entry: "M32", tx: 43, ty: 33, x: 0.385, y: 0.436, unlock_quest: null, unlock_visit: "M32" }
+    { id: "R_XITOU", name: "溪頭森林・燈籠町", real_ref: "南投縣鹿谷鄉（溪頭、大學池、茶園）", map_entry: "M32", tx: 43, ty: 33, x: 0.385, y: 0.436, unlock_quest: null, unlock_visit: "M32" },
+    { id: "R_YUSHAN", name: "玉山", real_ref: "玉山主峰（玉山國家公園）", map_entry: "M41", tx: 12, ty: 10, x: 0.535, y: 0.538, unlock_quest: "Q_END_2", hide_locked: true }   // v4.2 第 4c 批（B7）：破關後才出現（hide_locked：Q_END_2 完成前世界地圖、收集冊都不出現，4c 夜班）；座標換算與微調見 tools/v42_apply.js 8.6
   ]
 };

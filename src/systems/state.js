@@ -6,7 +6,7 @@
   var Daily = isNode ? require('./daily.js') : window.JQ.Daily;
   var Playtime = isNode ? require('./playtime.js') : window.JQ.Playtime;
 
-  var SCHEMA_VERSION = 7;   // v3.0 南部（70 號第五節）v7：legacySouth＋SouthMigrate（之前是 var SCHEMA_VERSION = 6;）； // v2.0 新經濟（67 號第五節）v6：升級表、經驗值換算＋EconMigrate；   // v1.3 台北章（62 號第五節）v5：legacyM05＋Ch3Migrate；   // v1.0 第一批（48 號 F9）v3：player.jobs、player.floor、player.skillSlots、trial；v1.1 第一章（59 號第五節）v4：chapter＋Ch1Migrate
+  var SCHEMA_VERSION = 8;   // v3.0 南部（70 號第五節）v7：legacySouth＋SouthMigrate（之前是 var SCHEMA_VERSION = 6;）； // v2.0 新經濟（67 號第五節）v6：升級表、經驗值換算＋EconMigrate；   // v1.3 台北章（62 號第五節）v5：legacyM05＋Ch3Migrate；   // v1.0 第一批（48 號 F9）v3：player.jobs、player.floor、player.skillSlots、trial；v1.1 第一章（59 號第五節）v4：chapter＋Ch1Migrate
   var SUBJECTS = ['國語', '英語', '數學', '自然', '社會'];
   var NAME_MAX = 8;
   var ANSWER_TIME_MODES = ['relaxed', 'standard', 'off'];
@@ -88,7 +88,7 @@
       equipment: { weapon: null, armor: null },
       pet: { hearts: 0, fed: 0 },
       lights: emptyBySubject(function () { return false; }),  // 從頭目拿回的五道光
-      lamps: emptyBySubject(function () { return false; }),   // 起點村子點亮的五盞知識燈
+      lamps: Object.assign(emptyBySubject(function () { return false; }), { '曙光': false }),   // 起點村子點亮的五盞知識燈
       stickers: [],
       story: ['intro'],
       activeQuest: null,          // v0.1 單地圖委託（保留給練習模式）
@@ -121,6 +121,9 @@
       legacySouth: false,         // v3.0 舊南部旗標（70 號 5.1；只有 SouthMigrate 會設成 true，Q_ORC_4 完成時關掉）
       flags: {},                  // v3.0 劇情旗標（fogling_joined＝霧仔加入；codex5 跟班）
       tierOpen: { inter: false, adv: false },   // v3.0：adv＝到過鹿耳門聖母廟（高級職業開放，v3.2 才有高級職業；v2.0 是「tierOpen: { inter: false },」）  // v2.0 中部（69 號 5.1）：到過大甲鎮瀾宮＝中級職業開放（第一次和鎮瀾宮志工說話時設定；不升 schema）
+      puzzles: {},
+      east: { lost: {}, clouds: {}, stars: {}, done: {} },
+      certs: {},
       ending: false
     };
   }

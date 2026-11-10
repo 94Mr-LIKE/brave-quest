@@ -15,6 +15,23 @@
       J.Assets.watch(this);
       J.Assets.queueBattleBg(this, this.data_.bg);
       J.Assets.queue(this, this.data_.mon.sprite, this.data_.mon.name);
+      var ps = this.data_.mon.phase_sprites || {}, self = this;   // v4.2 佛格的階段圖（第 2、4 階段）
+      Object.keys(ps).forEach(function (k) { if (J.Assets.has(ps[k])) J.Assets.queue(self, ps[k], self.data_.mon.name); });
+    }
+
+    /** v4.2 頭目換階段圖（遺忘霧王‧佛格 p2／p4）：同一個位置、同樣高度，圖讀不到就不換 */
+    setPhaseSprite(key) {
+      var tk = J.Assets.texKey(key), m = this.monster, self = this;
+      if (!m || !this.textures.exists(tk) || J.Assets.isPlaceholder(this, key)) return false;
+      // 等「生氣了」的脹大動畫（phaseEffect 約 0.65 秒）結束再換，換完以原本的高度重新算縮放
+      this.time.delayedCall(700, function () {
+        var h = m.height * self.baseScale;
+        m.setTexture(tk);
+        var s = h / Math.max(1, m.height);
+        m.setScale(s); self.baseScale = s;
+        if (self.shadow) self.shadow.width = m.displayWidth * 0.7;
+      });
+      return true;
     }
 
     create() {

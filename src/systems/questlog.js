@@ -81,6 +81,10 @@
       var nm = data && data.items[item] ? data.items[item].name : item;
       return { have: have, need: h.n, text: '收集「' + nm + '」' + have + '/' + h.n };
     }
+    if (kind === 'boss' && Array.isArray(q.bosses) && q.bosses.length) {   // v4.2 第 4c 批 Q_POST_3：四位霧將，順序自由
+      var got = q.bosses.filter(function (m) { return !!state.bosses[m]; }).length;
+      return { have: got, need: q.bosses.length, text: '淨化頭目 ' + got + '/' + q.bosses.length + (got >= q.bosses.length ? '（完成）' : '') };
+    }
     if (kind === 'boss') {
       var b = bossTarget(q);
       var bn = data && data.monsters[b] ? data.monsters[b].name : b;
@@ -137,7 +141,8 @@
   /** 頭目被淨化：自動完成相關 boss 委託。回傳完成結果陣列 */
   function onBossDefeated(state, quests, monsterId, data) {
     state.bosses[monsterId] = true;
-    return autoComplete(state, quests, data, function (q) { return (q.kind === 'boss') && bossTarget(q) === monsterId; });
+    // v4.2 第 4c 批：bosses（多位頭目）也算；寫了 finish 的委託（Q_POST_3 走進光柱才完成）不在這裡自動完成
+    return autoComplete(state, quests, data, function (q) { return (q.kind === 'boss') && !q.finish && (bossTarget(q) === monsterId || (Array.isArray(q.bosses) && q.bosses.indexOf(monsterId) >= 0)); });
   }
 
   function onChestOpened(state, quests, chestId, data) {

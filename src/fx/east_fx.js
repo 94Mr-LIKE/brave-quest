@@ -255,6 +255,7 @@
       self.stand(s.x, s.y, textTex(self.scene, 'east:sign:' + s.id, '木牌', 30, 22, '#fffbe8', '#8a5a30', 12));
       self.objs[key(s.x, s.y)] = { kind: 'east', what: 'sign', sign: s, prompt: '看看木牌' };
     });
+    this.buildCloudStairs();
     this.refreshBlocks();
     this.buildFog();
     this.buildTools();
@@ -603,6 +604,20 @@
     });
     this.redrawClouds();
   };
+  /** v4.2 第 4c 批：M41 雲階（定案第二節末段「程式畫硬雲（ending_done 後出現）」）：結局前是雲海、不畫、不能走；結局後畫成白色硬雲、可以走到 M42 */
+  Fx.prototype.buildCloudStairs = function () {
+    var self = this, cs = this.P.cloudStairs;
+    this.imgs.stairs = [];
+    if (!cs || !EF.cloudStairsOpen(this.state(), this.P)) return;
+    var k = tex(this.scene, 'east:cloud:hard', 40, 40, function (g) {
+      g.fillStyle = 'rgba(255,255,255,0.95)';
+      [[12, 24, 11], [24, 20, 12], [30, 27, 9], [18, 29, 10]].forEach(function (c) { g.beginPath(); g.arc(c[0], c[1], c[2], 0, Math.PI * 2); g.fill(); });
+      g.strokeStyle = 'rgba(190,205,235,0.9)'; g.lineWidth = 2; g.beginPath(); g.moveTo(4, 34); g.lineTo(36, 34); g.stroke();
+    });
+    cs.cells.forEach(function (p) { var img = self.ground(p[0], p[1], k); if (img.setDepth) img.setDepth(DEPTH.PATH); self.imgs.stairs.push(img); });
+  };
+  /** 這一格因為東部欄位「變成可以走」（目前只有開了的雲階） */
+  Fx.prototype.opens = function (x, y) { return !!this.P.cloudStairs && EF.cloudStairsOpen(this.state(), this.P, x, y); };
   Fx.prototype.redrawClouds = function () {
     var self = this, st = this.state();
     this.P.softClouds.forEach(function (c) { var hard = EF.has(st, 'clouds', c.id); (self.imgs.clouds[c.id] || []).forEach(function (img) { if (img.setVisible) img.setVisible(!hard); }); });
@@ -612,7 +627,7 @@
     this.imgs.stars = {}; this.imgs.consts = {};
     this.P.stars.forEach(function (s) {
       self.imgs.stars[s.i] = self.stand(s.x, s.y, starTex(sc, true));
-      self.objs[key(s.x, s.y)] = { kind: 'east', what: 'star', star: s, prompt: '撿起第 ' + (s.i + 1) + ' 顆星星（記憶卡碎片）' };
+      self.objs[key(s.x, s.y)] = { kind: 'east', what: 'star', star: s, prompt: '撿起第 ' + (s.i + 1) + ' 顆星星' };
     });
     this.P.constellations.forEach(function (c) {
       self.imgs.consts[c.id] = self.image(c.x * T + T / 2, c.y * T + 2, textTex(sc, 'east:const:0', '☆☆☆', 44, 16, '#fff3a0', 'rgba(11,18,54,.7)', 12), (c.y + 2) * T, 0.5, 1);
@@ -969,7 +984,7 @@
       case 'cloud': return this.hardenCloud(t.cloud);
       case 'star': return this.takeStar(t.star);
       case 'constellation': { var n = EF.constellationFill(this.state(), this.P)[t.con.id] || 0; return say(t.con.region + '的星座：已經放回 ' + n + '／' + EF.STARS_PER_CONSTELLATION + ' 顆星。', 'pet'); }
-      case 'sign': return say(t.sign.text || '……', 'narrator');
+      case 'sign': return t.sign.dialog ? sayId(t.sign.dialog, '木牌寫著：' + (t.sign.text || '……') + '。', 'pet') : say(t.sign.text || '……', 'narrator');   // v4.2 4c：M44 木牌播 D_SIGN_CHALLENGE
     }
   };
   /** 山屋小燈：點了就全滿並存檔、不收費；記成最近的休息點（71 號 2.1） */
@@ -1103,9 +1118,15 @@
     return handle;
   };
 
-  /** 遺失物（M39）：選要送回哪一座書架（用圖案選）；答對飛回書架、霧淡一級；答錯不扣血，東西飄走一點再回來（71 號 2.5） */
+  /** 遺失物（M39）：選要送回哪一座書架（用圖案選）；答對飛回書架、霧淡一級；答錯不扣血，東西飄走一點再回來（71 號 2.5）
+   *  v4.2：第一次碰遺失物＝開始 Q_CV_2（event，播 D_CV_2A）；每送回一件記一次進度，送滿 6 件委託完成（D_CV_2B） */
   Fx.prototype.returnLost = function (it) {
-    var self = this, P = this.P, st = this.state();
+    var self = this, g = G(), Q = (g && g.data && g.data.quests) || {}, st = this.state();
+    if (Q.Q_CV_2 && g.runEvent && J.QuestLog.status(st, Q, 'Q_CV_2') === 'available') return g.runEvent('Q_CV_2', this.scene, { noQuiz: true }).then(function () { return self.returnLostItem(it); });
+    return this.returnLostItem(it);
+  };
+  Fx.prototype.returnLostItem = function (it) {
+    var self = this, P = this.P, st = this.state(), g = G(), Q = (g && g.data && g.data.quests) || {};
     var opts = EF.lostChoices(P, it).map(function (cat) { var s = P.shelves.filter(function (x) { return x.cat === cat; })[0]; return { value: cat, text: (s ? s.emoji + ' ' : '') + cat }; });
     return J.UI.choose('這是「' + it.en + '」（' + it.name + '）。要送回哪一座書架？', opts).then(function (v) {
       if (v === null || v === undefined) return false;
@@ -1125,35 +1146,52 @@
       self.updateFog();
       var n = EF.lostReturned(st, P);
       banner(it.name + '回到「' + it.cat + '」書架了！（' + n + '／' + P.lostItems.length + '）' + (n === 6 ? '　北門可以過了！' : ''));
+      if (Q.Q_CV_2 && J.QuestLog.status(st, Q, 'Q_CV_2') === 'active') {
+        J.QuestLog.recordHelp(st, Q, 'Q_CV_2');
+        if (J.QuestLog.canComplete(st, Q, 'Q_CV_2', g.data) && g.completeQuest) g.completeQuest('Q_CV_2', self.scene);
+      }
       if (G().save) G().save();
       return true;
     });
   };
 
-  /** 題目（回音謎門、軟雲、星星用）：count 題、科目輪流；回傳 Promise<全部答對> */
+  /**
+   * v4.2 機關出題的題池（資深全端.md 10.2、K13）：組假委託 { subject, units, level_range, count }，用委託同一套 SceneFit 篩（扣寶箱題、外地、不在奇幻地圖的奇幻題）。
+   * 三層：strict → loose（SceneFit.helpFilter 自己會退，照樣扣寶箱題）→ 最後保險：拿掉 units、照樣 strict（console.warn）。回傳 { filter, tier }
+   */
+  function askFilter(questions, fake, mapId) {
+    var fit = J.SceneFit.helpFilter(questions, fake, mapId), s = fake.subject, P = fit.pools[s];
+    if (P && P.loose.length) return { filter: fit.filter, tier: fit.layer[s] };
+    var bare = { subject: s, level_range: fake.level_range, count: fake.count };
+    if (typeof console !== 'undefined') console.warn('[機關出題] ' + mapId + ' ' + s + ' 單元「' + (fake.units || []).join('、') + '」篩完沒有題目，拿掉單元再篩');
+    return { filter: function (x) { return J.SceneFit.strictFits(x, bare, mapId); }, tier: 'no_units' };
+  }
+  /** 題目（回音謎門、軟雲、星星用）：count 題、科目輪流；回傳 Promise<全部答對>。v4.2：照 askFilter 篩、不發答題獎勵（noPay）、篩完沒題不退回整科（noFallback） */
   Fx.prototype.ask = function (o) {
     var g = G(), st = this.state(), self = this, done = 0;
     return new Promise(function (resolve) {
       function next() {
         if (done >= o.count) { resolve(true); return; }
-        var subj = o.subjects[done % o.subjects.length], lo = o.levels[0], hi = o.levels[1];
-        var mk = function (units) { return J.Session.create(st, g.questions, subj, { mode: 'free', expMult: g.coef ? g.coef(self.mapId) : 1, filter: function (x) { return x.level >= lo && x.level <= hi && (!units || units.test(x.unit || '')); } }); };
-        var sess = mk(o.units), q = J.Session.next(sess, Date.now(), {});
-        if (!q && o.units) { sess = mk(null); q = J.Session.next(sess, Date.now(), {}); }
+        var subj = o.subjects[done % o.subjects.length];
+        var fit = askFilter(g.questions, { subject: subj, units: o.units || [], level_range: o.levels, count: o.count }, self.mapId);
+        var sess = J.Session.create(st, g.questions, subj, { mode: 'free', filter: fit.filter, noFallback: true, noPay: true }), q = J.Session.next(sess, Date.now(), {});
         if (!q) { toast('「' + subj + '」的題目還在準備中。'); resolve(false); return; }
-        J.Quiz.ask({ session: sess, mode: 'help', state: st, title: o.title, subtitle: (done + 1) + '/' + o.count,
+        J.Quiz.ask({ session: sess, mode: 'help', noPayNote: false, state: st, title: o.title, subtitle: (done + 1) + '/' + o.count,
           onSave: function () { g.save(); }, onRewards: function (res) { g.refreshHud(); if (res) g.afterReward(res.levelsGained); },
           onDone: function (r) { if (!r.correct) { g.save(); resolve(false); return; } done++; next(); } });
       }
       next();
     });
   };
-  /** 回音謎門（M37）：答對 3 題國語（第貳單元 臺灣風景畫＋第肆單元 奇幻故事屋，2–4 星）門就開；答錯不扣血，可以重來（71 號 2.3） */
+  /** 回音謎門（M37）：答對 3 題國語（第貳單元 臺灣風景畫＋第肆單元 奇幻故事屋，2–4 星）門就開；答錯不扣血，可以重來（71 號 2.3）
+   *  v4.2：門＝Q_CV_1（event）的觸發點；委託可接或進行中時走 G.runEvent（D_ECHO_DOOR → 3 題 → D_CV_1B），門跟著打開 */
   Fx.prototype.echoDoor = function () {
-    var self = this, st = this.state(), P = this.P;
-    return say('喂——？喂——？（回音霧學著你說話）門上的大嘴巴說：「答對三題，我就讓你過去。」', 'narrator').then(function () {
-      return self.ask({ subjects: ['國語'], levels: [2, 4], count: 3, units: /臺灣風景畫|奇幻故事屋/, title: '回音謎門' });
-    }).then(function (ok) {
+    var self = this, st = this.state(), P = this.P, g = G(), Q = (g && g.data && g.data.quests) || {};
+    var qs = Q.Q_CV_1 && g.runEvent ? J.QuestLog.status(st, Q, 'Q_CV_1') : null;
+    var run = qs === 'available' || qs === 'active' ? g.runEvent('Q_CV_1', this.scene) : say('喂——？喂——？（回音霧學著你說話）門上的大嘴巴說：「答對三題，我就讓你過去。」', 'narrator').then(function () {
+      return self.ask({ subjects: ['國語'], levels: [2, 4], count: 3, units: ['第貳單元 臺灣風景畫', '第肆單元 奇幻故事屋'], title: '回音謎門' });
+    });
+    return run.then(function (ok) {
       if (!ok) { toast('沒關係，再來找回音謎門就可以重來。'); return false; }
       EF.mark(st, 'done', 'echo_' + P.id);
       self.refreshBlocks();
@@ -1174,15 +1212,27 @@
       return true;
     });
   };
+  /** 星星（M43）：撿星星 → 答一般題（五科輪流，3–4 星；v4.2 裁定 K9，不做卡片系統）→ 星星自動飛回星座。
+   *  v4.2 第 4c 批：星星＝Q_POST_2（event）的進度；還沒接就先接下（播 D_POST_2A），15 顆都回去 → 委託完成（D_POST_2B） */
   Fx.prototype.takeStar = function (s) {
+    var self = this, g = G(), Q = (g && g.data && g.data.quests) || {}, st = this.state();
+    if (Q.Q_POST_2 && g.runEvent && J.QuestLog.status(st, Q, 'Q_POST_2') === 'available') return g.runEvent('Q_POST_2', this.scene, { noQuiz: true }).then(function () { return self.takeStarQuiz(s); });
+    return this.takeStarQuiz(s);
+  };
+  Fx.prototype.takeStarQuiz = function (s) {
     var self = this, st = this.state(), P = this.P;
-    // 71 號 2.9：題目從收集到的記憶卡出；遊戲還沒有記憶卡系統 → 先出一般題（五科輪流，3–4 星）
-    return this.ask({ subjects: [EF.SUBJECTS[s.i % EF.SUBJECTS.length]], levels: [3, 4], count: 1, title: '星星（記憶卡碎片）' }).then(function (ok) {
+    return this.ask({ subjects: [EF.SUBJECTS[s.i % EF.SUBJECTS.length]], levels: [3, 4], count: 1, title: '星星' }).then(function (ok) {
       if (!ok) return false;
       EF.mark(st, 'stars', String(s.i));
       self.redrawStars();
-      var con = P.constellations.filter(function (c) { return c.id === s.constellation; })[0];
-      banner('星星飛回' + (con ? con.region + '的' : '') + '星座了！' + (EF.constellationsDone(st, P) ? '　五個星座都完成了，北邊的星光拱門打開了！' : ''));
+      var con = P.constellations.filter(function (c) { return c.id === s.constellation; })[0], all = EF.constellationsDone(st, P);
+      banner('星星飛回' + (con ? con.region + '的' : '') + '星座了！' + (all ? '　五個星座都完成了，北邊的星光拱門打開了！' : ''));
+      var g = G(), Q = (g && g.data && g.data.quests) || {};
+      if (Q.Q_POST_2 && J.QuestLog.status(st, Q, 'Q_POST_2') === 'active') {
+        J.QuestLog.recordHelp(st, Q, 'Q_POST_2');
+        if (all) st.quests.Q_POST_2.progress = J.QuestLog.helpCount(Q.Q_POST_2);   // 15 顆都回去就算完成（進度以星星為準）
+        if (J.QuestLog.canComplete(st, Q, 'Q_POST_2', g.data) && g.completeQuest) g.completeQuest('Q_POST_2', self.scene);
+      }
       G().save();
       return true;
     });
@@ -1196,6 +1246,9 @@
     if ((st.titles = st.titles || []).indexOf('曙光的源頭') < 0) st.titles.push('曙光的源頭');
     banner('拿到稱號「曙光的源頭」！');
     G().save();
+    // v4.2 第 4c 批：走進光柱＝Q_POST_3 完成（boss ×4＋finish，完成時播 dialog_end＝D_POST_END）；沒有這個委託時照舊只播 D_POST_END
+    var g = G(), Q = (g.data && g.data.quests) || {};
+    if (Q.Q_POST_3 && g.completeQuest && J.QuestLog.canComplete(st, Q, 'Q_POST_3', g.data)) { g.completeQuest('Q_POST_3', this.scene); return true; }
     G().say('D_POST_END', [{ who: 'narrator', text: '溫暖的光從腳下升起。大家的記憶，都在這道光裡。' }]);
     return true;
   };
@@ -1250,7 +1303,7 @@
     var wrapped = [];
     function wrap(name, make) { var orig = P[name]; if (typeof orig !== 'function') { console.warn('[東部] MapScene 沒有 ' + name + '()，這個掛鉤略過'); return; } P[name] = make(orig); wrapped.push(name); }
     wrap('create', function (orig) { return function () { this.eastFx = null; var r = orig.apply(this, arguments); if (this.p && !this.transitioning) attach(this); return r; }; });
-    wrap('walkable', function (orig) { return function (x, y) { var fx = this.eastFx; if (fx && fx.blocks(x, y)) return false; return orig.call(this, x, y); }; });
+    wrap('walkable', function (orig) { return function (x, y) { var fx = this.eastFx; if (fx && fx.blocks(x, y)) return false; if (fx && fx.opens(x, y)) return true; return orig.call(this, x, y); }; });   // v4.2 4c：開了的雲階可以走
     wrap('tryStep', function (orig) { return function (dir) { var fx = this.eastFx; if (fx) { var r = fx.tryStep(dir); if (r === true || r === false) return r; } return orig.call(this, dir); }; });
     wrap('walkTo', function (orig) { return function (x, y, target) {
       var fx = this.eastFx;
@@ -1272,10 +1325,17 @@
     wrap('promptText', function (orig) { return function (t) { return t && t.kind === 'east' ? t.prompt : orig.call(this, t); }; });
     wrap('update', function (orig) { return function (time, delta) { var r = orig.call(this, time, delta); var fx = this.eastFx; if (fx && this.p && !this.transitioning) fx.update(time, delta); return r; }; });
     wrap('onWake', function (orig) { return function (data) { var r = orig.call(this, data); if (this.eastFx) this.eastFx.onWake(); return r; }; });
+    // v4.2 出口條件的 ctx（World.exitOpen 用）：這張圖的東部欄位＋戰力（只有 pl>= 條件才算）；最後的門的鎖門台詞順序（EastFields.lockDialogs）
+    P.exitContext = function (ex) {
+      var g = G(), needPl = [].concat((ex && ex.requires) || []).some(function (t) { return /^pl>=/.test(t); });
+      return { P: this.eastFx ? this.eastFx.P : null, pl: needPl && J.Character && J.Character.pl ? J.Character.pl(g.state, g.data) : undefined };
+    };
+    P.lockDialogIds = function (ex) { return EF && EF.lockDialogs ? EF.lockDialogs(ex, G().state, this.exitContext(ex)) : []; };
     EastFx.wrapped = wrapped;
     return true;
   }
 
+  EastFx.askFilter = askFilter;   // v4.2 測試用（N-Q-4）
   EastFx.Fx = Fx; EastFx.attach = attach; EastFx.hook = hook; EastFx.reduced = reduced; EastFx.speaker = speaker;
   EastFx.BREATH_MS = BREATH_MS; EastFx.MEMORY_SHOW_MS = MEMORY_SHOW_MS; EastFx.MEMORY_EXTRA_MS = MEMORY_EXTRA_MS; EastFx.COMPASS_DOT_MAPS = COMPASS_DOT_MAPS; EastFx.DEPTH = DEPTH;
   J.EastFx = EastFx;

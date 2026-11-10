@@ -229,7 +229,9 @@
       if (res.status === 'wrong') {
         J.Audio.play('wrong');
         if (battle) { end({ correct: false, res: res }, '沒打中……再加油！', 'bad'); return; }
-        feedback.textContent = '再想想看！可以按「需要幫忙」。';
+        // v4.2 黑熊固定題（o.optionWhy）：答錯時說明選的那一項為什麼不對（option_why 已跟著打亂換位），不扣血、再答一次
+        var why = o.optionWhy && Array.isArray(q.option_why) && answer.choice !== null && answer.choice !== undefined ? q.option_why[answer.choice] : '';
+        feedback.textContent = why ? why + '再想想看！' : '再想想看！可以按「需要幫忙」。';
         feedback.className = 'feedback bad';
         answer = { choice: null, multi: [], number: '', order: [] };
         buildAnswer();
@@ -244,7 +246,7 @@
       var deferred = !!(o.session && o.session.deferExp);
       var nopay = !!(o.session && o.session.noPay);   // v2.0 新經濟（67 號 5.3）：委託、寶箱答題不給，委託完成時一次給
       if (deferred) lines.push('打倒怪物時，才會拿到經驗值和金幣喔！');
-      else if (nopay) { if (o.mode === 'help') lines.push('完成委託時，會一次拿到經驗值和金幣喔！'); }
+      else if (nopay) { if (o.mode === 'help' && o.noPayNote !== false) lines.push('完成委託時，會一次拿到經驗值和金幣喔！'); }   // v4.2：洞窟機關不是委託（noPayNote:false）
       else if (r.outcome === 'repeat') lines.push('這題以前答對過囉：金幣 +' + r.coins);
       else lines.push('經驗值 +' + r.exp + '　金幣 +' + r.coins);
       if (r.bonusPaid && !deferred && !nopay) lines.push('（變化題一次答對，補回 ' + r.bonusPaid + ' 經驗值！）');

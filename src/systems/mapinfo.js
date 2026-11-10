@@ -33,7 +33,7 @@
   }
 
   // ---------------------------------------------------------------- 招牌
-  var SIGN_KIND = { general: 'general', item: 'item', weapon: 'weapon', armor: 'armor', inn: 'inn' };
+  var SIGN_KIND = { general: 'general', item: 'item', weapon: 'weapon', armor: 'armor', inn: 'inn', cloud_m42: 'armor', cloud_m43: 'weapon', cloud_m44: 'armor' };   // v4.2 4c：雲上小舖招牌照賣的東西（晨光雲衣、星光劍、曙光之鎧）
   var SIGN_TEXT = { general: '雜貨', item: '道具', weapon: '武器', armor: '防具', inn: '旅店' };
 
   /**

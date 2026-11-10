@@ -29,6 +29,8 @@
       mode: mode, expMult: opts.expMult || 1, filter: opts.filter || null, noRepeat: !!opts.noRepeat,
       noFallback: !!opts.noFallback,   // v2.2.1b：委託用——篩完沒題目時不要退回「整科都抽」（回傳 null，呼叫的人說「題目還在準備中」）
       noPay: !!opts.noPay,   // v2.0 新經濟（67 號第二節第 5 項）
+      // v4.2 黑熊固定題：fixed＝照順序出這幾題（不從題庫抽）；noRecord＝不進學習報表、適性難度、每日小任務、答對紀錄
+      fixed: Array.isArray(opts.fixed) ? opts.fixed : null, noRecord: !!opts.noRecord,
       // v0.9.3（老闆 2026-10-10 C1）戰鬥：答對、攻擊都不給經驗值和金幣，打倒怪物時才給（怪物的經驗值、金幣，見 game.js bvictory）；
       // 逃跑、累倒都不給。forgone＝這場答對「本來會拿到」的數字（只給測試看）。
       // 每日小任務的金幣等戰鬥結束才給：記在存檔 player.pendingDaily，由 settleBattle（戰鬥結束）或 settlePlayerExp（讀檔時）結算
@@ -52,6 +54,14 @@
   function next(sess, now, o) {
     o = o || {};
     var st = sess.state, q = null, isVariant = false;
+    if (sess.fixed) {
+      q = sess.fixed[o.fixedIndex !== undefined ? o.fixedIndex : sess.asked.length] || null;
+      if (!q) return null;
+      sess.asked.push(q.id); sess.q = q; sess.isVariant = false;
+      sess.wrongCount = 0; sess.hintsOpened = 0; sess.hintsUsed = false; sess.erased = []; sess.submitted = false; sess.solved = false;
+      sess.shownAt = now || 0;
+      return q;
+    }
     var subject = o.subject || sess.subject;
     var pool = sess.questions.filter(function (x) { return x.subject === subject && (!sess.filter || sess.filter(x)); });
     if (!pool.length && !sess.noFallback) pool = sess.questions.filter(function (x) { return x.subject === subject; });
@@ -107,10 +117,11 @@
     if (!q) return { status: 'none' };
     if (J.Guard.isLocked(sess.guard, now)) return { status: 'locked', remainingMs: J.Guard.remainingMs(sess.guard, now) };
     var correct = J.Answer.checkAnswer(q, response);
-    J.Report.recordSubmission(st, q);
+    if (!sess.noRecord) J.Report.recordSubmission(st, q);
     var g = J.Guard.onAnswer(sess.guard, correct, now - sess.shownAt, now);
     var adaptiveChange = 0;
-    if (!sess.submitted) {
+    if (!sess.submitted && sess.noRecord) sess.submitted = true;
+    else if (!sess.submitted) {
       sess.submitted = true;
       // v0.7.2 最近答過的題目（最多 10 題；回饋「題目有錯」時帶入最近 3 題的 ID）
       st.recentQ = (st.recentQ || []).filter(function (x) { return x !== q.id; });
@@ -133,6 +144,10 @@
     });
     if (sess.noPay) {   // v2.0 新經濟（67 號第二節第 5 項）：委託、寶箱答題不給經驗值和金幣；變化題（ADR-005）照樣出，但不再補回經驗值
       reward.exp = 0; reward.coins = 0; reward.bonusPaid = 0; reward.variantBonus = 0; reward.noPay = true;
+    }
+    if (sess.noRecord) {   // v4.2 固定題：只回報答對，不動存檔裡的學習紀錄
+      reward.needVariant = false;
+      return { status: 'correct', reward: reward, levelsGained: 0, dailyDone: [], quest: { questDone: false, lampLit: false, allLit: false }, adaptiveChange: 0, needVariant: false, explanation: q.explanation || '' };
     }
     if (sess.isVariant) st.pendingVariant = null;
     if (reward.needVariant) st.pendingVariant = J.Rewards.makePending(q, reward.variantBonus);

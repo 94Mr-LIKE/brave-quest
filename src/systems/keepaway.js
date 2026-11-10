@@ -4,14 +4,24 @@
   var COOLDOWN_MS = 3000;
   var notices = new WeakMap();
 
-  function areas(map) { return map && Array.isArray(map.keepaway) ? map.keepaway : []; }
+  /** v4.2（K10）保護區可以寫 show: { after, until }（同 npcs[].show）：after 完成以後、until 完成以前才有。
+   *  state 沒給時用遊戲目前的存檔；都沒有（資料檢查工具）時，有條件的保護區當成不在（不會一直擋路） */
+  function currentState(state) { return state || (typeof window !== 'undefined' && window.JQ && window.JQ.Game && window.JQ.Game.state) || null; }
+  function shown(a, state) {
+    if (!a || !a.show) return true;
+    var st = currentState(state);
+    if (!st || !st.quests) return false;
+    var done = function (id) { var r = st.quests[id]; return !!(r && r.status === 'done'); };
+    return (!a.show.after || done(a.show.after)) && !(a.show.until && done(a.show.until));
+  }
+  function areas(map, state) { return map && Array.isArray(map.keepaway) ? map.keepaway.filter(function (a) { return shown(a, state); }) : []; }
   function validArea(a) {
     return a && Number.isInteger(a.x) && Number.isInteger(a.y) && Number.isInteger(a.radius) && a.radius >= 1 && a.radius <= 8;
   }
-  function areaAt(map, x, y) {
-    return areas(map).find(function (a) { return validArea(a) && Math.max(Math.abs(x - a.x), Math.abs(y - a.y)) < a.radius; }) || null;
+  function areaAt(map, x, y, state) {
+    return areas(map, state).find(function (a) { return validArea(a) && Math.max(Math.abs(x - a.x), Math.abs(y - a.y)) < a.radius; }) || null;
   }
-  function blocked(map, x, y) { return !!areaAt(map, x, y); }
+  function blocked(map, x, y, state) { return !!areaAt(map, x, y, state); }
 
   /** 只有玩家嘗試靠近才提示；同一張地圖、同一個區域各自計時。 */
   function warn(map, x, y, show, now) {
@@ -57,7 +67,7 @@
     return errors;
   }
 
-  var KeepAway = { blocked: blocked, warn: warn, warnStep: warnStep, validate: validate, COOLDOWN_MS: COOLDOWN_MS };
+  var KeepAway = { shown: shown, blocked: blocked, warn: warn, warnStep: warnStep, validate: validate, COOLDOWN_MS: COOLDOWN_MS };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.KeepAway = KeepAway; }
   if (typeof module !== 'undefined') module.exports = KeepAway;
 })();

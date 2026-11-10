@@ -122,7 +122,16 @@
         dialog_before: m.dialog_before || null, dialog_after: m.dialog_after || null,
         // v3.0：舊南部的數值 legacy_s（legacySouth 時用）要帶進遊戲；elite＝精英（不是頭目）
         legacy_s: m.legacy_s ? Object.assign({}, m.legacy_s) : null, elite: m.elite === true,
+        trial: m.trial === true,   // v4.2（K7）五燈霧影：精英一階段，打贏也寫進 state.bosses、完成 Q_CV_3x、點試煉燈
         dialog_after_once: m.dialog_after_once || null,   // v4.0 東部：清醒後第一次的提醒
+        // v4.2 第 4c 批：4b 加的頭目欄位要帶進遊戲（原本這裡沒有複製，遊戲裡的佛格拿不到不計時、換階段台詞與圖、結局分支）；
+        //   phase_q_by／exact_phases＝每階段題數（佛格第 4 階段答對 1 題，執行長裁定）
+        untimed_phases: Array.isArray(m.untimed_phases) ? m.untimed_phases.slice() : null,
+        phase_dialogs: m.phase_dialogs ? Object.assign({}, m.phase_dialogs) : null,
+        phase_sprites: m.phase_sprites ? Object.assign({}, m.phase_sprites) : null,
+        phase_q_by: m.phase_q_by ? Object.assign({}, m.phase_q_by) : null,
+        exact_phases: Array.isArray(m.exact_phases) ? m.exact_phases.slice() : null,
+        ending: m.ending || null, ref_mobs: Array.isArray(m.ref_mobs) ? m.ref_mobs.slice() : null,
         desc: m.desc || '', wake: m.wake || ((m.name || id) + '清醒了，開心地跑走了。')
       };
     });
@@ -215,14 +224,29 @@
     return null;
   }
 
-  /** v1.2（61 號 2.0）出口可以走嗎：有 requires（委託 id 或陣列）時，那些委託都完成才可以走；沒寫就一直可以走 */
-  function exitOpen(ex, state) {
+  /** v4.2：Q_ 開頭以外的出口條件（lost_items>=6、trial_lamps_all、puzzle.P4-2、pl>=60、item:…、ending_done…）交給 EastFields.requirementMet */
+  function eastFields() {
+    if (typeof window !== 'undefined' && window.JQ && window.JQ.EastFields) return window.JQ.EastFields;
+    return typeof window === 'undefined' && typeof require === 'function' ? require('./east_fields.js') : null;
+  }
+  function isQuestToken(id) { return /^Q_\w+$/.test(id); }
+  /**
+   * v1.2（61 號 2.0）出口可以走嗎：有 requires（委託 id 或陣列）時，那些委託都完成才可以走；沒寫就一直可以走。
+   * v4.2：其他寫法交 EastFields（ctx＝{ P: 這張圖的東部欄位, pl: Character.pl() }；沒載入就當沒過）
+   */
+  function exitOpen(ex, state, ctx) {
     if (!ex || !ex.requires) return true;
     var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (typeof window === 'undefined' && typeof require === 'function' ? require('./testmode.js') : null);   // v1.3.1 測試模式（大人試玩）：不擋
     if (TM && TM.on()) return true;
     var qs = (state && state.quests) || {};
-    return (Array.isArray(ex.requires) ? ex.requires : [ex.requires]).every(function (id) { return !!(qs[id] && qs[id].status === 'done'); });
+    return (Array.isArray(ex.requires) ? ex.requires : [ex.requires]).every(function (id) {
+      if (isQuestToken(id)) return !!(qs[id] && qs[id].status === 'done');
+      var EF = eastFields();
+      return !!(EF && EF.requirementMet(id, state, ctx || {}));
+    });
   }
+  /** v4.2：不是委託 id 的條件寫法認不認得（validate 用） */
+  var REQ_TOKEN_RE = /^(lost_items>=\d+|trial_lamps_all|puzzle\.P\d-\d|pl>=\d+|item:\w+|constellations_done|ending_done)$/;
 
   /** 檢查資料彼此有沒有對上。回傳警告字串陣列 */
   function validate(data) {
@@ -238,7 +262,7 @@
       if (Object.keys(unknown).length) warn.push(id + '：圖例沒有的字元 ' + Object.keys(unknown).join(''));
       (m.exits || []).forEach(function (e) {
         if (!maps[e.to]) warn.push(id + '：出口通往不存在的地圖 ' + e.to);
-        if (e.requires && ![].concat(e.requires).every(function (r) { return data.quests[r]; })) warn.push(id + '：出口 (' + e.x + ',' + e.y + ') 的 requires 委託不存在');
+        if (e.requires && ![].concat(e.requires).every(function (r) { return isQuestToken(r) ? data.quests[r] : REQ_TOKEN_RE.test(r) && (!/^item:/.test(r) || data.items[r.slice(5)]); })) warn.push(id + '：出口 (' + e.x + ',' + e.y + ') 的 requires 委託不存在');
         if (e.requires_dialog && !data.dialogs[e.requires_dialog]) warn.push(id + '：出口 (' + e.x + ',' + e.y + ') 的 requires_dialog ' + e.requires_dialog + ' 不存在');
       });
       (m.npcs || []).forEach(function (n) {
@@ -256,7 +280,7 @@
 
   function mapCoef() { return 1; }   // v2.0 新經濟（67 號第二節第 2 項）：地圖係數取消，一律 1.0（舊表 1.0／1.1／1.2／1.3／1.5；26 號直接用每一區的 E、G）
 
-  var World = { EFFECTS: EFFECTS, DAMAGE_EFFECTS: DAMAGE_EFFECTS, TIER_MULT: TIER_MULT, normalizeJobRules: normalizeJobRules, CORE_ITEMS: CORE_ITEMS, CORE_BASE: CORE_BASE, battleBg: battleBg, normalizeShops: normalizeShops, CORE_JOBS: CORE_JOBS, normalizeItems: normalizeItems, normalizeJobs: normalizeJobs, normalizeMonsters: normalizeMonsters, fromWindow: fromWindow, size: size, charAt: charAt, tileDef: tileDef, blockers: blockers, isWalkable: isWalkable, exitAt: exitAt, exitOpen: exitOpen, validate: validate, mapCoef: mapCoef };
+  var World = { REQ_TOKEN_RE: REQ_TOKEN_RE, isQuestToken: isQuestToken, EFFECTS: EFFECTS, DAMAGE_EFFECTS: DAMAGE_EFFECTS, TIER_MULT: TIER_MULT, normalizeJobRules: normalizeJobRules, CORE_ITEMS: CORE_ITEMS, CORE_BASE: CORE_BASE, battleBg: battleBg, normalizeShops: normalizeShops, CORE_JOBS: CORE_JOBS, normalizeItems: normalizeItems, normalizeJobs: normalizeJobs, normalizeMonsters: normalizeMonsters, fromWindow: fromWindow, size: size, charAt: charAt, tileDef: tileDef, blockers: blockers, isWalkable: isWalkable, exitAt: exitAt, exitOpen: exitOpen, validate: validate, mapCoef: mapCoef };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.World = World; }
   if (typeof module !== 'undefined') module.exports = World;
 })();

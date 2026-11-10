@@ -126,6 +126,42 @@ window.ART = {
   },
   "M32": {
    "bg": "bg_M32.webp"
+  },
+  "M33": {
+   "bg": "bg_M33.webp"
+  },
+  "M34": {
+   "bg": "bg_M34.webp"
+  },
+  "M35": {
+   "bg": "bg_M35.webp"
+  },
+  "M36": {
+   "bg": "bg_M36.webp"
+  },
+  "M37": {
+   "bg": "bg_M37.webp"
+  },
+  "M38": {
+   "bg": "bg_M38.webp"
+  },
+  "M39": {
+   "bg": "bg_M39.webp"
+  },
+  "M40": {
+   "bg": "bg_M40.webp"
+  },
+  "M41": {
+   "bg": "bg_M41.webp"
+  },
+  "M42": {
+   "bg": "bg_M42.webp"
+  },
+  "M43": {
+   "bg": "bg_M43.webp"
+  },
+  "M44": {
+   "bg": "bg_M44.webp"
   }
  },
  "battle": {
@@ -215,6 +251,60 @@ window.ART = {
   "npc_dawn_ring_pu": "assets/npcs/npc_dawn_ring_pu.png",
   "item_dawn_shard_c": "assets/items/item_dawn_shard_c.png",
   "item_dawn_shard_s": "assets/items/item_dawn_shard_s.png",
-  "item_dawn_shard_e": "assets/items/item_dawn_shard_e.png"
+  "item_dawn_shard_e": "assets/items/item_dawn_shard_e.png",
+  "npc_paiyun_volunteer": "assets/npcs/npc_paiyun_volunteer.png",
+  "npc_ysnp_ranger": "assets/npcs/npc_ysnp_ranger.png",
+  "npc_bird_guide": "assets/npcs/npc_bird_guide.png",
+  "npc_inn_tataka": "assets/npcs/npc_inn_tataka.png",
+  "npc_trail_ranger": "assets/npcs/npc_trail_ranger.png",
+  "npc_lodge_manager_py": "assets/npcs/npc_lodge_manager_py.png",
+  "npc_pheasant": "assets/npcs/npc_pheasant.png",
+  "npc_bear": "assets/npcs/npc_bear.png",
+  "mon_an_muntjac": "assets/monsters/mon_an_muntjac.png",
+  "mon_fo_puff_cave": "assets/monsters/mon_fo_puff_cave.png",
+  "mon_fo_echo": "assets/monsters/mon_fo_echo.png",
+  "mon_fo_frost": "assets/monsters/mon_fo_frost.png",
+  "mon_fo_eraser": "assets/monsters/mon_fo_eraser.png",
+  "mon_fo_umbrella": "assets/monsters/mon_fo_umbrella.png",
+  "boss_fob_shadow_bat": "assets/monsters/boss_fob_shadow_bat.png",
+  "boss_fob_shadow_octo": "assets/monsters/boss_fob_shadow_octo.png",
+  "boss_fob_shadow_frog": "assets/monsters/boss_fob_shadow_frog.png",
+  "boss_fob_shadow_tree": "assets/monsters/boss_fob_shadow_tree.png",
+  "boss_fob_shadow_golem": "assets/monsters/boss_fob_shadow_golem.png",
+  "boss_fob_mist": "assets/monsters/boss_fob_mist.png",
+  "item_climb_permit": "assets/items/item_climb_permit.png",
+  "item_mountain_fruit": "assets/items/item_mountain_fruit.png",
+  "item_grass_jelly": "assets/items/item_grass_jelly.png",
+  "item_gear_z14_dawn": "assets/items/item_gear_z14_dawn.png",
+  "boss_fob_king": "assets/monsters/boss_fob_king.png",
+  "boss_fob_king_p2": "assets/monsters/boss_fob_king_p2.png",
+  "boss_fob_king_p4": "assets/monsters/boss_fob_king_p4.png",
+  "npc_fog_cloud": "assets/npcs/npc_fog_cloud.png",
+  "lamp_dawn_on": "assets/ui/lamp_dawn_on.png",
+  "lamp_dawn_off": "assets/ui/lamp_dawn_off.png",
+  "mon_fo_puff_s1": "assets/monsters/mon_fo_puff_s1.png",
+  "mon_fo_echo_s1": "assets/monsters/mon_fo_echo_s1.png",
+  "mon_fo_frost_s1": "assets/monsters/mon_fo_frost_s1.png",
+  "mon_fo_eraser_s1": "assets/monsters/mon_fo_eraser_s1.png",
+  "mon_fo_umbrella_s1": "assets/monsters/mon_fo_umbrella_s1.png",
+  "boss_wxb_raincloud_s2": "assets/monsters/boss_wxb_raincloud_s2.png",
+  "boss_mb_train_s2": "assets/monsters/boss_mb_train_s2.png",
+  "boss_fob_balloon_s2": "assets/monsters/boss_fob_balloon_s2.png",
+  "boss_mnb_goldjaw_s2": "assets/monsters/boss_mnb_goldjaw_s2.png",
+  "boss_pib_ship_s2": "assets/monsters/boss_pib_ship_s2.png",
+  "boss_mb_floodgate_s3": "assets/monsters/boss_mb_floodgate_s3.png",
+  "boss_mb_lantern_s3": "assets/monsters/boss_mb_lantern_s3.png",
+  "boss_fog_demon_s3": "assets/monsters/boss_fog_demon_s3.png",
+  "boss_wxb_whale_s3": "assets/monsters/boss_wxb_whale_s3.png",
+  "item_gear_z15_cloud": "assets/items/item_gear_z15_cloud.png",
+  "item_gear_z16_star": "assets/items/item_gear_z16_star.png",
+  "item_gear_z17_dawn": "assets/items/item_gear_z17_dawn.png",
+  "npc_tao_fisher": "assets/npcs/npc_tao_fisher.png",
+  "npc_tao_taro": "assets/npcs/npc_tao_taro.png",
+  "npc_tao_elder": "assets/npcs/npc_tao_elder.png",
+  "npc_tao_owner": "assets/npcs/npc_tao_owner.png",
+  "npc_tao_boatman": "assets/npcs/npc_tao_boatman.png",
+  "npc_tao_kid": "assets/npcs/npc_tao_kid.png",
+  "npc_goat_ly": "assets/npcs/npc_goat_ly.png"
  }
 };

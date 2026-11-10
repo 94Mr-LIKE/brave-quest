@@ -53,7 +53,7 @@
   }
 
   function litCount(state) {
-    return Object.keys(state.lamps).filter(function (k) { return state.lamps[k]; }).length;
+    return ['國語', '英語', '數學', '自然', '社會'].filter(function (k) { return state.lamps[k]; }).length;
   }
 
   function storyText(id) {

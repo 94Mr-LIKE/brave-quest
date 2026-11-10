@@ -27,7 +27,7 @@
   var Ice = isNode ? require('./ice.js') : window.JQ.Ice;
 
   var FIELDS = ['fog_mask', 'lodge_lamps', 'heal_points', 'echo_door', 'puzzles', 'ice_rooms', 'decals', 'shelves', 'lost_items', 'carpets',
-    'trial_lamps', 'soft_clouds', 'constellations', 'stars', 'light_pillar', 'night_zone', 'signs'];
+    'trial_lamps', 'soft_clouds', 'constellations', 'stars', 'light_pillar', 'night_zone', 'signs', 'cloud_stairs'];   // v4.2 4c：cloud_stairs＝M41 結局後的硬雲雲階（requires 成立才可走、程式畫雲）
   var SUBJECTS = ['國語', '英語', '數學', '自然', '社會'];
   var FOG = { radius: 4, compassRadius: 6, alpha: 0.92, levels: 8 };   // 71 號 2.3、2.5
   var COMPASS_ITEM = 'dawn_compass';
@@ -195,7 +195,10 @@
       if (!Array.isArray(nz) || nz.length !== 4) issues.push('night_zone 的 area 要是 [x, y, 寬, 高]');
       o.nightZone = { area: Array.isArray(nz) ? nz.slice() : [0, 0, 0, 0] };
     } else o.nightZone = null;
-    o.signs = (map.signs || []).filter(function (s) { return s && Number.isInteger(s.x) && Number.isInteger(s.y); }).map(function (s) { return { id: s.id, x: s.x, y: s.y, text: SIGN_TEXT[s.id] || s.text || '' }; });
+    o.signs = (map.signs || []).filter(function (s) { return s && Number.isInteger(s.x) && Number.isInteger(s.y); }).map(function (s) { return { id: s.id, x: s.x, y: s.y, text: SIGN_TEXT[s.id] || s.text || '', dialog: s.dialog || null }; });
+    // v4.2 第 4c 批：M41 雲階（地圖組 json 的 cloud_stairs 傳送點）：格子是雲海「~」，requires（ending_done）成立後才可走、程式畫成硬雲
+    o.cloudStairs = map.cloud_stairs ? { cells: (map.cloud_stairs.cells || []).filter(isPt).map(pt), requires: map.cloud_stairs.requires || 'ending_done' } : null;
+    if (o.cloudStairs) o.cloudStairs.cells.forEach(function (p) { inside(p, '雲階'); });
     o.bosses = (map.spawns || []).filter(function (s) { return s.boss; }).map(function (s) { return s.monster; });
     // 座標都要在地圖裡
     function inside(p, what) { if (!isPt(p) || p[0] < 0 || p[1] < 0 || (size.w && p[0] >= size.w) || (size.h && p[1] >= size.h)) issues.push(what + ' (' + p + ') 不在地圖裡'); }
@@ -210,7 +213,7 @@
   }
 
   // ═════════════════════ 狀態判斷 ═════════════════════
-  function trialLampLit(state, t) { return !!(state && ((isObj(state.trialLamps) && state.trialLamps[t.subject] === true) || (t.boss && isObj(state.bosses) && state.bosses[t.boss]))); }
+  function trialLampLit(state, t) { return !!(state && t.boss && isObj(state.bosses) && state.bosses[t.boss]); }   // v4.2 定案 #16：五燈亮不亮只看 state.bosses（不開 trialLamps 欄位）
   function trialLampsAll(state, P) { return P.trialLamps.length > 0 && P.trialLamps.every(function (t) { return trialLampLit(state, t); }); }
   function lostReturned(state, P) { return P.lostItems.filter(function (it) { return has(state, 'lost', it.id); }).length; }
   function starsCollected(state, P) { return P.stars.filter(function (s) { return has(state, 'stars', String(s.i)); }).length; }
@@ -226,11 +229,17 @@
   function lostVisible(state, it) { return !it.hidden || CavePuzzle.solved(state, it.hidden); }
   function puzzleVisible(state, P, pz) { return pz.appearsAfter !== 'trial_lamps_all' || trialLampsAll(state, P); }
   function bossesDone(state, P) { return P.bosses.length > 0 && P.bosses.every(function (b) { return !!(state && state.bosses && state.bosses[b]); }); }
+  /** v4.2 4c：M41 雲階開了沒（cloud_stairs.requires，預設 ending_done）；給 x、y 時再看那一格是不是雲階 */
+  function cloudStairsOpen(state, P, x, y) {
+    var cs = P && P.cloudStairs;
+    if (!cs || !cs.cells.length || !requirementMet(cs.requires, state, { P: P })) return false;
+    return x === undefined ? true : cs.cells.some(function (c) { return c[0] === x && c[1] === y; });
+  }
 
   /**
    * 出口、機關條件（71 號 2.2、2.6）：委託 id、'lost_items>=6'、'trial_lamps_all'、'puzzle.P4-2'、'pl>=60'、'item:dawn_compass'、
    * 'constellations_done'、'ending_done'（flags）。ctx = { P: parse 的結果, pl: 戰力, flags }。不認得的寫法一律當「沒過」。
-   * （這一版還沒接到 World.exitOpen：出口在地圖整合時一起接，見 交接_前端v40.md）
+   * （v4.2：World.exitOpen 遇到 Q_ 開頭以外的寫法交給這裡；MapScene.arrive 傳 ctx）
    */
   function requirementMet(token, state, ctx) {
     ctx = ctx || {};
@@ -243,9 +252,25 @@
     if ((m = /^pl>=(\d+)$/.exec(token))) return typeof ctx.pl === 'number' && ctx.pl >= Number(m[1]);
     if ((m = /^item:(\w+)$/.exec(token))) return !!(state && state.inventory && state.inventory[m[1]] > 0);
     if (token === 'constellations_done') return constellationsDone(state, P);
-    if (token === 'ending_done') return !!(state && ((isObj(state.flags) && state.flags.ending_done === true) || state.ending === true));
+    if (token === 'ending_done') return !!(state && ((isObj(state.flags) && state.flags.ending_done === true)));
     if (/^Q_\w+$/.test(token)) return !!(state && state.quests && state.quests[token] && state.quests[token].status === 'done');
     return false;
+  }
+
+  /**
+   * v4.2 門的鎖門台詞（fill 檔註解的播放規則）：最後的門（requires_dialog D_EXIT_LOCK_CV）先播 D_EXIT_LOCK_CV，
+   * 再依序接 ① 五盞燈沒全亮 → _LAMP ② 燈全亮、五角星盤 P4-2 沒解 → _STAR（燈沒全亮時星盤還沒出現，不播）③ 戰力 < 60 → _PL；
+   * 可以同時缺好幾項，照 ①②③ 接著播。其他出口只播自己的 requires_dialog。回傳台詞 id 陣列（沒有就空陣列）
+   */
+  function lockDialogs(ex, state, ctx) {
+    if (!ex || !ex.requires_dialog) return [];
+    if (ex.requires_dialog !== 'D_EXIT_LOCK_CV') return [ex.requires_dialog];
+    ctx = ctx || {};
+    var out = ['D_EXIT_LOCK_CV'], req = [].concat(ex.requires), lamps = requirementMet('trial_lamps_all', state, ctx);
+    if (req.indexOf('trial_lamps_all') >= 0 && !lamps) out.push('D_EXIT_LOCK_CV_LAMP');
+    req.forEach(function (t) { if (/^puzzle\./.test(t) && lamps && !requirementMet(t, state, ctx)) out.push('D_EXIT_LOCK_CV_STAR'); });
+    req.forEach(function (t) { if (/^pl>=/.test(t) && !requirementMet(t, state, ctx)) out.push('D_EXIT_LOCK_CV_PL'); });
+    return out;
   }
 
   /**
@@ -399,7 +424,7 @@
     STARS_PER_CONSTELLATION: STARS_PER_CONSTELLATION, WAY_MAPS: WAY_MAPS, hasEast: hasEast, hasWayfinding: hasWayfinding, parse: parse, mergePuzzle: mergePuzzle, inRect: inRect, inXYWH: inXYWH, key: key,
     progress: progress, mark: mark, has: has, trialLampLit: trialLampLit, trialLampsAll: trialLampsAll, lostReturned: lostReturned, lostVisible: lostVisible,
     starsCollected: starsCollected, constellationFill: constellationFill, constellationsDone: constellationsDone, hasCompass: hasCompass, puzzleVisible: puzzleVisible,
-    bossesDone: bossesDone, requirementMet: requirementMet, fogLevel: fogLevel, puzzleAt: puzzleAt, iceRoomAt: iceRoomAt, blockedCells: blockedCells,
+    bossesDone: bossesDone, cloudStairsOpen: cloudStairsOpen, requirementMet: requirementMet, lockDialogs: lockDialogs, fogLevel: fogLevel, puzzleAt: puzzleAt, iceRoomAt: iceRoomAt, blockedCells: blockedCells,
     wayTarget: wayTarget, arrowAngle: arrowAngle, pathTo: pathTo, lostChoices: lostChoices, GENDERED_ENDING: GENDERED_ENDING, endingArt: endingArt, MARKER_SHELF: MARKER_SHELF };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.EastFields = EastFields; }
   if (typeof module !== 'undefined') module.exports = EastFields;

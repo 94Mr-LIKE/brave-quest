@@ -83,6 +83,9 @@
         var m = g.data.monsters[s.monster];
         if (m) A.queue(self, m.sprite, m.name);
       });
+      // v4.2 第六座燈座（金色燈）、大結局過場的鎮民
+      if ((map.lamps || []).some(function (l) { return l.subject === '曙光'; })) ['lamp_dawn_on', 'lamp_dawn_off'].forEach(function (k) { if (A.has(k)) A.queue(self, k); });
+      if (Array.isArray(g.endingExtras) && g.endingExtrasMap === this.mapId) g.endingExtras.forEach(function (e) { if (A.has(e.sprite)) A.queue(self, e.sprite); });
       // v0.9.3 會走動的動物（黃牛）：美術還沒畫時用暫代圖（四方向走路格式）
       J.MapInfo.animalSpecs(map).forEach(function (a) { A.queue(self, a.sprite, a.name); });
       // v0.9.4 車站：新站牌、候車亭（sprites.js 有才載入；沒有時用程式畫的站牌）
@@ -139,7 +142,7 @@
       this.encounterCooldown = this.time.now + 1500;
       this.blocked = J.World.blockers(map);
       this.npcList().forEach(function (n) { self.blocked[n.x + ',' + n.y] = true; });
-      (map.lamps || []).forEach(function (l) { self.blocked[l.x + ',' + l.y] = true; });
+      (map.lamps || []).forEach(function (l) { if (self.lampShown(l)) self.blocked[l.x + ',' + l.y] = true; });   // v4.2 第六座燈座沒出現前不擋路
       (map.roadsigns || []).forEach(function (r) { self.blocked[r.x + ',' + r.y] = true; });   // v1.1 路牌（格子本來就是 K）
 
       this.hasBg = !!(this.bgFile && this.textures.exists('map:' + this.bgFile));
@@ -353,8 +356,10 @@
 
     /** 出口的傳送光圈 */
     buildExits() {
-      var self = this;
+      var self = this, st = G().state;
       (this.map.exits || []).forEach(function (e) {
+        // v4.2 第 4c 批：M41 雲階（requires 含 ending_done）結局前是雲海，不畫傳送光圈
+        if ([].concat(e.requires || []).indexOf('ending_done') >= 0 && !(st && st.flags && st.flags.ending_done === true)) return;
         var img = self.add.image(e.x * T, e.y * T, self.tex, self.frameOf('warp_a')).setOrigin(0, 0).setScale(S).setDepth(0.5).setAlpha(0.9);
         self.anims_.push({ img: img, a: self.frameOf('warp_a'), b: self.frameOf('warp_b') });
       });
@@ -447,6 +452,7 @@
     buildObjects() {
       var self = this, g = G(), st = g.state;
       var stn = this.map.station;
+      if (stn && stn.requires && !J.World.exitOpen({ requires: stn.requires }, st)) stn = null;   // v4.2 4c 夜班：M41 玉山站（requires ending_done）結局前不出現、不能搭
       this.station = stn || null;
       // v1.1 眺望點（59 號 2.9.4 美人山）：可以走的格子，放一支程式畫的望遠鏡；站上去或站在旁邊按 A，跳出插圖＋旁白
       this.viewpoints = (this.map.viewpoints || []).map(function (v) {
@@ -515,10 +521,14 @@
         self.chests.push({ data: c, img: img });
       });
       (this.map.lamps || []).forEach(function (l) {
+        if (!self.lampShown(l)) return;   // v4.2 第六座燈座：結局前不顯示
         var lit = !!st.lamps[l.subject];
-        var img = self.add.image(l.x * T + T / 2, l.y * T + T, self.tex, self.frameOf(lit ? 'lamp_on' : 'lamp_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T);
-        self.lamps.push({ data: l, img: img });
+        var dawn = self.dawnLampArt(l);
+        var img = dawn ? self.add.image(l.x * T + T / 2, l.y * T + T, J.Assets.texKey(lit ? 'lamp_dawn_on' : 'lamp_dawn_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T)
+          : self.add.image(l.x * T + T / 2, l.y * T + T, self.tex, self.frameOf(lit ? 'lamp_on' : 'lamp_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T);
+        self.lamps.push({ data: l, img: img, dawn: dawn });
       });
+      this.buildEndingExtras();   // v4.2 大結局：海風公園來歡迎的鎮民（只在過場出現、不說話）
       this.buildMapProps();   // v4.1 中橫：小車與雪鏈圖案告示牌
       this.buildSouth();   // v3.0 南部：友善動物、碼頭的船
     }
@@ -581,6 +591,7 @@
       this.friendlies = (this.map.friendly || []).map(function (f) {
         var tk = J.Assets.texKey(f.sprite), frame = self.textures.exists(tk) && self.textures.get(tk).has(1) ? 1 : undefined;
         var img = self.add.image(f.x * T + T / 2, (f.y + 1) * T, tk, frame).setOrigin(0.5, 1).setDepth((f.y + 1) * T);
+        if (f.show && J.KeepAway && !J.KeepAway.shown(f, G().state)) img.setVisible(false);   // v4.2（K10）
         self.tweens.add({ targets: img, y: img.y - 2, duration: 900 + (f.x * 53) % 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
         return { data: f, img: img };
       });
@@ -608,10 +619,57 @@
       });
     }
 
+    /** v4.2 第六座燈座（subject「曙光」）：flags.ending_done 之後、或大結局走進海風公園時才顯示（EndingRules.dawnLampShown）；五盞知識燈一直顯示 */
+    lampShown(l) {
+      if (!l || l.subject !== '曙光') return true;
+      var g = G();
+      return J.EndingRules ? J.EndingRules.dawnLampShown(g.state, !!g.endingDawnLamp) : !!(g.state && g.state.flags && g.state.flags.ending_done);
+    }
+    /** 第六座燈座用金色的 lamp_dawn_on／off（美術 R5：程式調色）；圖沒讀到就照五盞燈的圖塊畫 */
+    dawnLampArt(l) { return !!l && l.subject === '曙光' && this.hasArt('lamp_dawn_on') && this.hasArt('lamp_dawn_off'); }
+    /** v4.2 大結局 F6–F10：G.endingExtras＝[{ sprite, x, y, mood }]（鎮民、里長伯；不擋路、不能說話，頭上冒「！」或「♪」） */
+    buildEndingExtras() {
+      var self = this, list = G().endingExtras;
+      this.endingExtras = [];
+      if (!Array.isArray(list) || G().endingExtrasMap !== this.mapId) return;
+      list.forEach(function (e) { if (!e.later) self.addEndingExtra(e); });
+    }
+    addEndingExtra(e) {
+      var tk = J.Assets.texKey(e.sprite);
+      if (!this.textures.exists(tk)) return null;
+      var img = this.add.image(e.x * T + T / 2, e.y * T + T, tk).setOrigin(0.5, 1).setDepth((e.y + 1) * T);
+      var inf = J.Assets.info(e.sprite) || {};
+      img.setScale((inf.mapH || T * 1.5) / Math.max(1, img.height));
+      var mark = e.mood ? this.add.text(img.x, img.y - img.displayHeight - 2, e.mood, { fontFamily: 'sans-serif', fontSize: '18px', fontStyle: 'bold', color: '#ffd34d', stroke: '#2a1e22', strokeThickness: 3 }).setOrigin(0.5, 1).setDepth(9999) : null;
+      var x = { spec: e, img: img, mark: mark };
+      this.endingExtras.push(x);
+      return x;
+    }
+    /** 勇者特別版 H1：一路上的朋友這時才淡入（大結局版主角走路會經過他們的位置，先出現會擋路） */
+    showLaterExtras() {
+      var self = this, list = G().endingExtras;
+      if (!Array.isArray(list)) return 0;
+      var n = 0;
+      list.forEach(function (e) {
+        if (!e.later || self.endingExtras.some(function (x) { return x.spec === e; })) return;
+        var x = self.addEndingExtra(e);
+        if (x) { n++; x.img.setAlpha(0); self.tweens.add({ targets: [x.img].concat(x.mark ? [x.mark] : []), alpha: 1, duration: self.reduceMotionNow() ? 1 : 600 }); }
+      });
+      return n;
+    }
+
     updateLamps() {
       var self = this, st = G().state;
       this.lamps.forEach(function (l) {
         var lit = !!st.lamps[l.data.subject];
+        if (l.dawn) {   // v4.2 第六座燈座（金色）
+          var wasD = l.img.texture.key === J.Assets.texKey('lamp_dawn_on');
+          l.img.setTexture(J.Assets.texKey(lit ? 'lamp_dawn_on' : 'lamp_dawn_off'));
+          if (lit && !wasD) self.sparkle(l.img.x, l.img.y - T * 1.3, 0xffd36a);
+          if (lit && !l.glow) l.glow = self.addGlow(l.img.x, l.img.y - T * 1.45, 1.2);
+          if (!lit && l.glow) { self.removeGlow(l.glow); l.glow = null; }
+          return;
+        }
         var was = l.img.frame.name === self.frameOf('lamp_on');
         l.img.setFrame(self.frameOf(lit ? 'lamp_on' : 'lamp_off'));
         if (lit && !was) self.sparkle(l.img.x, l.img.y - T * 1.3, 0xfff3a0);
@@ -1011,6 +1069,8 @@
         (n.tw || []).forEach(function (t) { if (on && n.inView !== false) t.resume(); else t.pause(); });
         if (self.blocked) { if (on) self.blocked[n.data.x + ',' + n.data.y] = true; else delete self.blocked[n.data.x + ',' + n.data.y]; }
       });
+      // v4.2（K10）友善動物也可以寫 show（黑熊只在 Q_YS_1 完成～Q_YS_2 未完成出現）；保護區由 KeepAway 照同一個條件判斷
+      (this.friendlies || []).forEach(function (f) { if (f.data.show && J.KeepAway) f.img.setVisible(J.KeepAway.shown(f.data, st)); });
     }
 
     refreshMarkers() {
@@ -1363,9 +1423,11 @@
       g.state.location = { map: this.mapId, x: p.tx, y: p.ty };
       this.checkLandmark();
       var ex = J.World.exitAt(this.map, p.tx, p.ty);
-      // v1.2（61 號 2.0）出口 requires：委託還沒完成時不換圖，退回上一格、播 requires_dialog（番薯仔說明）
-      if (ex && !J.World.exitOpen(ex, g.state)) { p.path = []; p.pending = null; this.exitLocked(ex); return true; }
-      if (ex) { p.path = []; p.pending = null; this.goExit(ex); return true; }
+      // v1.2（61 號 2.0）出口 requires：委託還沒完成時不換圖，退回上一格、播 requires_dialog（番薯仔說明）；v4.2 東部條件帶 ctx
+      if (ex && !J.World.exitOpen(ex, g.state, typeof this.exitContext === 'function' ? this.exitContext(ex) : undefined)) { p.path = []; p.pending = null; this.exitLocked(ex); return true; }
+      if (ex) { p.path = []; p.pending = null; if (g.finishAt && g.finishAt(this, ex)) return true; if (g.firstExitDialog && g.firstExitDialog(this, ex)) return true; this.goExit(ex); return true; }   // 4c 夜班：M40 最後的門第一次推開播 D_SUMMIT_GATE   // v4.2 4c：Q_POST_1 走到 M42 北口＝完成（播完再換圖）
+      // v4.2 事件委託的觸發格（黑熊、山莊廣場、霧中入口）：自動停下、開始事件
+      if (g.eventAt && g.eventAt(this, p.tx, p.ty)) { p.path = []; p.pending = null; this.player.anims.stop(); return true; }
       if (!p.path.length && p.pending) {
         var pend = p.pending; p.pending = null;
         this.player.anims.stop();
@@ -1389,6 +1451,7 @@
       this.cameras.main.once('camerafadeoutcomplete', function () { G().changeMap(ex.to, ex.tx, ex.ty, self.p.facing); });
     }
 
+
     /** v1.2 鎖著的出口（exit.requires 還沒完成）：主角退回上一格（不停在出口上），番薯仔說明 requires_dialog */
     exitLocked(ex) {
       var p = this.p, g = G();
@@ -1402,6 +1465,15 @@
       g.exitLockedLog = (g.exitLockedLog || []).concat([ex.requires]);   // 測試用
       var dlg = ex.requires_dialog || null;
       if (ex.requires_dialogs) [].concat(ex.requires).some(function (q) { var rr = g.state.quests[q]; if (ex.requires_dialogs[q] && !(rr && rr.status === 'done')) { dlg = ex.requires_dialogs[q]; return true; } return false; });   // v4.0 東部（71 號 4.2：M26 北口頭目沒過／島還沒去完各一句）
+      // v4.2 最後的門：D_EXIT_LOCK_CV 後面依缺的條件接 _LAMP → _STAR → _PL（lockDialogIds、exitContext 由洞窟的掛鉤加上）；{pl}＝狀態頁「戰力」同一個數字（無條件捨去）
+      var ids = typeof this.lockDialogIds === 'function' ? this.lockDialogIds(ex) : [];
+      g.exitLockDialogs = ids;   // 測試用
+      if (ids.length > 1) {
+        var D = (g.data && g.data.dialogs) || {}, pl = String(Math.floor(J.Character.pl(g.state, g.data)));
+        return ids.reduce(function (p, id) {
+          return p.then(function () { return /\{pl\}/.test(JSON.stringify(D[id] || [])) ? g.say(null, D[id].map(function (l) { return Object.assign({}, l, { text: l.text.replace('{pl}', pl) }); })) : g.say(id, []); });
+        }, Promise.resolve());
+      }
       g.say(dlg, [{ who: 'pet', text: '這條路現在還不能走喔。' }]);
     }
 
@@ -1440,6 +1512,7 @@
 
     interact(t) {
       var g = G();
+      if (g.inEnding) return;   // v4.2 大結局過場中不能和人說話、開寶箱
       // v0.9.6（47 號 B08）放大地圖開著時和人說話、開寶箱：先關掉地圖，對話和題目才不會疊在地圖上
       if (J.UI.isOpen() && !J.UI.blocksMove()) { J.UI.closePassMove(); g.closedMapForTalk = (g.closedMapForTalk || 0) + 1; }
       this.p.path = [];
@@ -1689,6 +1762,7 @@
     }
 
     checkEncounter() {
+      if (G().inEnding) return;   // v4.2 大結局過場（主角自動走路）不遇怪
       var px = this.player.x, py = this.player.y;
       for (var i = 0; i < this.monsters.length; i++) {
         var m = this.monsters[i];

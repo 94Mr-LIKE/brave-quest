@@ -67,7 +67,7 @@
     G.showTitle();
   };
 
-  G.blocked = function () { return G.busy || (G.battleCtx && !G.battleCtx.over); };
+  G.blocked = function () { return G.busy || !!G.inEnding || (G.battleCtx && !G.battleCtx.over); };   // v4.2：大結局過場中選單打不開（N-END-5）
 
   G.showTitle = function () {
     J.HUD.show(false);
@@ -286,6 +286,9 @@
   G.save = function (force) {
     if (!G.state || G.restoring) return Promise.resolve();
     if (G.inBattle()) { G.saveSkipped = (G.saveSkipped || 0) + 1; return Promise.resolve(false); }
+    // v4.2 大結局過場中不存檔（大結局腳本 2.2：打贏佛格時存一次、F11 自動存一次；重看結局一律不存，存檔逐位元組不變）
+    //   4b 夜班修正 3：結局中一律不存（F0 的存檔在進結局前、F11 的存檔在 inEnding 關掉之後，不用特例）
+    if (G.inEnding) { G.saveSkipped = (G.saveSkipped || 0) + 1; return Promise.resolve(false); }
     G.lastSave = Date.now();
     return G.provider.save(SLOT, G.state).catch(function (e) { J.UI.toast('存檔失敗：' + e.message); });
   };
@@ -331,6 +334,12 @@
       G.held = {}; G.heldOrder = [];
       if (music && prev) { G.currentBgm = null; G.bgm(prev); }
     } });
+  };
+  /** v4.2 家長設定「重看結局」（破關後才有）：F1–F10 每一段都能跳過、MV 有跳過與 Esc；不改存檔、不再發證書（大結局腳本 2.2；N-END-3） */
+  G.replayEnding = function () {
+    if (!J.Ending || G.blocked() || !(G.state && G.state.flags && G.state.flags.ending_done)) return false;
+    J.Ending.play(G, { replay: true });
+    return true;
   };
   G.stopBgm = function (ms) { if (G.musicReady()) { try { window.JQ.Music.stopBgm(ms || 300); } catch (e) { /* 忽略 */ } } };
   /**
@@ -462,6 +471,20 @@
         G.say('D_TY_JOB_HINT', [{ who: 'narrator', text: '要轉職的話，可以搭車去慈護宮、行天宮或指南宮。' }]);
       }, 700);
     }
+    if (enteredMap) G.autoAccept(scene);   // v4.2（K7）第一次進 M40：五燈試煉的 5 個頭目委託一起接下
+    // v4.2 第 4c 批：第一次進 M42／M43 自動開始 Q_POST_1／Q_POST_2（trigger.enter；定案 #7、#42）
+    var enterEvent = enteredMap ? G.enterEvents(scene) : null;
+    // v4.2 第 4c 批（裁定 K11）：見習已出師、還沒轉職的孩子走進 M42 → 霧仔說 D_EAST_JOB_HINT。照 D_TY_JOB_HINT：每次開遊戲最多說一次
+    //   （只記在 G.eastJobHintShown，不寫存檔）；接在 Q_POST_1 的開場後面；那時候有別的對話、視窗就這次不說，下次走進來再說
+    if (enteredMap && scene.mapId === 'M42' && !G.eastJobHintShown && (G.data.dialogs || {}).D_EAST_JOB_HINT && J.Character.needsJobHint(st, G.data)) {
+      (enterEvent || Promise.resolve()).then(function () {
+        setTimeout(function () {
+          if (G.mapScene !== scene || scene.mapId !== 'M42' || scene.transitioning || G.mapChanging || G.blocked() || (J.UI.isOpen && J.UI.isOpen()) || G.eastJobHintShown) return;
+          G.eastJobHintShown = true;
+          G.say('D_EAST_JOB_HINT', []);
+        }, 700);
+      });
+    }
     var migrateV3Done = null;   // v1.0 升級說明播完的時間點（第一章說明要接在它後面，不會兩段對話同時跳出來）
     if (G.pendingMigrate) {
       var mg = G.pendingMigrate; G.pendingMigrate = null;
@@ -519,6 +542,8 @@
       setTimeout(function () { G.say(PET.quit || 'D_TRIAL_QUIT_PET', [{ who: 'pet', text: '上次小考中途離開，也算考一次喔。明天再一起加油！' }]); }, 600);
       G.trialQuitShown = quit;   // 測試用
     }
+    // v4.2 打贏佛格後結局沒看完就關掉網頁（Q_END_1 完成、還沒 ending_done）→ 從 F1 接著播（大結局腳本 2.2；N-END-4）
+    if (!G.inEnding && !G.endingResumeQueued && J.Ending && J.EndingRules && J.EndingRules.needsResume(st, G.data.quests)) { G.endingResumeQueued = true; J.Ending.resumeWhenReady(G); }
     if (G.pendingIntro) {
       G.pendingIntro = false;
       setTimeout(function () { G.say('D_INTRO', [{ who: 'pet', text: '我是番薯仔！我們一起把光找回來吧！' }]).then(function () { J.UI.toast('找頭上有「！」的人說話吧！', 4000); }); }, 400);
@@ -574,6 +599,7 @@
    * v1.0.6 同時按住一個垂直鍵和一個水平鍵＝斜走（例如 ↑＋→、W＋D；規則在 systems/move8.js）
    */
   G.heldDir = function () {
+    if (G.inEnding) return null;   // v4.2 大結局：主角自動走，方向鍵、搖桿不接手
     if (G.joy.dir) return G.joy.dir;
     return J.Move8.heldDir(G.held, G.heldOrder);
   };
@@ -844,6 +870,8 @@
 
   G.talkTo = function (npc, scene, opts) {
     if (G.blocked()) return;
+    // v4.2 破關後的里長伯（大結局腳本 5.5）：沒領過的職業 → 小頒獎；勇者 → 特別版；領過 → D_END_CHIEF_IDLE（＋還沒領完時 D_END_CERT_HINT）
+    if (npc.id === 'chief' && J.Ending && J.EndingRules && J.EndingRules.chiefBranch(G.state, G.data.jobs)) return J.Ending.chiefTalk(G, npc, scene);
     if (npc.ferry && npc.ferry.ids && npc.ferry.ids.length > 1 && J.FerryUI && !npc.__ferryPicked) return G.pickFerryRoute(npc, scene);   // v4.0 東部：富岡漁港售票員賣綠島、蘭嶼兩條航線
     if (npc.ferry && J.FerryUI) return J.FerryUI.interact(G, npc, scene);   // v3.0 船班（codex3）：東港碼頭售票員買票、上船
     opts = opts || {};
@@ -1019,9 +1047,11 @@
     return G.say(q.dialog_ending || 'D_ENDING', []).then(function () { J.UI.toast('冒險可以繼續：解委託、開寶箱、練習五科！', 6000); });
   };
 
-  /** 答題委託（help）：一題一題問，答完 count 題就完成 */
-  G.runHelp = function (id, npc, scene) {
+  /** 答題委託（help）：一題一題問，答完 count 題就完成。v4.2：事件委託（event）也走這裡；fixed_questions＝照順序出固定題；done(完成了沒) 可省略 */
+  G.runHelp = function (id, npc, scene, done) {
     var st = G.state, Q = G.data.quests, q = Q[id];
+    var fixed = Array.isArray(q.fixed_questions) && q.fixed_questions.length ? q.fixed_questions : null;
+    done = done || function () {};
     var lr = q.level_range || [1, 4];
     var units = q.units || [];
     // v1.4.1（v14_畫面審查 缺陷 7）：委託可以列 skip_scene（字詞）——情境或題目裡有這些字的題不抽（例：豆干店的帳不抽「地精拿走寶石」、新竹解說員不抽「金山的圖書館」；題庫不改）
@@ -1029,27 +1059,28 @@
     // v2.2.1b（v20_畫面審查 缺陷 9；情境會議決議第 3 步）：J.SceneFit.helpFilter 兩層篩題——第一層＝上面的單元、難度、skip_scene＋不是寶箱題＋
     // generic／本地圖／家鄉（外地、不在奇幻地圖的奇幻題不抽）；某一科第一層少於要答的題數才退回第二層（舊規則＋不是寶箱題）。noFallback：不再落到「整科都抽」
     var helpMap = q.map || (scene && scene.mapId), fit = J.SceneFit.helpFilter(G.questions, q, helpMap);
-    if (fit.fallback.length && typeof console !== 'undefined') console.warn('[委託情境] ' + id + '：' + fit.fallback.map(function (s) { return s + ' 嚴格題池 ' + fit.pools[s].strict.length + ' 題'; }).join('、') + '，比要答的題數少，退回寬鬆（照樣不抽寶箱題）');
+    if (fit.fallback.length && !fixed && typeof console !== 'undefined') console.warn('[委託情境] ' + id + '：' + fit.fallback.map(function (s) { return s + ' 嚴格題池 ' + fit.pools[s].strict.length + ' 題'; }).join('、') + '，比要答的題數少，退回寬鬆（照樣不抽寶箱題）');
     var homeMemo = { q: null };   // v4.0（夜班 v3.0.1 建議②）：這一次幫忙講過家鄉題過場句的題目
-    var sess = J.Session.create(st, G.questions, J.QuestLog.helpSubject(q, 0), {
+    var sess = J.Session.create(st, fixed || G.questions, fixed ? q.subject : J.QuestLog.helpSubject(q, 0), fixed ? { mode: 'free', noPay: true, noFallback: true, noRecord: true, fixed: fixed } : {   // v4.2 黑熊固定題：照順序、不從題庫抽、不進報表
       mode: 'free', noPay: true,   // v2.0 新經濟（67 號第二節第 5 項）：答題不給經驗值和金幣，完成委託時一次給
       filter: fit.filter, noFallback: true   // v2.2.1b：scenefit.js（單元、難度、skip_scene 的舊規則也在裡面：SceneFit.baseFits）；noFallback＝篩完沒題不退回整科
     });
     function nextQ() {
-      if (J.QuestLog.canComplete(st, Q, id, G.data)) { G.completeQuest(id, scene); return; }
+      if (J.QuestLog.canComplete(st, Q, id, G.data)) { G.completeQuest(id, scene).then(function () { done(true); }); return; }
       var prog = (st.quests[id] || {}).progress || 0;
       var subj = J.QuestLog.helpSubject(q, prog);
-      var qq = J.Session.next(sess, Date.now(), { subject: subj });
-      if (!qq) { J.UI.toast('「' + subj + '」的題目還在準備中。'); return; }
+      var qq = J.Session.next(sess, Date.now(), fixed ? { fixedIndex: prog } : { subject: subj });
+      if (!qq) { J.UI.toast('「' + subj + '」的題目還在準備中。'); done(false); return; }
       J.Quiz.ask({
         session: sess, mode: 'help', state: st, title: q.title, subtitle: '幫忙 ' + (prog + 1) + '/' + J.QuestLog.helpCount(q) + '・' + G.speaker(npc.id).name,
         speaker: G.speaker(npc.id).name,   // 題目情境的說話者換成委託人（不改題庫）
+        optionWhy: !!fixed,   // v4.2：固定題答錯時說明選的那一項為什麼不對
         sceneView: function (x) { return J.SceneFit.sceneView(x, helpMap, G.speaker(npc.id).name, q, J.DialogText); },   // v2.2.1b：generic 才換說話者；家鄉題在金包里以外先說過場句
         sceneOnce: homeMemo,   // v4.0（夜班 v3.0.1 建議②）：家鄉題過場句同一次幫忙只講一次（quiz.js 套 SceneFit.introOnce）
         onSave: function () { G.save(); },
         onRewards: function (res) { G.refreshHud(); if (res) G.afterReward(res.levelsGained); },
         onDone: function (r) {
-          if (r.left) { G.save(); J.UI.toast('先休息一下，隨時可以回來繼續幫忙！'); scene.refreshMarkers(); return; }
+          if (r.left) { G.save(); J.UI.toast('先休息一下，隨時可以回來繼續幫忙！'); scene.refreshMarkers(); done(false); return; }
           if (!r.correct) return;
           J.QuestLog.recordHelp(st, Q, id);
           if (Array.isArray(q.subjects) && scene.map.lamps && scene.map.lamps.some(function (l) { return l.subject === subj; })) {
@@ -1064,6 +1095,102 @@
       });
     }
     nextQ();
+  };
+
+  /**
+   * v4.2 事件委託（kind:'event'；定案 #7、#42）：踩到觸發格、碰到回音謎門或第一件遺失物時開始。
+   * 可接 → 接下；播 dialog_start；答題（固定題或題庫，同 runHelp）；答完當場完成（沒有回報委託人）。
+   * opts.noQuiz：只接下＋播開場（Q_CV_2 送回遺失物不抽題，件數由 east_fx 記）。回傳 Promise<完成了沒>
+   */
+  G.runEvent = function (id, scene, opts) {
+    var st = G.state, Q = G.data.quests, q = Q[id];
+    var s0 = q ? J.QuestLog.status(st, Q, id) : 'locked';
+    if (s0 !== 'available' && s0 !== 'active') return Promise.resolve(false);
+    if (s0 === 'available') { J.QuestLog.accept(st, Q, id); G.lastAccepted = id; G.save(); if (scene && scene.refreshMarkers) scene.refreshMarkers(); }
+    G.eventLog = (G.eventLog || []).concat([id]);   // 測試用
+    if (opts && opts.noQuiz && s0 === 'active') return Promise.resolve(true);
+    return G.say(q.dialog_start, [{ who: q.giver, text: q.goal || q.title }]).then(function () {
+      if (opts && opts.noQuiz) return true;
+      return new Promise(function (resolve) { G.runHelp(id, { id: q.giver }, scene, resolve); });
+    });
+  };
+  /** v4.2 事件委託的觸發格（quests.js trigger.cells；trigger.requires 例如 item:dawn_compass）：踩到就停下來開始。回傳 true＝接手了 */
+  G.eventAt = function (scene, x, y) {
+    if (!G.state || !G.data || G.blocked()) return false;
+    var st = G.state, Q = G.data.quests || {};
+    var id = Object.keys(Q).filter(function (k) {
+      var q = Q[k], t = q.trigger;
+      if (q.kind !== 'event' || !t || t.map !== scene.mapId || !Array.isArray(t.cells)) return false;
+      if (!t.cells.some(function (c) { return c[0] === x && c[1] === y; })) return false;
+      var s = J.QuestLog.status(st, Q, k);
+      if (s !== 'available' && s !== 'active') return false;
+      return !t.requires || !J.EastFields || J.EastFields.requirementMet(t.requires, st, {});
+    })[0];
+    if (!id) return false;
+    G.runEvent(id, scene);
+    return true;
+  };
+  /**
+   * v4.2 第 4c 批：trigger.enter 的事件委託（Q_POST_1 進 M42、Q_POST_2 進 M43）：可接時走進那張地圖就接下、播 dialog_start（不答題）。
+   * 回傳 Promise（播完）；沒有要開始的 → null。0.7 秒後才開始（地名橫幅先出來）；那時已經離開這張圖就不接，下次走進來再接
+   */
+  G.enterEvents = function (scene) {
+    var st = G.state, Q = G.data.quests || {};
+    var ids = Object.keys(Q).filter(function (k) { var q = Q[k], t = q.trigger; return q.kind === 'event' && t && t.enter === true && t.map === scene.mapId && J.QuestLog.status(st, Q, k) === 'available'; });
+    if (!ids.length) return null;
+    return new Promise(function (res) {
+      setTimeout(function () {
+        if (G.mapScene !== scene || scene.mapId !== Q[ids[0]].trigger.map || scene.transitioning) { res(false); return; }
+        G.runEvent(ids[0], scene, { noQuiz: true }).then(res, res);
+      }, 700);
+    });
+  };
+  /**
+   * v4.2 第 4c 批：事件委託的完成格（quests.js finish.cells）。Q_POST_1＝走到 M42 北口 (28–29,0)：記 1 題進度 → 完成（播 dialog_end D_POST_1B、
+   * 發獎勵）→ 播完再換地圖。由 MapScene.arrive 在走上出口時呼叫；回傳 true＝接手了（出口等完成畫面結束才走）
+   */
+  G.finishAt = function (scene, ex) {
+    var st = G.state, Q = G.data.quests || {};
+    var id = Object.keys(Q).filter(function (k) {
+      var q = Q[k], f = q.finish;
+      return q.kind === 'event' && f && f.map === scene.mapId && Array.isArray(f.cells) && f.cells.some(function (c) { return c[0] === ex.x && c[1] === ex.y; }) && ['available', 'active'].indexOf(J.QuestLog.status(st, Q, k)) >= 0;
+    })[0];
+    if (!id) return false;
+    if (J.QuestLog.status(st, Q, id) === 'available') J.QuestLog.accept(st, Q, id);   // 開場那次剛好被別的對話擋掉：走到終點照樣算完成
+    J.QuestLog.recordHelp(st, Q, id);
+    G.finishLog = (G.finishLog || []).concat([id]);   // 測試用
+    if (scene.player && scene.player.anims) scene.player.anims.stop();
+    G.completeQuest(id, scene).then(function () { if (G.mapScene === scene && !scene.transitioning) scene.goExit(ex); });
+    return true;
+  };
+  /**
+   * v4.2 4c 夜班（執行長裁定）：出口的 first_dialog（M40 最後的門 → M41：D_SUMMIT_GATE）＝門可以開、第一次走上去時播一次，播完才換地圖。
+   * 記在 flags['seen_' + 對白 id]（同怪物 dialog_after_once 的慣例；先記再播，播到一半關網頁也不重播）。回傳 true＝接手了
+   */
+  G.firstExitDialog = function (scene, ex) {
+    var id = ex && ex.first_dialog, st = G.state;
+    if (!id || !(G.data.dialogs || {})[id]) return false;
+    if (!st.flags || typeof st.flags !== 'object') st.flags = {};
+    if (st.flags['seen_' + id]) return false;
+    st.flags['seen_' + id] = true;
+    G.save();
+    G.firstExitLog = (G.firstExitLog || []).concat([id]);   // 測試用
+    if (scene.player && scene.player.anims) scene.player.anims.stop();
+    G.say(id, []).then(function () { if (G.mapScene === scene && !scene.transitioning) scene.goExit(ex); });
+    return true;
+  };
+  /** v4.2（K7）auto_accept 的委託（五燈試煉 Q_CV_3A–E）：走進那張地圖就一起接下，頭目馬上出現；開場台詞（同一句）播一次 */
+  G.autoAccept = function (scene) {
+    var st = G.state, Q = G.data.quests || {};
+    var ids = Object.keys(Q).filter(function (k) { return Q[k].auto_accept && Q[k].map === scene.mapId && J.QuestLog.status(st, Q, k) === 'available'; });
+    if (!ids.length) return [];
+    ids.forEach(function (k) { J.QuestLog.accept(st, Q, k); });
+    G.save();
+    G.respawnBosses();
+    if (scene.refreshMarkers) scene.refreshMarkers();
+    var dlg = Q[ids[0]].dialog_start;
+    setTimeout(function () { if (G.mapScene === scene && !scene.transitioning && !G.blocked()) G.say(dlg, []); }, 700);
+    return ids;
   };
 
   /**
@@ -1109,6 +1236,8 @@
     var st = G.state;
     if (J.Chests.isOpened(st, chest.id)) { G.say('D_CHEST_DONE', [{ who: 'pet', text: '這個寶箱已經打開過了。' }]); return; }
     var spec = J.Chests.questionSpec(chest);
+    // v4.2 洞窟機關寶箱（no_question）：解開機關才出現，不再上數字鎖
+    if (chest.no_question) { G.chestOpened(chest, scene); return; }
     G.say('D_CHEST_LOCKED', [{ who: 'pet', text: '寶箱上有數字鎖！答對就能打開。' }]).then(function () {
       var sess = J.Session.create(st, G.questions, spec.subject, { mode: 'free', noPay: true, filter: J.Chests.isChestQuestion });
       var q = J.Session.next(sess, Date.now(), { forceLevel: spec.level, preferType: spec.preferType });
@@ -1119,23 +1248,27 @@
         onRewards: function (res) { G.refreshHud(); if (res) G.afterReward(res.levelsGained); },
         onDone: function (r) {
           if (!r.correct) { G.save(); return; }
-          var lvl = st.player.level;
-          var o = J.Chests.open(st, chest, G.data.quests, G.data);
-          if (!o.ok) return;
-          scene.setChestOpen(chest.id);
-          G.jingle('chest', null, 'chest');
-          var parts = [];
-          if (o.gold) parts.push('金幣 +' + o.gold);
-          if (o.exp) parts.push('經驗值 +' + o.exp);   // v2.0 新經濟：寶箱也給經驗值
-          if (o.levels && !o.quests.length) setTimeout(function () { G.afterReward(o.levels); }, 300);
-          if (o.item) parts.push('得到「' + ((G.data.items[o.item] || {}).name || o.item) + '」');
-          J.UI.banner('寶箱打開了！' + (parts.length ? parts.join('、') : ''));
-          G.refreshHud();
-          G.save();
-          o.quests.forEach(function (qr) { G.questDone(qr.id, qr, scene, st.player.level - lvl); });
+          G.chestOpened(chest, scene);
         }
       });
     });
+  };
+  /** 寶箱打開後：發獎勵、畫面、寶箱委託（v4.2 從 openChest 拆出來，機關寶箱也用） */
+  G.chestOpened = function (chest, scene) {
+    var st = G.state, lvl = st.player.level;
+    var o = J.Chests.open(st, chest, G.data.quests, G.data);
+    if (!o.ok) return;
+    scene.setChestOpen(chest.id);
+    G.jingle('chest', null, 'chest');
+    var parts = [];
+    if (o.gold) parts.push('金幣 +' + o.gold);
+    if (o.exp) parts.push('經驗值 +' + o.exp);   // v2.0 新經濟：寶箱也給經驗值
+    if (o.levels && !o.quests.length) setTimeout(function () { G.afterReward(o.levels); }, 300);
+    if (o.item) parts.push('得到「' + ((G.data.items[o.item] || {}).name || o.item) + '」');
+    J.UI.banner('寶箱打開了！' + (parts.length ? parts.join('、') : ''));
+    G.refreshHud();
+    G.save();
+    o.quests.forEach(function (qr) { G.questDone(qr.id, qr, scene, st.player.level - lvl); });
   };
 
   /** 車站（maps.js 的 station）：打開世界地圖 */
@@ -1196,6 +1329,9 @@
 
   G.inspectLamp = function (lamp, scene) {
     var st = G.state;
+    // v4.2 第六座燈座：還沒亮 → D_LAMP_DAWN_DARK（K12）；不說「要找回『曙光之光』」
+    var dawn = J.EndingRules ? J.EndingRules.lampDialog(st, lamp.subject) : null;
+    if (dawn === 'D_LAMP_DAWN_DARK') { G.lastLampDialog = dawn; G.say(dawn, [{ who: 'pet', text: '這座燈還暗暗的，好像在等天亮。' }]); return; }
     if (st.lamps[lamp.subject]) { G.say('D_LAMP_LIT', [{ who: 'pet', text: lamp.subject + '燈亮亮的，好溫暖！' }]); return; }
     var text = st.lights[lamp.subject] ? '已經拿回' + lamp.subject + '之光了！去找村長點燈吧。' : '這是' + lamp.subject + '燈。要找回「' + lamp.subject + '之光」才能點亮。';
     G.say(null, [{ who: 'pet', text: text }]);
@@ -1390,10 +1526,12 @@
     // 每題只消耗一次增益；刪除索引給既有選項介面，讀屏標記留給 UI 接線。
     // v2.1 修正（wip_v20/v21_apply.js）：先打亂選項並存回 ctx.sess.q，再挑要刪的選項（以前先刪、quiz.js 才打亂，智慧之光會刪到正確答案）
     if (J.Answer && J.Answer.shuffleOptions) q = ctx.sess.q = J.Answer.shuffleOptions(q, Math.random);
-    var questionFx = J.Battle.prepareQuestion(b, q, { timerOff: J.Battle.timerOff(st.settings.answerTime), erased: ctx.sess.erased });
+    var untimed = J.Battle.untimedPhase ? J.Battle.untimedPhase(b) : false;   // v4.2（裁定 K8）佛格第 3 階段不計時（fob_king untimed_phases:[3]）
+    var questionFx = J.Battle.prepareQuestion(b, q, { timerOff: J.Battle.timerOff(st.settings.answerTime) || untimed, erased: ctx.sess.erased });
     ctx.sess.erased = questionFx.erased;
     ctx.sess.optionLabels = questionFx.optionLabels;
-    var timerMs = J.Battle.timeLimitMs(q.level, st.settings.answerTime, s.timeMult * (b.timeBuff || 1) * questionFx.timeMult);
+    var timerMs = untimed ? 0 : J.Battle.timeLimitMs(q.level, st.settings.answerTime, s.timeMult * (b.timeBuff || 1) * questionFx.timeMult);
+    ctx.lastTimerMs = timerMs;   // 測試用
     b.timeBuff = 1;
     J.Quiz.ask({
       session: ctx.sess, mode: 'battle', state: st, timerMs: timerMs,
@@ -1425,7 +1563,7 @@
     var use = null, opt = { hits: 1, mult: 1, noCrit: false, sureCrit: false }, pre = [];
     if (skill) {
       st.player.mp = Math.max(0, st.player.mp - (skill.mp || 0));   // 答對才扣魔力
-      use = J.Battle.useSkill(b, skill, { maxHp: s.maxHp, maxMp: s.maxMp, timerOff: J.Battle.timerOff(st.settings.answerTime), trait: s.trait });
+      use = J.Battle.useSkill(b, skill, { maxHp: s.maxHp, maxMp: s.maxMp, timerOff: J.Battle.timerOff(st.settings.answerTime) || !!(J.Battle.untimedPhase && J.Battle.untimedPhase(b)), trait: s.trait });   // v4.2 佛格第 3 階段：鼓舞之歌改走不計時分支
       ctx.lastSkill = { id: skill.id, eff: use.eff, attack: use.attack, counted: !!use.counted, heal: use.heal || 0 };   // 測試用
       ctx.skillLog = (ctx.skillLog || []).concat([skill.id]);
       G.bmsg(G.skillIcon(skill) + ' ' + skill.name + '！');
@@ -1473,7 +1611,12 @@
     var finish = function () {
       if (hr.phaseUp) { sc.phaseEffect(); J.UI.banner(mon.name + '生氣了！攻擊變強了！', 'rage-banner'); }   // v0.9.3 生氣了 = 進入下一階段、攻擊 +20%
       G.brender(); G.bmsg(msg);
-      if (b.over) setTimeout(G.bvictory, G.bwait(700)); else setTimeout(function () { G.bcommands(true); }, G.bwait(500));
+      // v4.2 佛格：進入新階段時換階段圖（phase_sprites）、播那一階段的台詞（phase_dialogs；第 3 階段那段說「這一段不計時。」）
+      var phDlg = hr.phaseUp && mon.phase_dialogs && mon.phase_dialogs[b.phase];
+      if (hr.phaseUp && mon.phase_sprites && mon.phase_sprites[b.phase] && sc.setPhaseSprite) sc.setPhaseSprite(mon.phase_sprites[b.phase]);
+      if (b.over) setTimeout(G.bvictory, G.bwait(700));
+      else if (phDlg && (G.data.dialogs || {})[phDlg]) { ctx.phaseDialogs = (ctx.phaseDialogs || []).concat([phDlg]); setTimeout(function () { G.say(phDlg, []).then(function () { G.bcommands(true); }); }, G.bwait(900)); }   // 測試用 phaseDialogs
+      else setTimeout(function () { G.bcommands(true); }, G.bwait(500));
     };
     G.brender();
     if (skill) G.skillFx(skill, use, function () { play(finish); }); else play(finish);
@@ -1589,6 +1732,23 @@
     drops.forEach(function (it) { J.Character.addItem(st, it, 1); });
     st.stats.battles.won = (st.stats.battles.won || 0) + 1;
     J.Bestiary.defeated(st, mon.id);   // 怪物名冊：打倒
+    // v4.2 最終頭目（fob_king，ending＝Q_END_1）：不跳勝利結算畫面（經驗、金幣照算、直接入帳）→ D_FOG_KING_ASK → 選項 → D_FOG_KING_END → 結局 F1（大結局腳本 2.1 F0、〇節）
+    if (mon.ending && J.Ending && J.EndingRules) {
+      var endDone = J.QuestLog.onBossDefeated(st, G.data.quests, mon.id, G.data);
+      J.EndingRules.afterFinalBoss(st, G.data.quests);   // 第九章、接下 Q_END_2
+      ctx.won = true; ctx.endingQuests = endDone.map(function (r) { return r.id; });   // 測試用
+      // 4b 夜班建議 5：結局分支照一般勝利補上升級提示（afterReward：onLevelUp＋橫幅）與回滿（打完佛格不帶著殘血進結局、回金包里）
+      var endLevels = st.player.level - lvl;
+      ctx.endingLevels = endLevels;   // 測試用
+      if (endLevels > 0) G.afterReward(endLevels);
+      J.Character.restoreFull(st, G.data);
+      G.save();   // F0 結束先存一次（中途關網頁 → 下次從 F1 接）
+      G.refreshHud();
+      G.bmsg(mon.wake || '');
+      ctx.el.cmds.innerHTML = '';
+      J.Ending.finalBoss(G, ctx);
+      return;
+    }
     G.stopBgm(200);
     G.jingle(mon.boss && drops.length ? 'rare_item' : 'victory', null, null, 7000);
     var lines = [mon.wake, '經驗值 +' + ctx.reward.exp + '　金幣 +' + ctx.reward.coins];
@@ -1598,7 +1758,7 @@
     G.bmsg(lines.join('　'));
     G.refreshHud();
     var done = [];
-    if (mon.boss) done = J.QuestLog.onBossDefeated(st, G.data.quests, mon.id, G.data);
+    if (mon.boss || mon.trial) done = J.QuestLog.onBossDefeated(st, G.data.quests, mon.id, G.data);   // v4.2（K7）五燈霧影 trial：也寫進 bosses、完成 Q_CV_3x
     // 打贏了：獎勵、頭目委託馬上寫入存檔（頭目戰後的對話很長，這段時間關掉分頁也不會白打）。
     // ctx.won 之後不會再有答題或攻擊，所以不會重複領獎；按「繼續」時 G.bend 再存一次。
     ctx.won = true;
@@ -1747,6 +1907,8 @@
     var st = G.state;
     if (!st) return;
     if (document.visibilityState === 'hidden') { J.Playtime.pause(st.playtime); return; }
+    // v4.2 大結局（約 4 分鐘）不算每日遊玩時間、不會被「時間到」打斷（大結局腳本 G3，老闆同意）：計時停在這裡，結束後從 0 接著算
+    if (G.inEnding) { J.Playtime.pause(st.playtime); G.endingTicks = (G.endingTicks || 0) + 1; return; }
     var now = Date.now();
     if (J.Daily.ensure(st.daily, now)) J.UI.toast('新的一天！每日小任務換新了。', null, { defer: true });   // v1.4.1：題目、戰鬥、對話開著時先等，關掉才出現（不蓋題目）
     var ev = J.Playtime.tick(st.playtime, st.settings, now);

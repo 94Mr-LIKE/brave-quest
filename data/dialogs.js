@@ -68,7 +68,29 @@ window.SPEAKERS = {
   harbor_uncle: "漁港阿伯", stall_keeper: "廟口攤販阿伯", old_miner: "老礦工阿伯", museum_guide: "博物館解說員",
   inn_keelung: "港邊旅店老闆", inn_jinguashi: "宿舍旅店老闆",
   tree_king: "枯萎樹王", fog_octopus: "迷霧章魚", mud_frog: "泥巴大蛙", noise_bat: "噪音蝙蝠王",
-  angry_golem: "暴躁石像", fog_demon: "遺忘霧魔", mnb_goldjaw: "金脈鐵顎王"
+  angry_golem: "暴躁石像", fog_demon: "遺忘霧魔", mnb_goldjaw: "金脈鐵顎王",
+  // ═══ v4.2 第 4a 批 SPEAKERS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  paiyun_volunteer: "登山服務中心志工",
+  ysnp_ranger: "國家公園解說員",
+  bird_guide: "鳥類解說員",
+  inn_tataka: "山屋管理員",
+  trail_ranger: "步道巡山員",
+  lodge_manager_py: "排雲山莊管理員",
+  fo_echo: "喂喂回音霧",
+  fob_mist: "山嵐霧精",
+  fob_king: "遺忘霧王‧佛格",
+  // ═══ v4.2 第 4a 批 SPEAKERS END ═══
+  // ═══ v4.2 第 4c 批 SPEAKERS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  tao_fisher: "蘭嶼的漁夫",
+  tao_taro: "種芋頭的阿姨",
+  tao_elder: "部落的長者",
+  tao_owner: "地下屋的屋主",
+  tao_boatman: "船屋的船主",
+  tao_kid: "蘭嶼的孩子",
+  cloud_shop_m42: "雲上小舖老闆",
+  cloud_shop_m43: "雲上小舖老闆",
+  cloud_shop_m44: "雲上小舖老闆",
+  // ═══ v4.2 第 4c 批 SPEAKERS END ═══
 };
 
 window.DIALOGS = {
@@ -238,9 +260,7 @@ window.DIALOGS = {
   D_XT_4B: [
     {"who":"lantern_shop","emotion":"開心","text":"燈籠又亮了！謝謝你，勇者！","taigi":{"hanji":"鼓仔燈閣光矣！多謝你，勇者！","tailo":"Kóo-á-ting koh kng--ah! To-siā lí, ióng-tsiá!","huayu":"燈籠又亮了！謝謝你，勇者！"}},
     {"who":"lantern_shop","emotion":"開心","text":"這些金幣送你，謝謝你！","taigi":{"hanji":"這寡金幣送你，多謝你！","tailo":"Tsit-kuá kim-pè sàng lí, to-siā--lí!","huayu":"這些金幣送你，謝謝你！"}},
-    // V41_STUB_BEGIN（v4.2 還原第 3 句）
-    {"who":"pet","emotion":"開心","text":"拿到森林燈籠了！往塔塔加的山路，要等之後開放喔！"}
-    // V41_STUB_END
+    {"who":"pet","emotion":"開心","text":"拿到森林燈籠了！往塔塔加的山路亮起來了。"}
   ],
   D_CIVET_AFTER: [
     {"who":"narrator","emotion":"平靜","text":"野生動物不要餵，也不要抓喔。"}
@@ -293,12 +313,6 @@ window.DIALOGS = {
     {"who":"pet","emotion":"驚訝","text":"四片曙光碎片在發光……"},
     {"who":"pet","emotion":"平靜","text":"先爬上虎子山頂，看看它們想做什麼！"}
   ],
-  // V41_STUB_BEGIN（v4.2 移除南口路牌台詞）
-  D_SIGN_TATAKA_XT: [
-    {"who":"pet","emotion":"平靜","text":"往南就是塔塔加，玉山就在前面了！"},
-    {"who":"pet","emotion":"平靜","text":"這條路之後開放，現在還不能走喔！"}
-  ],
-  // V41_STUB_END
 
   // ═════════════ 系統與主線 ═════════════
   D_INTRO: [
@@ -3602,7 +3616,7 @@ window.DIALOGS = {
     { who: "fog_kid", emotion: "平靜", text: "第一步：把最小的放到最右邊。" }
   ],
   D_PZ_P4_3_H3: [
-    { who: "fog_kid", emotion: "開心", text: "看地上的提示，先照著走 3 步！" }
+    { who: "fog_kid", emotion: "開心", text: "前 3 步：小→右、中→中、小→中。" }   // 實玩 D4（2026-11-09）：疊石盤地上沒有提示（puzzles.js hint3 沒有畫面提示），換回 puzzles.js P4-3 hints[2] 原文
   ],
   // ═════════════ v4.0 東部終章（洞窟解謎） END ═════════════
 
@@ -3924,4 +3938,1847 @@ window.DIALOGS = {
     { who: "pet", emotion: "平靜", text: "先回最南邊的燈塔，讓霧帆號清醒吧！" }
   ],
   // ═════════════ v4.0 東部（M26–M29） END ═════════════
+  // ═══ v4.2 第 4a 批 DIALOGS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  D_TK_1A: [
+    {
+      "who": "paiyun_volunteer",
+      "emotion": "開心",
+      "text": "歡迎！要上山的人，要先來這裡報到喔。",
+      "taigi": {
+        "hanji": "歡迎！欲上山的人，愛先來遮報到喔。",
+        "tailo": "Huan-gîng! Beh tsiūnn-suann ê lâng, ài sing lâi tsia pò-tò--ooh.",
+        "huayu": "歡迎！要上山的人，要先來這裡報到喔。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "這裡是塔塔加，排雲登山服務中心！"
+    },
+    {
+      "who": "paiyun_volunteer",
+      "emotion": "平靜",
+      "text": "上山要先申請，出發那天再來報到。",
+      "taigi": {
+        "hanji": "上山愛先申請，出發彼日才閣來報到。",
+        "tailo": "Tsiūnn-suann ài sing sin-tshíng, tshut-huat hit ji̍t tsiah-koh lâi pò-tò.",
+        "huayu": "上山要先申請，出發那天再來報到。"
+      }
+    },
+    {
+      "who": "paiyun_volunteer",
+      "emotion": "平靜",
+      "text": "出發前要先看天氣，安全最重要。",
+      "taigi": {
+        "hanji": "出發進前愛先看天氣，安全上重要。",
+        "tailo": "Tshut-huat tsìn-tsîng ài sing khuànn thinn-khì, an-tsuân siōng tiōng-iàu.",
+        "huayu": "出發前要先看天氣，安全最重要。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "山上越高越冷，要多帶一件外套！"
+    },
+    {
+      "who": "paiyun_volunteer",
+      "emotion": "擔心",
+      "text": "霧讓我忘了天氣的知識，幫我想 3 題好嗎？",
+      "taigi": {
+        "hanji": "霧予我袂記得天氣的智識，共我想三題，好無？",
+        "tailo": "Bū hōo guá bē-kì-tit thinn-khì ê tì-sik, kā guá siūnn sann tê, hó--bô?",
+        "huayu": "霧讓我忘了天氣的知識，幫我想 3 題好嗎？"
+      }
+    }
+  ],
+  D_TK_1B: [
+    {
+      "who": "paiyun_volunteer",
+      "emotion": "開心",
+      "text": "你都答對了，聽得真認真！",
+      "taigi": {
+        "hanji": "你攏回答著矣，聽甲真認真！",
+        "tailo": "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!",
+        "huayu": "你都答對了，聽得真認真！"
+      }
+    },
+    {
+      "who": "paiyun_volunteer",
+      "emotion": "開心",
+      "text": "一路平安，要小心喔！",
+      "taigi": {
+        "hanji": "一路平安，愛細膩喔！",
+        "tailo": "Tsi̍t-lōo pîng-an, ài sè-jī--ooh!",
+        "huayu": "一路平安，要小心喔！"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "報到好了，可以上山了！東邊就是登山口！"
+    }
+  ],
+  D_PAIYUN_IDLE: [
+    {
+      "who": "paiyun_volunteer",
+      "text": "上山要找伴一起去，不要自己一個去喔。",
+      "taigi": {
+        "hanji": "上山愛揣伴做伙去，毋通家己一个去喔。",
+        "tailo": "Tsiūnn-suann ài tshuē phuānn tsò-hué khì, m̄-thang ka-kī tsi̍t ê khì--ooh.",
+        "huayu": "上山要找伴一起去，不要自己一個去喔。"
+      }
+    }
+  ],
+  D_EXIT_LOCK_TK: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "要爬玉山主峰，要先申請、當天先來報到喔。"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "先去服務中心找志工吧！"
+    }
+  ],
+  D_TK_2_LOCK: [
+    {
+      "who": "ysnp_ranger",
+      "emotion": "平靜",
+      "text": "先去報到，再來找我。",
+      "taigi": {
+        "hanji": "先去報到，才閣來揣我。",
+        "tailo": "Sing khì pò-tò, tsiah-koh lâi tshuē guá.",
+        "huayu": "先去報到，再來找我。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "服務中心的志工，好像需要幫忙！"
+    }
+  ],
+  D_TK_2A: [
+    {
+      "who": "ysnp_ranger",
+      "emotion": "開心",
+      "text": "這裡是玉山國家公園。",
+      "taigi": {
+        "hanji": "遮是玉山國家公園。",
+        "tailo": "Tsia sī Gio̍k-san kok-ka kong-hn̂g.",
+        "huayu": "這裡是玉山國家公園。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "它是臺灣第二座成立的國家公園喔！"
+    },
+    {
+      "who": "ysnp_ranger",
+      "emotion": "平靜",
+      "text": "從這裡往東看是玉山，往西看是阿里山。",
+      "taigi": {
+        "hanji": "對遮向東爿看是玉山，向西爿看是阿里山。",
+        "tailo": "Tuì tsia ǹg tang-pîng khuànn sī Gio̍k-san, ǹg sai-pîng khuànn sī A-lí-san.",
+        "huayu": "從這裡往東看是玉山，往西看是阿里山。"
+      }
+    },
+    {
+      "who": "ysnp_ranger",
+      "emotion": "擔心",
+      "text": "霧讓我忘了這裡的故事，幫我想 2 題好嗎？",
+      "taigi": {
+        "hanji": "霧予我袂記得遮的故事，共我想兩題，好無？",
+        "tailo": "Bū hōo guá bē-kì-tit tsia ê kòo-sū, kā guá siūnn nn̄g tê, hó--bô?",
+        "huayu": "霧讓我忘了這裡的故事，幫我想 2 題好嗎？"
+      }
+    }
+  ],
+  D_TK_2B: [
+    {
+      "who": "ysnp_ranger",
+      "emotion": "開心",
+      "text": "你都答對了，聽得真認真！",
+      "taigi": {
+        "hanji": "你攏回答著矣，聽甲真認真！",
+        "tailo": "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!",
+        "huayu": "你都答對了，聽得真認真！"
+      }
+    },
+    {
+      "who": "ysnp_ranger",
+      "emotion": "開心",
+      "text": "這些金幣送你，謝謝你！",
+      "taigi": {
+        "hanji": "這寡金幣送你，多謝你！",
+        "tailo": "Tsit-kuá kim-pè sàng lí, to-siā--lí!",
+        "huayu": "這些金幣送你，謝謝你！"
+      }
+    }
+  ],
+  D_YSNP_IDLE: [
+    {
+      "who": "ysnp_ranger",
+      "text": "這裡很高，要多穿一件衣服喔。",
+      "taigi": {
+        "hanji": "遮真懸，愛加穿一領衫喔。",
+        "tailo": "Tsia tsin kuân, ài ke tshīng tsi̍t niá sann--ooh.",
+        "huayu": "這裡很高，要多穿一件衣服喔。"
+      }
+    }
+  ],
+  D_TK_3_LOCK: [
+    {
+      "who": "bird_guide",
+      "emotion": "平靜",
+      "text": "先去報到，再來找我。",
+      "taigi": {
+        "hanji": "先去報到，才閣來揣我。",
+        "tailo": "Sing khì pò-tò, tsiah-koh lâi tshuē guá.",
+        "huayu": "先去報到，再來找我。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "服務中心的志工，好像需要幫忙！"
+    }
+  ],
+  D_TK_3A: [
+    {
+      "who": "bird_guide",
+      "emotion": "開心",
+      "text": "你看樹林裡，那是一種很珍貴的鳥。",
+      "taigi": {
+        "hanji": "你看樹林內，彼是一種真珍貴的鳥仔。",
+        "tailo": "Lí khuànn tshiū-nâ lāi, he sī tsi̍t tsióng tsin tin-kuì ê tsiáu-á.",
+        "huayu": "你看樹林裡，那是一種很珍貴的鳥。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "是帝雉！國家第二級保育類野生動物！"
+    },
+    {
+      "who": "bird_guide",
+      "emotion": "平靜",
+      "text": "要很有耐心，安靜地看就好喔。",
+      "taigi": {
+        "hanji": "愛真有耐心，恬恬看就好喔。",
+        "tailo": "Ài tsin ū nāi-sim, tiām-tiām khuànn tō hó--ooh.",
+        "huayu": "要很有耐心，安靜地看就好喔。"
+      }
+    },
+    {
+      "who": "bird_guide",
+      "emotion": "平靜",
+      "text": "不要靠近，也不要吵牠。",
+      "taigi": {
+        "hanji": "毋通倚近，嘛毋通吵伊。",
+        "tailo": "M̄-thang uá-kīn, mā m̄-thang tshá i.",
+        "huayu": "不要靠近，也不要吵牠。"
+      }
+    },
+    {
+      "who": "bird_guide",
+      "emotion": "擔心",
+      "text": "霧讓我忘了怎麼介紹，幫我想 2 題好嗎？",
+      "taigi": {
+        "hanji": "霧予我袂記得按怎紹介，共我想兩題，好無？",
+        "tailo": "Bū hōo guá bē-kì-tit án-tsuánn siāu-kài, kā guá siūnn nn̄g tê, hó--bô?",
+        "huayu": "霧讓我忘了怎麼介紹，幫我想 2 題好嗎？"
+      }
+    }
+  ],
+  D_TK_3B: [
+    {
+      "who": "bird_guide",
+      "emotion": "開心",
+      "text": "你都答對了，聽得真認真！",
+      "taigi": {
+        "hanji": "你攏回答著矣，聽甲真認真！",
+        "tailo": "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!",
+        "huayu": "你都答對了，聽得真認真！"
+      }
+    },
+    {
+      "who": "bird_guide",
+      "emotion": "開心",
+      "text": "這些金幣送你，謝謝你！",
+      "taigi": {
+        "hanji": "這寡金幣送你，多謝你！",
+        "tailo": "Tsit-kuá kim-pè sàng lí, to-siā--lí!",
+        "huayu": "這些金幣送你，謝謝你！"
+      }
+    }
+  ],
+  D_BIRDGUIDE_IDLE: [
+    {
+      "who": "bird_guide",
+      "text": "清早和傍晚，比較有機會看到這種鳥。",
+      "taigi": {
+        "hanji": "透早佮暗頭仔，較有機會看著這款鳥仔。",
+        "tailo": "Thàu-tsá kah àm-thâu-á, khah ū ki-huē khuànn-tio̍h tsit khuán tsiáu-á.",
+        "huayu": "清早和傍晚，比較有機會看到這種鳥。"
+      }
+    }
+  ],
+  D_INN_TATAKA: [
+    {
+      "who": "inn_tataka",
+      "emotion": "開心",
+      "text": "歡迎來我們這裡休息！山上晚上很冷喔。",
+      "taigi": {
+        "hanji": "歡迎來阮遮歇睏！山頂暗時真寒喔。",
+        "tailo": "Huan-gîng lâi guán tsia hioh-khùn! Suann-tíng àm-sî tsin kuânn--ooh.",
+        "huayu": "歡迎來我們這裡休息！山上晚上很冷喔。"
+      }
+    }
+  ],
+  D_INN_TATAKA_NOCOIN: [
+    {
+      "who": "inn_tataka",
+      "emotion": "擔心",
+      "text": "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。",
+      "taigi": {
+        "hanji": "金幣無夠喔，金包里溫泉旅館會使免錢蹛，嘛會使去拍怪物趁金幣。",
+        "tailo": "Kim-pè bô-kàu--ooh, Kim-pau-lí un-tsuânn lí-kuán ē-sái bián-tsînn tuà, mā ē-sái khì phah kuài-bu̍t thàn kim-pè.",
+        "huayu": "金幣不夠喔，金包里溫泉旅館能免費住，也可以去打怪賺金幣。"
+      }
+    }
+  ],
+  D_YS_1A: [
+    {
+      "who": "trail_ranger",
+      "emotion": "開心",
+      "text": "歡迎！從入口走到這裡，快要兩公里了。",
+      "taigi": {
+        "hanji": "歡迎！對入口行到遮，強欲兩公里矣。",
+        "tailo": "Huan-gîng! Tuì ji̍p-kháu kiânn kàu tsia, kiōng-beh nn̄g kong-lí--ah.",
+        "huayu": "歡迎！從入口走到這裡，快要兩公里了。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "這裡是孟祿亭！"
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "平靜",
+      "text": "你看，西邊的樹像一把大傘，東邊的樹尖尖的。",
+      "taigi": {
+        "hanji": "你看，西爿的樹仔親像一枝大雨傘，東爿的樹仔尖尖。",
+        "tailo": "Lí khuànn, sai-pîng ê tshiū-á tshin-tshiūnn tsi̍t ki tuā hōo-suànn, tang-pîng ê tshiū-á tsiam-tsiam.",
+        "huayu": "你看，西邊的樹像一把大傘，東邊的樹尖尖的。"
+      }
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "平靜",
+      "text": "兩種森林，在這裡相連。",
+      "taigi": {
+        "hanji": "兩種樹林，佇遮相連。",
+        "tailo": "Nn̄g tsióng tshiū-nâ, tī tsia sio-liân.",
+        "huayu": "兩種森林，在這裡相連。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "這裡是溫帶林和寒帶林的交界！"
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "擔心",
+      "text": "霧讓我忘了樹的知識，幫我想 2 題好嗎？",
+      "taigi": {
+        "hanji": "霧予我袂記得樹仔的智識，共我想兩題，好無？",
+        "tailo": "Bū hōo guá bē-kì-tit tshiū-á ê tì-sik, kā guá siūnn nn̄g tê, hó--bô?",
+        "huayu": "霧讓我忘了樹的知識，幫我想 2 題好嗎？"
+      }
+    }
+  ],
+  D_YS_1B: [
+    {
+      "who": "trail_ranger",
+      "emotion": "開心",
+      "text": "你都答對了，聽得真認真！",
+      "taigi": {
+        "hanji": "你攏回答著矣，聽甲真認真！",
+        "tailo": "Lí lóng huê-tap tio̍h--ah, thiann kah tsin jīn-tsin!",
+        "huayu": "你都答對了，聽得真認真！"
+      }
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "擔心",
+      "text": "前面的步道好像有動靜，走路要小心。",
+      "taigi": {
+        "hanji": "頭前的步道敢若有動靜，行路愛細膩。",
+        "tailo": "Thâu-tsîng ê pōo-tō kánn-ná ū tōng-tsīng, kiânn-lōo ài sè-jī.",
+        "huayu": "前面的步道好像有動靜，走路要小心。"
+      }
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "開心",
+      "text": "這些金幣送你，謝謝你！",
+      "taigi": {
+        "hanji": "這寡金幣送你，多謝你！",
+        "tailo": "Tsit-kuá kim-pè sàng lí, to-siā--lí!",
+        "huayu": "這些金幣送你，謝謝你！"
+      }
+    }
+  ],
+  D_TRAILRANGER_IDLE: [
+    {
+      "who": "trail_ranger",
+      "text": "垃圾和剩下的食物，都要帶下山喔。",
+      "taigi": {
+        "hanji": "糞埽佮賰的食物，攏愛提落山喔。",
+        "tailo": "Pùn-sò kah tshun ê si̍t-bu̍t, lóng ài the̍h lo̍h-suann--ooh.",
+        "huayu": "垃圾和剩下的食物，都要帶下山喔。"
+      }
+    }
+  ],
+  D_YS_2A: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "前面的林邊，有一隻黑熊坐著吃果子。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "驚訝",
+      "text": "是臺灣黑熊！胸前有黃白色的 V 字……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "我們不要靠近。先想一想，遇到熊要怎麼辦？"
+    }
+  ],
+  D_BEAR_LEAVE: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "大家安靜地往後退。"
+    },
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "黑熊吃完果子，慢慢走回森林了。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "牠回家了！我們也要記得告訴巡山員。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "看到熊要冷靜、安靜離開，再告訴巡山員！"
+    }
+  ],
+  D_YS_3_LOCK: [
+    {
+      "who": "trail_ranger",
+      "emotion": "擔心",
+      "text": "前面的步道好像有動靜，先去看看。",
+      "taigi": {
+        "hanji": "頭前的步道敢若有動靜，先去看覓。",
+        "tailo": "Thâu-tsîng ê pōo-tō kánn-ná ū tōng-tsīng, sing khì khuànn-māi.",
+        "huayu": "前面的步道好像有動靜，先去看看。"
+      }
+    }
+  ],
+  D_YS_3A: [
+    {
+      "who": "trail_ranger",
+      "emotion": "開心",
+      "text": "謝謝你們通報我，我會寫下來。",
+      "taigi": {
+        "hanji": "多謝恁共我通報，我會寫落來。",
+        "tailo": "To-siā lín kā guá thong-pò, guá ē siá--lo̍h-lâi.",
+        "huayu": "謝謝你們通報我，我會寫下來。"
+      }
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "擔心",
+      "text": "可是前面的步道，被一大團霧擋住了。",
+      "taigi": {
+        "hanji": "毋過頭前的步道，予一大丸霧擋牢矣。",
+        "tailo": "M̄-koh thâu-tsîng ê pōo-tō, hōo tsi̍t tuā uân bū tòng-tiâu--ah.",
+        "huayu": "可是前面的步道，被一大團霧擋住了。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "是白木林那邊！"
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "平靜",
+      "text": "讓那團霧清醒，才走得過去。",
+      "taigi": {
+        "hanji": "予彼丸霧清醒，才行會過。",
+        "tailo": "Hōo hit uân bū tshing-tshínn, tsiah kiânn ē kuè.",
+        "huayu": "讓那團霧清醒，才走得過去。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "頭目戰不能逃跑，準備好再過去喔！"
+    }
+  ],
+  D_BOSS_MIST_A: [
+    {
+      "who": "fob_mist",
+      "emotion": "神祕",
+      "text": "呼……前面好危險……不要過來……"
+    },
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "山嵐霧精把步道擋住了！答對題目叫醒牠！"
+    }
+  ],
+  D_BOSS_MIST_B: [
+    {
+      "who": "fob_mist",
+      "emotion": "平靜",
+      "text": "呼……我只是……不想讓你們迷路……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "牠是被霧王叫來擋路的……其實牠只是擔心我們。"
+    }
+  ],
+  D_YS_3B: [
+    {
+      "who": "trail_ranger",
+      "emotion": "開心",
+      "text": "霧散了！你看那片樹幹白白的樹林。",
+      "taigi": {
+        "hanji": "霧散矣！你看彼片樹身白白的樹林。",
+        "tailo": "Bū suànn--ah! Lí khuànn hit phiàn tshiū-sin pe̍h-pe̍h ê tshiū-nâ.",
+        "huayu": "霧散了！你看那片樹幹白白的樹林。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "那是白木林！枯掉的鐵杉和冷杉，樹幹變白了。"
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "平靜",
+      "text": "再往前走，就到山莊了。",
+      "taigi": {
+        "hanji": "閣向頭前行，就到山莊矣。",
+        "tailo": "Koh ǹg thâu-tsîng kiânn, tō kàu san-tsong--ah.",
+        "huayu": "再往前走，就到山莊了。"
+      }
+    },
+    {
+      "who": "trail_ranger",
+      "emotion": "開心",
+      "text": "這些金幣送你，謝謝你！",
+      "taigi": {
+        "hanji": "這寡金幣送你，多謝你！",
+        "tailo": "Tsit-kuá kim-pè sàng lí, to-siā--lí!",
+        "huayu": "這些金幣送你，謝謝你！"
+      }
+    }
+  ],
+  D_EXIT_LOCK_YS: [
+    {
+      "who": "pet",
+      "emotion": "擔心",
+      "text": "白木林前的霧太濃了，看不到路。"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "先回孟祿亭問問巡山員吧！"
+    }
+  ],
+  D_MUNTJAC_AFTER: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "山羌是野生動物，不可以隨便捉喔。"
+    }
+  ],
+  D_PY_1A: [
+    {
+      "who": "lodge_manager_py",
+      "emotion": "開心",
+      "text": "歡迎來山莊！晚上可以在這裡休息。",
+      "taigi": {
+        "hanji": "歡迎來山莊！暗時會使佇遮歇睏。",
+        "tailo": "Huan-gîng lâi san-tsong! Àm-sî ē-sái tī tsia hioh-khùn.",
+        "huayu": "歡迎來山莊！晚上可以在這裡休息。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "這裡是排雲山莊！"
+    },
+    {
+      "who": "lodge_manager_py",
+      "emotion": "平靜",
+      "text": "山莊每天下午 6 點到 8 點才有電。",
+      "taigi": {
+        "hanji": "山莊逐工下晡六點到八點才有電。",
+        "tailo": "San-tsong ta̍k-kang ē-poo la̍k tiám kàu peh tiám tsiah ū tiān.",
+        "huayu": "山莊每天下午 6 點到 8 點才有電。"
+      }
+    },
+    {
+      "who": "lodge_manager_py",
+      "emotion": "平靜",
+      "text": "電要省著用。這裡也不能升火烤肉喔。",
+      "taigi": {
+        "hanji": "電愛儉咧用。遮嘛袂使起火烘肉喔。",
+        "tailo": "Tiān ài khiām--leh īng. Tsia mā bē-sái khí-hué hang-bah--ooh.",
+        "huayu": "電要省著用。這裡也不能升火烤肉喔。"
+      }
+    },
+    {
+      "who": "lodge_manager_py",
+      "emotion": "擔心",
+      "text": "霧讓我算不清楚時間，幫我算 2 題好嗎？",
+      "taigi": {
+        "hanji": "霧予我算袂清楚時間，共我算兩題，好無？",
+        "tailo": "Bū hōo guá sǹg bē tshing-tshó sî-kan, kā guá sǹg nn̄g tê, hó--bô?",
+        "huayu": "霧讓我算不清楚時間，幫我算 2 題好嗎？"
+      }
+    }
+  ],
+  D_PY_1B: [
+    {
+      "who": "lodge_manager_py",
+      "emotion": "開心",
+      "text": "算得剛剛好，謝謝你！",
+      "taigi": {
+        "hanji": "算甲拄仔好，多謝你！",
+        "tailo": "Sǹg kah tú-á-hó, to-siā--lí!",
+        "huayu": "算得剛剛好，謝謝你！"
+      }
+    },
+    {
+      "who": "lodge_manager_py",
+      "emotion": "平靜",
+      "text": "冬天水管會結冰，水也要省著用。",
+      "taigi": {
+        "hanji": "寒天水管會結冰，水嘛愛儉咧用。",
+        "tailo": "Kuânn-thinn tsuí-kóng ē kiat-ping, tsuí mā ài khiām--leh īng.",
+        "huayu": "冬天水管會結冰，水也要省著用。"
+      }
+    },
+    {
+      "who": "lodge_manager_py",
+      "emotion": "開心",
+      "text": "這些金幣送你，謝謝你！",
+      "taigi": {
+        "hanji": "這寡金幣送你，多謝你！",
+        "tailo": "Tsit-kuá kim-pè sàng lí, to-siā--lí!",
+        "huayu": "這些金幣送你，謝謝你！"
+      }
+    }
+  ],
+  D_LODGE_PY_IDLE: [
+    {
+      "who": "lodge_manager_py",
+      "text": "這裡不能搭帳篷喔。",
+      "taigi": {
+        "hanji": "遮袂使搭布棚喔。",
+        "tailo": "Tsia bē-sái tah pòo-pênn--ooh.",
+        "huayu": "這裡不能搭帳篷喔。"
+      }
+    }
+  ],
+  D_INN_PAIYUN: [
+    {
+      "who": "lodge_manager_py",
+      "emotion": "開心",
+      "text": "在這裡休息不用錢，好好睡一晚。",
+      "taigi": {
+        "hanji": "佇遮歇睏免錢，好好仔睏一暝。",
+        "tailo": "Tī tsia hioh-khùn bián-tsînn, hó-hó-á khùn tsi̍t mê.",
+        "huayu": "在這裡休息不用錢，好好睡一晚。"
+      }
+    }
+  ],
+  D_PY_2A: [
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "你看，山莊前面有好大一片雲海……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "霧是很多很小的小水滴。雲和霧是怎麼來的呢？"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "答對 2 題，我就把霧王的故事告訴你。"
+    }
+  ],
+  D_FOG_ORIGIN: [
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "霧王以前，也是一朵雲喔。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "大家弄丟、忘記的東西，會飄到天上。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "忘掉的字、忘記說的謝謝，都聚在一起……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "就變成了遺忘霧。霧王只是怕自己被忘記。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "我也是從霧裡生出來的，所以我懂它的寂寞。"
+    },
+    {
+      "who": "pet",
+      "emotion": "擔心",
+      "text": "可是忘掉學過的東西，大家會更難過啊！"
+    },
+    {
+      "who": "hero",
+      "emotion": "開心",
+      "text": "我們去告訴霧王：被記得，就不會消失。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "嗯！我們往風口出發吧！"
+    }
+  ],
+  D_EXIT_LOCK_PY: [
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "等一下……我有一件事想先告訴你。"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "去山莊前的廣場，聽霧仔說吧！"
+    }
+  ],
+  D_FK_1A: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "這裡是風口，一大片灰灰的碎石坡。"
+    },
+    {
+      "who": "pet",
+      "emotion": "擔心",
+      "text": "風好大，碎石坡很滑，要慢慢走！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "這裡比排雲山莊還高，也更冷了。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "上面被霧王的霧牆擋住了……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "拿出曙光羅盤，答對 2 題，照出霧裡的路吧！"
+    }
+  ],
+  D_FK_1B: [
+    {
+      "who": "narrator",
+      "emotion": "驚訝",
+      "text": "曙光羅盤一照，霧牆中間出現一個洞口！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "驚訝",
+      "text": "是霧之洞窟！路一直往上，通到山頂。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "洞窟裡有山屋小燈，可以休息和存檔喔！"
+    }
+  ],
+  D_EXIT_LOCK_FK: [
+    {
+      "who": "pet",
+      "emotion": "擔心",
+      "text": "往山頂的路被一片白霧牆擋住了。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "曙光羅盤也許照得出路。"
+    }
+  ],
+  D_SIGN_FENGKOU: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "起霧的時候，要看清楚路標，慢慢走。"
+    }
+  ],
+  D_ECHO_DOOR: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "石門上有一張大大的嘴巴。"
+    },
+    {
+      "who": "hero",
+      "emotion": "驚訝",
+      "text": "有人在嗎？"
+    },
+    {
+      "who": "fo_echo",
+      "emotion": "開心",
+      "text": "有人在嗎？有人在嗎？……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "是喂喂回音霧！答對 3 題國語，門就會開。"
+    }
+  ],
+  D_CV_1B: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "石門慢慢打開了！"
+    },
+    {
+      "who": "fo_echo",
+      "emotion": "平靜",
+      "text": "謝謝……謝謝……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "往北邊的樓梯走，去第 2 層！"
+    }
+  ],
+  D_CV_2A: [
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "這裡飄著好多大家弄丟的東西……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "把東西送回對的書架，送回 6 件，北門就會開。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "書架上的圖案，就是分類的提示！"
+    }
+  ],
+  D_CV_2B: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "北門打開了！霧也變淡了。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "東西都回家了，主人一定很高興。"
+    }
+  ],
+  D_CV_3A: [
+    {
+      "who": "fog_kid",
+      "emotion": "驚訝",
+      "text": "五座燈座上，都站著一個霧影！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "讓霧影清醒，五盞燈全亮，最後的門才會開。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "先打哪一個都可以，加油！"
+    }
+  ],
+  D_BOSS_SHADOW_A: [
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "是霧影！長得好像以前遇過的頭目！"
+    }
+  ],
+  D_LAMP_TRIAL_KO: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "霧影散開了，國語燈亮了起來！"
+    }
+  ],
+  D_LAMP_TRIAL_EN: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "霧影散開了，英語燈亮了起來！"
+    }
+  ],
+  D_LAMP_TRIAL_MA: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "霧影散開了，數學燈亮了起來！"
+    }
+  ],
+  D_LAMP_TRIAL_NA: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "霧影散開了，自然燈亮了起來！"
+    }
+  ],
+  D_LAMP_TRIAL_SO: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "霧影散開了，社會燈亮了起來！"
+    }
+  ],
+  D_LAMP_TRIAL_ALL: [
+    {
+      "who": "narrator",
+      "emotion": "驚訝",
+      "text": "五盞燈全亮了！地上浮出一個五角星盤。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "讓五顆星石都亮起來，最後的門就會開！"
+    }
+  ],
+  D_EXIT_LOCK_CV: [
+    {
+      "who": "pet",
+      "emotion": "擔心",
+      "text": "最後的門還打不開。"
+    }
+  ],
+  D_SUMMIT_GATE: [
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "門後面，就是玉山的山頂了。"
+    },
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "真正的玉山頂很高、很冷，冬天常常積雪。"
+    },
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "起霧、下雨的時候，要看清楚指標，慢慢走。"
+    },
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "要去爬真的玉山，一定要跟大人結伴一起去，還要事先申請。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "準備好了嗎？我們上去吧！"
+    }
+  ],
+  D_EXIT_LOCK_CV_LAMP: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "還有燈座沒亮，先讓霧影清醒吧！"
+    }
+  ],
+  D_EXIT_LOCK_CV_STAR: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "地上的五顆星石，還沒全亮喔！"
+    }
+  ],
+  D_EXIT_LOCK_CV_PL: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "門上寫著：戰力 60 才推得開。"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "你現在的戰力是 {pl}，再練強一點吧！"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "剛轉職的話，換回以前的職業也可以過喔。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "還沒準備好，可以先找小燈休息、練功喔。"
+    }
+  ],
+  D_EXIT_LOCK_XT: [
+    {
+      "who": "pet",
+      "emotion": "擔心",
+      "text": "往塔塔加的山路黑漆漆的，要有森林燈籠才走得過去。"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "先去幫燈籠町的燈籠店老闆吧！"
+    }
+  ],
+  D_EXIT_LOCK_LIB: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "北門還關著，還有東西沒回到書架上。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "把 6 件東西送回對的書架，北門就會開。"
+    }
+  ],
+  D_FOG_KING_P3: [
+    {
+      "who": "fob_king",
+      "emotion": "擔心",
+      "text": "你們一路上……記住了什麼？"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "想不起來也沒關係，慢慢想喔。"
+    },
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "這一段不計時。"
+    }
+  ],
+  D_EAST_JOB_HINT: [
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "見習冒險者，到宮廟或府城公會轉職，會更快變強喔。"
+    }
+  ],
+  // ═══ v4.2 第 4a 批 DIALOGS END ═══
+  // ═══ v4.2 第 4b 批 DIALOGS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  D_SUMMIT_ARRIVE: [
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "我們到山頂了！這裡就是臺灣最高的地方。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "空氣比較稀薄，也比山下冷。"
+    },
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "四周都被濃霧蓋住了……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "霧王的霧，把整座山藏起來了。"
+    }
+  ],
+  D_FOG_KING_MEET: [
+    {
+      "who": "narrator",
+      "emotion": "神祕",
+      "text": "山頂上空的霧裡，浮出一本好大的書。"
+    },
+    {
+      "who": "fob_king",
+      "emotion": "神祕",
+      "text": "你們……為什麼不肯忘記？"
+    },
+    {
+      "who": "fob_king",
+      "emotion": "擔心",
+      "text": "大家都忘了，就不會難過了……"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "擔心",
+      "text": "霧王，我們是來找你說話的。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "學過的東西都在心裡！我們一起答題吧！"
+    }
+  ],
+  D_FOG_KING_P2: [
+    {
+      "who": "fob_king",
+      "emotion": "神祕",
+      "text": "看……四位霧將的影子……"
+    },
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "是一路上遇過的霧將！一題一題來！"
+    }
+  ],
+  D_FOG_KING_P4: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "霧開始變薄，東邊亮起一條金色的光。"
+    },
+    {
+      "who": "fob_king",
+      "emotion": "平靜",
+      "text": "最後一題……"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "加油！最後一題了！"
+    }
+  ],
+  D_FOG_KING_ASK: [
+    {
+      "who": "fob_king",
+      "emotion": "擔心",
+      "text": "你們……會記得我嗎？"
+    }
+  ],
+  D_FOG_KING_CHOICE_A: [
+    {
+      "who": "hero",
+      "emotion": "開心",
+      "text": "會！我們會一直記得你！"
+    }
+  ],
+  D_FOG_KING_CHOICE_B: [
+    {
+      "who": "hero",
+      "emotion": "開心",
+      "text": "我們會把你寫進故事裡！"
+    }
+  ],
+  D_FOG_KING_END: [
+    {
+      "who": "fob_king",
+      "emotion": "開心",
+      "text": "被記得……原來是這種暖暖的感覺。"
+    },
+    {
+      "who": "fob_king",
+      "emotion": "平靜",
+      "text": "謝謝你們。我想變回一朵雲了。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "霧王，你也被我們記住了喔！"
+    }
+  ],
+  D_CH9_END: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "終章完成！"
+    },
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "你讓遺忘霧王想起了被記得的感覺。"
+    }
+  ],
+  D_END_E1: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "霧王的書頁，一頁一頁變成白雲。"
+    },
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "白雲從山頂流下去，鋪成一大片雲海。"
+    }
+  ],
+  D_END_E2: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "第一道曙光，照亮了玉山的山頂！"
+    },
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "霧散了，四周的山一座座從雲海裡露出來。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "好漂亮！我們做到了！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "謝謝你，{name}！"
+    }
+  ],
+  D_END_E3: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "金包里的五盞知識燈旁邊，第六盞燈亮了。"
+    },
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "第六盞燈亮起來了！",
+      "taigi": {
+        "hanji": "第六葩燈光起來矣！",
+        "tailo": "Tē-la̍k pha ting kng--khí-lâi--ah!",
+        "huayu": "第六盞燈亮起來了！"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "它叫做「曙光燈」！"
+    },
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "謝謝你！金包里又亮起來了！",
+      "taigi": {
+        "hanji": "多謝你！金包里閣光起來矣！",
+        "tailo": "To-siā--lí! Kim-pau-lí koh kng--khí-lâi--ah!",
+        "huayu": "謝謝你！金包里又亮起來了！"
+      }
+    }
+  ],
+  D_END_E4: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "一路上幫過的朋友，都來揮手了。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "精靈、地精、獸人……大家都來了！"
+    }
+  ],
+  D_END_E5: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "霧仔變成了一朵小小的雲。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "我變成雲了！我還要跟著你們喔。"
+    }
+  ],
+  D_END_E6: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "謝謝你一路的努力！"
+    },
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "你得到稱號「點亮曙光的人」！"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "還可以繼續冒險喔！山頂西邊出現了雲做的階梯。"
+    }
+  ],
+  D_END_HOME_1: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "遺忘霧散了，天空變得好藍。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "我們回到金包里了！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "公園那邊，好像有什麼在發光……"
+    }
+  ],
+  D_END_HOME_2: [
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "哇！五盞燈都亮著，大家都在公園等我們耶！"
+    }
+  ],
+  D_END_AWARD_1: [
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "{name}，你來得正好！",
+      "taigi": {
+        "hanji": "你來甲拄仔好！",
+        "tailo": "Lí lâi kah tú-á-hó!",
+        "huayu": "你來得正好！"
+      }
+    },
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "大家都在等你回來。",
+      "taigi": {
+        "hanji": "逐家攏咧等你轉來。",
+        "tailo": "Ta̍k-ke lóng teh tán lí tńg--lâi.",
+        "huayu": "大家都在等你回來。"
+      }
+    },
+    {
+      "who": "chief",
+      "emotion": "平靜",
+      "text": "一路上辛苦了！",
+      "taigi": {
+        "hanji": "一路辛苦囉！",
+        "tailo": "Tsi̍t-lōo sin-khóo--looh!",
+        "huayu": "一路上辛苦了！"
+      }
+    },
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "這是勇者之證，送給你！",
+      "taigi": {
+        "hanji": "這是勇者之證，送你！",
+        "tailo": "Tse sī ióng-tsiá tsi tsìng, sàng lí!",
+        "huayu": "這是勇者之證，送給你！"
+      }
+    }
+  ],
+  D_END_AWARD_2: [
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "還有這個，幫你戴上！",
+      "taigi": {
+        "hanji": "閣有這个，共你掛起來！",
+        "tailo": "Koh ū tsit ê, kā lí kuà--khí-lâi!",
+        "huayu": "還有這個，幫你戴上！"
+      }
+    }
+  ],
+  D_END_AWARD_3: [
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "好漂亮！上面還有你的名字耶！"
+    },
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "大家都會記得你的努力。",
+      "taigi": {
+        "hanji": "逐家攏會記得你的拍拚。",
+        "tailo": "Ta̍k-ke lóng ē-kì-tit lí ê phah-piànn.",
+        "huayu": "大家都會記得你的努力。"
+      }
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "驚訝",
+      "text": "你看！五盞燈旁邊，有一座燈座在發光！"
+    }
+  ],
+  D_END_NIGHT: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "金包里的漁港點起燈火，大家一起慶祝。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "{name}，下次冒險還要一起去喔！"
+    }
+  ],
+  D_END_CHIEF_IDLE: [
+    {
+      "who": "chief",
+      "text": "有空要回來金包里喔！",
+      "taigi": {
+        "hanji": "有閒愛轉來金包里喔！",
+        "tailo": "Ū-îng ài tńg-lâi Kim-pau-lí--ooh!",
+        "huayu": "有空要回來金包里喔！"
+      }
+    }
+  ],
+  D_END_CERT_1: [
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "你換職業了！",
+      "taigi": {
+        "hanji": "你換職業矣！",
+        "tailo": "Lí uānn tsit-gia̍p--ah!",
+        "huayu": "你換職業了！"
+      }
+    },
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "這是勇者之證，送給你！",
+      "taigi": {
+        "hanji": "這是勇者之證，送你！",
+        "tailo": "Tse sī ióng-tsiá tsi tsìng, sàng lí!",
+        "huayu": "這是勇者之證，送給你！"
+      }
+    }
+  ],
+  D_END_CERT_2: [
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "大家都會記得你的努力。",
+      "taigi": {
+        "hanji": "逐家攏會記得你的拍拚。",
+        "tailo": "Ta̍k-ke lóng ē-kì-tit lí ê phah-piànn.",
+        "huayu": "大家都會記得你的努力。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "證書收進手帳的「證書冊」了！"
+    }
+  ],
+  D_END_CERT_HINT: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "換成別的職業，再來找里長伯，可以再領一張證書喔！"
+    }
+  ],
+  D_END_HERO_CALL: [
+    {
+      "who": "chief",
+      "emotion": "驚訝",
+      "text": "大家快來看！",
+      "taigi": {
+        "hanji": "逐家緊來看！",
+        "tailo": "Ta̍k-ke kín lâi khuànn!",
+        "huayu": "大家快來看！"
+      }
+    }
+  ],
+  D_END_HERO_1: [
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "我們金包里出了一位勇者！",
+      "taigi": {
+        "hanji": "咱金包里出一个勇者矣！",
+        "tailo": "Lán Kim-pau-lí tshut tsi̍t ê ióng-tsiá--ah!",
+        "huayu": "我們金包里出了一位勇者！"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "全鎮的人和一路上的朋友都來了！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "你看！燈都在發光！"
+    }
+  ],
+  D_END_HERO_VO: [
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "這是最特別的勇者之證！",
+      "taigi": {
+        "hanji": "這是上特別的勇者之證！",
+        "tailo": "Tse sī siōng ti̍k-pia̍t ê ióng-tsiá tsi tsìng!",
+        "huayu": "這是最特別的勇者之證！"
+      }
+    }
+  ],
+  D_END_HERO_2: [
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "金包里永遠是你的家！",
+      "taigi": {
+        "hanji": "金包里永遠是你的厝！",
+        "tailo": "Kim-pau-lí íng-uán sī lí ê tshù!",
+        "huayu": "金包里永遠是你的家！"
+      }
+    },
+    {
+      "who": "chief",
+      "emotion": "開心",
+      "text": "大家都會記得你的努力。",
+      "taigi": {
+        "hanji": "逐家攏會記得你的拍拚。",
+        "tailo": "Ta̍k-ke lóng ē-kì-tit lí ê phah-piànn.",
+        "huayu": "大家都會記得你的努力。"
+      }
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "你得到稱號「傳說中的勇者」！證書收進證書冊了！"
+    }
+  ],
+  D_LAMP_DAWN_DARK: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "這座燈還暗暗的，好像在等天亮。"
+    }
+  ],
+  D_MV_NARR_B1: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "旅程，從金山的海邊開始。"
+    }
+  ],
+  D_MV_NARR_B3: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "來到有好多高樓的大城市。"
+    }
+  ],
+  D_MV_NARR_B4: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "水庫邊、河堤上，都有人揮手。"
+    }
+  ],
+  D_MV_NARR_B5: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "古城和大海，都醒過來了。"
+    }
+  ],
+  D_MV_NARR_B7: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "玉山上，天亮了。"
+    }
+  ],
+  D_MV_NARR_B8: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "海風吹來了，回家吧。"
+    }
+  ],
+  // ═══ v4.2 第 4b 批 DIALOGS END ═══
+  // ═══ v4.2 第 4c 批 DIALOGS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  D_POST_1A: [
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "這裡是晨光雲階！有些雲軟軟的，踩不上去。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "答對 1 題，軟軟的雲就會變硬。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "不用每朵都答，開出一條路就可以！"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "累了就回入口的小燈休息喔。"
+    }
+  ],
+  D_POST_1B: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "雲階走完了！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "下一層是星光雲庭，地上有好多星星喔！"
+    }
+  ],
+  D_POST_2A: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "夜空下的雲庭裡，散落著發亮的星星。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "天上 5 個星座，都少了星星。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "每顆星星，都是你一路上的記憶。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "撿起地上的星星，答對題目，星星就會飛回星座！"
+    }
+  ],
+  D_POST_2B: [
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "最後一層是曙光源頭。準備好再去喔！"
+    }
+  ],
+  D_EXIT_LOCK_POST2: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "5 個星座都完成，拱門才會打開喔。"
+    }
+  ],
+  D_POST_3A: [
+    {
+      "who": "fog_kid",
+      "emotion": "驚訝",
+      "text": "四座雲島上，有四位發著曙光的霧將！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "平靜",
+      "text": "四位都清醒了，中間的光柱才會變亮。"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "先打哪一位都可以，準備好再去喔！"
+    }
+  ],
+  D_POST_BOSS_A: [
+    {
+      "who": "pet",
+      "emotion": "驚訝",
+      "text": "發著曙光的霧將，比以前更強！"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "沒關係，你也學會了好多東西！"
+    }
+  ],
+  D_POST_BOSS_B: [
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "又一位霧將清醒了！"
+    }
+  ],
+  D_POST_END: [
+    {
+      "who": "narrator",
+      "emotion": "開心",
+      "text": "溫暖的光從腳下升起。大家的記憶，都在這道光裡。"
+    },
+    {
+      "who": "fog_kid",
+      "emotion": "開心",
+      "text": "這裡就是曙光開始的地方。謝謝你陪我走到這裡！"
+    },
+    {
+      "who": "pet",
+      "emotion": "開心",
+      "text": "辛苦了！累了就找小燈休息吧！"
+    }
+  ],
+  D_SIGN_CHALLENGE: [
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "木牌寫著：給想挑戰更高的冒險者。"
+    }
+  ],
+  D_SHOP_CLOUD: [
+    {
+      "who": "cloud_shop_m42",
+      "emotion": "開心",
+      "text": "這是雲上小舖！這一層的裝備在這裡買。",
+      "huayu_only": true
+    }
+  ],
+  D_TAO_FISHER_IDLE: [
+    {
+      "who": "tao_fisher",
+      "emotion": "平靜",
+      "text": "飛魚季的時候，架子上會曬滿飛魚。",
+      "huayu_only": true
+    },
+    {
+      "who": "tao_fisher",
+      "emotion": "平靜",
+      "text": "請不要從曬飛魚的架子下面走過去喔。",
+      "huayu_only": true
+    }
+  ],
+  D_TAO_TARO_IDLE: [
+    {
+      "who": "tao_taro",
+      "emotion": "開心",
+      "text": "這是水芋田。芋頭是我們每天吃的主食。",
+      "huayu_only": true
+    },
+    {
+      "who": "tao_taro",
+      "emotion": "平靜",
+      "text": "大船做好的時候，要準備好多芋頭來慶祝。",
+      "huayu_only": true
+    }
+  ],
+  D_TAO_ELDER_IDLE: [
+    {
+      "who": "tao_elder",
+      "emotion": "平靜",
+      "text": "天氣熱的時候，大家坐在涼台上休息、聊天。",
+      "huayu_only": true
+    }
+  ],
+  D_TAO_OWNER_IDLE: [
+    {
+      "who": "tao_owner",
+      "emotion": "平靜",
+      "text": "這是用海邊的卵石砌的地下屋。",
+      "huayu_only": true
+    },
+    {
+      "who": "tao_owner",
+      "emotion": "平靜",
+      "text": "屋子蓋得低低的，不怕颱風和冬天的強風。",
+      "huayu_only": true
+    },
+    {
+      "who": "tao_owner",
+      "emotion": "開心",
+      "text": "冬天暖暖的，夏天涼涼的。",
+      "huayu_only": true
+    },
+    {
+      "who": "tao_owner",
+      "emotion": "平靜",
+      "text": "這是我的家。想進去，要先問過我喔。",
+      "huayu_only": true
+    }
+  ],
+  D_TAO_BOATMAN_IDLE: [
+    {
+      "who": "tao_boatman",
+      "emotion": "平靜",
+      "text": "船屋裡放的是大船，小船就放在海邊。",
+      "huayu_only": true
+    },
+    {
+      "who": "tao_boatman",
+      "emotion": "平靜",
+      "text": "拼板舟請不要隨便摸，也不要坐上去喔。",
+      "huayu_only": true
+    }
+  ],
+  D_TAO_KID_IDLE: [
+    {
+      "who": "tao_kid",
+      "emotion": "開心",
+      "text": "Akokey！見面打招呼時，我們這樣說喔。",
+      "huayu_only": true
+    },
+    {
+      "who": "tao_kid",
+      "emotion": "平靜",
+      "text": "想幫我拍照，要先問我喔！",
+      "huayu_only": true
+    }
+  ],
+  D_ANIMAL_GOAT_LY: [
+    {
+      "who": "narrator",
+      "emotion": "平靜",
+      "text": "山羊的耳朵上有記號，代表牠是誰家養的。"
+    },
+    {
+      "who": "pet",
+      "emotion": "平靜",
+      "text": "牠們有主人，不要追，也不要嚇牠們喔！"
+    }
+  ],
+  // ═══ v4.2 第 4c 批 DIALOGS END ═══
 };

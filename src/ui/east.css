@@ -8,7 +8,8 @@
   background: rgba(11, 18, 54, .75); font-size: 24px; line-height: 1; }
 #hud .east-tools .east-btn { min-height: 44px; padding: 4px 12px; font-size: 20px; white-space: nowrap; }
 @media (max-height: 460px) { #hud .east-tools { top: 52px; } #hud .east-tools .east-btn { font-size: 18px; } }
-@media (orientation: portrait) and (max-width: 680px) { #hud .east-tools { top: calc(100% + 4px); } }
+/* 實玩 D2（768×1024 平板直放：工具列 top 60px 壓在第二排的「⚙️ 設定」上）：直放一律和小地圖一樣放到 HUD 下面（style.css #hud .minimap 的直放規則），不再只限 680px 以下 */
+@media (orientation: portrait) { #hud .east-tools { top: calc(100% + 4px); } }
 
 /* 借書台密碼盤（P3-3）、疊石盤（P4-3） */
 .east-panel .east-eqs { display: flex; flex-direction: column; gap: 2px; margin: 8px 0; }

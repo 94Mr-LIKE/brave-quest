@@ -692,5 +692,790 @@ window.MONSTERS = {
     dialog_before: "D_BOSS_LANTERN_A", dialog_after: "D_BOSS_LANTERN_B",
     desc: "比房子還高的大紅燈籠，裡面不是火，而是慢慢旋轉的灰霧。",
     wake: "燈籠霧將清醒了，燈籠裡亮起暖暖的橘光。"
-  }
+  },
+  // ═══ v4.2 第 4a 批 MONSTERS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  an_muntjac: {
+    "name": "吠吠山羌",
+    "sprite": "mon_an_muntjac",
+    "level": 5,
+    "hp": 600,
+    "atk": 97,
+    "exp": 260,
+    "gold": 70,
+    "subject": "國語",
+    "q_levels": [
+      2,
+      3
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [
+      {
+        "item": "mountain_fruit",
+        "rate": 0.4
+      }
+    ],
+    "desc": "小小的棕色山羌，四腳站穩，聽到聲音就警戒地大叫。",
+    "wake": "吠吠山羌清醒了，一溜煙跑進樹林。",
+    "dialog_after_once": "D_MUNTJAC_AFTER"
+  },
+  fo_puff_cave: {
+    "name": "洞窟噗噗霧泡泡",
+    "sprite": "mon_fo_puff_cave",
+    "level": 5,
+    "hp": 610,
+    "atk": 98,
+    "exp": 270,
+    "gold": 70,
+    "subject": "自然",
+    "q_levels": [
+      2,
+      3
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "洞窟裡淡紫灰色的霧泡泡，比外面的強一點。",
+    "wake": "噗噗霧泡泡被光照暖了，小水滴變成水蒸氣，散掉了。"
+  },
+  fo_echo: {
+    "name": "喂喂回音霧",
+    "sprite": "mon_fo_echo",
+    "level": 5,
+    "hp": 610,
+    "atk": 99,
+    "exp": 270,
+    "gold": 70,
+    "subject": "國語",
+    "q_levels": [
+      2,
+      3
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "像對話泡泡的白霧團，會學你說話，守著回音謎門。",
+    "wake": "喂喂回音霧安靜下來，輕輕說了聲謝謝。"
+  },
+  fo_frost: {
+    "name": "霜霜冰霧靈",
+    "sprite": "mon_fo_frost",
+    "level": 5,
+    "hp": 620,
+    "atk": 99,
+    "exp": 270,
+    "gold": 70,
+    "subject": "數學",
+    "q_levels": [
+      2,
+      3
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "包著透明冰晶的小霧團，一生氣地板就結冰。",
+    "wake": "霜霜冰霧靈慢慢融化，變成一滴晶亮的水。"
+  },
+  fo_eraser: {
+    "name": "掉掉橡皮擦",
+    "sprite": "mon_fo_eraser",
+    "level": 5,
+    "hp": 620,
+    "atk": 101,
+    "exp": 270,
+    "gold": 70,
+    "subject": "英語",
+    "q_levels": [
+      2,
+      3
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "被弄丟的橡皮擦長出手腳，在書庫裡飄，很想被主人找到。",
+    "wake": "掉掉橡皮擦想起主人了，高高興興地回家。"
+  },
+  fo_umbrella: {
+    "name": "忘忘雨傘",
+    "sprite": "mon_fo_umbrella",
+    "level": 5,
+    "hp": 620,
+    "atk": 101,
+    "exp": 280,
+    "gold": 75,
+    "subject": "自然",
+    "q_levels": [
+      2,
+      3
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "被忘在書庫的黃色摺疊傘，會突然撐開擋住攻擊，有點委屈。",
+    "wake": "忘忘雨傘想起下雨天的約定，回到主人的書包。"
+  },
+  fob_shadow_bat: {
+    "name": "霧影・噪音蝙蝠王",
+    "sprite": "boss_fob_shadow_bat",
+    "level": 5,
+    "hp": 1750,
+    "atk": 101,
+    "exp": 810,
+    "gold": 210,
+    "subject": "國語",
+    "q_levels": [
+      2,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "噪音蝙蝠王形狀的灰白霧影，眼睛發著藍光，守著國語燈。",
+    "wake": "霧影散開了，國語燈亮了起來。",
+    "elite": true,
+    "trial": true,
+    "dialog_before": "D_BOSS_SHADOW_A"
+  },
+  fob_shadow_octo: {
+    "name": "霧影・迷霧章魚",
+    "sprite": "boss_fob_shadow_octo",
+    "level": 5,
+    "hp": 1750,
+    "atk": 101,
+    "exp": 810,
+    "gold": 210,
+    "subject": "英語",
+    "q_levels": [
+      2,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "迷霧章魚形狀的灰白霧影，眼睛發著藍光，守著英語燈。",
+    "wake": "霧影散開了，英語燈亮了起來。",
+    "elite": true,
+    "trial": true,
+    "dialog_before": "D_BOSS_SHADOW_A"
+  },
+  fob_shadow_frog: {
+    "name": "霧影・泥巴大蛙",
+    "sprite": "boss_fob_shadow_frog",
+    "level": 5,
+    "hp": 1750,
+    "atk": 101,
+    "exp": 810,
+    "gold": 210,
+    "subject": "數學",
+    "q_levels": [
+      2,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "泥巴大蛙形狀的灰白霧影，眼睛發著藍光，守著數學燈。",
+    "wake": "霧影散開了，數學燈亮了起來。",
+    "elite": true,
+    "trial": true,
+    "dialog_before": "D_BOSS_SHADOW_A"
+  },
+  fob_shadow_tree: {
+    "name": "霧影・枯萎樹王",
+    "sprite": "boss_fob_shadow_tree",
+    "level": 5,
+    "hp": 1750,
+    "atk": 101,
+    "exp": 810,
+    "gold": 210,
+    "subject": "自然",
+    "q_levels": [
+      2,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "枯萎樹王形狀的灰白霧影，眼睛發著藍光，守著自然燈。",
+    "wake": "霧影散開了，自然燈亮了起來。",
+    "elite": true,
+    "trial": true,
+    "dialog_before": "D_BOSS_SHADOW_A"
+  },
+  fob_shadow_golem: {
+    "name": "霧影・暴躁石像",
+    "sprite": "boss_fob_shadow_golem",
+    "level": 5,
+    "hp": 1750,
+    "atk": 101,
+    "exp": 810,
+    "gold": 210,
+    "subject": "社會",
+    "q_levels": [
+      2,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "desc": "暴躁石像形狀的灰白霧影，眼睛發著藍光，守著社會燈。",
+    "wake": "霧影散開了，社會燈亮了起來。",
+    "elite": true,
+    "trial": true,
+    "dialog_before": "D_BOSS_SHADOW_A"
+  },
+  fob_mist: {
+    "name": "山嵐霧精",
+    "sprite": "boss_fob_mist",
+    "level": 5,
+    "hp": 2650,
+    "atk": 88,
+    "exp": 2600,
+    "gold": 700,
+    "subject": "混合",
+    "q_levels": [
+      2,
+      4
+    ],
+    "boss": true,
+    "final": false,
+    "phases": 3,
+    "phase_q": 2,
+    "drops": [],
+    "desc": "玉山步道的頭目。被霧王叫來擋路的大霧團，把步道鋪成一片白。",
+    "wake": "山嵐霧精清醒了，霧慢慢散開，一陣涼風往山頂吹去。",
+    "subjects": [
+      "自然",
+      "社會"
+    ],
+    "last_q_level": 4,
+    "ref_mobs": [
+      "fo_puff",
+      "an_muntjac"
+    ],
+    "battle_bg": "alpine",
+    "dialog_before": "D_BOSS_MIST_A",
+    "dialog_after": "D_BOSS_MIST_B"
+  },
+  // ═══ v4.2 第 4a 批 MONSTERS END ═══
+  // ═══ v4.2 第 4b 批 MONSTERS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  fob_king: {
+    "name": "遺忘霧王‧佛格",
+    "sprite": "boss_fob_king",
+    "level": 5,
+    "hp": 3590,
+    "atk": 88,
+    "exp": 2700,
+    "gold": 700,
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然",
+      "社會"
+    ],
+    "q_levels": [
+      2,
+      4
+    ],
+    "boss": true,
+    "final": true,
+    "phases": 4,
+    "phase_q": 2,
+    "last_q_level": 4,
+    "untimed_phases": [
+      3
+    ],
+    "phase_q_by": {
+      "4": 1
+    },
+    "exact_phases": [
+      4
+    ],
+    "drops": [],
+    "desc": "最終頭目。像一本攤開的空白大書，怕自己被大家忘記的霧王。",
+    "wake": "佛格想起被記得的感覺，化成一片溫暖的雲海。",
+    "ref_mobs": [
+      "fo_eraser",
+      "fo_umbrella"
+    ],
+    "battle_bg": "summit",
+    "dialog_before": "D_FOG_KING_MEET",
+    "dialog_after": "D_FOG_KING_END",
+    "phase_dialogs": {
+      "2": "D_FOG_KING_P2",
+      "3": "D_FOG_KING_P3",
+      "4": "D_FOG_KING_P4"
+    },
+    "phase_sprites": {
+      "2": "boss_fob_king_p2",
+      "4": "boss_fob_king_p4"
+    },
+    "ending": "Q_END_1"
+  },
+  // ═══ v4.2 第 4b 批 MONSTERS END ═══
+  // ═══ v4.2 第 4c 批 MONSTERS BEGIN（tools/v42_apply.js 每次整段重建）═══
+  fo_puff_s1: {
+    "name": "晨光噗噗霧泡泡",
+    "sprite": "mon_fo_puff_s1",
+    "level": 5,
+    "hp": 840,
+    "atk": 107,
+    "exp": 465,
+    "gold": 75,
+    "subject": "自然",
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "battle_bg": "cloudsea",
+    "desc": "被晨光染成淡金橘色的噗噗霧泡泡，眼睛閃著金光。",
+    "wake": "晨光噗噗霧泡泡被照暖了，小水滴變成水蒸氣散掉，露出一道晨光。"
+  },
+  fo_echo_s1: {
+    "name": "晨光喂喂回音霧",
+    "sprite": "mon_fo_echo_s1",
+    "level": 5,
+    "hp": 860,
+    "atk": 110,
+    "exp": 480,
+    "gold": 80,
+    "subject": "國語",
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "battle_bg": "cloudsea",
+    "desc": "淡金橘色的回音霧，學你說話學得更快了。",
+    "wake": "晨光喂喂回音霧安靜下來，霧散開了，露出一道晨光。"
+  },
+  fo_frost_s1: {
+    "name": "晨光霜霜冰霧靈",
+    "sprite": "mon_fo_frost_s1",
+    "level": 5,
+    "hp": 880,
+    "atk": 113,
+    "exp": 495,
+    "gold": 80,
+    "subject": "數學",
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "battle_bg": "cloudsea",
+    "desc": "淡金橘色的冰霧靈，冰晶在晨光裡一閃一閃。",
+    "wake": "晨光霜霜冰霧靈慢慢融化，變成一滴水，映著一道晨光。"
+  },
+  fo_eraser_s1: {
+    "name": "晨光掉掉橡皮擦",
+    "sprite": "mon_fo_eraser_s1",
+    "level": 5,
+    "hp": 900,
+    "atk": 116,
+    "exp": 525,
+    "gold": 85,
+    "subject": "英語",
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "battle_bg": "cloudsea",
+    "desc": "淡金橘色的橡皮擦，在雲階上跑來跑去找主人。",
+    "wake": "晨光掉掉橡皮擦想起主人了，化成一道晨光飛回家。"
+  },
+  fo_umbrella_s1: {
+    "name": "晨光忘忘雨傘",
+    "sprite": "mon_fo_umbrella_s1",
+    "level": 5,
+    "hp": 920,
+    "atk": 118,
+    "exp": 540,
+    "gold": 85,
+    "subject": "自然",
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "battle_bg": "cloudsea",
+    "desc": "淡金橘色的摺疊傘，在雲階上撐開又收起。",
+    "wake": "晨光忘忘雨傘想起下雨天的約定，化成一道晨光。"
+  },
+  wxb_raincloud_s2: {
+    "name": "星光黏黏雨雲王",
+    "sprite": "boss_wxb_raincloud_s2",
+    "level": 5,
+    "hp": 2710,
+    "atk": 122,
+    "exp": 1935,
+    "gold": 285,
+    "subject": "自然",
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "elite": true,
+    "battle_bg": "cloudsea",
+    "desc": "深藍色、閃著銀色星點的大雨雲，黏在雲庭不肯走。",
+    "wake": "星光黏黏雨雲王清醒了，下完最後一陣小雨，露出滿天星光。"
+  },
+  mb_train_s2: {
+    "name": "星光迷路火車頭",
+    "sprite": "boss_mb_train_s2",
+    "level": 5,
+    "hp": 2830,
+    "atk": 128,
+    "exp": 2070,
+    "gold": 285,
+    "subject": "混合",
+    "subjects": [
+      "社會",
+      "數學"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "elite": true,
+    "battle_bg": "cloudsea",
+    "desc": "深藍色、閃著銀色星點的老火車頭，在雲上衝來衝去。",
+    "wake": "星光迷路火車頭清醒了，嘟嘟兩聲，化成一道星光開走了。"
+  },
+  fob_balloon_s2: {
+    "name": "星光霧氣球大王",
+    "sprite": "boss_fob_balloon_s2",
+    "level": 5,
+    "hp": 2960,
+    "atk": 133,
+    "exp": 2205,
+    "gold": 300,
+    "subject": "混合",
+    "subjects": [
+      "自然",
+      "數學"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "elite": true,
+    "battle_bg": "cloudsea",
+    "desc": "深藍色、閃著銀色星點的霧氣球，飄在雲庭最高的地方。",
+    "wake": "星光霧氣球大王清醒了，霧全部散掉，露出一片星光。"
+  },
+  ghb_civetboss_s2: {
+    "name": "星光夜遊團長",
+    "sprite": "boss_ghb_civetboss_s2",
+    "level": 5,
+    "hp": 3080,
+    "atk": 139,
+    "exp": 2295,
+    "gold": 300,
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "自然"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "elite": true,
+    "battle_bg": "cloudsea",
+    "desc": "深藍色、閃著銀色星點的夜遊團長，把星星當燈籠藏起來。",
+    "wake": "星光夜遊團長清醒了，把星星一顆顆掛回天上，化成一道星光。"
+  },
+  mnb_goldjaw_s2: {
+    "name": "星光金脈鐵顎王",
+    "sprite": "boss_mnb_goldjaw_s2",
+    "level": 5,
+    "hp": 3200,
+    "atk": 145,
+    "exp": 2340,
+    "gold": 300,
+    "subject": "混合",
+    "subjects": [
+      "數學",
+      "自然"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "elite": true,
+    "battle_bg": "cloudsea",
+    "desc": "深藍色、閃著銀色星點的鐵顎巨獸，胸口的金光變成了銀光。",
+    "wake": "星光金脈鐵顎王清醒了，胸口的光變得暖暖的，化成一道星光。"
+  },
+  pib_ship_s2: {
+    "name": "星光霧帆號",
+    "sprite": "boss_pib_ship_s2",
+    "level": 5,
+    "hp": 3330,
+    "atk": 151,
+    "exp": 2430,
+    "gold": 315,
+    "subject": "混合",
+    "subjects": [
+      "英語",
+      "自然",
+      "社會"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": false,
+    "final": false,
+    "phases": 1,
+    "phase_q": 0,
+    "drops": [],
+    "elite": true,
+    "battle_bg": "cloudsea",
+    "desc": "深藍色、閃著銀色星點的霧帆號，在雲海上開來開去。",
+    "wake": "星光霧帆號清醒了，霧做的帆變成白雲，露出一道星光。"
+  },
+  mb_floodgate_s3: {
+    "name": "曙光霧閘機將",
+    "sprite": "boss_mb_floodgate_s3",
+    "level": 5,
+    "hp": 6060,
+    "atk": 176,
+    "exp": 8850,
+    "gold": 1100,
+    "subject": "混合",
+    "subjects": [
+      "自然",
+      "數學"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": true,
+    "final": false,
+    "phases": 3,
+    "phase_q": 2,
+    "drops": [],
+    "last_q_level": 4,
+    "dialog_before": "D_POST_BOSS_A",
+    "dialog_after": "D_POST_BOSS_B",
+    "ref_mobs": [
+      "fo_puff_s1",
+      "fo_echo_s1",
+      "fo_frost_s1",
+      "fo_eraser_s1",
+      "fo_umbrella_s1",
+      "wxb_raincloud_s2",
+      "mb_train_s2",
+      "fob_balloon_s2",
+      "ghb_civetboss_s2",
+      "mnb_goldjaw_s2",
+      "pib_ship_s2"
+    ],
+    "battle_bg": "cloudsea",
+    "desc": "白金色、閃著金色光暈的霧閘機將，守著曙光源頭的水門。",
+    "wake": "曙光霧閘機將清醒了，水門打開，化成一道曙光。"
+  },
+  mb_lantern_s3: {
+    "name": "曙光燈籠霧將",
+    "sprite": "boss_mb_lantern_s3",
+    "level": 5,
+    "hp": 6450,
+    "atk": 188,
+    "exp": 9300,
+    "gold": 1150,
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "自然"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": true,
+    "final": false,
+    "phases": 3,
+    "phase_q": 2,
+    "drops": [],
+    "last_q_level": 4,
+    "dialog_before": "D_POST_BOSS_A",
+    "dialog_after": "D_POST_BOSS_B",
+    "ref_mobs": [
+      "fo_puff_s1",
+      "fo_echo_s1",
+      "fo_frost_s1",
+      "fo_eraser_s1",
+      "fo_umbrella_s1",
+      "wxb_raincloud_s2",
+      "mb_train_s2",
+      "fob_balloon_s2",
+      "ghb_civetboss_s2",
+      "mnb_goldjaw_s2",
+      "pib_ship_s2"
+    ],
+    "battle_bg": "cloudsea",
+    "desc": "白金色、閃著金色光暈的大燈籠，裡面的霧轉得好快。",
+    "wake": "曙光燈籠霧將清醒了，燈籠裡的霧散開，亮起一道曙光。"
+  },
+  fog_demon_s3: {
+    "name": "曙光遺忘霧魔",
+    "sprite": "boss_fog_demon_s3",
+    "level": 5,
+    "hp": 6840,
+    "atk": 200,
+    "exp": 9900,
+    "gold": 1150,
+    "subject": "混合",
+    "subjects": [
+      "國語",
+      "英語",
+      "數學",
+      "自然"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": true,
+    "final": false,
+    "phases": 3,
+    "phase_q": 2,
+    "drops": [],
+    "last_q_level": 4,
+    "dialog_before": "D_POST_BOSS_A",
+    "dialog_after": "D_POST_BOSS_B",
+    "ref_mobs": [
+      "fo_puff_s1",
+      "fo_echo_s1",
+      "fo_frost_s1",
+      "fo_eraser_s1",
+      "fo_umbrella_s1",
+      "wxb_raincloud_s2",
+      "mb_train_s2",
+      "fob_balloon_s2",
+      "ghb_civetboss_s2",
+      "mnb_goldjaw_s2",
+      "pib_ship_s2"
+    ],
+    "battle_bg": "cloudsea",
+    "desc": "白金色、閃著金色光暈的大霧，是曙光源頭最濃的霧。",
+    "wake": "曙光遺忘霧魔被照暖了，大霧慢慢散開，露出一道曙光。"
+  },
+  wxb_whale_s3: {
+    "name": "曙光雲鯨霧將",
+    "sprite": "boss_wxb_whale_s3",
+    "level": 5,
+    "hp": 7230,
+    "atk": 212,
+    "exp": 10500,
+    "gold": 1200,
+    "subject": "混合",
+    "subjects": [
+      "自然",
+      "英語"
+    ],
+    "q_levels": [
+      3,
+      4
+    ],
+    "boss": true,
+    "final": false,
+    "phases": 3,
+    "phase_q": 2,
+    "drops": [],
+    "last_q_level": 4,
+    "dialog_before": "D_POST_BOSS_A",
+    "dialog_after": "D_POST_BOSS_B",
+    "ref_mobs": [
+      "fo_puff_s1",
+      "fo_echo_s1",
+      "fo_frost_s1",
+      "fo_eraser_s1",
+      "fo_umbrella_s1",
+      "wxb_raincloud_s2",
+      "mb_train_s2",
+      "fob_balloon_s2",
+      "ghb_civetboss_s2",
+      "mnb_goldjaw_s2",
+      "pib_ship_s2"
+    ],
+    "battle_bg": "cloudsea",
+    "desc": "白金色、閃著金色光暈的雲鯨，在曙光源頭慢慢游。",
+    "wake": "曙光雲鯨霧將清醒了，變成一朵大白雲，迎著一道曙光游走。"
+  },
+  // ═══ v4.2 第 4c 批 MONSTERS END ═══
 };

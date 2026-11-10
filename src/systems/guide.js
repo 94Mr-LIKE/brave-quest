@@ -54,8 +54,14 @@
     var Q = (data && data.quests) || {}, q = Q[id];
     if (!q) return null;
     var ready = QuestLog.canComplete(state, Q, id, data), s = null, kind = q.kind || 'help';
-    if (ready) { s = npcSpot(data, q.giver, q.map); kind = 'report'; }
-    else if (kind === 'boss') { var b = q.boss || q.target || q.monster; s = (b && spawnSpot(data, b, id, q.map)) || npcSpot(data, q.giver, q.map); }
+    // v4.2 4c：進行中、寫了 finish 的事件委託（Q_POST_1 走到北口）→ 指向完成的地方
+    if (kind === 'event') { var tg = (q.finish && QuestLog.status(state, Q, id) === 'active' ? q.finish : q.trigger) || {}; s = Array.isArray(tg.cells) && tg.cells.length ? { map: tg.map, x: tg.cells[0][0], y: tg.cells[0][1] } : (tg.map ? { map: tg.map, x: null, y: null } : null); }   // v4.2：事件委託指向觸發點（觸發點當場完成，沒有回報）
+    else if (ready && q.finish) { var fn = q.finish; s = Array.isArray(fn.cells) && fn.cells.length ? { map: fn.map, x: fn.cells[0][0], y: fn.cells[0][1] } : { map: fn.map, x: null, y: null }; }   // v4.2 4c：Q_POST_3 打完四位霧將 → 指向光柱
+    else if (ready) { s = npcSpot(data, q.giver, q.map); kind = 'report'; }
+    // v4.1 實玩 D1（排進 v4.2）：收集／頭目委託還沒接（可接）→ 先指委託人（頭目要接了才出現）；接了以後才指怪物出沒區／頭目。
+    //   進地圖就自動接下的（auto_accept：五燈試煉、佛格、四霧將）沒有人發，照舊指頭目那張圖
+    else if ((kind === 'boss' || kind === 'hunt') && !q.auto_accept && QuestLog.status(state, Q, id) === 'available' && (s = npcSpot(data, q.giver, q.map))) { /* s＝委託人 */ }
+    else if (kind === 'boss') { var b = (Array.isArray(q.bosses) && q.bosses.filter(function (m) { return !(state.bosses && state.bosses[m]); })[0]) || q.boss || q.target || q.monster; s = (b && spawnSpot(data, b, id, q.map)) || npcSpot(data, q.giver, q.map); }
     else if (kind === 'hunt') { s = (q.hunt && dropSpot(data, q.hunt.item, q.map)) || npcSpot(data, q.giver, q.map); }
     else if (kind === 'chest') { var cm = chestMap(data, q.chest || q.target); s = cm ? { map: cm, x: null, y: null } : null; }
     else s = npcSpot(data, q.giver, q.map);

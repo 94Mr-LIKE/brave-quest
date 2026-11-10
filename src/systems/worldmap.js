@@ -44,8 +44,10 @@
   }
 
   /** 回傳 [{id, name, x, y, unlocked, here}] */
+  /** v4.2 4c 夜班：hide_locked 的地區（R_YUSHAN，破關後才出現）還沒解鎖時整個不出現（不畫點、不列清單、不掛下一步旗） */
+  function visible(r, state) { return !(r && r.hide_locked === true) || isUnlocked(r, state); }
   function regions(world, state, currentMap) {
-    return ((world && world.regions) || []).map(function (r) {
+    return ((world && world.regions) || []).filter(function (r) { return visible(r, state); }).map(function (r) {
       var e = entry(r, null);
       return { id: r.id, name: r.name || r.id, x: r.x, y: r.y, unlocked: isUnlocked(r, state), here: !!(e && e.map === currentMap), raw: r };
     });
@@ -143,7 +145,7 @@
   }
   function zoomPoint(f, box) { return { fx: (f.fx - box.x0) * box.s, fy: (f.fy - box.y0) * box.s }; }
 
-  var WorldMap = { lockText: lockText, spreadDots: spreadDots, minGap: minGap, isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction,
+  var WorldMap = { visible: visible, lockText: lockText, spreadDots: spreadDots, minGap: minGap, isUnlocked: isUnlocked, regions: regions, entry: entry, fraction: fraction,
     NORTH_MAX_Y: NORTH_MAX_Y, COLLAPSE_MAX_W: COLLAPSE_MAX_W, COLLAPSE_MAX_H: COLLAPSE_MAX_H, isNorth: isNorth, northIndexes: northIndexes, collapseFor: collapseFor, centroid: centroid, zoomBox: zoomBox, zoomPoint: zoomPoint };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.WorldMap = WorldMap; }
   if (typeof module !== 'undefined') module.exports = WorldMap;

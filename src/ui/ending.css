@@ -1,0 +1,66 @@
+/* v4.2 第 4b 批：大結局（docs/src/fx/ending_flow.js）、證書卡、勳章卡、證書冊。另開一檔：east.css 規定不放動畫（v40_ch7 S40-6）。
+ * 重複播的動畫都 ≥ 1 秒一次；減少動態效果（.reduced）時不放重複動畫、淡入 0.5 秒內；閃光只有開頭一次、亮度 ≤22%（N-END-8）。 */
+/* 插圖舞台：在地圖上、對話框下；圖照比例放大、不裁（640×360 像素插圖照原比例） */
+.ending-stage { position: fixed; inset: 0; background: #05070f; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.ending-stage .ending-img { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; opacity: 0; }
+.ending-stage .ending-img.in { animation: endingIn .8s ease-out forwards; }
+.ending-stage.reduced .ending-img.in { animation-duration: .5s; }
+@keyframes endingIn { from { opacity: 0; } to { opacity: 1; } }
+.ending-stage.white::after { content: ''; position: absolute; inset: 0; background: #fff; animation: endingWhite 1.2s ease-out forwards; pointer-events: none; }
+@keyframes endingWhite { from { opacity: .22; } to { opacity: 0; } }   /* 亮度 ≤22%、只閃一次（N-END-8） */
+.ending-stage.dim .ending-img { filter: brightness(.45); transition: filter .5s; }
+.ending-stage.night .ending-img { filter: brightness(.7) saturate(.9) hue-rotate(-12deg); transition: filter .8s; }
+.ending-fog { position: absolute; left: 50%; bottom: 22%; transform: translateX(-50%); width: 120px; height: 120px; display: none; }
+.ending-fog.kid, .ending-fog.poof, .ending-fog.cloud { display: block; }
+.ending-fog .fog-kid { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); background-repeat: no-repeat; image-rendering: pixelated; transition: opacity .5s; }
+.ending-fog .fog-cloud { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 116px; height: 120px; background-repeat: no-repeat; background-size: 300% 400%; background-position: 0 0; opacity: 0; transition: opacity .5s; image-rendering: pixelated; }   /* 實玩 D1：3×4 走路圖只露出第 0 格（29×30 放大 4 倍） */
+.ending-fog.poof .fog-kid { opacity: 0; }
+.ending-fog.poof::before { content: ''; position: absolute; inset: -20px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.85) 0 35%, rgba(255,255,255,0) 70%); animation: endingPoof .7s ease-out forwards; }
+@keyframes endingPoof { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+.ending-fog.cloud .fog-kid { opacity: 0; }
+.ending-fog.cloud .fog-cloud { opacity: 1; }
+.ending-card { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%); text-align: center; color: #fff6dc; text-shadow: 0 2px 6px #000; opacity: 0; transition: opacity .5s; pointer-events: none; }
+.ending-card.on { opacity: 1; }
+.ending-card .big { font-size: clamp(30px, 6vw, 56px); font-weight: bold; }
+.ending-card .small { font-size: clamp(15px, 2.4vw, 22px); margin-top: 6px; color: #e8ddc0; }
+.ending-sub { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); max-width: 92vw; padding: 8px 18px; border-radius: 10px; background: rgba(6, 10, 30, .72); color: #fff; font-size: clamp(18px, 3vw, 26px); opacity: 0; transition: opacity .3s; }
+.ending-sub.on { opacity: 1; }
+.ending-skip { position: absolute; right: max(10px, env(safe-area-inset-right)); top: max(10px, env(safe-area-inset-top)); min-height: 44px; min-width: 96px; padding: 6px 16px; font-size: 20px; font-weight: bold; border-radius: 10px; border: 2px solid #c8d4ff; background: rgba(20, 30, 70, .8); color: #fff; }
+/* 勇者特別版：五盞燈＋曙光燈的光柱（只動 opacity／transform；減少動態效果時不加 .pillars） */
+.ending-stage.hero-h2::before { content: ''; position: absolute; inset: 0; background: rgba(10, 20, 60, .35); pointer-events: none; }
+.ending-stage.pillars::after { content: ''; position: absolute; left: 10%; right: 10%; top: 0; bottom: 0; pointer-events: none;
+  background: repeating-linear-gradient(90deg, rgba(255,240,190,0) 0 7%, rgba(255,240,190,.22) 7% 9%, rgba(255,240,190,0) 9% 16.6%); animation: endingPillar 2.4s ease-in-out infinite alternate; }
+.ending-stage.merge::after { left: 44%; right: 44%; background: linear-gradient(90deg, rgba(255,236,170,0), rgba(255,236,170,.22), rgba(255,236,170,0)); }
+@keyframes endingPillar { from { opacity: .55; } to { opacity: 1; } }
+.ending-stage.fireworks .ending-card::before { content: '✦ ✧ ✦'; display: block; color: #ffd36a; font-size: 28px; animation: endingPillar 1.2s ease-in-out infinite alternate; }
+/* 證書卡、勳章卡（全螢幕；出現 2 秒後才能點掉） */
+.ending-cardwin { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(5, 8, 25, .78); cursor: pointer; animation: endingIn .6s ease-out; }
+.ending-cardwin.reduced { animation-duration: .4s; }
+.ending-cardwin .cert-canvas { width: min(96vw, calc((100vh - 70px) * 1.5)); height: auto; box-shadow: 0 6px 24px rgba(0,0,0,.6); border-radius: 6px; }
+.ending-cardwin .card-hint { color: #fff; font-size: 20px; opacity: 0; transition: opacity .4s; min-height: 28px; }
+.ending-cardwin .card-hint.on { opacity: .9; }
+.medal-box { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #fff; text-align: center; }
+.medal-box .medal-img, .cert-side .medal-img { height: min(46vh, 300px); width: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,.5)); }
+.medal-name { font-size: clamp(24px, 4vw, 36px); font-weight: bold; color: #ffe6a0; }
+.medal-line { font-size: clamp(18px, 3vw, 24px); color: #fff; }
+.ending-cardwin.hero .medal-img, .cert-view.hero .medal-img { animation: endingPillar 2s ease-in-out infinite alternate; }
+.ending-cardwin.hero.reduced .medal-img, .cert-view.hero.reduced .medal-img { animation: none; }
+/* 證書冊：全螢幕證書（給孩子截圖；只留一個小小的「×」，可點範圍 44×44） */
+.cert-view { position: fixed; inset: 0; background: #0b1236; display: flex; align-items: center; justify-content: center; gap: 2vw; padding: 2vh 2vw; }
+.cert-view .cert-canvas { width: min(70vw, calc(96vh * 1.5)); height: auto; }
+.cert-view .cert-side { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #fff; text-align: center; }
+.cert-view .cert-x { position: absolute; right: max(4px, env(safe-area-inset-right)); top: max(4px, env(safe-area-inset-top)); width: 44px; height: 44px; font-size: 24px; line-height: 1; border: none; background: transparent; color: #fff; opacity: .5; }
+.cert-view .cert-tip { position: absolute; left: 50%; bottom: 3vh; transform: translateX(-50%); color: #fff; font-size: 18px; animation: certTip 2.4s ease-out forwards; pointer-events: none; }
+@keyframes certTip { 0% { opacity: 0; } 15% { opacity: .85; } 80% { opacity: .85; } 100% { opacity: 0; } }
+@media (orientation: portrait) { .cert-view { flex-direction: column; } .cert-view .cert-canvas { width: 96vw; } .cert-view .cert-side .medal-img { height: 26vh; } }
+body.cert-viewing #hud, body.cert-viewing #pad, body.cert-viewing #toasts { visibility: hidden; }
+/* 證書冊格子（手帳 → 收集冊 → 證書冊）：直式 4 欄、橫式 6 欄 */
+.cert-book { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin: 6px 0; }
+@media (orientation: portrait) { .cert-book { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.cert-book .cert-slot { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; min-height: 44px; border-radius: 10px; background: rgba(255,255,255,.08); color: inherit; border: 2px solid transparent; font-size: 15px; text-align: center; }
+.cert-book .cert-slot img { width: 64px; height: 64px; }
+.cert-book .cert-slot.locked img { filter: grayscale(1) brightness(.35); opacity: .7; }
+.cert-book .cert-slot.hero.got { border-color: #e2b84a; box-shadow: 0 0 0 2px #7a5a10 inset; }
+.cert-book .cert-slot.hero.locked { border-color: rgba(226,184,74,.55); }
+.cert-book .cert-slot .small { font-size: 13px; color: var(--muted); }
+.cert-book h4 { grid-column: 1 / -1; margin: 6px 0 0; font-size: 17px; color: var(--accent); }
