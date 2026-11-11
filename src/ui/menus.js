@@ -494,7 +494,7 @@
       });
     }
     if (stay.action === 'refuse') {
-      return G.say(innInfo && innInfo.dialog_nocoin, [{ who: npcId || '__inn', text: '金幣不夠喔！可以回金包里的溫泉旅館休息，或去打幾隻怪物存錢。' }]).then(function () { return false; });
+      return G.say(innInfo && innInfo.dialog_nocoin, [{ who: npcId || '__inn', text: '錢不夠喔！可以回金包里的溫泉旅館休息，或去打幾隻怪物存錢。' }]).then(function () { return false; });
     }
     var q = stay.action === 'free'
       ? '要在' + name + '住一晚嗎？住一晚要 ' + stay.price + ' 金幣，你現在有 ' + st.player.coins + ' 金幣。'
@@ -523,7 +523,7 @@
     var st = G.state, label = String((innInfo && innInfo.bath && innInfo.bath.label) || '♨️ 泡溫泉').replace(/^♨️\s*/, '');
     var b = J.Shop.bathStay(st, innInfo || {});
     G.lastBath = b;   // 測試用
-    if (b.action !== 'pay') return G.say(null, [{ who: 'pet', text: '金幣不夠，不能' + label + '喔！去打幾隻怪物存錢吧。' }]).then(function () { return false; });
+    if (b.action !== 'pay') return G.say(null, [{ who: 'pet', text: '錢不夠，不能' + label + '喔！去打幾隻怪物存錢吧。' }]).then(function () { return false; });
     return G.say(innInfo.dialog_bath || null, [{ who: 'pet', text: label + '不算住宿喔！記得要有大人陪。' }]).then(function () {
       G.lastBath = J.Shop.payBath(st, innInfo);
       J.Character.rest(st, G.data);

@@ -84,7 +84,7 @@
       var introId = route.dialog && route.dialog.intro, introDone = !!(route.quest && st.quests && st.quests[route.quest] && st.quests[route.quest].status === 'done');
       work = (introId && !introDone ? G.say(introId, []) : Promise.resolve()).then(function () { return say('buy'); }).then(function () {   // v3.0 第一次先介紹
         if (!current() || G.blocked()) return false;
-        return U.confirm('要買來回票嗎？一張 ' + route.price + ' 金幣。', '買來回票', '等一下');
+        return U.confirm('要買來回票嗎？一張 ' + route.price + ' 塊。', '買來回票', '等一下');
       }).then(function (yes) {
         if (!yes || !current()) return;
         var bought = F.buy(st, route, G.data.items, G);

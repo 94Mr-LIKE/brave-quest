@@ -1447,7 +1447,7 @@ window.QUESTS = {
   },
   Q_LQ_0: {
     title: "往小琉球的船", giver: "ticket_seller", map: "M25", kind: "ferry",
-    goal: "在東港碼頭買往小琉球的來回船票（200 金幣）。",
+    goal: "在東港碼頭買往小琉球的來回船票（200 塊）。",
     log_next: "買到船票了！到碼頭點船，就能去小琉球。",
     subject: "社會", units: [], count: null, level_range: [2, 3],
     hunt: null, requires: ["Q_ORC_4"], reward: { exp: 0, gold: 0, item: null, light: null },
@@ -1487,7 +1487,7 @@ window.QUESTS = {
   },
   Q_PT_2: {
     title: "讓燈塔再亮", giver: "lighthouse_keeper", map: "M25", kind: "help",
-    goal: "幫燈塔守護員排好燈光閃爍的規律：答對 3 題數學。",
+    goal: "幫燈塔守護員排好燈火閃爍的規律：答對 3 題數學。",
     log_next: "燈塔亮了！外海的霧裡，好像有一艘船……",
     subject: "數學", units: ["9 列表與規律"], count: 3, level_range: [2, 3],
     hunt: null, requires: ["Q_PT_1"], reward: { exp: 240, gold: 180, item: null, light: null },
@@ -1567,7 +1567,7 @@ window.QUESTS = {
   },
   Q_GI_0: {
     title: "往綠島的船", giver: "ticket_seller_fg", map: "M26", kind: "ferry",
-    goal: "在富岡漁港買往綠島的來回船票（200 金幣）。",
+    goal: "在富岡漁港買往綠島的來回船票（200 塊）。",
     log_next: "買到船票了！到碼頭點船，就能去綠島。",
     subject: "社會", units: [], count: null, level_range: [2, 3],
     hunt: null, requires: ["Q_TT_3"], reward: { exp: 0, gold: 0, item: null, light: null },
@@ -1599,7 +1599,7 @@ window.QUESTS = {
   },
   Q_LY_0: {
     title: "往蘭嶼的船", giver: "ticket_seller_fg", map: "M26", kind: "ferry",
-    goal: "在富岡漁港買往蘭嶼的來回船票（200 金幣）。",
+    goal: "在富岡漁港買往蘭嶼的來回船票（200 塊）。",
     log_next: "買到船票了！到碼頭點船，就能去蘭嶼。",
     subject: "社會", units: [], count: null, level_range: [2, 3],
     hunt: null, requires: ["Q_TT_3"], reward: { exp: 0, gold: 0, item: null, light: null },

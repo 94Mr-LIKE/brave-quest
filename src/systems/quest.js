@@ -15,7 +15,7 @@
       story: '漁市的燈亮了！漁船一艘艘平安回港，海生伯說：「算得清楚，生意才做得長久啦！」' },
     '自然': { area: '白煙溫泉谷', npc: 'npc_scientist', npcName: '湯博士', role: '溫泉研究員', sticker: 'sticker_science', stickerName: '溫泉貼紙',
       greet: '你好！我在研究溫泉為什麼會冒白煙。一起來觀察和實驗吧！',
-      story: '溫泉谷的燈亮了！白煙在燈光下像雲一樣飄，湯博士說：「仔細觀察，就會有新發現。」' },
+      story: '溫泉谷的燈亮了！白煙在燈火下像雲一樣飄，湯博士說：「仔細觀察，就會有新發現。」' },
     '社會': { area: '山邊古道', npc: 'npc_chief', npcName: '石里長', role: '古道里長', sticker: 'sticker_social', stickerName: '古道貼紙',
       greet: '以前的人挑著魚走過這條古道到城裡。想知道我們社區的故事嗎？',
       story: '古道的燈亮了！石階一路亮到山上，石里長說：「了解家鄉，就會更愛家鄉。」' }

@@ -46,8 +46,8 @@
         "cutscene": "D_FERRY"
       },
       "dialogText": {
-        "buy": "來回票要 {price} 金幣。要買一張嗎？",
-        "noMoney": "來回票要 {price} 金幣喔",
+        "buy": "來回票要 {price} 塊。要買一張嗎？",
+        "noMoney": "來回票要 {price} 塊喔",
         "locked": "海上的霧還很濃，船先不開喔。",
         "board": "船要開往{to}囉！",
         "arrive": "到{to}了！下船小心喔。"
@@ -95,8 +95,8 @@
         "cutscene": "D_FERRY"
       },
       "dialogText": {
-        "buy": "來回票要 {price} 金幣。要買一張嗎？",
-        "noMoney": "來回票要 {price} 金幣喔",
+        "buy": "來回票要 {price} 塊。要買一張嗎？",
+        "noMoney": "來回票要 {price} 塊喔",
         "locked": "海上的霧還很濃，船先不開喔。",
         "board": "船要開往{to}囉！",
         "arrive": "到{to}了！下船小心喔。"

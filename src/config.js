@@ -6,7 +6,7 @@
   'use strict';
   var CONFIG = {
     GAME_TITLE: '勇者大冒險',
-    VERSION_LABEL: 'v4.2',   // v4.2 玉山・霧之洞窟・終章（之前是 VERSION_LABEL: 'v4.0'；v4.0.1、v4.1 漏改）   // v4.0 東部（之前是 VERSION_LABEL: 'v3.0'）   // v3.0 南部（之前是 VERSION_LABEL: 'v2.2'）   // v2.2 題庫擴充（之前是 VERSION_LABEL: 'v2.1', 中級職業）   // v2.1 中級職業（之前是 VERSION_LABEL: 'v2.0', 中部）   // v2.0 中部（之前是 v1.4）   // v1.4 桃竹章（之前是 v1.3.1）   // v1.3.1 台語氣象諺語（之前是 'v1.3'）   // v1.3 台北章（之前是 VERSION_LABEL: 'v1.2', 第二章）   // 給人看的版本（設定頁「關於本遊戲」）；網址快取用的版本號是 data/version.js 的 JQ_VERSION（內容雜湊）
+    VERSION_LABEL: 'v4.2.1',   // v4.2.1 南部台語與老闆錄音換入、用詞統一   // v4.2 玉山・霧之洞窟・終章（之前是 VERSION_LABEL: 'v4.0'；v4.0.1、v4.1 漏改）   // v4.0 東部（之前是 VERSION_LABEL: 'v3.0'）   // v3.0 南部（之前是 VERSION_LABEL: 'v2.2'）   // v2.2 題庫擴充（之前是 VERSION_LABEL: 'v2.1', 中級職業）   // v2.1 中級職業（之前是 VERSION_LABEL: 'v2.0', 中部）   // v2.0 中部（之前是 v1.4）   // v1.4 桃竹章（之前是 v1.3.1）   // v1.3.1 台語氣象諺語（之前是 'v1.3'）   // v1.3 台北章（之前是 VERSION_LABEL: 'v1.2', 第二章）   // 給人看的版本（設定頁「關於本遊戲」）；網址快取用的版本號是 data/version.js 的 JQ_VERSION（內容雜湊）
 
     // 畫面：邏輯格子 32px、內部解析度 640×360（16:9）
     TILE: 32,

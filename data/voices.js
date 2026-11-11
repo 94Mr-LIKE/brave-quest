@@ -29,9 +29,9 @@
 window.VOICES = {
   speakers: {
   // ═══ v4.2 第 4c 批 VOICES.speakers BEGIN（tools/v42_apply.js 每次整段重建）═══
-    cloud_shop_m42: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":false,"persona":"雲上小舖的老闆，講華語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
-    cloud_shop_m43: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":false,"persona":"雲上小舖的老闆，講華語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
-    cloud_shop_m44: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":false,"persona":"雲上小舖的老闆，講華語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
+    cloud_shop_m42: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":true,"persona":"雲上小舖的老闆，講台語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
+    cloud_shop_m43: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":true,"persona":"雲上小舖的老闆，講台語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
+    cloud_shop_m44: {"name":"雲上小舖老闆","gender":"m","age":"adult","stage":"中年","look":"npc_innkeeper_m","pitch":0.68,"rate":1.02,"taigi":true,"persona":"雲上小舖的老闆，講台語，說話慢慢的、很和氣。","voice_share":"innkeeper"},
     tao_fisher: {"name":"蘭嶼的漁夫","gender":"m","age":"adult","stage":"中年","look":"npc_tao_fisher","pitch":0.69,"rate":0.92,"taigi":false,"persona":"在飛魚架旁曬魚的達悟族漁夫，講話慢、很親切。","voice_share":"harbor_uncle"},
     tao_taro: {"name":"種芋頭的阿姨","gender":"f","age":"adult","stage":"中年","look":"npc_tao_taro","pitch":0.96,"rate":1.02,"taigi":false,"persona":"在水芋田工作的達悟族阿姨，笑咪咪的。"},
     tao_elder: {"name":"部落的長者","gender":"m","age":"elder","stage":"老年","look":"npc_tao_elder","pitch":0.66,"rate":0.76,"taigi":false,"persona":"坐在涼台上休息的部落長者，聲音穩、說話慢。","voice_share":"calla_farmer"},
