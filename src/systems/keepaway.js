@@ -67,7 +67,22 @@
     return errors;
   }
 
-  var KeepAway = { shown: shown, blocked: blocked, warn: warn, warnStep: warnStep, validate: validate, COOLDOWN_MS: COOLDOWN_MS };
+  /**
+   * v4.2.2（老闆 2026-11-14「M33帝雉記得分散跑」）：friendly 寫 wander: true 的動物可以走的格子＝自己保護區（同 id）裡、
+   * 離中心 radius−2 格以內（主角被保護區擋在外面，所以動物走到哪裡都離主角 2 格以上、碰不到、不擋路）。
+   * 沒有同 id 的保護區時用自己位置 ±2 格。walk(x, y)＝地形可不可以站（不看保護區）。回傳 [{x, y}]（由上到下、由左到右）
+   */
+  var WANDER_MARGIN = 2;
+  function wanderTiles(map, f, walk) {
+    if (!f || typeof walk !== 'function') return [];
+    var a = (map && Array.isArray(map.keepaway) ? map.keepaway : []).filter(function (k) { return validArea(k) && k.id === f.id; })[0];
+    var cx = a ? a.x : f.x, cy = a ? a.y : f.y, r = a ? a.radius - WANDER_MARGIN : WANDER_MARGIN, out = [];
+    if (!Number.isInteger(cx) || !Number.isInteger(cy) || r < 0) return out;
+    for (var y = cy - r; y <= cy + r; y++) for (var x = cx - r; x <= cx + r; x++) if (x >= 0 && y >= 0 && walk(x, y)) out.push({ x: x, y: y });
+    return out;
+  }
+
+  var KeepAway = { shown: shown, blocked: blocked, warn: warn, warnStep: warnStep, validate: validate, COOLDOWN_MS: COOLDOWN_MS, WANDER_MARGIN: WANDER_MARGIN, wanderTiles: wanderTiles };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.KeepAway = KeepAway; }
   if (typeof module !== 'undefined') module.exports = KeepAway;
 })();

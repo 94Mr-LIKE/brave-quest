@@ -1296,9 +1296,12 @@
       return J.FerryUI.interact(G, Object.assign({}, npc, { ferry: { id: v, side: npc.ferry.side }, __ferryPicked: true }), scene);
     });
   };
+  /** v4.2.2 測試模式（大人試玩，只存在這台裝置）：碼頭的船不用票、不看前置委託 */
+  G.testModeOn = function () { return !!(J.TestMode && J.TestMode.on()); };
   G.pickBoatRoute = function (dock, scene) {
     J.Ferry.ensure(G.state);
-    var have = dock.routes.filter(function (r) { return G.state.ferry.tickets[r.route] > 0; });
+    var tm = G.testModeOn();
+    var have = dock.routes.filter(function (r) { return tm || G.state.ferry.tickets[r.route] > 0; });
     G.ferryPickLog = (G.ferryPickLog || []).concat([have.map(function (r) { return r.route; }).join('+') || '-']);
     if (!have.length) return G.say('D_FERRY_PICK_NONE', [{ who: 'pet', text: '要先跟售票員買船票，才能上船喔。' }]);
     var go = function (r) { return r ? G.boardBoat(Object.assign({}, dock, { route: r.route, to: r.to, routes: null }), scene) : false; };
@@ -1315,6 +1318,8 @@
     J.Ferry.ensure(G.state);
     var has = G.state.ferry.tickets[route.id] > 0;
     G.boatLog = (G.boatLog || []).concat([{ map: scene.mapId, side: side, ticket: has }]);
+    // v4.2.2 測試模式：沒票、或有票但前置委託還沒完成（船「還不開」）時也直接開船（不動票、不寫委託）；有票而且能搭就照一般流程
+    if (G.testModeOn() && (!has || !J.Ferry.canBoard(G.state, route, side, G).ok)) return J.FerryUI.testRide(G, route, side, scene);
     if (!has && side === 'from') return G.say('D_FERRY_NEED_TICKET', [{ who: 'pet', text: '要先跟售票員買船票，才能上船喔。' }]);
     if (!has) return G.say('D_FERRY_FREE_RETURN', [{ who: 'pet', text: '船長說：這班回程船讓你免費搭！' }]).then(function () { var d = route.from; G.changeMap(d.map, d.x, d.y, 'down'); });
     return J.FerryUI.interact(G, { id: 'pet', ferry: { id: route.id, side: side } }, scene);

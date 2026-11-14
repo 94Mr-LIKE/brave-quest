@@ -193,6 +193,7 @@
       var r = requested[key], tk = texKey(key);
       var tex;
       if (!scene.textures.exists(tk)) {
+        if (r.kind === 'strip') return;   // v4.2.2 野怪多幀圖沒載入（file:// 沒打包、載入失敗）：不做佔位圖，地圖退回單張圖
         var ph = placeholderCanvas(key, r.kind, r.label);
         tex = scene.textures.addCanvas(tk, ph.canvas);
         if (r.kind === 'walk') addWalkFrames(tex, ph.fw, ph.fh, 3, 4);
@@ -200,11 +201,13 @@
         return;
       }
       tex = scene.textures.get(tk);
-      if (r.kind === 'walk' && !tex.__framed) {
+      // 走路圖 cols×rows 格；v4.2.2 野怪多幀圖（type strip，<圖像 key>_anim）是橫排一列 cols 格，同一套切法
+      if ((r.kind === 'walk' || r.kind === 'strip') && !tex.__framed) {
         var src = tex.getSourceImage();
         var inf = info(key) || {};
         var cols = inf.cols || 3, rows = inf.rows || 4;
         var fw = inf.frameW || Math.floor(src.width / cols), fh = inf.frameH || Math.floor(src.height / rows);
+        if (r.kind === 'strip') { fw = Math.floor(src.width / cols); fh = src.height; }   // 多幀圖的 frameW／frameH 是整張圖的寬高（和單張圖登錄同一規則），每格寬從圖檔算
         addWalkFrames(tex, fw, fh, cols, rows);
       }
     });

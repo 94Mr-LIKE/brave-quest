@@ -296,7 +296,22 @@
       if (J.TestMode && J.TestMode.supported(window)) {
         body.appendChild(h('h3', { text: '🧪 測試模式（大人試玩用）' }));
         if (J.TestMode.on()) {
-          body.appendChild(h('p.small', { text: '測試模式開著：世界地圖每個地區都能搭車、出口不擋。只在這台裝置，不會存進存檔或存檔碼。' }));
+          // v4.2.2 第三輪審查 S-4：開關本身不進存檔，但用它走到的地方（去過、位置、旅店復活點）會照常存檔——說明照實寫
+          body.appendChild(h('p.small.testmode-note', { text: '測試模式開著：世界地圖每個地區都能搭車、出口不擋、碼頭的船不用船票。開關本身不會存進存檔；但用它去過的地方、站的位置會照常存檔，請大人另開一份存檔來試，不要用孩子的存檔。' }));
+          // v4.2.2（老闆 2026-11-14「要打開所有地圖都能跑」）：世界地圖沒列的圖（洞窟、離島、玉山、雲之深層…）用這個直接前往（站在那張圖的 start）
+          var targets = J.TestMode.mapTargets(G.data.maps);
+          if (targets.length) {
+            var mapSel = h('select.testmode-map', { 'aria-label': '測試模式：選擇要前往的地圖', style: { fontSize: '18px', minHeight: '44px', maxWidth: '100%' } });   // 手機也點得到、看得清楚
+            targets.forEach(function (t) { mapSel.appendChild(h('option', { value: t.id, text: t.id + ' ' + t.name })); });
+            if (G.state && G.state.location && targets.some(function (t) { return t.id === G.state.location.map; })) mapSel.value = G.state.location.map;
+            body.appendChild(h('div.row', {}, [mapSel, h('button.testmode-go', { onclick: function () {
+              var t = targets.filter(function (x) { return x.id === mapSel.value; })[0];
+              if (!t || !G.mapScene || G.blocked() || G.inTrial) { J.UI.toast('現在不能換地圖（戰鬥或過場中）。'); return; }
+              G.testModeGoLog = (G.testModeGoLog || []).concat([t.id]);   // 測試用
+              handle.close();
+              G.changeMap(t.id, t.x, t.y, 'down');
+            } }, ['前往地圖'])]));
+          }
           body.appendChild(h('div.row', {}, [h('button.testmode-off', { onclick: function () { J.TestMode.disable(); J.TestMode.badge(document); J.UI.toast('測試模式已關掉'); render(); } }, ['關掉測試模式'])]));
         } else {
           var tmRow = h('div.row', {}), tmMsg = h('p.small.testmode-msg', { text: '' });

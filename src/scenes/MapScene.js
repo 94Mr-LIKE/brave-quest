@@ -6,11 +6,12 @@
  * - 網址加 ?debug=1：把 grid 半透明疊在背景上（綠＝可走、紅＝擋、藍＝出口），方便校對碰撞
  * - 點擊／觸控地面用 A* 走過去；方向鍵／WASD／螢幕方向鍵也能走
  * - v1.0.6 斜走（8 方向、仍然是格子移動；規則在 systems/move8.js）：不斜穿牆角、貼牆斜推會順著滑、
- *   斜走一步的時間是直走的 √2 倍；走路圖只有四方向，斜走時面向橫向（原本面向其中一個分量方向就不轉）
+ *   v4.2.2 斜走一步的時間和直走一樣（以前是 √2 倍）；走路圖只有四方向，斜走時面向橫向（原本面向其中一個分量方向就不轉）
  * - 看得見的怪物在 spawns 範圍遊走，碰到就進入戰鬥；戰鬥後跑走、30 秒後重生
  * - 只載入這張地圖用到的圖塊與角色圖
  * - v0.5 大地圖（邊長 3 倍）：背景可為 .webp；超過裝置最大貼圖尺寸時自動切塊；載入時顯示進度條；
  *   鏡頭外的怪物不播動畫、遊走降頻，NPC 動畫暫停，備援圖塊分區隱藏；深度只在改變時才設定（避免每格重新排序）
+ * - v4.2.2 第三批：角色腳下影子（共用一張程式貼圖）、NPC 腳底固定的呼吸、有腳的野怪踏步／沒腳的上下飄動（第四次修改；數學在 systems/sprite_anim.js；只改畫面，不改位置）
  */
 (function () {
   'use strict';
@@ -25,6 +26,11 @@
   var FG_CELL_DEPTH = 40000;   // 上層格（'U'：從背景切出來、畫在角色上方的那一格）
   var LABEL_DEPTH = 45000;     // v0.9.6 站名小牌：一定在上層格之上（不然會被背景蓋掉一部分字）；在前景大圖（50000）、剪影（60000）之下
   var GLOW_DEPTH = 1;       // 燈光光暈：背景（0）與傳送光圈（0.5）之上、所有角色（深度＝腳底 y ≥ 32）之下
+  var CHAR_SHADOW_DEPTH = 5;   // v4.2.2 角色腳下影子：地面、樹影（1）、東部地面標示（2–4）之上，所有角色（≥ 32）之下，不會蓋到別的角色
+  var MOB_STEP_MS = 520;   // 野怪走一格的時間（v4.2.2 有腳的野怪一格踏兩步照這個算）
+  var FRIEND_STEP_MS = 650;   // v4.2.2 會走動的友善動物（M33 帝雉）走一格的時間（和黃牛一樣慢）
+  // 主角以外角色的剪影（coverFx）：和主角的剪影（buildForeground，那一行照舊寫數字）同色、同透明度、同深度
+  var GHOST_TINT = 0xdfeeff, GHOST_ALPHA = 0.35, GHOST_DEPTH = 60000;
   var BUCKET = 8;          // 大地圖備援圖塊的分區大小（格）：鏡頭外的分區隱藏
 
   function G() { return J.Game; }
@@ -81,7 +87,8 @@
       this.npcList().forEach(function (n) { A.queue(self, n.sprite || 'npc_unknown', g.speaker(n.id).name); });
       (map.spawns || []).forEach(function (s) {
         var m = g.data.monsters[s.monster];
-        if (m) A.queue(self, m.sprite, m.name);
+        // v4.2.2 野怪多幀圖（sprites.js 有登錄 <圖像 key>_anim 才載入；美術分批交，還沒畫的怪不發請求）
+        if (m) { A.queue(self, m.sprite, m.name); if (A.has(m.sprite + '_anim')) A.queue(self, m.sprite + '_anim'); }
       });
       // v4.2 第六座燈座（金色燈）、大結局過場的鎮民
       if ((map.lamps || []).some(function (l) { return l.subject === '曙光'; })) ['lamp_dawn_on', 'lamp_dawn_off'].forEach(function (k) { if (A.has(k)) A.queue(self, k); });
@@ -96,6 +103,7 @@
       // v1.1 路牌（59 號 2.8；地圖物件，不是 NPC）：美術 obj_road_sign（32×48，底部置中）；沒有圖時用程式畫的木牌
       if ((map.roadsigns || []).length && A.has('obj_road_sign')) A.queue(this, 'obj_road_sign');
       (map.friendly || []).forEach(function (f) { A.queue(self, f.sprite, f.name); });   // v3.0 友善動物（黑面琵鷺、綠蠵龜）
+      if (map.boat_dock && A.has('ferry_boat')) A.queue(this, 'ferry_boat');   // v4.2.2 碼頭的船（美術圖還沒登記時用程式畫的船）
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
@@ -184,6 +192,7 @@
       this.landmarkNow = this.p ? J.MapInfo.landmarkAt(map, this.p.tx, this.p.ty) : null;
       this.buildMonsters();
       this.buildAnimals();
+      this.buildFriendlyWander();   // v4.2.2 M33 帝雉分散走動
       this.buildSigns();
       this.buildLights();
       this.buildForeground();
@@ -435,6 +444,13 @@
         var g = c.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(1, 0, 2, 4); g.fillRect(0, 1, 4, 2);
         this.textures.addCanvas('ui:spark', c);
       }
+      if (!this.textures.exists('fx:footshadow')) {   // v4.2.2 所有角色共用的腳下影子（寬 32、高 12 的黑色橢圓；透明度由每個影子自己設）
+        var fc = document.createElement('canvas'); fc.width = 32; fc.height = 12;
+        var fg = fc.getContext('2d'); fg.fillStyle = '#000000';
+        // 逐格填實心像素（不用抗鋸齒的半透明邊）：像素圖風格、在雜色草地上邊緣也看得清楚
+        for (var ey = 0; ey < 12; ey++) for (var ex = 0; ex < 32; ex++) if (Math.pow((ex + 0.5 - 16) / 16, 2) + Math.pow((ey + 0.5 - 6) / 6, 2) <= 1) fg.fillRect(ex, ey, 1, 1);
+        this.textures.addCanvas('fx:footshadow', fc);
+      }
     }
 
     /** v0.9.3 背景圖讀不到（重試後）：不畫備援方塊，鏡頭前蓋一層深色畫面＋文字，等玩家按「重新整理」 */
@@ -592,21 +608,66 @@
         var tk = J.Assets.texKey(f.sprite), frame = self.textures.exists(tk) && self.textures.get(tk).has(1) ? 1 : undefined;
         var img = self.add.image(f.x * T + T / 2, (f.y + 1) * T, tk, frame).setOrigin(0.5, 1).setDepth((f.y + 1) * T);
         if (f.show && J.KeepAway && !J.KeepAway.shown(f, G().state)) img.setVisible(false);   // v4.2（K10）
-        self.tweens.add({ targets: img, y: img.y - 2, duration: 900 + (f.x * 53) % 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-        return { data: f, img: img };
+        // v4.2.2（老闆 2026-11-13）友善動物都不會走。單張圖的（帝雉、黑熊，美術分類都是有腳的）改成腳底固定的呼吸（updateSpriteFx）；
+        // 有走路圖的（黑面琵鷺、綠蠵龜：sprites.js type walk）依指示「有走路圖的不動」，原本的上下漂浮補間照舊
+        var walk = frame === 1 && self.textures.get(tk).has(11), bp = J.SpriteAnim.npcPeriod(f.x, f.y);
+        if (walk) self.tweens.add({ targets: img, y: img.y - 2, duration: 900 + (f.x * 53) % 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+        return { data: f, img: img, walk: walk, sy0: img.scaleY, bp: bp, bph: J.SpriteAnim.npcPhase(f.x, f.y, bp) };
       });
       this.boat = null;
       var bd = this.map.boat_dock;
       if (bd && Array.isArray(bd.ship_area)) {
-        var a = bd.ship_area, g = this.add.graphics(), x = a[0] * T + 4, y = a[1] * T + 4, w = a[2] * T - 8, h = a[3] * T - 8, tall = h > w;
-        g.fillStyle(0xf4f1e8, 1).fillRoundedRect(x, y, w, h, Math.min(w, h) / 3);   // 白色船身
-        g.lineStyle(3, 0x2f6fb0, 1).strokeRoundedRect(x, y, w, h, Math.min(w, h) / 3);   // 藍色船邊
-        g.fillStyle(0xdfe7ef, 1).fillRect(tall ? x + w * 0.2 : x + w * 0.3, tall ? y + h * 0.3 : y + h * 0.2, tall ? w * 0.6 : w * 0.4, tall ? h * 0.4 : h * 0.6);   // 船艙
-        g.fillStyle(0x2a1e22, 1);
-        for (var i = 0; i < 3; i++) { if (tall) g.fillRect(x + w * 0.35, y + h * (0.36 + i * 0.1), w * 0.3, h * 0.05); else g.fillRect(x + w * (0.36 + i * 0.1), y + h * 0.35, w * 0.05, h * 0.3); }   // 窗
-        g.setDepth((a[1] + a[3]) * T);
-        this.boat = { data: bd, gfx: g };
+        // v4.2.2（老闆 2026-11-14「搭船這個有點意義不明，這到底是啥?」）：以前是程式畫的白色圓角方塊＋三條黑窗，看不出是船。
+        // 改成一艘俯視、船頭朝右的客船：美術圖 ferry_boat（sprites.js 有登記、載入成功）優先，沒有就用 boatTexture 程式畫的船。
+        // 保持長寬比放進 ship_area（四周留 4 像素）；停船範圍是直的（M24 小琉球）就轉 90 度、船頭朝上。
+        var a = bd.ship_area, key = this.hasArt('ferry_boat') ? J.Assets.texKey('ferry_boat') : this.boatTexture();
+        var fit = J.Ferry && J.Ferry.boatFit ? J.Ferry.boatFit(a, T, this.textures.get(key).getSourceImage().width, this.textures.get(key).getSourceImage().height) : { x: (a[0] + a[2] / 2) * T, y: (a[1] + a[3] / 2) * T, scale: 1, angle: 0 };
+        var img = this.add.image(fit.x, fit.y, key).setOrigin(0.5, 0.5).setScale(fit.scale).setAngle(fit.angle).setDepth((a[1] + a[3]) * T);
+        this.boat = { data: bd, img: img, art: key !== 'ui:ferry_boat' };
+        G().boatShown = { map: this.mapId, art: this.boat.art, fit: fit };   // 測試用
       }
+    }
+
+    /**
+     * v4.2.2 碼頭的船（沒有美術圖時）：256×96、透明底、俯視、船頭朝右的白色小客船——尖船頭、藍色船邊線、船艙一排窗、紅色煙囪、救生圈。
+     * 和美術圖規格同尺寸（C:\tmp\v422_coord\ferry_asset_need.md），換成美術圖時縮放算法不用改。
+     */
+    boatTexture() {
+      var key = 'ui:ferry_boat';
+      if (this.textures.exists(key)) return key;
+      var c = document.createElement('canvas'); c.width = 256; c.height = 96;
+      var x = c.getContext('2d');
+      function hull(inset) {
+        x.beginPath();
+        x.moveTo(14 + inset, 12 + inset);
+        x.lineTo(182, 12 + inset);
+        x.quadraticCurveTo(228 - inset, 18 + inset, 250 - inset * 1.6, 48);
+        x.quadraticCurveTo(228 - inset, 78 - inset, 182, 84 - inset);
+        x.lineTo(14 + inset, 84 - inset);
+        x.quadraticCurveTo(4 + inset, 84 - inset, 4 + inset, 72 - inset);
+        x.lineTo(4 + inset, 24 + inset);
+        x.quadraticCurveTo(4 + inset, 12 + inset, 14 + inset, 12 + inset);
+        x.closePath();
+      }
+      hull(0); x.fillStyle = '#24324a'; x.fill();             // 深色外框
+      hull(3); x.fillStyle = '#2f6fb0'; x.fill();             // 藍色船邊線
+      hull(7); x.fillStyle = '#f4f1e8'; x.fill();             // 白色甲板
+      x.fillStyle = '#c94a3d'; x.fillRect(200, 44, 30, 8);    // 船頭紅色記號（看得出船頭朝哪）
+      x.fillStyle = '#24324a'; x.fillRect(52, 24, 112, 48);   // 船艙外框
+      x.fillStyle = '#dfe7ef'; x.fillRect(55, 27, 106, 42);   // 船艙屋頂
+      x.fillStyle = '#9fb8d0'; x.fillRect(55, 45, 106, 6);    // 屋脊
+      x.fillStyle = '#24324a';
+      for (var i = 0; i < 6; i++) { x.fillRect(60 + i * 17, 20, 10, 6); x.fillRect(60 + i * 17, 70, 10, 6); }   // 兩側一排窗
+      x.fillStyle = '#24324a'; x.beginPath(); x.arc(132, 48, 11, 0, Math.PI * 2); x.fill();   // 煙囪
+      x.fillStyle = '#c94a3d'; x.beginPath(); x.arc(132, 48, 8, 0, Math.PI * 2); x.fill();
+      x.fillStyle = '#2a1e22'; x.beginPath(); x.arc(132, 48, 4, 0, Math.PI * 2); x.fill();
+      [[30, 28], [30, 68]].forEach(function (p) {   // 船尾兩個救生圈
+        x.fillStyle = '#f08a2c'; x.beginPath(); x.arc(p[0], p[1], 8, 0, Math.PI * 2); x.fill();
+        x.fillStyle = '#ffffff'; x.fillRect(p[0] - 8, p[1] - 2, 16, 4); x.fillRect(p[0] - 2, p[1] - 8, 4, 16);
+        x.fillStyle = '#f4f1e8'; x.beginPath(); x.arc(p[0], p[1], 3.5, 0, Math.PI * 2); x.fill();
+      });
+      this.textures.addCanvas(key, c);
+      return key;
     }
 
     setChestOpen(id) {
@@ -715,7 +776,9 @@
     buildSigns() {
       var self = this;
       this.signs = [];
-      J.MapInfo.signSpots(this.map).forEach(function (sg) {
+      // v4.2.2：位置照 MapInfo.SIGN_PLAQUES（每家店掛在自己那棟房子上）；hidden＝背景已畫好這家店的招牌，不再畫一塊（小地圖的店家標記照留，img 為 null）
+      J.MapInfo.signSpots(this.map, this.mapId).forEach(function (sg) {
+        if (sg.hidden) { self.signs.push({ spot: sg, img: null }); return; }
         var key = 'sign_' + sg.kind, img;
         if (self.hasArt(key) && !sg.custom) img = self.add.image(sg.x * T + T / 2, (sg.y + 1) * T, J.Assets.texKey(key)).setOrigin(0.5, 1).setScale(1.15);
         else img = self.add.image(sg.x * T + T / 2, (sg.y + 1) * T, self.textSign(sg.kind, sg.text)).setOrigin(0.5, 1);
@@ -1043,15 +1106,17 @@
       this.petTarget = { x: this.pet.x, y: this.pet.y };
       this.petState = null;   // 換地圖時重設跟隨狀態（場景物件會沿用），從朝下站姿重新開始
       this.petDist = 0;
+      this.petFx = {};   // v4.2.2 番薯仔腳下影子（updateSpriteFx；每張地圖重建）
       if (J.Followers) J.Followers.build(this);   // v3.0 跟班掛鉤（codex5）：每次進場重建隊伍
 
       this.npcList().forEach(function (n) {
         var tk = J.Assets.texKey(n.sprite || 'npc_unknown');
         var img = self.add.image(n.x * T + T / 2, n.y * T + T, tk, self.textures.get(tk).has(1) ? 1 : undefined).setOrigin(0.5, 1).setDepth((n.y + 1) * T);
-        var t1 = self.tweens.add({ targets: img, y: img.y - 2, duration: 700 + (n.x * 37) % 400, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+        // v4.2.2 整張上下浮動改成腳底固定的呼吸（updateSpriteFx）；頭上記號的跳動照舊
         var mark = self.add.image(img.x, img.y - img.displayHeight - 4, 'ui:bang').setOrigin(0.5, 1).setScale(2).setDepth(9000).setVisible(false);
         var t2 = self.tweens.add({ targets: mark, y: mark.y - 4, duration: 500, yoyo: true, repeat: -1 });
-        self.npcs.push({ data: n, img: img, mark: mark, tw: [t1, t2] });
+        var bp = J.SpriteAnim.npcPeriod(n.x, n.y);
+        self.npcs.push({ data: n, img: img, mark: mark, tw: [t2], sy0: img.scaleY, bp: bp, bph: J.SpriteAnim.npcPhase(n.x, n.y, bp) });
       });
       this.refreshMarkers();
       this.syncDepths();
@@ -1093,6 +1158,8 @@
     // ---------------------------------------------------------------- 怪物
     buildMonsters() {
       var self = this, g = G(), st = g.state;
+      this.spawnSpreadStats = { relaxed: 0, r2: 0, r4: 0 };   // 本次進圖的放寬次數（含之後重生），不寫存檔
+      var pending = [];
       (this.map.spawns || []).forEach(function (s, si) {
         var m = g.data.monsters[s.monster];
         if (!m) return;
@@ -1103,9 +1170,16 @@
         if (s.elite && s.quest && J.QuestLog.status(st, g.data.quests, s.quest) !== 'active') return;   // v3.0 精英：只在委託進行中出現
         for (var i = 0; i < (s.count || 1); i++) {
           var mob = { spawn: s, mon: m, id: s.monster, idx: si * 10 + i, active: false, sprite: null, tx: 0, ty: 0, moving: false, nextMove: 0, respawnAt: 0, boss: !!(s.boss || m.boss) };
+          pending.push(mob);
+        }
+      });
+      // 特殊怪沿用原站位與出現條件；先放好，讓一般野怪避開它們。
+      [false, true].forEach(function (normal) {
+        pending.forEach(function (mob) {
+          if (J.SpawnSpread.ordinary(mob.spawn, mob.mon) !== normal) return;
           self.placeMonster(mob, true);
           self.monsters.push(mob);
-        }
+        });
       });
     }
 
@@ -1134,18 +1208,30 @@
       var far = tiles.filter(function (t) { return !p || Math.abs(t.x - p.tx) + Math.abs(t.y - p.ty) >= 4; });
       var pick = (far.length ? far : tiles)[Math.floor(Math.random() * (far.length ? far : tiles).length)];
       if (mob.boss) { var a2 = mob.spawn.area; pick = { x: a2[0], y: a2[1] }; }
+      if (J.SpawnSpread.ordinary(mob.spawn, mob.mon)) {
+        var result = J.SpawnSpread.pick({ tiles: tiles,
+          player: p ? { x: p.tx, y: p.ty } : null,
+          occupied: this.monsters.filter(function (o) { return o !== mob && o.active; }).map(function (o) { return { x: o.tx, y: o.ty }; }),
+          features: J.SpawnSpread.features(this.map), stats: this.spawnSpreadStats });
+        // 分散測試逐群驗證：即使主角站最擠的位置、其他怪全塞進範圍，最低限制仍有空格。
+        pick = result.tile;
+      }
       mob.tx = pick.x; mob.ty = pick.y;
       var tk = J.Assets.texKey(mob.mon.sprite);
       if (!mob.sprite) {
-        mob.sprite = this.add.image(0, 0, tk).setOrigin(0.5, 1);
+        // v4.2.2 多幀圖（type strip、橫排 cols 格）載入了而且每一格都切好：用第 0 格建立，mobFx 換格；否則照舊用單張圖（頭目階段圖目前只在戰鬥用）
+        var ak = mob.mon.sprite + '_anim', ainf = J.Assets.info(ak), atk = J.Assets.texKey(ak);
+        mob.frames = ainf && ainf.type === 'strip' && this.textures.exists(atk) && this.textures.get(atk).has(ainf.cols - 1) ? ainf.cols : 0;
+        mob.sprite = this.add.image(0, 0, mob.frames ? atk : tk, mob.frames ? 0 : undefined).setOrigin(0.5, 1);
         // 地圖上的怪物高度：sprites.js 的 mapH 優先，否則用 config.js 的預設
         var inf = J.Assets.info(mob.mon.sprite) || {};
         var target = inf.mapH || (mob.boss ? C.MAP_BOSS_H : C.MAP_MONSTER_H);
-        mob.sprite.setScale(target / Math.max(mob.sprite.height, 1));
+        mob.baseScale = target / Math.max(mob.sprite.height, 1);
+        mob.sprite.setScale(mob.baseScale);
       }
       mob.sprite.setPosition(mob.tx * T + T / 2, mob.ty * T + T).setAlpha(first ? 1 : 0).setVisible(mob.inView !== false);
       if (!first) this.tweens.add({ targets: mob.sprite, alpha: 1, duration: 600 });
-      if (!mob.bob) mob.bob = this.tweens.add({ targets: mob.sprite, scaleY: mob.sprite.scaleY * 1.08, duration: 420 + (mob.idx * 53) % 300, yoyo: true, repeat: -1 });
+      // v4.2.2 站著的呼吸改在 updateSpriteFx（以前是這裡的 ×1.08 補間）
       mob.active = true;
       mob.path = [];
       mob.nextMove = this.time.now + 800 + Math.random() * 1500;
@@ -1181,9 +1267,9 @@
           mob.nextMove = now + (mob.path.length ? 900 : 2500 + Math.random() * 3000);
           return;
         }
-        mob.moving = true;
+        mob.moving = true; mob.stepAt = now;   // v4.2.2 踏步：這一格的左右兩步從現在開始
         if (t.c * T + T / 2 < mob.sprite.x) mob.sprite.setFlipX(false); else if (t.c * T + T / 2 > mob.sprite.x) mob.sprite.setFlipX(true);
-        self.tweens.add({ targets: mob.sprite, x: t.c * T + T / 2, y: t.r * T + T, duration: 520, onComplete: function () {
+        self.tweens.add({ targets: mob.sprite, x: t.c * T + T / 2, y: t.r * T + T, duration: MOB_STEP_MS, onComplete: function () {
           mob.moving = false;
           mob.nextMove = self.time.now + (mob.path.length ? 60 : 800 + Math.random() * 1400);   // 走到目標後停一下
         } });
@@ -1275,6 +1361,58 @@
       });
     }
 
+    /**
+     * v4.2.2（老闆 2026-11-14「M33帝雉記得分散跑」）：maps.js friendly 寫 wander: true、而且有走路圖（sprites.js type walk）的友善動物
+     * （目前只有 M33 兩隻帝雉）在自己的保護區裡各自慢慢走動（KeepAway.wanderTiles：離中心 radius−2 格以內）。
+     * 兩隻的保護區不重疊、主角被保護區擋在外面，所以不會擠在一起、碰不到主角、不擋路；不能互動。沒寫 wander 的照舊（站著／原本的漂浮）。
+     * buildSouth 建的是 image（不能播動畫），這裡換成 sprite（同位置、同深度、同顯示狀態）。
+     */
+    buildFriendlyWander() {
+      var self = this, Wd = J.World;
+      (this.friendlies || []).forEach(function (f) {
+        if (!f.walk || !f.data || f.data.wander !== true || !J.KeepAway || !J.KeepAway.wanderTiles) return;
+        var tiles = J.KeepAway.wanderTiles(self.map, f.data, function (x, y) {
+          return !(self.blocked && self.blocked[x + ',' + y]) && Wd.isWalkable(G().data.tilesets, self.map, x, y, null) && !Wd.exitAt(self.map, x, y) && Wd.charAt(self.map, x, y) !== 'U';
+        });
+        if (tiles.length < 2) return;
+        var tk = f.img.texture.key, old = f.img;
+        self.tweens.killTweensOf(old);   // 有走路圖的原本上下漂浮；改成走路
+        self.ensureWalkAnims(tk, f.data.sprite);
+        f.img = self.add.sprite(f.data.x * T + T / 2, (f.data.y + 1) * T, tk, self.idleFrame(f.data.sprite, 'down')).setOrigin(0.5, 1).setDepth((f.data.y + 1) * T).setVisible(old.visible);
+        old.destroy();
+        var ok = {};
+        tiles.forEach(function (t) { ok[t.x + ',' + t.y] = true; });
+        Object.assign(f, { wander: tiles, okSet: ok, tx: f.data.x, ty: f.data.y, facing: 'down', moving: false, path: [], nextMove: self.time.now + 600 + (f.data.x * 37 + f.data.y * 11) % 1500 });
+      });
+    }
+
+    /** 帝雉的走動（和黃牛 wanderAnimals 同一套：A* 走到保護區裡隨機一格，走到了停一下）；看不見（show 條件沒成立）時不走 */
+    wanderFriendlies(now) {
+      var self = this;
+      (this.friendlies || []).forEach(function (f) {
+        if (!f.wander || f.moving || now < f.nextMove || !f.img.scene) return;
+        if (!f.img.visible) { f.nextMove = now + 1000; return; }
+        var can = function (x, y) { return !!f.okSet[x + ',' + y] && !self.friendlies.some(function (o) { return o !== f && o.wander && o.tx === x && o.ty === y; }); };
+        if (!f.path.length) {
+          var goal = J.MapInfo.wanderTarget(f.wander, { x: f.tx, y: f.ty });
+          f.path = goal ? (J.Pathfind.findPath(can, self.size.w, self.size.h, { c: f.tx, r: f.ty }, { c: goal.x, r: goal.y }, 400) || []) : [];
+          if (!f.path.length) { f.nextMove = now + 1200 + Math.random() * 1500; return; }
+        }
+        var t = f.path.shift();
+        if (!can(t.c, t.r)) { f.path = []; f.nextMove = now + 600; return; }
+        var dir = t.c > f.tx ? 'right' : t.c < f.tx ? 'left' : t.r > f.ty ? 'down' : 'up';
+        f.tx = t.c; f.ty = t.r; f.facing = dir; f.moving = true;
+        var key = f.img.texture.key + '-' + dir;
+        if (self.anims.exists(key) && (!f.img.anims.isPlaying || !f.img.anims.currentAnim || f.img.anims.currentAnim.key !== key)) f.img.anims.play(key);
+        self.tweens.add({ targets: f.img, x: t.c * T + T / 2, y: t.r * T + T, duration: FRIEND_STEP_MS, onComplete: function () {
+          f.moving = false;
+          if (f.path.length) { f.nextMove = self.time.now; return; }
+          f.img.anims.stop(); f.img.setFrame(self.idleFrame(f.data.sprite, f.facing));
+          f.nextMove = self.time.now + 1500 + Math.random() * 3000;   // 走到了停下來啄啄地面、看看四周
+        } });
+      });
+    }
+
     /** 戰鬥結束：怪物清醒跑走，30 秒後在範圍內重生（頭目淨化後不再出現） */
     monsterRunAway(mob, defeated) {
       if (!mob || !mob.sprite) return;
@@ -1282,7 +1420,17 @@
       var dx = mob.sprite.x >= this.player.x ? T * 2.5 : -T * 2.5;
       this.tweens.add({ targets: mob.sprite, x: mob.sprite.x + dx, y: mob.sprite.y - T / 3, alpha: 0, duration: 900, onComplete: function () { mob.sprite.setVisible(false); } });
       if (mob.boss && defeated) mob.respawnAt = 0;
-      else mob.respawnAt = this.time.now + RESPAWN_MS;
+      else mob.respawnAt = this.loopNow() + RESPAWN_MS;   // v4.2.2 DEF-01：從回到地圖這一刻開始倒數（不是開戰那一刻）
+    }
+
+    /**
+     * v4.2.2 DEF-01（老闆 2026-11-14「打完怪才開始計算30秒」）：遊戲迴圈「現在」的時間（＝update(time) 收到的 time）。
+     * 戰鬥時這個場景被 sleep，場景時鐘 this.time.now 只在場景 update 時更新，醒來（onWake）那一刻還停在開戰時；
+     * 拿它算重生與遇怪冷卻，戰鬥超過 30 秒回來下一幀就過期 → 同一隻怪立刻重生又開戰。沒有迴圈資訊（測試的假場景）時退回場景時鐘。
+     */
+    loopNow() {
+      var loop = this.sys && this.sys.game && this.sys.game.loop;
+      return loop && typeof loop.now === 'number' && loop.now > 0 ? loop.now : this.time.now;
     }
 
     // ---------------------------------------------------------------- 移動
@@ -1399,7 +1547,7 @@
       p.moving = true; p.t = this.stepCarry || 0; this.stepCarry = 0;   // v3.0.1（86 號 #2）多出來的時間帶到這一格
       p.from = { x: p.tx * T + T / 2, y: p.ty * T + T };
       p.to = { x: nx * T + T / 2, y: ny * T + T };
-      // v1.0.6 斜走一步的時間是直走的 √2 倍（速度看起來一致）
+      // v4.2.2 斜走一步的時間和直走一樣（老闆 2026-11-13 裁定；v1.0.6 原本是 √2 倍）
       p.stepMs = J.Move8.stepMs(STEP_MS, dir) / G().moveSpeed();
       p.stepDir = dir;
       if (p.t > 0) { var k0 = Math.min(1, p.t / p.stepMs), bx0 = this.player.x, by0 = this.player.y; this.player.x = p.from.x + (p.to.x - p.from.x) * k0; this.player.y = p.from.y + (p.to.y - p.from.y) * k0; this.walkStep(Math.abs(this.player.x - bx0) + Math.abs(this.player.y - by0)); }   // v3.0.1（86 號 #2）
@@ -1530,7 +1678,7 @@
 
     promptText(t) {
       if (t.kind === 'npc' && t.npc.ferry) return '買船票／搭船';   // v3.0 船班（codex3）
-      if (t.kind === 'boat') return '搭船';   // v3.0 碼頭的船
+      if (t.kind === 'boat') { var bn = J.Ferry && J.Ferry.dockDestinations ? J.Ferry.dockDestinations(t.dock, G().data.maps) : []; return '搭船' + (bn.length ? '到' + bn.join('／') : ''); }   // v3.0 碼頭的船；v4.2.2 寫出目的地（「搭船到小琉球」）
       if (t.kind === 'npc') return '和' + G().speaker(t.npc.id).name + '說話';
       if (t.kind === 'animal') return '摸摸' + t.animal.spec.name;
       if (t.kind === 'chest') return G().state.chests[t.chest.id] ? '看看寶箱' : '打開寶箱';
@@ -1615,7 +1763,8 @@
       this.shrineCamera();
       if (time >= this.cullAt) { this.cullAt = time + 150; this.cull(); this.fadeMinimap(); this.fadeOverlays(); }
       this.wanderMonsters(time);
-      if (!g.busy) this.wanderAnimals(time);
+      if (!g.busy) { this.wanderAnimals(time); this.wanderFriendlies(time); }
+      this.updateSpriteFx(time);   // v4.2.2 第三批
       this.syncDepths();
       if (!blocked && time > this.encounterCooldown) this.checkEncounter();
       if (!blocked && !p.moving && !J.UI.isOpen()) {
@@ -1671,6 +1820,125 @@
       return out;
     }
 
+    /**
+     * v4.2.2（老闆 2026-11-13）：角色腳下影子、NPC 呼吸、有腳的野怪踏步、沒腳的上下飄動；數學在 systems/sprite_anim.js。
+     * 只改縮放、origin（畫面往上畫）、rotation 與影子，不改 sprite.x／y：遇怪判定、深度、鏡頭外判斷、SpawnSpread、存檔都不受影響。
+     * 鏡頭外（看不見）的角色只把影子藏起來；減少動態效果時不踏步、不呼吸、飄動停在最低點，影子靜止。
+     */
+    updateSpriteFx(now) {
+      var rm = this.reduceMotionNow(), f = this.followers, fl = this.friendlies, i;
+      this.footShadow(this.p, this.player, 1);
+      this.footShadow(this.petFx, this.pet, 1);
+      if (f) for (i = 1; i < f.sprites.length; i++) this.footShadow(f.states[i], f.sprites[i], 1);   // 第 0 隻就是番薯仔
+      for (i = 0; i < this.animals.length; i++) this.footShadow(this.animals[i], this.animals[i].sprite, 1);
+      if (fl) for (i = 0; i < fl.length; i++) {   // 友善動物不會走：單張圖的呼吸；有走路圖的原本漂浮照舊，影子留在地上
+        if (fl[i].walk) this.footShadow(fl[i], fl[i].img, 1, fl[i].wander ? undefined : (fl[i].data.y + 1) * T); else this.standFx(fl[i], fl[i].img, now, rm);   // 會走動的（帝雉）影子跟著腳底
+      }
+      for (i = 0; i < this.npcs.length; i++) this.standFx(this.npcs[i], this.npcs[i].img, now, rm);
+      for (i = 0; i < this.monsters.length; i++) this.mobFx(this.monsters[i], now, rm);
+      // 第六次修改（老闆 2026-11-13「小番薯不見了」「野怪會完全被擋住」）：主角以外的角色被上層格蓋住時也顯示剪影（主角照舊用 updateGhost／樹冠透明）
+      this.coverFx(this.petFx, this.pet);
+      if (f) for (i = 1; i < f.sprites.length; i++) this.coverFx(f.states[i], f.sprites[i]);
+      for (i = 0; i < this.animals.length; i++) this.coverFx(this.animals[i], this.animals[i].sprite);
+      if (fl) for (i = 0; i < fl.length; i++) this.coverFx(fl[i], fl[i].img);
+      for (i = 0; i < this.npcs.length; i++) this.coverFx(this.npcs[i], this.npcs[i].img);
+      for (i = 0; i < this.monsters.length; i++) this.coverFx(this.monsters[i], this.monsters[i].sprite);
+    }
+    /**
+     * 剪影（主角以外）：角色碰到上層格（fgSet，和主角 updateGhost 同一套格子、同樣內縮的判斷框）時，在最上層（GHOST_DEPTH）畫同一張貼圖、同一格、
+     * 同樣 scale／origin／flip／rotation 的淺藍 35% 單色影子，而且只裁出「被蓋住的那一塊」：整隻被蓋住就是整隻剪影，蓋住下半身時上半身照常。
+     * 剪影物件第一次被蓋住時才建立（hold.cover），離開就隱藏；角色銷毀時一起銷毀。只改剪影，不改角色本身。
+     */
+    coverFx(hold, spr) {
+      if (!hold || !spr) return;
+      var g = hold.cover, A = J.SpriteAnim, box = null, l = 0, t = 0;
+      if (g && !g.scene) g = hold.cover = null;   // 換地圖後舊場景的物件已經銷毀
+      if (!spr.scene) { if (g) { g.destroy(); hold.cover = null; } return; }
+      if (this.hasFg && spr.visible && spr.alpha > 0.01) {
+        var dw = spr.displayWidth, dh = spr.displayHeight;
+        l = spr.x - spr.originX * dw; t = spr.y - spr.originY * dh;
+        if (A.coverBox(l + 4, t + 4, dw - 8, dh - 6, this.fgSet, T)) box = A.coverBox(l, t, dw, dh, this.fgSet, T);
+      }
+      if (!box) { if (g && g.visible) g.setVisible(false); return; }
+      if (!g) g = hold.cover = this.add.image(spr.x, spr.y, spr.texture.key, spr.frame.name).setTint(GHOST_TINT).setTintMode(Phaser.TintModes.FILL).setDepth(GHOST_DEPTH);
+      if (g.texture.key !== spr.texture.key) g.setTexture(spr.texture.key, spr.frame.name); else if (g.frame.name !== spr.frame.name) g.setFrame(spr.frame.name);
+      // 審查 S-1（2026-11-14 瀏覽器實測確認）：翻轉的角色若剪影也用 flipX＋左右對調的 crop，Phaser 4 WebGL 會把裁切的「位置」和「取樣 UV」各鏡射一次，
+      // 左右只被蓋住一部分時輪廓取到圖的另一邊（Canvas 版剛好相反）。改成剪影不用 flipX、用負的 scaleX 翻轉（翻轉交給變換矩陣，兩種渲染器一樣），
+      // crop 用「沒翻轉的貼圖座標」：顯示的第 d 欄＝貼圖第 W−1−d 欄，所以被蓋住的顯示範圍 [cx, cx+cw) 對到貼圖 [W−cx−cw, W−cx)。
+      var fx = !!spr.flipX, sx = Math.abs(spr.scaleX) || 1, sy = Math.abs(spr.scaleY) || 1;
+      g.setVisible(true).setPosition(spr.x, spr.y).setScale(fx ? -sx : sx, sy).setOrigin(spr.originX, spr.originY).setFlipX(false).setRotation(spr.rotation || 0).setAlpha(GHOST_ALPHA * spr.alpha);
+      var cw = box.w / sx, cx = (box.x - l) / sx;
+      g.setCrop(fx ? spr.width - cx - cw : cx, (box.y - t) / sy, cw, box.h / sy);
+    }
+    /**
+     * 不會走的單張圖角色（NPC、帝雉、黑熊；美術分類都有腳）：腳底固定的呼吸（只改 scaleY），最高至少 1 像素。
+     * 以後若有會走的單張圖 NPC：在它的資料記 id／sprite／baseScale／moving／stepAt，改呼叫 mobFx 同一段踏步即可（目前沒有會走的 NPC）。
+     */
+    standFx(o, img, now, rm) {
+      var A = J.SpriteAnim, sy = o.sy0;
+      if (!img.scene) { this.footShadow(o, img, 1); return; }   // 已銷毀：只收掉影子
+      if (img.visible) sy = o.sy0 * (1 + A.breath(now, o.bp, A.NPC_AMP, o.bph, img.height * o.sy0, rm));
+      if (img.scaleY !== sy) img.setScale(img.scaleX, sy);
+      this.footShadow(o, img, 1);
+    }
+    /**
+     * 野怪（老闆 2026-11-13）：有腳的（step）走一格踏兩步（左右傾斜＋小起伏）、站著呼吸；沒腳的（float）不論走或站都上下飄動（貼地的幅度小）。
+     * 頭目與不會走的怪：step 只呼吸、float 照樣飄。打倒跑走時 step 回到原本大小、不傾斜；float 跑走中照樣飄（不會突然掉到地上）。
+     * 有多幀圖的（mob.frames＞0，見 placeMonster）改成換格，rotation 一直 0；格序與每格毫秒在 SpriteAnim.animFrame。
+     */
+    mobFx(mob, now, rm) {
+      var s = mob.sprite, A = J.SpriteAnim;
+      if (!s || !mob.baseScale) return;
+      if (!s.scene) { this.footShadow(mob, s, 1); return; }   // 已銷毀：只收掉影子
+      if (!mob.motion) {
+        mob.motion = A.motionOf(mob.id);
+        mob.breathP = A.mobPeriod(mob.idx); mob.breathPh = A.mobPhase(mob.idx, mob.breathP);
+        mob.floatP = A.floatPeriod(mob.idx); mob.floatPh = A.floatPhase(mob.idx, mob.floatP); mob.gnd = A.grounded(mob.id);
+        mob.kind = A.animKind(mob.id); mob.animPh = A.animPhase(mob.idx, mob.frames, mob.kind);
+      }
+      var fl = mob.motion === 'float', lift = 0, br = 0, tilt = 0;
+      if (s.visible) {
+        if (mob.frames) {
+          // v4.2.2 多幀圖：換格取代程式的傾斜與起伏。有腳的走一格播一輪、站著（含跑走）停並攏格＋呼吸；漂浮、飛行換格＋原本的飄動；貼地只換格不飄
+          var fr = A.animFrame(mob.kind, now, mob.active && mob.moving ? (now - mob.stepAt) / MOB_STEP_MS : NaN, mob.animPh, mob.frames, rm);
+          if (mob.frame !== fr) { mob.frame = fr; s.setFrame(fr); }
+          if (fl && !mob.gnd) lift = A.floatLift(now, mob.floatP, mob.floatPh, rm, false);
+          else if (!fl && mob.active && !mob.moving) br = A.breath(now, mob.breathP, A.MOB_AMP, mob.breathPh, s.height * mob.baseScale, rm);
+        }
+        else if (fl) lift = A.floatLift(now, mob.floatP, mob.floatPh, rm, mob.gnd);   // 貼地的（D 類）0～2 像素，其餘 1～7
+        else if (mob.active && mob.moving) { var k = (now - mob.stepAt) / MOB_STEP_MS; lift = A.stepLift(k, rm); tilt = A.stepTilt(k, rm); }
+        else if (mob.active) br = A.breath(now, mob.breathP, A.MOB_AMP, mob.breathPh, s.height * mob.baseScale, rm);
+      }
+      var sy = mob.baseScale * (1 + br), r = tilt * Math.PI / 180;
+      if (s.scaleX !== mob.baseScale || s.scaleY !== sy || mob.lift !== lift) {
+        mob.lift = lift;
+        s.setScale(mob.baseScale, sy).setOrigin(0.5, 1 + lift / Math.max(1, s.displayHeight));   // 和主角的 setBob 一樣：腳底（sprite.y）不變，只把圖往上畫
+      }
+      if (s.rotation !== r) s.setRotation(r);   // 以 origin（腳底中央）為軸傾斜；不踏步時一律回到 0
+      this.footShadow(mob, s, fl ? A.shadowScale(lift, A.FLOAT_TOP) : 1);
+    }
+    /**
+     * 腳下影子：共用 fx:footshadow 貼圖、固定深度（地面之上、角色之下）；跟著角色的顯示、透明度、銷毀；k＝縮放（飄高時略縮小，平常 1）。
+     * 影子記在角色的資料（hold.shadow：怪物、NPC、動物、主角的 p…），不加屬性到 Phaser 物件上（保持引擎物件的形狀一致）。
+     */
+    footShadow(hold, spr, shk, groundY) {
+      if (!hold || !spr) return;
+      var sh = hold.shadow, A = J.SpriteAnim;
+      if (!spr.scene) { if (sh) { sh.destroy(); hold.shadow = null; } return; }
+      var on = spr.visible && spr.alpha > 0.01;
+      if (!sh) {
+        if (!on) return;
+        sh = hold.shadow = this.add.image(0, 0, 'fx:footshadow').setDepth(CHAR_SHADOW_DEPTH);
+      }
+      if (sh.visible !== on) sh.setVisible(on);
+      if (!on) return;
+      var k = A.shadowWidth(spr.displayWidth) / 32 * shk, a = A.SHADOW_ALPHA * spr.alpha;
+      var gy = (groundY === undefined ? spr.y : groundY) + 1;   // 橢圓中心在腳底下 1 像素：大半露在腳外（飄動、踏步只改 origin，spr.y 一直是地面）
+      if (sh.x !== spr.x || sh.y !== gy) sh.setPosition(spr.x, gy);
+      if (sh.scaleX !== k) sh.setScale(k);
+      if (sh.alpha !== a) sh.setAlpha(a);
+    }
+
     syncDepths() {
       // Phaser 每次 setDepth 都會讓整個畫面重新排序，所以只有深度真的改變、而且在鏡頭附近的才設定
       function setD(o, d) { if (o.depth !== d) o.setDepth(d); }
@@ -1678,6 +1946,7 @@
       setD(this.pet, this.pet.y - 0.1);
       this.monsters.forEach(function (m) { if (m.sprite && m.inView !== false) setD(m.sprite, m.sprite.y); });
       (this.animals || []).forEach(function (a) { if (a.inView !== false) setD(a.sprite, a.sprite.y); });
+      (this.friendlies || []).forEach(function (f) { if (f.wander && f.img.scene) setD(f.img, f.img.y); });   // v4.2.2 會走動的帝雉
     }
 
     /**
@@ -1695,7 +1964,6 @@
         if (v === mob.inView) return;
         mob.inView = v;
         if (mob.active) mob.sprite.setVisible(v);
-        if (mob.bob) { if (v) mob.bob.resume(); else mob.bob.pause(); }
       });
       (this.animals || []).forEach(function (a) {
         var v = inView(a.sprite.x, a.sprite.y);
@@ -1853,7 +2121,7 @@
     onWake(data) {
       this.cameras.main.fadeIn(250, 0, 0, 0);
       if (J.Ambience) J.Ambience.battle(false);   // v3.0.1（86 號 #7）環境音 1.0 秒淡入
-      this.encounterCooldown = this.time.now + 2000;
+      this.encounterCooldown = this.loopNow() + 2000;   // v4.2.2 DEF-01：場景剛醒來，this.time.now 還停在開戰時
       if (data.mob) this.monsterRunAway(data.mob, data.result === 'win');
       this.refreshMarkers();
       this.updateLamps();

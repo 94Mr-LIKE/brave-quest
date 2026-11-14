@@ -44,16 +44,27 @@
     });
     return n;
   }
-  /** 能力（不含裝備）：48 號 2.1 */
-  function baseStats(state, data) {
-    var p = state.player, job = jobOf(data, p.job), L = p.level, n = mastered(state, data);
+  /** 原始公式值（不含保底與裝備），指定等級時仍沿用同一份出師紀錄。 */
+  function formulaStats(state, data, level) {
+    var p = state.player, job = jobOf(data, p.job), L = level === undefined ? p.level : level, n = mastered(state, data);
     var base = Object.assign({}, BASE, (data && data.base) || {}), g = growth(data);
     var t = 1 + Number(rules(data).transfer_step === undefined ? 0.2 : rules(data).transfer_step) * n;
     var out = { n: n };
     KEYS.forEach(function (k) {
-      var raw = rnd((base[k] + g[k] * (L - 1)) * (job.mods[k] === undefined ? 1 : job.mods[k]) * t);
-      out[k] = Math.max(raw, Number((p.floor || {})[k]) || 0);
+      out[k] = rnd((base[k] + g[k] * (L - 1)) * (job.mods[k] === undefined ? 1 : job.mods[k]) * t);
     });
+    return out;
+  }
+  /** v4.2.2 甲案：max(公式(Lv), floor + 公式(Lv) - 公式(1))；沒有保底時與舊版相同。 */
+  function baseStats(state, data) {
+    var out = formulaStats(state, data), first = formulaStats(state, data, 1);
+    KEYS.forEach(function (k) { out[k] = Math.max(out[k], (Number((state.player.floor || {})[k]) || 0) + out[k] - first[k]); });
+    return out;
+  }
+  /** 轉職專用舊算法：max(公式值, 舊保底)，不含裝備及甲案成長加成，避免連續轉職把保底滾大。 */
+  function statsForFloor(state, data) {
+    var out = formulaStats(state, data);
+    KEYS.forEach(function (k) { out[k] = Math.max(out[k], Number((state.player.floor || {})[k]) || 0); });
     return out;
   }
   /** 這件裝備現在的職業能不能用（48 號 3.1：專屬武器看 jobs；其他看類別；通用大家都能用） */
@@ -274,7 +285,7 @@
     if (!c.ok) return c;
     var p = ensureJobs(state);
     var ratio = Number(rules(data).floor_ratio === undefined ? 0.5 : rules(data).floor_ratio);
-    var bs = baseStats(state, data);
+    var bs = statsForFloor(state, data);
     KEYS.forEach(function (k) { p.floor[k] = Math.max(Number(p.floor[k]) || 0, Math.floor(bs[k] * ratio)); });
     p.jobs[p.job] = { lv: p.level, exp: p.exp };
     var from = p.job;
@@ -339,7 +350,10 @@
   /** 戰力 B 案：目前職業等級、出師加成與保底；不含職業倍率及裝備。 */
   function pl(state, data) {
     var p = state.player;
-    return (Math.max(Math.round((6 + 2 * (p.level - 1)) * (1 + 0.2 * mastered(state, data))), Number((p.floor || {}).atk) || 0) - 6) / 2 + 1;
+    // d_growth.js 甲案：戰力沿用不含職業倍率與裝備的攻擊公式，再加保底超過 Lv1 的差額。
+    var t = 1 + 0.2 * mastered(state, data), raw = rnd((6 + 2 * (p.level - 1)) * t), first = rnd(6 * t);
+    var atk = Math.max(raw, (Number((p.floor || {}).atk) || 0) + raw - first);
+    return (atk - 6) / 2 + 1;
   }
 
   var Character = { pl: pl, FAM_NAME: FAM_NAME, famNames: famNames, equipFams: equipFams, GROWTH: GROWTH, baseStats: baseStats, ensureJobs: ensureJobs, jobLevel: jobLevel, needsJobHint: needsJobHint, mastered: mastered, usable: usable, usableJobs: usableJobs, isOpen: isOpen, gearValue: gearValue, autoEquip: autoEquip, learnedSkills: learnedSkills, slotSkills: slotSkills, setSkillSlots: setSkillSlots, compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };

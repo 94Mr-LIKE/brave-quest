@@ -129,5 +129,29 @@
     });
   }
 
-  J.FerryUI = { play: play, interact: interact };
+  /**
+   * v4.2.2 測試模式（大人試玩，G.boardBoat 判斷）：不用票、不看前置委託，照樣播約 4 秒的海上過場，結束後換到對岸下船格。
+   * 不動 state.ferry（票數、出發端）、不寫委託；只呼叫既有 G.changeMap。回傳 Promise<boolean>（true＝換圖了）
+   */
+  function testRide(G, route, side, scene) {
+    if (!route || (side !== 'from' && side !== 'to') || G._ferryInteracting || G.blocked() || G.inTrial || G.mapChanging || scene.transitioning || J.UI.blocksMove()) return Promise.resolve(false);
+    var dest = route[side === 'from' ? 'to' : 'from'];
+    if (!dest || !G.data.maps[dest.map]) return Promise.resolve(false);
+    G._ferryInteracting = true;
+    G.testRideLog = (G.testRideLog || []).concat([route.id + ':' + side]);   // 測試用
+    return new Promise(function (resolve) {
+      G.busy = true; scene.transitioning = true;
+      function release() { G.busy = false; scene.transitioning = false; G._ferryInteracting = false; G.held = {}; G.heldOrder = []; G.joy = { dir: null, force: 0 }; if (scene.p) scene.p.path = []; }
+      var handle = play({ from: route[side], to: dest, routeName: route.name }, function () {
+        release();
+        if (G.mapScene !== scene) { resolve(false); return; }
+        G.changeMap(dest.map, dest.x, dest.y, 'down');
+        G.refreshHud();
+        resolve(true);
+      });
+      if (!handle) { release(); resolve(false); }
+    });
+  }
+
+  J.FerryUI = { play: play, interact: interact, testRide: testRide };
 })();

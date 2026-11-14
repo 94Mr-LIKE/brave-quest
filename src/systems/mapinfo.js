@@ -33,27 +33,103 @@
   }
 
   // ---------------------------------------------------------------- 招牌
-  var SIGN_KIND = { general: 'general', item: 'item', weapon: 'weapon', armor: 'armor', inn: 'inn', cloud_m42: 'armor', cloud_m43: 'weapon', cloud_m44: 'armor' };   // v4.2 4c：雲上小舖招牌照賣的東西（晨光雲衣、星光劍、曙光之鎧）
+  // v4.2 4c：雲上小舖招牌照賣的東西（晨光雲衣、星光劍、曙光之鎧）
+  // v4.2.2：台北城三家店（item/weapon/armor_taipei）、基隆廟口與宜蘭老街的道具攤以前沒有對應，都退回「雜貨」的籃子圖（舊錯）
+  var SIGN_KIND = { general: 'general', item: 'item', weapon: 'weapon', armor: 'armor', inn: 'inn', cloud_m42: 'armor', cloud_m43: 'weapon', cloud_m44: 'armor',
+    item_taipei: 'item', weapon_taipei: 'weapon', armor_taipei: 'armor', item_keelung: 'item', item_yilan: 'item' };
   var SIGN_TEXT = { general: '雜貨', item: '道具', weapon: '武器', armor: '防具', inn: '旅店' };
 
   /**
-   * 每間店、旅店的招牌位置：找店主人附近（2 格內）最近的門 'D'，招牌掛在門的上一格；
-   * 找不到門就掛在店主人頭上一格。回傳 [{kind, text, x, y, npcX, npcY}]
+   * v4.2.2 匾額位置表（老闆 2026-11-14「招牌通通掛在房屋上面當匾額」）：每一家店都看過背景圖，指定招牌掛在它那棟房子的哪裡。
+   * SIGN_PLAQUES[地圖][shop_id 或 'inn'] =
+   *   { x, y, on }：招牌「底部中心」在 (x·32+16, (y+1)·32) 像素（x、y 可以有小數，用來對準門楣、雨棚）；on＝掛在什麼上面
+   *   { hide }：背景本來就畫了這家店的招牌（不畫程式招牌，免得兩塊疊在一起）；hide＝背景畫的是什麼
+   *   open：露天攤、旁邊沒有房子（雲上小舖），格子檢查不要求落在建築格上；待老闆確認
+   * 檢查：tests/validate_world.js「招牌掛在房子上」（每家都要有、不碰角色、落在不可走的建築格上）。
+   * 背景是 docs/assets/maps/bg_Mxx.webp（每格 32 像素），選位時逐家看圖；總覽在 招牌匾額_總覽_第N頁.png。
    */
-  function signSpots(map) {
+  var SIGN_PLAQUES = {
+    M01: { general: { x: 31, y: 31, on: '店面招牌橫木（紅瓦屋簷下）' }, inn: { x: 84, y: 14, on: '溫泉旅館屋簷下橫樑' } },
+    M04: { inn: { x: 22.5, y: 3.9, on: '樹屋小屋正面木牆（圓窗上方）' } },
+    M05: { inn: { x: 81.5, y: 5, on: '旅舍門楣（屋簷下）' } },
+    M07: { inn: { x: 30.5, y: 9.5, on: '圓石屋門上方（茅草屋簷下）' } },
+    M08: { inn: { x: 67.2, y: 5.8, on: '營帳入口橫木上方' } },
+    M09: { item: { x: 32.2, y: 14.5, on: '道具攤門上方屋簷' }, weapon: { hide: '背景已畫劍的招牌板' }, armor: { hide: '背景已畫盾的招牌板' },
+      inn: { x: 7.5, y: 5.6, on: '民宿門楣雕花橫板' } },
+    M10: { inn: { x: 51, y: 25.3, on: '客棧門楣（背景圓形碗招牌左邊）' } },
+    M47: { item_keelung: { x: 41.9, y: 34.75, on: '廟口攤位的綠色棚子' }, inn: { x: 53.5, y: 32, on: '旅店門上方黃色雨棚' } },
+    M48: { inn: { x: 15, y: 6.3, on: '宿舍門廊小屋頂' } },
+    M14: { item_yilan: { x: 30, y: 8, on: '老街店面拱門上方牆面' }, inn: { x: 21.5, y: 36.4, on: '溫泉旅館右翼一樓屋簷' } },
+    M50: { inn: { x: 31.6, y: 8.9, on: '民宿門楣' } },
+    M51: { inn: { x: 49, y: 6.5, on: '冷泉旅館門上方屋簷' } },
+    M13: { inn: { x: 16.9, y: 34, on: '茶館暖簾上方橫樑' } },
+    M12: { item_taipei: { hide: '背景已畫藥水的招牌板' }, weapon_taipei: { hide: '背景已畫劍的招牌板' }, armor_taipei: { hide: '背景已畫盾的招牌板' },
+      inn: { x: 29.7, y: 25.2, on: '旅館門廊雨棚' } },
+    M53: { inn: { x: 55.5, y: 33, on: '溫泉旅館暖簾上方屋簷' } },
+    M54: { inn: { x: 22, y: 46, on: '旅館入口玻璃雨棚' } },
+    M15: { inn: { x: 79.6, y: 33, on: '旅店拱門上方簷口' } },
+    M16: { inn: { x: 12, y: 15, on: '旅店門楣（紫色門簾處）' } },
+    M17: { inn: { x: 36.1, y: 40, on: '民宿門上方一樓屋簷' } },
+    M18: { inn: { x: 23.9, y: 14.6, on: '旅店門上方紅色雨棚' } },
+    M19: { inn: { x: 52.5, y: 28, on: '客棧木製雨棚' } },
+    M20: { inn: { x: 61.5, y: 29.2, on: '旅店門上方屋簷' } },
+    M21: { inn: { x: 90, y: 41.8, on: '客棧門楣（獅頭裝飾下方）' } },
+    M22: { inn: { x: 88, y: 32.3, on: '民宿門上方屋簷' } },
+    M23: { inn: { x: 52.5, y: 29.6, on: '民宿門上方屋簷' } },
+    M24: { inn: { x: 22.5, y: 17, on: '民宿門上方屋簷' } },
+    M25: { inn: { x: 44.85, y: 54, on: '旅店門廊屋頂' } },
+    M26: { inn: { x: 58.5, y: 37.5, on: '民宿門廊山牆' } },
+    M27: { ice_gi: { x: 25.75, y: 30, on: '冰店門右邊牆面（掛勾招牌）' }, inn: { x: 44.75, y: 31, on: '民宿門上方屋簷' } },
+    M28: { inn: { x: 33.5, y: 34.4, on: '民宿門上方屋頂邊緣' } },
+    M29: { mochi_hl: { hide: '背景已畫麻糬的招牌板' }, inn: { x: 65.5, y: 48, on: '旅店門廊屋頂' } },
+    M30: { inn: { x: 29, y: 23, on: '旅店屋簷下木牆' } },
+    M31: { inn: { x: 63.9, y: 34, on: '旅店門上方一樓屋簷' } },
+    M32: { inn: { x: 69, y: 34.3, on: '老闆右手邊那棟旅店的木牆（紅燈籠下）' } },
+    M33: { inn: { x: 44.1, y: 33.4, on: '山屋門上方屋簷' } },
+    M35: { inn: { x: 23, y: 14, on: '山莊入口雨棚' } },
+    M42: { cloud_m42: { x: 25.7, y: 39, open: true, on: '雲上露天攤（沒有房子），立在店主人左邊' } },
+    M43: { cloud_m43: { x: 24.7, y: 41, open: true, on: '雲上露天攤（沒有房子），立在店主人左邊' } },
+    M44: { cloud_m44: { x: 26.3, y: 32, open: true, on: '雲上露天攤（沒有房子），立在店主人右邊' } }
+  };
+
+  /**
+   * 每間店、旅店的招牌位置。回傳 [{kind, text, custom, x, y, npcX, npcY, onDoor, hidden, on, open, fromTable}]
+   * 1. mapId 有在 SIGN_PLAQUES 指定 → 照表（hidden：背景已有招牌，不畫）。
+   * 2. 沒有指定 → 規則「掛在房子上」：從店主人附近（2 格內）最近的門 'D' 往上找第一格牆（不能走的格子），掛在那一格；
+   *    沒有門就從店主人那一直行（再來是左右各一行）往上找，跳過頭會碰到的那一格（店主人上一格），掛在第一格牆上。
+   *    3 格內都找不到牆才退回店主人上方 2 格（不會壓到 50 像素高的頭）。
+   * v4.2.2 沿革：以前沒有門時掛在店主人頭上 1 格（被頭蓋住），11-13 改 2 格（懸在路上），11-14 老闆要求全部掛在房子上。
+   */
+  var SIGN_ABOVE_KEEPER = 2;   // 3 格內找不到牆時的最後退路：店主人上方 2 格（上一格會被 50 像素高的頭蓋住）
+  var WALL_CHARS = 'HRK#T';   // 牆、屋頂、櫃台／攤位、石牆、樹（maps.js 圖例裡不能走、屬於房子或攤位的格子）
+  function isWall(map, x, y) { var ch = World.charAt(map, x, y); return !!ch && WALL_CHARS.indexOf(ch) >= 0; }
+  function ruleSpot(map, s) {
+    var best = null, bestD = 99;
+    for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
+      if (World.charAt(map, s.x + dx, s.y + dy) !== 'D') continue;
+      var d = Math.abs(dx) * 1.5 + Math.abs(dy);   // 同一直行的門優先
+      if (d < bestD) { bestD = d; best = { x: s.x + dx, y: s.y + dy }; }
+    }
+    var cols = best ? [best.x] : [s.x, s.x - 1, s.x + 1];
+    var from = best ? best.y - 1 : s.y - SIGN_ABOVE_KEEPER;   // 沒有門：店主人上一格會被頭蓋住，從上兩格開始
+    for (var c = 0; c < cols.length; c++) for (var y = from; y >= Math.max(0, from - 2); y--) {
+      if (isWall(map, cols[c], y)) return { x: cols[c], y: y, onDoor: !!best, onWall: true };
+    }
+    return best ? { x: best.x, y: Math.max(0, best.y - 1), onDoor: true, onWall: false } : { x: s.x, y: Math.max(0, s.y - SIGN_ABOVE_KEEPER), onDoor: false, onWall: false };
+  }
+  function signSpots(map, mapId) {
     var shops = [];
-    if (map.shop) shops.push({ kind: SIGN_KIND[map.shop.shop_id] || 'general', x: map.shop.x, y: map.shop.y });
-    (map.extra_shops || []).forEach(function (s) { shops.push({ kind: SIGN_KIND[s.shop_id] || 'general', x: s.x, y: s.y }); });
-    if (map.inn) shops.push({ kind: 'inn', x: map.inn.x, y: map.inn.y, text: map.inn.sign || null });   // v0.9.3 B14 各地旅店的招牌字
+    if (map.shop) shops.push({ id: map.shop.shop_id, kind: SIGN_KIND[map.shop.shop_id] || 'general', x: map.shop.x, y: map.shop.y });
+    (map.extra_shops || []).forEach(function (s) { shops.push({ id: s.shop_id, kind: SIGN_KIND[s.shop_id] || 'general', x: s.x, y: s.y }); });
+    if (map.inn) shops.push({ id: 'inn', kind: 'inn', x: map.inn.x, y: map.inn.y, text: map.inn.sign || null });   // v0.9.3 B14 各地旅店的招牌字
+    var table = (mapId && SIGN_PLAQUES[mapId]) || {};
     return shops.map(function (s) {
-      var best = null, bestD = 99;
-      for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
-        if (World.charAt(map, s.x + dx, s.y + dy) !== 'D') continue;
-        var d = Math.abs(dx) * 1.5 + Math.abs(dy);   // 同一直行的門優先
-        if (d < bestD) { bestD = d; best = { x: s.x + dx, y: s.y + dy }; }
-      }
-      var at = best || { x: s.x, y: s.y };
-      return { kind: s.kind, text: s.text || SIGN_TEXT[s.kind], custom: !!s.text, x: at.x, y: Math.max(0, at.y - 1), npcX: s.x, npcY: s.y, onDoor: !!best };
+      var base = { kind: s.kind, shopId: s.id, text: s.text || SIGN_TEXT[s.kind], custom: !!s.text, npcX: s.x, npcY: s.y };
+      var p = table[s.id];
+      if (p && p.hide) return Object.assign(base, { x: s.x, y: Math.max(0, s.y - 2), onDoor: false, hidden: true, hide: p.hide, fromTable: true });
+      if (p) return Object.assign(base, { x: p.x, y: p.y, onDoor: false, on: p.on || '', open: !!p.open, fromTable: true });
+      var r = ruleSpot(map, s);
+      return Object.assign(base, { x: r.x, y: r.y, onDoor: r.onDoor, onWall: r.onWall, fromTable: false });
     });
   }
 
@@ -451,7 +527,7 @@
     return { x: view.x + Math.min(view.w - 1, Math.floor(px / cssW * view.w)), y: view.y + Math.min(view.h - 1, Math.floor(py / cssH * view.h)) };
   }
 
-  var MapInfo = { STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+  var MapInfo = { STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, SIGN_ABOVE_KEEPER: SIGN_ABOVE_KEEPER, SIGN_PLAQUES: SIGN_PLAQUES, SIGN_KIND: SIGN_KIND, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
     wanderTarget: wanderTarget, petSpot: petSpot, glowRgb: glowRgb, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
     LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.MapInfo = MapInfo; }

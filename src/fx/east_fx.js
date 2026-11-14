@@ -19,7 +19,10 @@
   var EF = J.EastFields, CP = J.CavePuzzle, Ice = J.Ice;
   var T = (J.CONFIG && J.CONFIG.TILE) || 32;
   var VIEW_W = (J.CONFIG && J.CONFIG.VIEW_W) || 640, VIEW_H = (J.CONFIG && J.CONFIG.VIEW_H) || 360;
-  var DEPTH = { GROUND: 2, PATH: 3, BEAM: 4, NIGHT: 39000, FOG: 58000, ARROW: 59000 };   // 找路箭頭在霧上面（剪影 60000 以下）
+  // 找路箭頭在霧上面（剪影 60000 以下）。
+  // v4.2.2（老闆 2026-11-13 截圖「兩塊偏亮的方形草叢格」）：夜路的藍色層原本 39000，在上層格（40000）與光暈補片（40001）之下，
+  // 夜路裡的上層格沒被染藍，一格一格比旁邊亮。改到 40002：上層格也染藍；站名牌、落葉（45000）、前景大圖（50000）、剪影（60000）照舊在上面
+  var DEPTH = { GROUND: 2, PATH: 3, BEAM: 4, NIGHT: 40002, FOG: 58000, ARROW: 59000 };
   var FOG_FADE_MS = 450;
   var COMPASS_DOT_MAPS = ['M37'];            // 71 號 2.3：曙光羅盤在回音霧廊的正確的路上冒出淡金色光點
   var FOG_COLOR = { M37: '#5b6b86', M39: '#8f897c' };

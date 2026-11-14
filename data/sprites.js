@@ -600,6 +600,12 @@ window.SPRITES = {
   "frameW": 96,
   "frameH": 96
  },
+ "ferry_boat": {
+  "file": "assets/ui/ferry_boat.png",
+  "type": "single",
+  "frameW": 256,
+  "frameH": 96
+ },
  "npc_bookstore_m": {
   "file": "assets/npcs/npc_bookstore_m.png",
   "type": "single",
@@ -2463,9 +2469,15 @@ window.SPRITES = {
 },
  "npc_pheasant": {
  "file": "assets/npcs/npc_pheasant.png",
- "type": "single",
- "frameW": 93,
- "frameH": 144
+ "type": "walk",
+ "frameW": 31,
+ "frameH": 36,
+ "rows": [
+  "down",
+  "left",
+  "right",
+  "up"
+ ]
 },
  "npc_bear": {
  "file": "assets/npcs/npc_bear.png",
@@ -2754,5 +2766,989 @@ window.SPRITES = {
   "right",
   "up"
  ]
+},
+ "mon_dango_anim": {
+ "file": "assets/monsters/mon_dango_anim.png",
+ "type": "strip",
+ "frameW": 344,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_puff_anim": {
+ "file": "assets/monsters/mon_fo_puff_anim.png",
+ "type": "strip",
+ "frameW": 388,
+ "frameH": 86,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mushroom_anim": {
+ "file": "assets/monsters/mon_mushroom_anim.png",
+ "type": "strip",
+ "frameW": 424,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_shadow_bat_anim": {
+ "file": "assets/monsters/boss_fob_shadow_bat_anim.png",
+ "type": "strip",
+ "frameW": 676,
+ "frameH": 177,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_shadow_frog_anim": {
+ "file": "assets/monsters/boss_fob_shadow_frog_anim.png",
+ "type": "strip",
+ "frameW": 664,
+ "frameH": 169,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_shadow_golem_anim": {
+ "file": "assets/monsters/boss_fob_shadow_golem_anim.png",
+ "type": "strip",
+ "frameW": 704,
+ "frameH": 174,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_shadow_octo_anim": {
+ "file": "assets/monsters/boss_fob_shadow_octo_anim.png",
+ "type": "strip",
+ "frameW": 716,
+ "frameH": 170,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_shadow_tree_anim": {
+ "file": "assets/monsters/boss_fob_shadow_tree_anim.png",
+ "type": "strip",
+ "frameW": 656,
+ "frameH": 166,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_al_cloud_anim": {
+ "file": "assets/monsters/mon_al_cloud_anim.png",
+ "type": "strip",
+ "frameW": 404,
+ "frameH": 104,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_al_cypress_anim": {
+ "file": "assets/monsters/mon_al_cypress_anim.png",
+ "type": "strip",
+ "frameW": 532,
+ "frameH": 99,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_an_egret_anim": {
+ "file": "assets/monsters/mon_an_egret_anim.png",
+ "type": "strip",
+ "frameW": 352,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_an_macaque_anim": {
+ "file": "assets/monsters/mon_an_macaque_anim.png",
+ "type": "strip",
+ "frameW": 404,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_an_magpie_anim": {
+ "file": "assets/monsters/mon_an_magpie_anim.png",
+ "type": "strip",
+ "frameW": 408,
+ "frameH": 100,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_an_muntjac_anim": {
+ "file": "assets/monsters/mon_an_muntjac_anim.png",
+ "type": "strip",
+ "frameW": 400,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_armor_anim": {
+ "file": "assets/monsters/mon_armor_anim.png",
+ "type": "strip",
+ "frameW": 312,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_bat_anim": {
+ "file": "assets/monsters/mon_bat_anim.png",
+ "type": "strip",
+ "frameW": 452,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_boar_anim": {
+ "file": "assets/monsters/mon_boar_anim.png",
+ "type": "strip",
+ "frameW": 424,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_crab_anim": {
+ "file": "assets/monsters/mon_crab_anim.png",
+ "type": "strip",
+ "frameW": 436,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_dj_rush_anim": {
+ "file": "assets/monsters/mon_dj_rush_anim.png",
+ "type": "strip",
+ "frameW": 408,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_dj_taro_anim": {
+ "file": "assets/monsters/mon_dj_taro_anim.png",
+ "type": "strip",
+ "frameW": 424,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ds_lychee_anim": {
+ "file": "assets/monsters/mon_ds_lychee_anim.png",
+ "type": "strip",
+ "frameW": 424,
+ "frameH": 104,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ds_pineapple_anim": {
+ "file": "assets/monsters/mon_ds_pineapple_anim.png",
+ "type": "strip",
+ "frameW": 404,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fiddler_crab_anim": {
+ "file": "assets/monsters/mon_fiddler_crab_anim.png",
+ "type": "strip",
+ "frameW": 388,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_echo_anim": {
+ "file": "assets/monsters/mon_fo_echo_anim.png",
+ "type": "strip",
+ "frameW": 436,
+ "frameH": 94,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_echo_s1_anim": {
+ "file": "assets/monsters/mon_fo_echo_s1_anim.png",
+ "type": "strip",
+ "frameW": 436,
+ "frameH": 94,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_eraser_anim": {
+ "file": "assets/monsters/mon_fo_eraser_anim.png",
+ "type": "strip",
+ "frameW": 352,
+ "frameH": 82,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_eraser_s1_anim": {
+ "file": "assets/monsters/mon_fo_eraser_s1_anim.png",
+ "type": "strip",
+ "frameW": 352,
+ "frameH": 82,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_frost_anim": {
+ "file": "assets/monsters/mon_fo_frost_anim.png",
+ "type": "strip",
+ "frameW": 360,
+ "frameH": 96,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_frost_s1_anim": {
+ "file": "assets/monsters/mon_fo_frost_s1_anim.png",
+ "type": "strip",
+ "frameW": 360,
+ "frameH": 96,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_puff_cave_anim": {
+ "file": "assets/monsters/mon_fo_puff_cave_anim.png",
+ "type": "strip",
+ "frameW": 384,
+ "frameH": 85,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_umbrella_anim": {
+ "file": "assets/monsters/mon_fo_umbrella_anim.png",
+ "type": "strip",
+ "frameW": 380,
+ "frameH": 94,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_bamboo_anim": {
+ "file": "assets/monsters/mon_gh_bamboo_anim.png",
+ "type": "strip",
+ "frameW": 316,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_civet_anim": {
+ "file": "assets/monsters/mon_gh_civet_anim.png",
+ "type": "strip",
+ "frameW": 412,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_civet_f_anim": {
+ "file": "assets/monsters/mon_gh_civet_f_anim.png",
+ "type": "strip",
+ "frameW": 400,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_cone_anim": {
+ "file": "assets/monsters/mon_gh_cone_anim.png",
+ "type": "strip",
+ "frameW": 424,
+ "frameH": 87,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_geta_anim": {
+ "file": "assets/monsters/mon_gh_geta_anim.png",
+ "type": "strip",
+ "frameW": 412,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_geta_f_anim": {
+ "file": "assets/monsters/mon_gh_geta_f_anim.png",
+ "type": "strip",
+ "frameW": 456,
+ "frameH": 99,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_lantern_anim": {
+ "file": "assets/monsters/mon_gh_lantern_anim.png",
+ "type": "strip",
+ "frameW": 364,
+ "frameH": 101,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_lantern_f_anim": {
+ "file": "assets/monsters/mon_gh_lantern_f_anim.png",
+ "type": "strip",
+ "frameW": 348,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_umbrella_anim": {
+ "file": "assets/monsters/mon_gh_umbrella_anim.png",
+ "type": "strip",
+ "frameW": 336,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gh_umbrella_f_anim": {
+ "file": "assets/monsters/mon_gh_umbrella_f_anim.png",
+ "type": "strip",
+ "frameW": 356,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_goblin_anim": {
+ "file": "assets/monsters/mon_goblin_anim.png",
+ "type": "strip",
+ "frameW": 328,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gt_jade_anim": {
+ "file": "assets/monsters/mon_gt_jade_anim.png",
+ "type": "strip",
+ "frameW": 416,
+ "frameH": 101,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gt_steam_anim": {
+ "file": "assets/monsters/mon_gt_steam_anim.png",
+ "type": "strip",
+ "frameW": 328,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_gt_sulfur_anim": {
+ "file": "assets/monsters/mon_gt_sulfur_anim.png",
+ "type": "strip",
+ "frameW": 368,
+ "frameH": 99,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_hc_noodle_anim": {
+ "file": "assets/monsters/mon_hc_noodle_anim.png",
+ "type": "strip",
+ "frameW": 408,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ly_bubble_anim": {
+ "file": "assets/monsters/mon_ly_bubble_anim.png",
+ "type": "strip",
+ "frameW": 448,
+ "frameH": 104,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ly_kumquat_anim": {
+ "file": "assets/monsters/mon_ly_kumquat_anim.png",
+ "type": "strip",
+ "frameW": 356,
+ "frameH": 104,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ly_mackerel_anim": {
+ "file": "assets/monsters/mon_ly_mackerel_anim.png",
+ "type": "strip",
+ "frameW": 324,
+ "frameH": 102,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ly_scallion_anim": {
+ "file": "assets/monsters/mon_ly_scallion_anim.png",
+ "type": "strip",
+ "frameW": 392,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ly_tigerwind_anim": {
+ "file": "assets/monsters/mon_ly_tigerwind_anim.png",
+ "type": "strip",
+ "frameW": 400,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mc_alarm_anim": {
+ "file": "assets/monsters/mon_mc_alarm_anim.png",
+ "type": "strip",
+ "frameW": 368,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mc_gondola_anim": {
+ "file": "assets/monsters/mon_mc_gondola_anim.png",
+ "type": "strip",
+ "frameW": 416,
+ "frameH": 105,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mc_roaster_anim": {
+ "file": "assets/monsters/mon_mc_roaster_anim.png",
+ "type": "strip",
+ "frameW": 360,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mc_signal_anim": {
+ "file": "assets/monsters/mon_mc_signal_anim.png",
+ "type": "strip",
+ "frameW": 316,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mc_vacuum_anim": {
+ "file": "assets/monsters/mon_mc_vacuum_anim.png",
+ "type": "strip",
+ "frameW": 552,
+ "frameH": 102,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mc_vending_anim": {
+ "file": "assets/monsters/mon_mc_vending_anim.png",
+ "type": "strip",
+ "frameW": 376,
+ "frameH": 99,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ml_berry_anim": {
+ "file": "assets/monsters/mon_ml_berry_anim.png",
+ "type": "strip",
+ "frameW": 352,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ml_signal_anim": {
+ "file": "assets/monsters/mon_ml_signal_anim.png",
+ "type": "strip",
+ "frameW": 304,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mm_mudstone_anim": {
+ "file": "assets/monsters/mon_mm_mudstone_anim.png",
+ "type": "strip",
+ "frameW": 368,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mn_cart_anim": {
+ "file": "assets/monsters/mon_mn_cart_anim.png",
+ "type": "strip",
+ "frameW": 448,
+ "frameH": 100,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mn_drill_anim": {
+ "file": "assets/monsters/mon_mn_drill_anim.png",
+ "type": "strip",
+ "frameW": 364,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mn_dust_anim": {
+ "file": "assets/monsters/mon_mn_dust_anim.png",
+ "type": "strip",
+ "frameW": 412,
+ "frameH": 102,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mn_lamp_anim": {
+ "file": "assets/monsters/mon_mn_lamp_anim.png",
+ "type": "strip",
+ "frameW": 348,
+ "frameH": 102,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mn_ore_anim": {
+ "file": "assets/monsters/mon_mn_ore_anim.png",
+ "type": "strip",
+ "frameW": 504,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mn_timber_anim": {
+ "file": "assets/monsters/mon_mn_timber_anim.png",
+ "type": "strip",
+ "frameW": 320,
+ "frameH": 100,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_mudslime_anim": {
+ "file": "assets/monsters/mon_mudslime_anim.png",
+ "type": "strip",
+ "frameW": 488,
+ "frameH": 104,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_owl_anim": {
+ "file": "assets/monsters/mon_owl_anim.png",
+ "type": "strip",
+ "frameW": 436,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_pi_anchor_anim": {
+ "file": "assets/monsters/mon_pi_anchor_anim.png",
+ "type": "strip",
+ "frameW": 360,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_pi_crab_anim": {
+ "file": "assets/monsters/mon_pi_crab_anim.png",
+ "type": "strip",
+ "frameW": 388,
+ "frameH": 101,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_pi_hermit_anim": {
+ "file": "assets/monsters/mon_pi_hermit_anim.png",
+ "type": "strip",
+ "frameW": 348,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_pi_milkfish_anim": {
+ "file": "assets/monsters/mon_pi_milkfish_anim.png",
+ "type": "strip",
+ "frameW": 308,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_pi_octo_anim": {
+ "file": "assets/monsters/mon_pi_octo_anim.png",
+ "type": "strip",
+ "frameW": 408,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_pi_parrot_anim": {
+ "file": "assets/monsters/mon_pi_parrot_anim.png",
+ "type": "strip",
+ "frameW": 380,
+ "frameH": 102,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_pib_anchor_anim": {
+ "file": "assets/monsters/mon_pib_anchor_anim.png",
+ "type": "strip",
+ "frameW": 540,
+ "frameH": 131,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_rabbit_anim": {
+ "file": "assets/monsters/mon_rabbit_anim.png",
+ "type": "strip",
+ "frameW": 328,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_rock_anim": {
+ "file": "assets/monsters/mon_rock_anim.png",
+ "type": "strip",
+ "frameW": 404,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_seagull_anim": {
+ "file": "assets/monsters/mon_seagull_anim.png",
+ "type": "strip",
+ "frameW": 500,
+ "frameH": 99,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_sprout_anim": {
+ "file": "assets/monsters/mon_sprout_anim.png",
+ "type": "strip",
+ "frameW": 380,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_tea_basket_anim": {
+ "file": "assets/monsters/mon_tea_basket_anim.png",
+ "type": "strip",
+ "frameW": 400,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_tea_mantis_anim": {
+ "file": "assets/monsters/mon_tea_mantis_anim.png",
+ "type": "strip",
+ "frameW": 380,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_tea_moth_anim": {
+ "file": "assets/monsters/mon_tea_moth_anim.png",
+ "type": "strip",
+ "frameW": 444,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ty_carve_anim": {
+ "file": "assets/monsters/mon_ty_carve_anim.png",
+ "type": "strip",
+ "frameW": 400,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_ty_tofu_anim": {
+ "file": "assets/monsters/mon_ty_tofu_anim.png",
+ "type": "strip",
+ "frameW": 460,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wisp_anim": {
+ "file": "assets/monsters/mon_wisp_anim.png",
+ "type": "strip",
+ "frameW": 356,
+ "frameH": 104,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_rain_anim": {
+ "file": "assets/monsters/mon_wx_rain_anim.png",
+ "type": "strip",
+ "frameW": 412,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_rain_e_anim": {
+ "file": "assets/monsters/mon_wx_rain_e_anim.png",
+ "type": "strip",
+ "frameW": 376,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_rainbow_anim": {
+ "file": "assets/monsters/mon_wx_rainbow_anim.png",
+ "type": "strip",
+ "frameW": 456,
+ "frameH": 104,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_snow_anim": {
+ "file": "assets/monsters/mon_wx_snow_anim.png",
+ "type": "strip",
+ "frameW": 364,
+ "frameH": 95,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_thunder_anim": {
+ "file": "assets/monsters/mon_wx_thunder_anim.png",
+ "type": "strip",
+ "frameW": 376,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_wave_anim": {
+ "file": "assets/monsters/mon_wx_wave_anim.png",
+ "type": "strip",
+ "frameW": 392,
+ "frameH": 103,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_wave_e_anim": {
+ "file": "assets/monsters/mon_wx_wave_e_anim.png",
+ "type": "strip",
+ "frameW": 404,
+ "frameH": 102,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_wx_wind_anim": {
+ "file": "assets/monsters/mon_wx_wind_anim.png",
+ "type": "strip",
+ "frameW": 376,
+ "frameH": 101,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_bat_anim": {
+ "file": "assets/monsters/boss_bat_anim.png",
+ "type": "strip",
+ "frameW": 660,
+ "frameH": 173,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_balloon_anim": {
+ "file": "assets/monsters/boss_fob_balloon_anim.png",
+ "type": "strip",
+ "frameW": 652,
+ "frameH": 172,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_balloon_s2_anim": {
+ "file": "assets/monsters/boss_fob_balloon_s2_anim.png",
+ "type": "strip",
+ "frameW": 652,
+ "frameH": 172,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_king_anim": {
+ "file": "assets/monsters/boss_fob_king_anim.png",
+ "type": "strip",
+ "frameW": 780,
+ "frameH": 229,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_mist_anim": {
+ "file": "assets/monsters/boss_fob_mist_anim.png",
+ "type": "strip",
+ "frameW": 684,
+ "frameH": 170,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fog_anim": {
+ "file": "assets/monsters/boss_fog_anim.png",
+ "type": "strip",
+ "frameW": 692,
+ "frameH": 183,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fog_demon_s3_anim": {
+ "file": "assets/monsters/boss_fog_demon_s3_anim.png",
+ "type": "strip",
+ "frameW": 716,
+ "frameH": 189,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_frog_anim": {
+ "file": "assets/monsters/boss_frog_anim.png",
+ "type": "strip",
+ "frameW": 648,
+ "frameH": 165,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_ghb_civetboss_anim": {
+ "file": "assets/monsters/boss_ghb_civetboss_anim.png",
+ "type": "strip",
+ "frameW": 704,
+ "frameH": 162,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_ghb_civetboss_s2_anim": {
+ "file": "assets/monsters/boss_ghb_civetboss_s2_anim.png",
+ "type": "strip",
+ "frameW": 704,
+ "frameH": 162,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_golem_anim": {
+ "file": "assets/monsters/boss_golem_anim.png",
+ "type": "strip",
+ "frameW": 688,
+ "frameH": 170,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mb_floodgate_anim": {
+ "file": "assets/monsters/boss_mb_floodgate_anim.png",
+ "type": "strip",
+ "frameW": 656,
+ "frameH": 165,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mb_floodgate_s3_anim": {
+ "file": "assets/monsters/boss_mb_floodgate_s3_anim.png",
+ "type": "strip",
+ "frameW": 680,
+ "frameH": 171,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mb_lantern_anim": {
+ "file": "assets/monsters/boss_mb_lantern_anim.png",
+ "type": "strip",
+ "frameW": 680,
+ "frameH": 170,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mb_lantern_s3_anim": {
+ "file": "assets/monsters/boss_mb_lantern_s3_anim.png",
+ "type": "strip",
+ "frameW": 704,
+ "frameH": 176,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mb_train_anim": {
+ "file": "assets/monsters/boss_mb_train_anim.png",
+ "type": "strip",
+ "frameW": 616,
+ "frameH": 173,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mb_train_s2_anim": {
+ "file": "assets/monsters/boss_mb_train_s2_anim.png",
+ "type": "strip",
+ "frameW": 616,
+ "frameH": 173,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mnb_goldjaw_anim": {
+ "file": "assets/monsters/boss_mnb_goldjaw_anim.png",
+ "type": "strip",
+ "frameW": 632,
+ "frameH": 169,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_mnb_goldjaw_s2_anim": {
+ "file": "assets/monsters/boss_mnb_goldjaw_s2_anim.png",
+ "type": "strip",
+ "frameW": 632,
+ "frameH": 169,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_octopus_anim": {
+ "file": "assets/monsters/boss_octopus_anim.png",
+ "type": "strip",
+ "frameW": 700,
+ "frameH": 166,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_pib_ship_anim": {
+ "file": "assets/monsters/boss_pib_ship_anim.png",
+ "type": "strip",
+ "frameW": 608,
+ "frameH": 160,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_pib_ship_s2_anim": {
+ "file": "assets/monsters/boss_pib_ship_s2_anim.png",
+ "type": "strip",
+ "frameW": 608,
+ "frameH": 160,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_tree_anim": {
+ "file": "assets/monsters/boss_tree_anim.png",
+ "type": "strip",
+ "frameW": 640,
+ "frameH": 162,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_wxb_raincloud_anim": {
+ "file": "assets/monsters/boss_wxb_raincloud_anim.png",
+ "type": "strip",
+ "frameW": 644,
+ "frameH": 173,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_wxb_raincloud_s2_anim": {
+ "file": "assets/monsters/boss_wxb_raincloud_s2_anim.png",
+ "type": "strip",
+ "frameW": 644,
+ "frameH": 173,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_wxb_whale_anim": {
+ "file": "assets/monsters/boss_wxb_whale_anim.png",
+ "type": "strip",
+ "frameW": 636,
+ "frameH": 173,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_wxb_whale_s3_anim": {
+ "file": "assets/monsters/boss_wxb_whale_s3_anim.png",
+ "type": "strip",
+ "frameW": 660,
+ "frameH": 179,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_puff_s1_anim": {
+ "file": "assets/monsters/mon_fo_puff_s1_anim.png",
+ "type": "strip",
+ "frameW": 384,
+ "frameH": 85,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_fo_umbrella_s1_anim": {
+ "file": "assets/monsters/mon_fo_umbrella_s1_anim.png",
+ "type": "strip",
+ "frameW": 376,
+ "frameH": 95,
+ "cols": 4,
+ "rows": 1
+},
+ "mon_frog_anim": {
+ "file": "assets/monsters/mon_frog_anim.png",
+ "type": "strip",
+ "frameW": 340,
+ "frameH": 98,
+ "cols": 4,
+ "rows": 1
 }
 };

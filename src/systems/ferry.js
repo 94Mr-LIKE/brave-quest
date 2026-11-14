@@ -163,8 +163,34 @@
     return errors;
   }
 
+  /**
+   * v4.2.2（老闆 2026-11-14「搭船這個有點意義不明」）：碼頭的船要寫出去哪裡。maps.js 的 boat_dock（routes 有寫就列每一條的 to）→
+   * 目的地地圖的名字（照 maps.js 的 name：小琉球、屏東恆春半島、綠島、蘭嶼、台東縱谷海港），不重複、照順序。
+   */
+  function dockDestinations(dock, maps) {
+    if (!object(dock)) return [];
+    var ids = Array.isArray(dock.routes) && dock.routes.length ? dock.routes.map(function (r) { return r && r.to; }) : [dock.to];
+    var out = [];
+    ids.forEach(function (id) {
+      if (!safeId(id)) return;
+      var name = maps && own(maps, id) && maps[id] && maps[id].name ? maps[id].name : id;
+      if (out.indexOf(name) < 0) out.push(name);
+    });
+    return out;
+  }
+  /**
+   * v4.2.2 碼頭的船圖（俯視、船頭朝右，iw×ih）放進 ship_area [x, y, 寬, 高]（格）：保持長寬比、四周留 4 像素、置中；
+   * 範圍是直的（高 > 寬，例如小琉球）就轉 −90 度（船頭朝上）。回傳 { x, y（中心像素）, scale, angle, w, h（畫面上的寬高）}
+   */
+  function boatFit(area, tile, iw, ih) {
+    var aw = area[2] * tile - 8, ah = area[3] * tile - 8, tall = ah > aw;
+    var k = tall ? Math.min(aw / ih, ah / iw) : Math.min(aw / iw, ah / ih);
+    return { x: (area[0] + area[2] / 2) * tile, y: (area[1] + area[3] / 2) * tile, scale: k, angle: tall ? -90 : 0,
+      w: Math.round((tall ? ih : iw) * k), h: Math.round((tall ? iw : ih) * k) };
+  }
+
   var Ferry = { routes: routes, ensure: ensure, registerItems: registerItems, install: install,
-    canBuy: canBuy, buy: buy, canBoard: canBoard, board: board, validate: validate };
+    canBuy: canBuy, buy: buy, canBoard: canBoard, board: board, validate: validate, dockDestinations: dockDestinations, boatFit: boatFit };
   if (typeof window !== 'undefined') {
     window.JQ = window.JQ || {}; window.JQ.Ferry = Ferry;
     registerItems(window.ITEMS || (window.ITEMS = {}), window.FERRIES || defaults);

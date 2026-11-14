@@ -2,6 +2,7 @@
  * v1.3.1 測試模式（老闆 2026-10-26：在線上版試玩各地，不用每次先解完委託）
  * - 家長設定（通過家長確認以後）最下面「🧪 測試模式」→ 輸入密碼 → 比對 SHA-256 雜湊（程式裡只放雜湊，不放明碼；用 crypto.subtle，不支援時不顯示按鈕）
  * - 開著時：世界地圖每個地區都能直接搭車（WorldMap.isUnlocked）、出口的 requires 不擋（World.exitOpen）、畫面左上角小小的「測試模式」標籤
+ * - v4.2.2：碼頭的船不用船票、不看前置委託（G.boardBoat → FerryUI.testRide，不動票、不寫委託）；設定頁多一個「前往地圖」下拉選單（mapTargets），每張地圖都到得了
  * - 只存在這台裝置的 localStorage（bq_testmode），不寫進存檔、不放進存檔碼（不會傳給孩子）；不開開發者疊圖、不改等級金幣
  * 純邏輯可以在 node 測試：setStorage（換成記憶體）、setHash（換成測試用的假雜湊，tests 不放真的密碼）。
  */
@@ -62,7 +63,18 @@
   function setStorage(s) { store = s || null; }
   function setHash(h) { hash = h || HASH; }
 
-  var TestMode = { KEY: KEY, HASH: HASH, supported: supported, digest: digest, check: check, on: on, enable: enable, disable: disable, badge: badge, setStorage: setStorage, setHash: setHash };
+  /**
+   * v4.2.2（老闆 2026-11-14「測試模式要打開所有地圖都能跑」）：設定頁「前往地圖」下拉選單的清單。
+   * maps＝MAPS（照 maps.js 的順序）→ [{ id, name, x, y }]；下車位置＝那張地圖的 start（每張圖都有、都可走，測試檢查）。
+   * 世界地圖沒列的圖（草原、洞窟、塔頂、廟裡、離島、玉山、雲之深層…）都靠這個到得了；測試模式關著時回傳空陣列（選單也不顯示）。
+   */
+  function mapTargets(maps) {
+    if (!on() || !maps) return [];
+    return Object.keys(maps).filter(function (id) { var s = maps[id] && maps[id].start; return !!s && Number.isInteger(s.x) && Number.isInteger(s.y); })
+      .map(function (id) { var m = maps[id]; return { id: id, name: m.name || id, x: m.start.x, y: m.start.y }; });
+  }
+
+  var TestMode = { KEY: KEY, HASH: HASH, supported: supported, digest: digest, check: check, on: on, enable: enable, disable: disable, badge: badge, setStorage: setStorage, setHash: setHash, mapTargets: mapTargets };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.TestMode = TestMode; }
   if (typeof module !== 'undefined') module.exports = TestMode;
 })();
