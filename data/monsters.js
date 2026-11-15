@@ -1478,4 +1478,16 @@ window.MONSTERS = {
     "wake": "曙光雲鯨霧將清醒了，變成一朵大白雲，迎著一道曙光游走。"
   },
   // ═══ v4.2 第 4c 批 MONSTERS END ═══
+  // ═══ v4.2.3 峭壁谷 MONSTERS（M55 野外特殊 BOSS，不綁委託、沒有對白；規格 7.4；老闆 2026-11-15 選 V1 龍）═══
+  fob_gorgedragon: {
+    name: "峽谷霧龍", sprite: "boss_fob_gorgedragon", level: 5, hp: 2550, atk: 82, subject: "混合",
+    subjects: ["國語", "自然"], q_levels: [2, 4],
+    exp: 2200, gold: 600, drops: [{ item: "gear_qb_pole", rate: 1 }], boss: true, final: false,
+    phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["an_macaque", "wx_wave_e"], battle_bg: "qbgorge",
+    desc: "峭壁谷最深處的大龍，身體像有條紋的大理石，外面裹著濃霧。霧讓牠守著瀑布，不讓人靠近。",
+    wake: "峽谷霧龍清醒了，身上的霧散成水花，慢慢游回瀑布後面。"
+  },
+  // ═══ v4.2.3 峭壁谷 MONSTERS END ═══
+  // v4.2.3 M45 合歡山隧道洞窟的野外特殊頭目（不綁委託；老闆 2026-11-15「可以、照建議」：HP 2700、攻 86、打倒才拿得到合歡冰晶劍、打倒後不再出現、不加台詞）
+  wxb_snowking: {"name":"冰晶雪球大王","sprite":"boss_wxb_snowking","level":5,"hp":2700,"atk":86,"subject":"混合","subjects":["英語","自然"],"q_levels":[2,4],"exp":2500,"gold":700,"drops":[{"item":"gear_hh_icesword","rate":1}],"boss":true,"final":false,"phases":3,"phase_q":2,"last_q_level":4,"ref_mobs":["wx_snow","fo_puff"],"battle_bg":"fogcave","desc":"雪球寶寶的大王。隧道裡的霧讓牠頭昏昏，一直坐在冰晶王座上，守著隧道深處的寶物。","wake":"冰晶雪球大王清醒了，把王冠上的冰晶擦亮，坐回王座打起瞌睡。"},
 };

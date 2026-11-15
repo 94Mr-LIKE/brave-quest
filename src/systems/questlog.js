@@ -101,6 +101,28 @@
     return { have: r.progress || 0, need: helpCount(q), text: '幫忙答對 ' + (r.progress || 0) + '/' + helpCount(q) + ' 題（' + subj + '）' };
   }
 
+  /**
+   * v4.2.3（老闆 2026-11-15 選 A「恆春沒有台語?」）打獵／頭目委託進行中再找委託人：
+   * 不再拿委託目標（只有華語）當台詞，改播「委託開始」那段對白裡委託人自己說的最後一句台語句（已上線、有台語字幕與語音）。
+   * 回傳 { id: 對話鍵, index: 句序, line, lines }；lines 和原對話等長、只留那一句（句序不變，語音鍵 <對話鍵>_<句序> 才對得上），
+   * 後面接一頁旁白（系統提示，華語；huayu_only 不找預錄音檔）顯示 info（目標與進度）。找不到台語句 → null（照舊用委託目標）。
+   */
+  // v4.2.3 技術長驗收（2026-11-15）：最後一句是「你可以去讓它清醒嗎？要小心喔。」（已答應了還再問）的 3 個頭目委託，
+  // 改用同段裡的描述句（對話鍵 → 句序）。通用規則（問句往前找）會誤改 Q_AP_4、Q_YL_5 會挑錯句，所以逐一指定。
+  var ACTIVE_LINE = { D_BG_4A: 0, D_JGS_3A: 1, D_YL_5A: 0 };
+  function taigiOf(l, who) { return !!(l && l.who === who && l.text && !l.huayu_only && l.taigi && (l.taigi.hanji || l.taigi.tailo)); }
+  function activeTalk(q, dialogs, npcId, info) {
+    var id = q && q.dialog_start, d = id && dialogs && dialogs[id];
+    if (!Array.isArray(d)) return null;
+    var who = npcId || q.giver, k = -1;
+    d.forEach(function (l, i) { if (taigiOf(l, who)) k = i; });
+    if (k < 0) return null;
+    if (ACTIVE_LINE.hasOwnProperty(id) && taigiOf(d[ACTIVE_LINE[id]], who)) k = ACTIVE_LINE[id];   // 指定的句子不是委託人的台語句（資料改過）就照通用規則
+    var lines = d.map(function (l, i) { return i === k ? l : null; });
+    if (info) lines.push({ who: 'narrator', text: info, huayu_only: true });
+    return { id: id, index: k, line: d[k], lines: lines };
+  }
+
   function canComplete(state, quests, id, data) {
     if (status(state, quests, id) !== 'active') return false;
     var p = progress(state, quests, id, data);
@@ -223,7 +245,7 @@
     return 'ask';
   }
 
-  var QuestLog = { dawnShards: dawnShards, DAWN_SHARDS_TOTAL: DAWN_SHARDS_TOTAL, serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked, HUNT_PITY: HUNT_PITY, huntPity: huntPity };
+  var QuestLog = { dawnShards: dawnShards, DAWN_SHARDS_TOTAL: DAWN_SHARDS_TOTAL, serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, activeTalk: activeTalk, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked, HUNT_PITY: HUNT_PITY, huntPity: huntPity };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.QuestLog = QuestLog; }
   if (typeof module !== 'undefined') module.exports = QuestLog;
 })();

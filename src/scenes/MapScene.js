@@ -102,8 +102,11 @@
       if (map.statue) A.queue(this, map.statue.sprite || J.MapInfo.STATUE_SPRITE, '媽祖');
       // v1.1 路牌（59 號 2.8；地圖物件，不是 NPC）：美術 obj_road_sign（32×48，底部置中）；沒有圖時用程式畫的木牌
       if ((map.roadsigns || []).length && A.has('obj_road_sign')) A.queue(this, 'obj_road_sign');
+      if ((map.viewpoints || []).length && A.has('obj_telescope')) A.queue(this, 'obj_telescope');   // v4.2.3 眺望點望遠鏡：美術 obj_telescope（64×96，顯示 32×48）；沒有圖時用程式畫的
       (map.friendly || []).forEach(function (f) { A.queue(self, f.sprite, f.name); });   // v3.0 友善動物（黑面琵鷺、綠蠵龜）
       if (map.boat_dock && A.has('ferry_boat')) A.queue(this, 'ferry_boat');   // v4.2.2 碼頭的船（美術圖還沒登記時用程式畫的船）
+      // v4.2.2 K（老闆 2026-11-15「這台車是??」）：中橫的雪鏈小車與告示牌，sprites.js 有登記美術圖才載入；沒有時用程式畫的
+      (map.props || []).forEach(function (p) { var k = MapScene.PROP_ART[p.id]; if (k && A.has(k)) A.queue(self, k); });
     }
 
     /** 地圖上的 NPC，加上「沒有站櫃 NPC 的旅店」虛擬老闆 */
@@ -471,10 +474,7 @@
       if (stn && stn.requires && !J.World.exitOpen({ requires: stn.requires }, st)) stn = null;   // v4.2 4c 夜班：M41 玉山站（requires ending_done）結局前不出現、不能搭
       this.station = stn || null;
       // v1.1 眺望點（59 號 2.9.4 美人山）：可以走的格子，放一支程式畫的望遠鏡；站上去或站在旁邊按 A，跳出插圖＋旁白
-      this.viewpoints = (this.map.viewpoints || []).map(function (v) {
-        var img = self.add.image(v.x * T + T / 2, (v.y + 1) * T - 2, self.viewpointTexture()).setOrigin(0.5, 1).setDepth((v.y + 1) * T - 2);
-        return { data: v, img: img };
-      });
+      this.buildViewpoints();
       // v1.1 路牌：靜態圖（不浮動、沒有「！」），腳底貼在格子下緣；站在旁邊按 A 播 roadsigns[].dialog
       this.roadsigns = (this.map.roadsigns || []).map(function (r) {
         var key = self.hasArt('obj_road_sign') ? J.Assets.texKey('obj_road_sign') : self.roadSignTexture();
@@ -554,45 +554,66 @@
       var self = this;
       this.mapProps = [];
       (this.map.props || []).forEach(function (p) {
-        if (p.id !== 'car_snow_chain' && p.id !== 'sign_snow_chain') return;
+        if (p.id !== 'car_snow_chain' && p.id !== 'sign_snow_chain' && p.id !== 'traffic_cones') return;
         if (!Array.isArray(p.cells) || !p.cells.length) return;
         var x = Math.min.apply(null, p.cells.map(function (c) { return c[0]; }));
         var y = Math.max.apply(null, p.cells.map(function (c) { return c[1]; }));
-        var key = self.mapPropTexture(p.id);
+        // v4.2.2 K：美術圖（sprites.js 有登記、載入成功）優先，縮放成跟程式圖一樣的格子大小；沒有就用程式畫的
+        var ak = MapScene.PROP_ART[p.id], art = !!(ak && J.Assets && J.Assets.has && self.hasArt(ak));
+        if (!art && p.id === 'traffic_cones') return;   // v4.2.3 交通錐只用美術圖（老闆 2026-11-15「該給GPT畫圖的…別吝嗇」），圖沒載入就不畫
+        var key = art ? J.Assets.texKey(ak) : self.mapPropTexture(p.id);
         var img = self.add.image(x * T, (y + 1) * T, key).setOrigin(0, 1).setDepth((y + 1) * T);
-        self.mapProps.push({ data: p, img: img });
+        // v4.2.3：美術雪鏈告示牌 64×96（1 格寬 × 1.5 格高的 2 倍圖）→ 顯示 32×48，底邊貼格子下緣（寬 1 格，左下角對齊＝底部置中）
+        if (art && img.setDisplaySize) img.setDisplaySize(p.id === 'car_snow_chain' ? 64 : 32, p.id === 'sign_snow_chain' ? 48 : 32);
+        self.mapProps.push({ data: p, img: img, art: art });
       });
     }
 
-    /** 小車兩格寬；牌面用輪胎＋交叉雪鏈，不寫品牌或文字。 */
+    /** v4.2.2 K：站在小車或告示牌旁（或上面）時可以按 Ⓐ 看說明。回傳那個物件，沒有就 null */
+    mapPropAt(x, y) { return MapScene.propAt(this.mapProps, x, y); }
+
+    /**
+     * 小車兩格寬、告示牌一格（不寫品牌）。
+     * v4.2.2 K（老闆 2026-11-15「這台車是??」：舊圖輪子是黑圓打大叉、牌子像「禁止」標誌，看不出是什麼）：
+     * 小車改成看得出車頭車尾的側面小汽車，輪胎外圈一圈銀色鏈條＋橫條（雪鏈）；告示牌上半畫套雪鏈的輪胎、下半寫「雪鏈」兩個字。
+     */
     mapPropTexture(id) {
       var car = id === 'car_snow_chain';
       var key = 'ui:prop:' + id;
       if (this.textures.exists(key)) return key;
       var c = document.createElement('canvas'); c.width = car ? 64 : 32; c.height = 32;
       var x = c.getContext('2d');
+      // 套雪鏈的輪胎：深色輪胎、灰色輪圈，外圈一圈銀色鏈節，再加幾條橫跨胎面的鏈條
       function tire(cx, cy, r) {
-        x.fillStyle = '#26313b';
-        x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill();
-        x.strokeStyle = '#dce5eb'; x.lineWidth = 1.5;
-        // 兩條斜鏈交叉覆在胎面，與普通輪胎區別。
-        x.beginPath(); x.moveTo(cx - r * 0.7, cy - r * 0.7); x.lineTo(cx + r * 0.7, cy + r * 0.7);
-        x.moveTo(cx + r * 0.7, cy - r * 0.7); x.lineTo(cx - r * 0.7, cy + r * 0.7); x.stroke();
+        x.fillStyle = '#1f262c'; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill();
+        x.fillStyle = '#9aa6ad'; x.beginPath(); x.arc(cx, cy, r * 0.42, 0, Math.PI * 2); x.fill();
+        x.fillStyle = '#eef3f5';
+        for (var k = 0; k < 10; k++) { var a = k * Math.PI / 5; x.fillRect(Math.round(cx + Math.cos(a) * (r - 1.2)) - 1, Math.round(cy + Math.sin(a) * (r - 1.2)) - 1, 2, 2); }
+        x.strokeStyle = '#d7dee2'; x.lineWidth = 1;
+        for (var j = 0; j < 4; j++) { var b = j * Math.PI / 2 + Math.PI / 4; x.beginPath(); x.moveTo(cx + Math.cos(b) * r * 0.45, cy + Math.sin(b) * r * 0.45); x.lineTo(cx + Math.cos(b) * r, cy + Math.sin(b) * r); x.stroke(); }
       }
       if (car) {
-        // 無品牌的淺色小車：車頂、前後車窗、車身與兩個裝雪鏈的輪胎。
-        x.fillStyle = '#27404c'; x.fillRect(4, 13, 56, 14);
-        x.fillStyle = '#e8eceb'; x.fillRect(5, 14, 54, 11); x.fillRect(17, 4, 28, 14);
-        x.fillStyle = '#93c6d8'; x.fillRect(20, 7, 10, 9); x.fillRect(33, 7, 9, 9);
-        x.fillStyle = '#fff4bf'; x.fillRect(54, 16, 5, 4);
-        x.fillStyle = '#c35245'; x.fillRect(5, 16, 3, 4);
-        x.fillStyle = '#6d8490'; x.fillRect(31, 7, 2, 16);
-        tire(15, 25, 6); tire(49, 25, 6);
+        // 側面小汽車（車頭朝右）：紅色車身、白色車頂、淺藍車窗、黃色車燈、紅色尾燈，車底一條陰影
+        x.fillStyle = 'rgba(0,0,0,0.25)'; x.fillRect(6, 28, 54, 3);
+        x.fillStyle = '#7a1f1a'; x.fillRect(3, 14, 58, 13);
+        x.fillStyle = '#d6453a'; x.fillRect(4, 15, 56, 10);
+        x.fillStyle = '#7a1f1a'; x.fillRect(15, 4, 32, 11);
+        x.fillStyle = '#f4f1ea'; x.fillRect(16, 5, 30, 10);
+        x.fillStyle = '#8fd0ea'; x.fillRect(18, 7, 12, 7); x.fillRect(33, 7, 11, 7);
+        x.fillStyle = '#ffffff'; x.fillRect(19, 8, 3, 2); x.fillRect(34, 8, 3, 2);
+        x.fillStyle = '#7a1f1a'; x.fillRect(31, 6, 1, 18);
+        x.fillStyle = '#ffe36a'; x.fillRect(56, 17, 4, 4);
+        x.fillStyle = '#ff8a7a'; x.fillRect(4, 17, 3, 4);
+        x.fillStyle = '#3b3b3b'; x.fillRect(36, 19, 4, 1);
+        tire(15, 25, 6.5); tire(49, 25, 6.5);
       } else {
-        x.fillStyle = '#695744'; x.fillRect(14, 22, 4, 10);
-        x.fillStyle = '#294951'; x.fillRect(2, 1, 28, 25);
-        x.fillStyle = '#f2d77e'; x.fillRect(4, 3, 24, 21);
-        tire(16, 13, 8);
+        // 告示牌：木柱、深色外框、黃底；上半套雪鏈的輪胎，下半「雪鏈」
+        x.fillStyle = '#695744'; x.fillRect(14, 26, 4, 6);
+        x.fillStyle = '#294951'; x.fillRect(1, 0, 30, 27);
+        x.fillStyle = '#f7dc6f'; x.fillRect(3, 2, 26, 23);
+        tire(16, 9, 6);
+        x.fillStyle = '#20343a'; x.font = 'bold 10px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+        x.fillText('雪鏈', 16, 24);
       }
       this.textures.addCanvas(key, c);
       return key;
@@ -743,6 +764,17 @@
     /** sprites.js 有這張圖、而且真的載入成功（不是佔位圖） */
     hasArt(key) { return J.Assets.has(key) && this.textures.exists(J.Assets.texKey(key)) && !J.Assets.isPlaceholder(this, key); }
 
+    /** v1.1 眺望點的望遠鏡。v4.2.3（老闆 2026-11-15「該給GPT畫圖的…別吝嗇」）：美術 obj_telescope 優先，顯示 32×48、底部置中貼格子下緣；沒有圖時用程式畫的 24×30 */
+    buildViewpoints() {
+      var self = this;
+      this.viewpoints = (this.map.viewpoints || []).map(function (v) {
+        var art = self.hasArt('obj_telescope'), img;
+        if (art) { img = self.add.image(v.x * T + T / 2, (v.y + 1) * T, J.Assets.texKey('obj_telescope')).setOrigin(0.5, 1).setDepth((v.y + 1) * T - 2); if (img.setDisplaySize) img.setDisplaySize(32, 48); }
+        else img = self.add.image(v.x * T + T / 2, (v.y + 1) * T - 2, self.viewpointTexture()).setOrigin(0.5, 1).setDepth((v.y + 1) * T - 2);
+        return { data: v, img: img, art: art };
+      });
+    }
+
     /** v1.1 眺望點的小望遠鏡（程式畫，24×30，底部置中）：三腳架＋鏡筒 */
     viewpointTexture() {
       var key = 'ui:viewpoint';
@@ -776,6 +808,7 @@
     buildSigns() {
       var self = this;
       this.signs = [];
+      this.signCamSpots = null; this.signCamSpot = null;   // v4.2.3 招牌鏡頭：換地圖（場景重開）時重算
       // v4.2.2：位置照 MapInfo.SIGN_PLAQUES（每家店掛在自己那棟房子上）；hidden＝背景已畫好這家店的招牌，不再畫一塊（小地圖的店家標記照留，img 為 null）
       J.MapInfo.signSpots(this.map, this.mapId).forEach(function (sg) {
         if (sg.hidden) { self.signs.push({ spot: sg, img: null }); return; }
@@ -793,18 +826,52 @@
      */
     shrineCamera() {
       var st = this.map.statue, cam = this.cameras.main;
-      if (!st || !this.player || !cam) return;
+      if (!this.player || !cam) return;
       var want = 0;
-      if (this.p && this.p.ty <= st.y + 7) {
+      if (st && this.p && this.p.ty <= st.y + 7) {
         var viewH = cam.worldView.height || (cam.height / (cam.zoom || 1));
         var top = Math.max(0, (st.y - 4.5) * T);   // 神像腳底在 (st.y+1)*T、約 3 格高；上緣再多留一點給 HUD
         // 鏡頭上緣＝top，但主角的腳要留在畫面裡（離下緣至少 1.2 格）
         want = Math.max(0, Math.min(this.player.y - (top + viewH / 2), viewH / 2 - T * 1.2));
       }
-      var cur = cam.followOffset.y;
-      if (Math.abs(cur - want) > 0.5) cam.setFollowOffset(0, cur + (want - cur) * 0.15);
-      else if (cur !== want) cam.setFollowOffset(0, want);
+      this.signCamOffset = this.signCamWant(cam);   // v4.2.3 招牌鏡頭（老闆選 B）：靠近有匾額的店家時也往上移；兩者取大的
+      want = Math.max(want, this.signCamOffset);
+      var cur = cam.followOffset.y, next = J.MapInfo.camEase(cur, want, this.reduceMotionNow());   // 減少動態：直接切換
+      if (next !== cur) cam.setFollowOffset(0, next);
       this.shrineCamOffset = cam.followOffset.y;   // 測試用
+    }
+
+    /**
+     * v4.2.3（老闆 2026-11-15 選 B；實玩 DEF-02）：主角靠近有匾額的店家（站在店主人面前、走近店門）時，鏡頭要往上移多少，
+     * 讓匾額整塊落在上方狀態列下面；主角的腳留在對話框上面。範圍與算法在 MapInfo.signCamPick／signCamOffset。
+     */
+    signCamWant(cam) {
+      var p = this.p, MI = J.MapInfo;
+      if (!p || !this.player || !this.signs || !this.signs.length || !MI.signCamPick) { this.signCamSpot = null; return 0; }
+      if (!this.signCamSpots) {
+        this.signCamSpots = [];
+        var list = this.signCamSpots;
+        this.signs.forEach(function (s) { if (s.img) list.push({ x: s.spot.x, y: s.spot.y, npcX: s.spot.npcX, npcY: s.spot.npcY, shopId: s.spot.shopId, top: s.img.y - s.img.displayHeight }); });
+      }
+      var hit = MI.signCamPick(this.signCamSpots, p.tx, p.ty, this.signCamSpot);
+      this.signCamSpot = hit;
+      if (!hit) return 0;
+      var viewH = cam.worldView.height || (cam.height / (cam.zoom || 1)), dom = this.signCamDom();
+      return MI.signCamOffset({ signTop: hit.top, playerY: this.player.y, targetY: this.camTarget ? this.camTarget.y : this.player.y, viewH: viewH,
+        mapH: this.size ? this.size.h * T : 0, hudH: dom.hud * viewH, bottomH: dom.bottom * viewH });
+    }
+    /** 上方狀態列底、下方對話框頂各佔畫布高度的幾成（量 DOM；200 毫秒量一次） */
+    signCamDom() {
+      var now = Date.now(), c = this.signCamDomAt;
+      if (c && now - c.at < 200) return c;
+      c = this.signCamDomAt = { at: now, hud: 0, bottom: 0 };
+      if (typeof document === 'undefined' || !this.sys || !this.sys.game || !this.sys.game.canvas) return c;
+      var cv = this.sys.game.canvas.getBoundingClientRect();
+      if (!cv.height) return c;
+      var hud = document.getElementById('hud'), dlg = document.querySelector('.dialog');
+      if (hud && !hud.hidden) { var hr = hud.getBoundingClientRect(); if (hr.height) c.hud = Math.max(0, Math.min(0.5, (hr.bottom - cv.top) / cv.height)); }
+      if (dlg) { var dr = dlg.getBoundingClientRect(); if (dr.height) c.bottom = Math.max(0, Math.min(0.7, (cv.bottom - dr.top) / cv.height)); }
+      return c;
     }
 
     /**
@@ -1349,7 +1416,9 @@
         a.tx = t.c; a.ty = t.r; a.facing = dir;
         a.moving = true;
         var key = a.sprite.texture.key + '-' + dir;
-        if (a.walk) { if (self.anims.exists(key) && (!a.sprite.anims.isPlaying || a.sprite.anims.currentAnim.key !== key)) a.sprite.anims.play(key); }
+        // v4.2.3 k1：減少動態效果時和帝雉（wanderFriendlies）、野怪一樣——照樣走，但不播走路動畫、停在面向的站姿
+        if (a.walk && J.Motion && self.reduceMotionNow()) { if (a.sprite.anims.isPlaying) a.sprite.anims.stop(); a.sprite.setFrame(self.idleFrame(a.spec.sprite, dir)); }
+        else if (a.walk) { if (self.anims.exists(key) && (!a.sprite.anims.isPlaying || a.sprite.anims.currentAnim.key !== key)) a.sprite.anims.play(key); }
         else if (dir === 'left' || dir === 'right') a.sprite.setFlipX(dir === 'right');
         self.tweens.add({ targets: a.sprite, x: t.c * T + T / 2, y: t.r * T + T, duration: 650, onComplete: function () {
           a.moving = false;
@@ -1403,7 +1472,9 @@
         var dir = t.c > f.tx ? 'right' : t.c < f.tx ? 'left' : t.r > f.ty ? 'down' : 'up';
         f.tx = t.c; f.ty = t.r; f.facing = dir; f.moving = true;
         var key = f.img.texture.key + '-' + dir;
-        if (self.anims.exists(key) && (!f.img.anims.isPlaying || !f.img.anims.currentAnim || f.img.anims.currentAnim.key !== key)) f.img.anims.play(key);
+        // v4.2.3（實玩 DEF-04）：減少動態效果時和野怪一樣（SpriteAnim.animFrame 的 reduced）——照樣走，但不播走路動畫、停在面向的站姿
+        if (J.Motion && self.reduceMotionNow()) { if (f.img.anims.isPlaying) f.img.anims.stop(); f.img.setFrame(self.idleFrame(f.data.sprite, dir)); }
+        else if (self.anims.exists(key) && (!f.img.anims.isPlaying || !f.img.anims.currentAnim || f.img.anims.currentAnim.key !== key)) f.img.anims.play(key);
         self.tweens.add({ targets: f.img, x: t.c * T + T / 2, y: t.r * T + T, duration: FRIEND_STEP_MS, onComplete: function () {
           f.moving = false;
           if (f.path.length) { f.nextMove = self.time.now; return; }
@@ -1640,6 +1711,8 @@
       if (bd && ((bd.board && bd.board.x === x && bd.board.y === y) || (Array.isArray(bd.ship_area) && x >= bd.ship_area[0] && y >= bd.ship_area[1] && x < bd.ship_area[0] + bd.ship_area[2] && y < bd.ship_area[1] + bd.ship_area[3]))) return { kind: 'boat', dock: bd };
       var an = this.animalAt(x, y);
       if (an) return { kind: 'animal', animal: an };
+      var pr = MapScene.propAt(this.mapProps, x, y);   // v4.2.2 K 中橫的雪鏈小車、告示牌（用靜態函式：舊測試會把方法單獨抄到替身上）
+      if (pr) return { kind: 'prop', prop: pr };
       return null;
     }
 
@@ -1674,6 +1747,7 @@
       else if (t.kind === 'viewpoint') g.viewpoint(t.view);   // v1.1 美人山眺望點
       else if (t.kind === 'boat') g.boardBoat(t.dock, this);   // v3.0 碼頭的船
       else if (t.kind === 'animal') { t.animal.nextMove = Math.max(t.animal.nextMove, this.time.now + 2500); g.animalTalk(t.animal.spec); }   // 說話時先站著不動
+      else if (t.kind === 'prop') { var pi = MapScene.PROP_INFO[t.prop.id]; g.say(pi.dialog, [{ who: 'pet', text: pi.fallback }]); }   // v4.2.2 K 番薯仔說明（華語）
     }
 
     promptText(t) {
@@ -1686,6 +1760,7 @@
       if (t.kind === 'shrine') return '在神像前轉職';
       if (t.kind === 'roadsign') return '看看路牌';
       if (t.kind === 'viewpoint') return '看看' + (t.view.label || '風景');
+      if (t.kind === 'prop') return MapScene.PROP_INFO[t.prop.id].prompt;   // v4.2.2 K「看看裝雪鏈的車」「看看雪鏈告示牌」
       return '看看' + t.lamp.subject + '燈';
     }
 
@@ -2129,5 +2204,23 @@
   }
 
   window.JQ = window.JQ || {};
+  // v4.2.2 K：地圖小物的美術圖鍵（sprites.js 登記後自動換上；尺寸照程式圖：小車 64×32、告示牌 32×32，底部對齊格子）
+  // v4.2.3（老闆 2026-11-15「中橫的車子改成警車，表示有管制」）：小車換成美術的警車圖（obj_police_car 128×64），旁邊加美術的交通錐（obj_traffic_cones 64×64，1 格）；
+  //   prop id 沿用 car_snow_chain（maps.js、tools/bigmaps/M30.json 不改名）
+  MapScene.PROP_ART = { car_snow_chain: 'obj_police_car', sign_snow_chain: 'obj_sign_snow_chain', traffic_cones: 'obj_traffic_cones' };
+  // 走到旁邊按 Ⓐ 的提示與番薯仔說明（D_PROP_* 在 dialogs.js；番薯仔講華語）
+  MapScene.PROP_INFO = {
+    car_snow_chain: { prompt: '看看警車', dialog: 'D_PROP_POLICE_CAR', fallback: '警車停在大禹嶺管制站旁——這段路有管制。' },
+    sign_snow_chain: { prompt: '看看雪鏈告示牌', dialog: 'D_PROP_SNOW_SIGN', fallback: '告示牌：路面結冰時，車子要加雪鏈。' },
+    traffic_cones: { prompt: '看看交通錐', dialog: 'D_PROP_CONES', fallback: '交通錐排在路邊：這裡有管制，車子要慢慢開。' }
+  };
+  MapScene.propAt = function (list, x, y) {
+    list = list || [];
+    for (var i = 0; i < list.length; i++) {
+      var d = list[i].data;
+      if (MapScene.PROP_INFO[d.id] && d.cells.some(function (c) { return c[0] === x && c[1] === y; })) return d;
+    }
+    return null;
+  };
   window.JQ.MapScene = MapScene;
 })();

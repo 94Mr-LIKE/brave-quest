@@ -193,6 +193,41 @@ window.ITEMS = {
     "desc": "發著曙光的鎧甲，穿上就覺得暖暖的。大家都能穿。"
   },
   // ═══ v4.2 第 4c 批 ITEMS END ═══
+  // ═══ v4.2.3 合歡山隧道洞窟 ITEMS（M45 特殊裝備；不能賣、不在任何商店）═══
+  gear_hh_icesword: {
+    "name": "合歡冰晶劍",
+    "sprite": "item_gear_hh_icesword",
+    "kind": "weapon",
+    "fam": "gen",
+    "price": 5250,
+    "atk": 30,
+    "def": 0,
+    "mp": 0,
+    "jobs": null,
+    "fx": {
+      "dmg": 0.05
+    },
+    "fx_desc": "冰晶的寒光讓攻擊傷害 +5%",
+    "precious": true,
+    "desc": "合歡山隧道深處的冰晶磨成的劍，摸起來涼涼的。大家都能用。"
+  },
+  gear_hh_vest: {
+    "name": "中橫反光背心",
+    "sprite": "item_gear_hh_vest",
+    "kind": "armor",
+    "fam": "gen",
+    "price": 4300,
+    "atk": 0,
+    "def": 14,
+    "mp": 6,
+    "jobs": null,
+    "precious": true,
+    "desc": "在中橫公路開路、修路的人穿的反光背心，又暖又亮，在暗暗的隧道裡也看得到你。魔力也會變多。大家都能穿。"
+  },
+  // ═══ v4.2.3 峭壁谷 ITEMS（M55；規格 5.2；不能賣、不加進任何 SHOPS）═══
+  gear_qb_pole: { name: "峽谷登山杖", sprite: "item_gear_qb_pole", kind: "weapon", fam: "gen", price: 4700, atk: 29, def: 0, mp: 4, jobs: null, fx: { dmg: 0.03 }, fx_desc: "走峭壁也很穩，攻擊傷害 +3%", precious: true, desc: "峭壁谷的大理石磨成杖頭的登山杖，走棧道、過吊橋都靠它。大家都能用。" },
+  gear_qb_helmet: { name: "峽谷安全帽", sprite: "item_gear_qb_helmet", kind: "armor", fam: "gen", price: 3500, atk: 0, def: 13, mp: 4, jobs: null, precious: true, desc: "走進峽谷要戴好安全帽，小心頭上的落石。戴上後魔力也會變多。大家都能戴。" },
+  // ═══ v4.2.3 峭壁谷 ITEMS END ═══
 };
 
 /* 商店：shop_id 對應 maps.js 的 shop.shop_id / extra_shops[].shop_id */

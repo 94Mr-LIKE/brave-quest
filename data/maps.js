@@ -85,7 +85,7 @@ window.MAPS = {
       "TTT================================================*****************TTF.FFFFFFFFFFFFFFFFFFFFFFFT",
       "TTT*==*=======================================================================================.T",
       "TTTUUUUUUUU.UUUUUUUUU..UUU..UUUUUUUUU.UUUUUU.==..UUUUUUU...U....UUU.UUU....UUU....UUUU.UU..UUUUT",
-      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTT.TTTTTTTTTT..TTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTT..TTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
     ],
@@ -214,7 +214,7 @@ window.MAPS = {
       "TTTT..UUUUU......UU...........****......===..TTT**.FF...*..***...............KKKKK..FF####",
       "TTT...*UUUU.....*****...................===.UTTTTT..FF.............................FF*####",
       "TTTU.******.....****...........UUUUUUUU.===.TTTTTTT..FFFFFFFFFFFFF===FFFFFFFFFFFFFFFF*####",
-      "TTTT.TT.......UU*.........U.TTTTRRRRRRT.===.*TTTT**......*........===....**..........*####",
+      "TTTTTTT.......UU*.........U.TTTTRRRRRRT.===.*TTTT**......*........===....**..........*####",
       "TTTTTTTU.....****.......UUUUTTTTKKKKKKT.===..TTTT**U*..U***U......===..U****......****####",
       "TTTTTTTTTTU.............TTTTTTTTKKKKKKT.===..TTTT***U..*****......===.*****.........**####",
       "TTTTTTTTTTT........UUU....==............===....*...**....***......===.................####",
@@ -662,6 +662,26 @@ window.MAPS = {
         ],
         "boss": true,
         "quest": "Q_ELF_4"
+      },
+      {
+        "monster": "owl",
+        "count": 1,
+        "area": [
+          30,
+          3,
+          10,
+          9
+        ]
+      },
+      {
+        "monster": "al_cypress",
+        "count": 1,
+        "area": [
+          66,
+          29,
+          22,
+          6
+        ]
       }
     ],
     "inn": {
@@ -869,7 +889,9 @@ window.MAPS = {
       { monster: "fiddler_crab", count: 3, area: [2, 37, 28, 13] },
       { monster: "mud_frog", count: 1, area: [15, 44, 1, 1], boss: true, quest: "Q_GNO_4" },
       { monster: "mudslime", count: 2, area: [46, 36, 19, 12] },
-      { monster: "fiddler_crab", count: 2, area: [65, 33, 22, 16] }
+      { monster: "fiddler_crab", count: 2, area: [65, 33, 22, 16] },
+      { monster: "mudslime", count: 1, area: [44, 1, 11, 11] },
+      { monster: "mudslime", count: 1, area: [30, 36, 12, 8] }
     ],
     inn: { npc: null, price: 10, x: 81, y: 9, name: "紅樹林地精旅舍", sign: "旅舍", dialog: "D_INN_MANGROVE", dialog_nocoin: "D_INN_MANGROVE_NOCOIN" },
     shop: null,
@@ -1267,7 +1289,9 @@ window.MAPS = {
     spawns: [
       { monster: "seagull", count: 3, area: [56, 32, 24, 10] },
       { monster: "seagull", count: 1, area: [30, 43, 42, 14] },
-      { monster: "mn_cart", count: 1, area: [70, 24, 24, 8] }
+      { monster: "mn_cart", count: 1, area: [70, 24, 24, 8] },
+      { monster: "seagull", count: 1, area: [3, 27, 42, 6] },
+      { monster: "mn_cart", count: 1, area: [49, 4, 38, 6] }
     ],
     inn: { npc: "innkeeper_port", price: 6, x: 6, y: 9, name: "山城民宿", sign: "民宿", dialog_nocoin: "D_INN_PORT_NOCOIN" },
     shop: { shop_id: "item", npc: "item_keeper", x: 33, y: 18 },
@@ -1425,7 +1449,9 @@ window.MAPS = {
     spawns: [
       { monster: "armor", count: 1, area: [45, 18, 30, 29] },
       { monster: "wisp", count: 1, area: [72, 17, 11, 30] },
-      { monster: "wisp", count: 1, area: [57, 0, 24, 18] }
+      { monster: "wisp", count: 1, area: [57, 3, 24, 15] },
+      { monster: "armor", count: 2, area: [30, 28, 13, 15] },
+      { monster: "wisp", count: 1, area: [33, 18, 11, 10] }
     ],
     inn: { npc: null, price: 18, x: 53, y: 29, name: "府城老客棧", sign: "客棧", dialog: "D_INN_FUCHENG", dialog_nocoin: "D_INN_FUCHENG_NOCOIN", sells: "gear_fucheng" },
     shop: null,
@@ -1601,10 +1627,10 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTT..............RRRRRRR................==........RRRRRRR......................TTTT",
-      "TTTT.......UU.....RRRRRRR................==........RRRRRRR.................UU...TTTT",
-      "TTTT.......TT.....RRRRRRR....UU..........==........RRRRRRR.UU..............TT...TTTT",
-      "TTTT..............RRRRRRR....TT..........==........HHHHHHH.TT..........UU.......TTTT",
+      "TTTT..............RRRRRRRR...............==........RRRRRRR......................TTTT",
+      "TTTT.......UU.....RRRRRRRR...............==........RRRRRRR.................UU...TTTT",
+      "TTTT.......TT.....RRRRRRRR...UU..........==........RRRRRRR.UU..............TT...TTTT",
+      "TTTT..............RRRRRRRR...TT..........==........HHHHHHH.TT..........UU.......TTTT",
       "TTTT..............HHHHHHHH......UUU......==........HHHHHHH.............TT.......TTTT",
       "TTT...............HHHHHHHH......TTT......==.....................................TTTT",
       "TTT......................................=======================================TTTT",
@@ -1776,7 +1802,9 @@ window.MAPS = {
       { monster: "wx_rain", count: 3, area: [19, 19, 46, 6] },
       { monster: "seagull", count: 1, area: [22, 3, 52, 12] },
       { monster: "crab", count: 1, area: [70, 0, 26, 7] },
-      { monster: "wx_rain", count: 1, area: [74, 10, 22, 6] }
+      { monster: "wx_rain", count: 1, area: [74, 10, 22, 6] },
+      { monster: "seagull", count: 2, area: [66, 20, 27, 6] },
+      { monster: "wx_rain", count: 2, area: [48, 43, 44, 6] }
     ],
     inn: { x: 54, y: 34, npc: null, price: 6, name: "港邊旅店", sign: "旅店", dialog: "D_INN_KEELUNG", dialog_nocoin: "D_INN_KEELUNG_NOCOIN" },
     shop: { x: 40, y: 36, shop_id: "item_keelung", npc: "stall_keeper" },
@@ -1885,7 +1913,10 @@ window.MAPS = {
       { monster: "mn_lamp", count: 1, area: [63, 19, 27, 6] },
       { monster: "mn_drill", count: 1, area: [60, 25, 30, 13] },
       { monster: "mn_timber", count: 1, area: [63, 36, 27, 7] },
-      { monster: "mnb_goldjaw", count: 1, area: [84, 5, 1, 1], boss: true, quest: "Q_JGS_3" }
+      { monster: "mnb_goldjaw", count: 1, area: [84, 5, 1, 1], boss: true, quest: "Q_JGS_3" },
+      { monster: "mn_drill", count: 1, area: [39, 21, 21, 6] },
+      { monster: "mn_lamp", count: 1, area: [6, 43, 21, 6] },
+      { monster: "mn_timber", count: 1, area: [60, 43, 25, 6] }
     ],
     inn: { x: 14, y: 9, npc: null, price: 6, name: "礦山宿舍旅店", sign: "宿舍", dialog: "D_INN_JINGUASHI", dialog_nocoin: "D_INN_JINGUASHI_NOCOIN" },
     shop: null,
@@ -2285,7 +2316,8 @@ window.MAPS = {
       { monster: "ly_bubble", count: 2, area: [44, 13, 17, 10] },
       { monster: "ly_mackerel", count: 3, area: [19, 34, 58, 14] },
       { monster: "ly_bubble", count: 2, area: [2, 26, 37, 8] },
-      { monster: "wxb_raincloud", count: 1, area: [88, 49, 1, 1], boss: true, quest: "Q_YL_5" }
+      { monster: "wxb_raincloud", count: 1, area: [88, 49, 1, 1], boss: true, quest: "Q_YL_5" },
+      { monster: "ly_bubble", count: 1, area: [47, 27, 46, 6] }
     ],
     inn: { x: 52, y: 10, npc: null, price: 8, bath: { price: 4, label: "♨️ 泡冷泉" }, name: "蘇澳冷泉旅店", sign: "冷泉", dialog: "D_INN_SUAO", dialog_nocoin: "D_INN_SUAO_NOCOIN", dialog_bath: "D_INN_SUAO_BATH" },
     shop: null
@@ -2371,9 +2403,10 @@ window.MAPS = {
       { id: "C_M52_5", x: 79, y: 39, subject: "數學", level: 3, reward: { gold: 3, exp: 2, item: null } }
     ],
     spawns: [
-      { monster: "tea_mantis", count: 3, area: [25, 35, 54, 9] },
+      { monster: "tea_mantis", count: 3, area: [25, 35, 54, 8] },
       { monster: "tea_moth", count: 2, area: [44, 4, 36, 11] },
-      { monster: "tea_basket", count: 2, area: [0, 35, 12, 13] }
+      { monster: "tea_basket", count: 1, area: [0, 35, 12, 13] },
+      { monster: "tea_basket", count: 2, area: [45, 15, 15, 13] }
     ],
     inn: null,
     shop: null
@@ -2389,7 +2422,7 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTRRRRRRRRRRRRRRRRTT==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-      "TTTTTTTTTTTTTTTTTTTTTTT...RRRRRRRRRRRRRRRR..==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "TTTTTTTTTTTTTTTTTTTTTTTT..RRRRRRRRRRRRRRRR..==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTT..RRRRRRRRRRRRRRRR..==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTT..RRRRRRRRRRRRRRRR..==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTT..RRRRRRRRRRRRRRRR..==TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
@@ -2477,7 +2510,9 @@ window.MAPS = {
       { monster: "an_magpie", count: 3, area: [40, 29, 23, 15] },
       { monster: "mc_gondola", count: 1, area: [74, 18, 12, 8] },
       { monster: "mc_alarm", count: 2, area: [65, 28, 20, 16] },
-      { monster: "mc_roaster", count: 2, area: [26, 29, 17, 15] }
+      { monster: "mc_roaster", count: 2, area: [26, 29, 17, 15] },
+      { monster: "mc_gondola", count: 1, area: [72, 12, 15, 6] },
+      { monster: "mc_alarm", count: 1, area: [10, 44, 40, 6] }
     ],
     inn: { x: 17, y: 37, npc: null, price: 10, name: "貓空茶館", sign: "茶館", dialog: "D_INN_MAOKONG", dialog_nocoin: "D_INN_MAOKONG_NOCOIN" },
     shop: null
@@ -2884,7 +2919,10 @@ window.MAPS = {
       { monster: "ty_carve", count: 1, area: [44, 39, 16, 12] },
       { monster: "wx_thunder", count: 1, area: [0, 0, 71, 22] },
       { monster: "ty_tofu", count: 2, area: [8, 46, 20, 7] },
-      { monster: "mb_floodgate", count: 1, area: [40, 22, 1, 1], boss: true, quest: "Q_TY_5" }
+      { monster: "mb_floodgate", count: 1, area: [40, 22, 1, 1], boss: true, quest: "Q_TY_5" },
+      { monster: "wx_thunder", count: 2, area: [4, 29, 15, 10] },
+      { monster: "ty_tofu", count: 2, area: [28, 43, 16, 10] },
+      { monster: "ty_carve", count: 1, area: [71, 20, 16, 8] }
     ],
     inn: { x: 80, y: 36, npc: null, price: 12, name: "大溪老街旅店", sign: "旅店", dialog: "D_INN_DAXI", dialog_nocoin: "D_INN_DAXI_NOCOIN" },
     shop: null
@@ -2899,7 +2937,7 @@ window.MAPS = {
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
       "~~~~**TTTTTTTTTTTTTTTTTTT....TTTTTTTTTTTTTTTTTTTT.TTTTTTT..TTT......TTTTTTTTT..TTTTTTTTTTT",
-      "~~~~**TTTTTTTTTTT............TTTTTTTTTTTTTTTTTTTT.......T..TTTT.........TTTTT...TTTTTTTTTT",
+      "~~~~**TTTTTTTTTTTTTTTTTTT....TTTTTTTTTTTTTTTTTTTT.......T..TTTT.........TTTTT...TTTTTTTTTT",
       "~~~~**TTRRRRRRRR==RRRRRRRR.......TTTTTTTTTTTTTTTTU.T.....T...TTT..T......TTTT...TTTTTTTTTT",
       "~~~~**TTRRRRRRRR==RRRRRRRRUU..T...T.TTTTTTTTTTTTTU....U......TTT..........TT.......TTTTTTT",
       "~~~~**TTRRRRRRRR==RRRRRRRRTT........TTTTT..TTT..TTT..UTU......TT...UU.....TT.........TTTTT",
@@ -3079,11 +3117,13 @@ window.MAPS = {
       { id: "C_M17_6", x: 25, y: 45, subject: "數學", level: 3, reward: { gold: 6, exp: 8, item: "crystal" } }
     ],
     spawns: [
-      { monster: "ml_signal", count: 3, area: [6, 18, 24, 9] },
-      { monster: "ml_berry", count: 3, area: [46, 23, 11, 25] },
+      { monster: "ml_signal", count: 3, area: [6, 18, 24, 8] },
+      { monster: "ml_berry", count: 3, area: [46, 24, 11, 23] },
       { monster: "ml_signal", count: 1, area: [8, 31, 21, 9] },
       { monster: "ml_berry", count: 1, area: [9, 41, 19, 6] },
-      { monster: "mb_train", count: 1, area: [20, 18, 1, 1], boss: true, quest: "Q_ML_2" }
+      { monster: "mb_train", count: 1, area: [20, 18, 1, 1], boss: true, quest: "Q_ML_2" },
+      { monster: "ml_signal", count: 1, area: [30, 2, 19, 9] },
+      { monster: "ml_berry", count: 1, area: [68, 22, 20, 9] }
     ],
     inn: { x: 38, y: 43, npc: null, price: 14, name: "苗栗山城民宿", sign: "民宿", dialog: "D_INN_SANYI", dialog_nocoin: "D_INN_SANYI_NOCOIN" },
     shop: null
@@ -3181,7 +3221,8 @@ window.MAPS = {
       { monster: "an_egret", count: 3, area: [4, 34, 41, 15] },
       { monster: "dj_rush", count: 3, area: [62, 19, 26, 27] },
       { monster: "dj_taro", count: 2, area: [44, 31, 18, 20] },
-      { monster: "an_egret", count: 1, area: [62, 45, 26, 6] }
+      { monster: "an_egret", count: 1, area: [62, 45, 26, 6] },
+      { monster: "dj_taro", count: 1, area: [46, 20, 13, 11] }
     ],
     inn: { x: 22, y: 17, npc: null, price: 14, name: "大甲小鎮旅店", sign: "旅店", dialog: "D_INN_DAJIA", dialog_nocoin: "D_INN_DAJIA_NOCOIN" },
     shop: null
@@ -3279,7 +3320,8 @@ window.MAPS = {
     spawns: [
       { monster: "gh_umbrella", count: 3, area: [3, 3, 40, 20] },
       { monster: "gh_geta", count: 2, area: [3, 26, 40, 23] },
-      { monster: "gh_umbrella", count: 1, area: [55, 31, 22, 23] }
+      { monster: "gh_umbrella", count: 1, area: [55, 31, 22, 23] },
+      { monster: "gh_umbrella", count: 1, area: [45, 2, 6, 20] }
     ],
     inn: { x: 52, y: 31, npc: null, price: 16, name: "鹿港老街客棧", sign: "客棧", dialog: "D_INN_LUKANG", dialog_nocoin: "D_INN_LUKANG_NOCOIN" },
     shop: null
@@ -3388,7 +3430,8 @@ window.MAPS = {
       { monster: "gh_lantern", count: 2, area: [49, 37, 47, 6] },
       { monster: "gh_civet", count: 3, area: [2, 3, 12, 38] },
       { monster: "gh_lantern", count: 1, area: [44, 40, 22, 17] },
-      { monster: "mb_lantern", count: 1, area: [82, 44, 1, 1], boss: true, quest: "Q_BG_4" }
+      { monster: "mb_lantern", count: 1, area: [82, 44, 1, 1], boss: true, quest: "Q_BG_4" },
+      { monster: "gh_lantern", count: 2, area: [56, 17, 36, 7] }
     ],
     inn: { x: 62, y: 34, npc: null, price: 16, name: "北港鎮上旅店", sign: "旅店", dialog: "D_INN_BEIGANG", dialog_nocoin: "D_INN_BEIGANG_NOCOIN" },
     shop: null
@@ -3592,8 +3635,10 @@ window.MAPS = {
     ],
     spawns: [
       { monster: "pi_crab", count: 1, area: [0, 2, 18, 27] },
-      { monster: "pi_hermit", count: 2, area: [11, 29, 34, 17] },
-      { monster: "pi_milkfish", count: 2, area: [49, 27, 32, 20] }
+      { monster: "pi_hermit", count: 2, area: [14, 29, 31, 17] },
+      { monster: "pi_milkfish", count: 2, area: [49, 29, 32, 17] },
+      { monster: "pi_crab", count: 1, area: [19, 47, 26, 8] },
+      { monster: "pi_crab", count: 1, area: [52, 47, 22, 8] }
     ],
     inn: { x: 90, y: 36, npc: null, price: 18, name: "濕地民宿", sign: "民宿", dialog: "D_INN_TAIJIANG", dialog_nocoin: "D_INN_TAIJIANG_NOCOIN" },
     shop: null,
@@ -3832,7 +3877,7 @@ window.MAPS = {
       "~~~~~~~~~~~~***===..........TTTTTTT==.TT...........UTT..............U..T",
       "~~~~~~~~~~~~***==............TTTTTT==......T........TTU.............TUUT",
       "~~~~~~~~~~~~***===...........TTTTTT==........=......................TTTT",
-      "~~~~~~~~~~~~***===..............TTT==........=...RRRRRRRR...........TTTT",
+      "~~~~~~~~~~~~***===..............TTT==........=..RRRRRRRRR...........TTTT",
       "~~~~~~~~~~~~***==................T.==...........RRRRRRRRR..........TTTTT",
       "~~~~~~~~~~~~***==..................==...........RRRRRRRRR............TTT",
       "~~~~~~~~~~~~***===............U....==.......###HHHHHHHHHH###........TTTT",
@@ -3864,17 +3909,17 @@ window.MAPS = {
       "~~~~~~~~~~~~***==.....UUU.............T..........T.........*****~~~~~~~~",
       "~~~~~~~~~~~~***=......UTT................T....T....U.....TU*****~~~~~~~~",
       "~~~~~~~~~~~~***==.....TTTT...........U............UTU.....U*****~~~~~~~~",
-      "~~~~~~~~~~~~***==.=....TT.......T....HHH..TT......UTT.....T*****~~~~~~~~",
+      "~~~~~~~~~~~~***==.=....TT.......T.....HHH.TT......UTT.....T*****~~~~~~~~",
       "~~~~~~~~~~~~***====...............T..HHHH......T..TTTT.TT..*****~~~~~~~~",
-      "~~~~~~~~~~~~***==....................HHH............T......*****~~~~~~~~",
-      "~~~~~~~~~~~~***===T..........U.......HHH...................*****~~~~~~~~",
-      "~~~~~~~~~~~~***==...........UTT...TT.HHH.....T....U......U.*****~~~~~~~~",
-      "~~~~~~~~~~~~***===.........TTTT......HHH.UUT......T......T.*****~~~~~~~~",
-      "~~~~~~~~~~~~***==..U........T.UU.....HHH.TT...T........U..T*****~~~~~~~~",
-      "~~~~~~~~~~~~***=...T........TTTT...T.HHH..T...........UTU..*****~~~~~~~~",
-      "~~~~~~~~~~~~***===.....T.............HHH.=TTU........UTTT..*****~~~~~~~~",
-      "~~~~~~~~~~~~***==.U.............T..==HHH....U........TTTTU.*****~~~~~~~~",
-      "~~~~~~~~~~~~***=..T......U.........==HHH...TTTTU......TTTT.*****~~~~~~~~",
+      "~~~~~~~~~~~~***==....................HHHH...........T......*****~~~~~~~~",
+      "~~~~~~~~~~~~***===T..........U.......HHHH..................*****~~~~~~~~",
+      "~~~~~~~~~~~~***==...........UTT...TT..HHH....T....U......U.*****~~~~~~~~",
+      "~~~~~~~~~~~~***===.........TTTT.......HHHUUT......T......T.*****~~~~~~~~",
+      "~~~~~~~~~~~~***==..U........T.UU......HHHTT...T........U..T*****~~~~~~~~",
+      "~~~~~~~~~~~~***=...T........TTTT...T..HHH.T...........UTU..*****~~~~~~~~",
+      "~~~~~~~~~~~~***===.....T..............HHH=TTU........UTTT..*****~~~~~~~~",
+      "~~~~~~~~~~~~***==.U.............T..==HHHH...U........TTTTU.*****~~~~~~~~",
+      "~~~~~~~~~~~~***=..T......U.........==HHHH..TTTTU......TTTT.*****~~~~~~~~",
       "~~~~~~~~~~~~***=.=......TTT.....===============T..........=*****~~~~~~~~",
       "~~~~~~~~~~~~***=.=......TTT.....===============TT........TU*****~~~~~~~~",
       "~~~~~~~~~~~~***===T.T...TTTT....===============T......T...T*****~~~~~~~~",
@@ -3920,10 +3965,13 @@ window.MAPS = {
       { id: "C_M25_6", x: 34, y: 80, subject: "數學", level: 3, reward: { gold: 30, exp: 40, item: "herb" } }
     ],
     spawns: [
-      { monster: "pi_parrot", count: 3, area: [0, 18, 34, 28] },
-      { monster: "pi_octo", count: 3, area: [0, 58, 30, 32] },
+      { monster: "pi_parrot", count: 3, area: [15, 18, 19, 26] },
+      { monster: "pi_octo", count: 3, area: [15, 58, 15, 20] },
       { monster: "wx_wave", count: 2, area: [50, 60, 22, 30] },
-      { monster: "pib_ship", count: 1, area: [40, 82, 1, 1], boss: true, quest: "Q_PT_3" }
+      { monster: "pib_ship", count: 1, area: [40, 82, 1, 1], boss: true, quest: "Q_PT_3" },
+      { monster: "pi_parrot", count: 2, area: [37, 1, 31, 18] },
+      { monster: "pi_parrot", count: 2, area: [37, 19, 31, 11] },
+      { monster: "pi_octo", count: 1, area: [51, 45, 17, 13] }
     ],
     inn: { x: 44, y: 56, npc: null, price: 22, name: "墾丁旅店", sign: "旅店", dialog: "D_INN_KENTING", dialog_nocoin: "D_INN_KENTING_NOCOIN", sells: "gear_kenting" },
     shop: null,
@@ -4025,7 +4073,9 @@ window.MAPS = {
     spawns: [
       { monster: "wx_rain_e", count: 2, area: [6, 26, 32, 6] },
       { monster: "wx_rainbow", count: 1, area: [62, 2, 14, 9] },
-      { monster: "fob_balloon", count: 1, area: [38, 3, 1, 1], boss: true, quest: "Q_TT_3" }
+      { monster: "fob_balloon", count: 1, area: [38, 3, 1, 1], boss: true, quest: "Q_TT_3" },
+      { monster: "wx_rainbow", count: 2, area: [64, 11, 22, 14] },
+      { monster: "wx_rain_e", count: 1, area: [4, 47, 28, 10] }
     ],
     inn: { x: 58, y: 41, npc: null, price: 24, name: "縱谷民宿", sign: "民宿", dialog: "D_INN_TAITUNG", dialog_nocoin: "D_INN_TAITUNG_NOCOIN", sells: "gear_taitung" },
     shop: null,
@@ -4040,17 +4090,17 @@ window.MAPS = {
     grid: [
       "~~~~~~~***~~~~~~~~~~~~***~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
       "~~~~~~~***...HH.......***~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
-      "~~~~~~~**....HH.......***~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
-      "~~~~~~~**....HH.......*********************************************~~~~~",
-      "~~~~~~~**....HH.......~~~******************************************~~~~~",
+      "~~~~~~~***...HH.......***~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "~~~~~~~***...HH.......*********************************************~~~~~",
       "~~~~~~~***...HH.......~~~******************************************~~~~~",
-      "~~~~~~~**.=====================================================****~~~~~",
-      "~~~~~~~**.=====================================================****~~~~~",
-      "~~~~~~~**.==.................................................==.***~~~~~",
+      "~~~~~~~***...HH.......~~~******************************************~~~~~",
+      "~~~~~~~***=====================================================****~~~~~",
+      "~~~~~~~***=====================================================****~~~~~",
       "~~~~~~~***==.................................................==.***~~~~~",
-      "~~~~~~~**.==.................................................==****~~~~~",
+      "~~~~~~~***==.................................................==.***~~~~~",
       "~~~~~~~***==.................................................==****~~~~~",
-      "~~~~~~~**.==.................................................==.***~~~~~",
+      "~~~~~~~***==.................................................==****~~~~~",
+      "~~~~~~~***==.................................................==.***~~~~~",
       "~~~~~~~***==........................RRRRR....................==.***~~~~~",
       "~~~~~~~***==........RRRRRRR..RRRRRRRRRRRR....................==.***~~~~~",
       "~~~~~~~***==........RRRRRRR..RRRRRRRRRRRR....................==****~~~~~",
@@ -4148,13 +4198,13 @@ window.MAPS = {
       "~~~~~~~~~~~==......*~~~~~~.~~~~~~,,,,,~~~~~~~~~~~.........=.,,,~~~~***~~",
       "~~~~~~~~~~~==.......~~~~~~.~~~~~~,,,,,~~~~~~~~~~~.........=.,,,~~~~*~~~~",
       "~~~~~~~~~~~==.......~~~~~~.~~~~~~.....*~~~~~~~~~..........=.,,,,,,**~~~~",
-      "~~~~~~~****==...............***********.......UUUU........=.,~~,,*~~~~~~",
+      "~~~~~~~****==...............***********.......TTTT........=.,~~,,*~~~~~~",
       "~~~~~~~**.=.................***********.......TTTU........=.,~~,,,*~~~~~",
-      "~~~~~****.=...................RRRRRRRR.........T......UUU.=.,,,,,,***~~~",
+      "~~~~~****.=...................RRRRRRRR........TTT.....TTT.=.,,,,,,***~~~",
       "~~~~~*****=...................RRRRRRRR................UTU.=.,,,,,**~~~~~",
       "~~~~~~~***=..**...............RRRRRRRR...UUU...........T..=.,,,,,~~~~~~~",
       "~~~~~~***.=...................HHHHHHHH...UTU..............=.,~~,,,*~~~~~",
-      "~~~~~****.=............**.....HHHHHHHH....T.........UU....=.,~~,,,**~~~~",
+      "~~~~~****.=............**.....HHHHHHHH....T........TTT....=.,~~,,,**~~~~",
       "~~~~~****.=............**.....HHHDHHHH.............TUT....=.,,,,,,*~~~~~",
       "~~~~~****.=.................=============..........T.T....=.,,,,,~~~~~~~",
       "~~~~******========.===.===..=============.................=.,,,~~***~~~~",
@@ -4513,7 +4563,7 @@ window.MAPS = {
       "########################################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~~~~~~~~~~~~~~~~~",
       "########################################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~~~~~~~~~~~~~~~~~",
       "########################################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~~~~~~~~~~~~~~~~~",
-      "########################################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~~~~~~~~~~~~~~~~~",
+      "####################==##################TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~~~~~~~~~~~~~~~~~",
       "~~~~~~~~~~~~~~~~~~~~BB~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
       "~~~~~~~~~~~~~~~~~~~~BB~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
       "~~~~~~~~~~~~~~~~~~~~BB~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
@@ -4643,6 +4693,23 @@ window.MAPS = {
         "ty": 20,
         "requires": "Q_HL_3",
         "requires_dialog": "D_EXIT_LOCK_HL"
+      },
+      {
+        "x": 20,
+        "y": 11,
+        "to": "M55",
+        "tx": 23,
+        "ty": 34,
+        "warp": true,
+        "note": "太魯閣紅木橋北端的峭壁洞口（v4.2.3，老闆 2026-11-14：乙，開發新洞窟峭壁谷）"
+      },
+      {
+        "x": 21,
+        "y": 11,
+        "to": "M55",
+        "tx": 24,
+        "ty": 34,
+        "warp": true
       }
     ],
     "npcs": [
@@ -4792,7 +4859,7 @@ window.MAPS = {
         "area": [
           67,
           20,
-          23,
+          8,
           30
         ]
       },
@@ -4817,6 +4884,16 @@ window.MAPS = {
         ],
         "boss": true,
         "quest": "Q_HL_3"
+      },
+      {
+        "monster": "an_macaque",
+        "count": 2,
+        "area": [
+          46,
+          18,
+          16,
+          10
+        ]
       }
     ],
     "inn": {
@@ -4876,9 +4953,9 @@ window.MAPS = {
       "#.............==.....................~~~~~~~~#~~~~~~~~#..........~~~~~~~#~~~~~~~#~~~~~~~~#~~~~~~",
       "~.............==.....................~~~~~###~~~~~~..~~.............~~~~~~~~~#~.~~~~~##~#~#~~~~~",
       "~~#~..........==........................~T~~#~~~.T~~....RRRR........~~#~.~~~~~~..~~~###~~~#~#~~~",
-      "~~~~#.........==.~........................~~..~~.#.~#...RRRR..........~~.....#...~~HHHH.~~~~~~~~",
-      "~~~~~.........==.~.......................................RRR..............#....#.~.HHHH..~~~~~~~",
-      "#~~.~....~....==........................................HHHHFFF....................HHHH...~~~~~~",
+      "~~~~#.........==.~........................~~..~~.#.~#...RRRR..........~~.....#...~~##HHH~~~~~~~~",
+      "~~~~~.........==.~.......................................RRR..............#....#.~.##H..H~~~~~~~",
+      "#~~.~....~....==........................................HHHHFFF.....................#H..H#~~~~~~",
       "#.......~~....=================================================================================#",
       "~#......~~....======================================#===========================================",
       "~~~~..........==.......RRRRRRRRRR.....=..==.........~..........#.##..#..U~#.......#~~#..#..=====",
@@ -4894,7 +4971,7 @@ window.MAPS = {
       "#.............==..........................~#~.~~~#~~......~~~~~~~~~~~~~~~~~~~~~~~~#~~~~##~~~~~~~",
       "~~.~~U........==.........................~~~~~~~#~~~......~#~#~~~~~~~~~~~~~~~~~~#~~~~~~~#~#~~~~~",
       "~~.~~~........==..................~~~..~~~~~.~~.~~~#..~..~~~~~~~~~~~~~~~~~~~~~~#~~~~~~~~~~~~~~~~",
-      "#.............==................................................~~.~~~~~~~~~~~~~~~~~~#~~~~~~~~~~",
+      "#.............==...#............................................~~.~~~~~~~~~~~~~~~~~~#~~~~~~~~~~",
       "#.............==...~~~.......#.......~.....==...~~~..........~...~.~~~#~#~##~~~~~~###~~~~~~#~~~~",
       "~~***********.==..~~~~...............~~..#.==...~~~#...............#.##~~##~~~~~#~#~~~~~~~~~~~~~",
       "~~***********.==..~.~~~..............~~....=...~~~~~~.~..............~~~~~~~~~~~~~#~~~~~##~~~~~~",
@@ -5014,6 +5091,15 @@ window.MAPS = {
             17
           ]
         ]
+      },
+      {
+        "id": "traffic_cones",
+        "cells": [
+          [
+            65,
+            16
+          ]
+        ]
       }
     ],
     "roadsigns": [],
@@ -5111,6 +5197,26 @@ window.MAPS = {
           15,
           17
         ]
+      },
+      {
+        "monster": "fo_puff",
+        "count": 1,
+        "area": [
+          0,
+          16,
+          20,
+          8
+        ]
+      },
+      {
+        "monster": "fo_puff",
+        "count": 1,
+        "area": [
+          2,
+          33,
+          30,
+          9
+        ]
       }
     ],
     "inn": {
@@ -5156,6 +5262,23 @@ window.MAPS = {
         "ty": 26,
         "requires": "Q_CH_4",
         "requires_dialog": "D_EXIT_LOCK_ZH"
+      },
+      {
+        "x": 86,
+        "y": 16,
+        "to": "M45",
+        "tx": 23,
+        "ty": 34,
+        "warp": true,
+        "note": "東段峽谷公路隧道口 → 合歡山隧道洞窟（v4.2.3，老闆 2026-11-13：入口 2 格寬）"
+      },
+      {
+        "x": 87,
+        "y": 16,
+        "to": "M45",
+        "tx": 24,
+        "ty": 34,
+        "warp": true
       }
     ],
     "landmarks": [
@@ -5663,9 +5786,9 @@ window.MAPS = {
         "count": 3,
         "area": [
           0,
-          31,
-          30,
-          22
+          33,
+          35,
+          20
         ]
       },
       {
@@ -5673,29 +5796,29 @@ window.MAPS = {
         "count": 2,
         "area": [
           0,
-          31,
-          30,
-          22
+          34,
+          23,
+          19
         ]
       },
       {
         "monster": "gh_umbrella_f",
         "count": 1,
         "area": [
-          13,
-          33,
-          22,
-          24
+          18,
+          34,
+          15,
+          19
         ]
       },
       {
         "monster": "gh_geta_f",
         "count": 1,
         "area": [
-          13,
-          33,
-          22,
-          24
+          18,
+          34,
+          15,
+          19
         ]
       },
       {
@@ -5709,6 +5832,26 @@ window.MAPS = {
         ],
         "boss": true,
         "quest": "Q_XT_4"
+      },
+      {
+        "monster": "gh_cone",
+        "count": 2,
+        "area": [
+          6,
+          11,
+          22,
+          9
+        ]
+      },
+      {
+        "monster": "gh_bamboo",
+        "count": 2,
+        "area": [
+          6,
+          21,
+          16,
+          10
+        ]
       }
     ],
     "night_zone": {
@@ -8015,6 +8158,17 @@ window.MAPS = {
           6
         ],
         "note": "東南閱覽區"
+      },
+      {
+        "monster": "fo_eraser",
+        "count": 1,
+        "area": [
+          33,
+          35,
+          12,
+          6
+        ],
+        "note": "v4.2.3 補回：南口進來的大廳"
       }
     ],
     "chests": [
@@ -9094,6 +9248,16 @@ window.MAPS = {
           27,
           6
         ]
+      },
+      {
+        "monster": "fo_frost_s1",
+        "count": 1,
+        "area": [
+          37,
+          15,
+          16,
+          9
+        ]
       }
     ],
     "chests": [],
@@ -9991,5 +10155,842 @@ window.MAPS = {
       ],
       "note": "四隻都打倒後走進光柱 → 稱號「曙光的源頭」，播 D_POST_END"
     }
+  },
+
+  // ───────────────────────────── M45 合歡山隧道洞窟（v4.2.3）─────────────────────────────
+  // 入口在 M30 東段峽谷公路的隧道口 (86–87,16)，2 格寬；規格 OB\合歡隧道_v423\合歡隧道_M45_設計規格.md。
+  M45: {
+    "name": "合歡山隧道洞窟",
+    "type": "dungeon",
+    "level": 5,
+    "bgm": "cave",
+    "battle_bg": "fogcave",
+    "tileset": "cave",
+    "suggest": "Lv47–51",
+    "real_ref": "中橫公路（台 8 線）合歡山段的隧道；洞窟本身是虛構的",
+    "art_note": "下緣正中央是 M30 隧道口進來的石拱與 6 格寬舊隧道（混凝土襯砌、舊路面、4 盞壁燈）；西南舊工具間；岔路廣場；西邊冰晶大廳（5 叢冰晶、結冰的水池）；西北小冰窟；上方圓頂冰室（4 根冰柱、王座石台與兩盞暖燈）；東邊開路工人的舊工寮（木屋、鷹架、壓路機）；東南、東北兩個小凹室。背景 docs/assets/maps/bg_M45.webp（v4.2.3 美術 M45_背景初稿.png：GPT 整張一次畫、裁回 4:3 放大 1.125 倍；格子照美術「建議修改後格子」）。",
+    "grid": [
+      "################################################",
+      "################################################",
+      "##################.....##......#################",
+      "##....############.............########......###",
+      "##....###..........TT.......T..########......###",
+      "##....###....................................###",
+      "##....###....................................###",
+      "##....###..#######.............#####...#########",
+      "##....###..#######.TT.......T..#####...#########",
+      "##............####.............#####...#########",
+      "##............########...###########...#########",
+      "##.*.......*..########...###########...#########",
+      "##............########...###########...#########",
+      "##....~~~~....########...###########...#########",
+      "##....~~~~....########...###########...#########",
+      "##....~~~~....########...#########............##",
+      "##........*...########...#########...HHHHHH.*.##",
+      "##............########...#########...HHHHHH...##",
+      "##..*.......*.########...#########.##HHHHHH#..##",
+      "##............##.......==......###.##HHHDHH#..##",
+      "##............##.......==......###............##",
+      "###########............==.....................##",
+      "###########............==.....................##",
+      "###########............==.....................##",
+      "################.......==......###.KK.........##",
+      "################.......==......###.KK.........##",
+      "####################...==..#######............##",
+      "####################...==..#######............##",
+      "############.KK..###...==..##############....###",
+      "############.KK..###...==..##############...####",
+      "############...........==..##############...####",
+      "############...........==..##############...####",
+      "############.....###...==..##############...####",
+      "############.....###...==..#####################",
+      "####################.#.==..#####################",
+      "#######################==#######################"
+    ],
+    "exits": [
+      {
+        "x": 23,
+        "y": 35,
+        "to": "M30",
+        "tx": 86,
+        "ty": 18,
+        "note": "隧道口 → M30 東段峽谷公路（隧道口下方的公路）"
+      },
+      {
+        "x": 24,
+        "y": 35,
+        "to": "M30",
+        "tx": 87,
+        "ty": 18
+      }
+    ],
+    "roadsigns": [],
+    "start": {
+      "x": 23,
+      "y": 34,
+      "note": "隧道口進來的舊路面"
+    },
+    "npcs": [],
+    "spawns": [
+      {
+        "monster": "wx_snow",
+        "count": 3,
+        "area": [
+          2,
+          9,
+          13,
+          12
+        ],
+        "note": "冰晶大廳"
+      },
+      {
+        "monster": "wx_snow",
+        "count": 1,
+        "area": [
+          9,
+          3,
+          9,
+          6
+        ],
+        "note": "西北通道"
+      },
+      {
+        "monster": "wx_snow",
+        "count": 1,
+        "area": [
+          16,
+          19,
+          16,
+          7
+        ],
+        "note": "岔路廣場"
+      },
+      {
+        "monster": "fo_puff",
+        "count": 2,
+        "area": [
+          34,
+          15,
+          12,
+          13
+        ],
+        "note": "舊工寮"
+      },
+      {
+        "monster": "fo_puff",
+        "count": 1,
+        "area": [
+          31,
+          5,
+          8,
+          10
+        ],
+        "note": "東側通道"
+      },
+      {
+        "monster": "wx_snow",
+        "count": 1,
+        "area": [
+          18,
+          2,
+          13,
+          8
+        ],
+        "note": "深處寶庫（頭目規格 D7：寶庫一般怪減成 1＋1）"
+      },
+      {
+        "monster": "fo_puff",
+        "count": 1,
+        "area": [
+          18,
+          2,
+          13,
+          8
+        ],
+        "note": "深處寶庫"
+      },
+      {
+        "monster": "wxb_snowking",
+        "count": 1,
+        "area": [
+          24,
+          3,
+          1,
+          1
+        ],
+        "boss": true,
+        "field": true,
+        "note": "深處寶庫王座前（野外特殊頭目，不綁委託；打倒後寫 state.bosses，不再出現）"
+      }
+    ],
+    "chests": [
+      {
+        "id": "C_M45_1",
+        "x": 12,
+        "y": 31,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": "guide"
+        },
+        "note": "西南舊工具間（死路）。規格 (12,30) 會把北邊 (12,28–29) 兩格地面封死，往南移 1 格"
+      },
+      {
+        "id": "C_M45_2",
+        "x": 30,
+        "y": 25,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": "eraser"
+        },
+        "note": "岔路廣場東南角（美術差異：原 (31,25) 在岩壁裡，移 1 格）"
+      },
+      {
+        "id": "C_M45_3",
+        "x": 8,
+        "y": 12,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": "grass_jelly"
+        },
+        "note": "冰晶大廳、冰池北邊"
+      },
+      {
+        "id": "C_M45_4",
+        "x": 3,
+        "y": 3,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": "guide"
+        },
+        "note": "西北尖角（死路）"
+      },
+      {
+        "id": "C_M45_5",
+        "x": 39,
+        "y": 20,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": "gear_hh_vest"
+        },
+        "note": "舊工寮門邊：中橫反光背心（美術差異：原 (39,19) 在木屋前牆，移 1 格）"
+      },
+      {
+        "id": "C_M45_6",
+        "x": 43,
+        "y": 32,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": "eraser"
+        },
+        "note": "東南凹室（死路）"
+      },
+      {
+        "id": "C_M45_7",
+        "x": 44,
+        "y": 3,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 10,
+          "exp": 15,
+          "item": "grass_jelly"
+        },
+        "note": "東北凹室（死路）"
+      },
+      {
+        "id": "C_M45_8",
+        "x": 20,
+        "y": 2,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 11,
+          "exp": 15,
+          "item": "grass_jelly"
+        },
+        "note": "深處寶庫王座左邊（頭目規格 D2-A：冰晶劍改成打倒冰晶雪球大王才拿得到，這箱改放仙草露）"
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "入口舊隧道",
+        "area": [
+          20,
+          26,
+          7,
+          10
+        ]
+      },
+      {
+        "name": "岔路廣場",
+        "area": [
+          16,
+          19,
+          16,
+          7
+        ]
+      },
+      {
+        "name": "冰晶大廳",
+        "area": [
+          2,
+          3,
+          13,
+          18
+        ]
+      },
+      {
+        "name": "舊工寮",
+        "area": [
+          34,
+          15,
+          12,
+          18
+        ]
+      },
+      {
+        "name": "深處寶庫",
+        "area": [
+          18,
+          2,
+          13,
+          8
+        ]
+      }
+    ],
+    "lights": [
+      {
+        "x": 3,
+        "y": 11,
+        "r": 1.3,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 11,
+        "y": 11,
+        "r": 1.3,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 4,
+        "y": 18,
+        "r": 1.3,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 12,
+        "y": 18,
+        "r": 1.3,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 10,
+        "y": 16,
+        "r": 1.3,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 7,
+        "y": 14,
+        "r": 1.5,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 19,
+        "y": 27,
+        "r": 1
+      },
+      {
+        "x": 26,
+        "y": 27,
+        "r": 1
+      },
+      {
+        "x": 19,
+        "y": 32,
+        "r": 1
+      },
+      {
+        "x": 26,
+        "y": 32,
+        "r": 1
+      },
+      {
+        "x": 24,
+        "y": 2,
+        "r": 1.5
+      },
+      {
+        "x": 41,
+        "y": 19,
+        "r": 1
+      }
+    ],
+    "no_minimap": true,
+    "rec_level": [
+      47,
+      51
+    ]
+  },
+  // v4.2.3 峭壁谷（M55）：太魯閣紅木橋北端洞口進來的新洞窟（規格 峭壁谷_v423峭壁谷_設計規格.md；格子＝美術定稿）
+  M55: {
+    "name": "峭壁谷",
+    "type": "dungeon",
+    "level": 5,
+    "bgm": "cave",
+    "battle_bg": "qbgorge",
+    "tileset": "cave",
+    "suggest": "Lv43–47",
+    "rec_level": [
+      43,
+      47
+    ],
+    "real_ref": "太魯閣國家公園的大理岩峽谷意象（燕子口壺穴、九曲洞、白楊步道水濂洞、錐麓斷崖、立霧溪）；洞窟本身是虛構的",
+    "art_note": "灰白帶深灰條紋的大理岩峽谷洞窟：中間一條碧綠溪流橫過，南北兩岸各一條 2 格寬木棧道、兩座吊橋（欄 9–10、37–38）；下緣入口接彎兩次的岩壁隧道；西南壺穴溪灘、東南水簾小洞、西北大理石洞廳與壺穴小洞、東邊斷崖小徑與觀景台、上方中央霧瀑深潭（頭目）。背景 tools/bigmaps/M55_bg.webp（美術 A2 定稿 M55_背景定稿.png，2026-11-15；格子照 M55_建議修改後格子_參考.txt）。v4.2.3 老闆 2026-11-14「太魯閣對岸開發新洞窟 峭壁谷」。",
+    "no_minimap": true,
+    "grid": [
+      "################################################",
+      "################################################",
+      "######################~~~~################....##",
+      "###.....##########............##########......##",
+      "###.....##....................##########......##",
+      "###.....##....................................##",
+      "###.....##..######..T......T..............######",
+      "####..####..######............##########..######",
+      "###.............##............##########..######",
+      "###.............##............##########..######",
+      "###..T.......T..######...###############..######",
+      "###.....~~~.....######...###############..######",
+      "###.....~~~.....######...###############..######",
+      "###..T.......T..######...###############..######",
+      "###.............######...###############..######",
+      "###.............######...###############..######",
+      "########...###########...###############..######",
+      "###BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB###",
+      "###BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB###",
+      "##~~~~~~~BB~~~~~~~~~~~~~~~~~~~~~~~~~~BB~~~~~~~##",
+      "##~~~~~~~BB~~~~~~~~~~~~~~~~~~~~~~~~~~BB~~~~~~~##",
+      "##~~~~~~~BB~~~~~~~~~~~~~~~~~~~~~~~~~~BB~~~~~~~##",
+      "###BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB###",
+      "###BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB###",
+      "######..#########...########........#####..#####",
+      "######..#########...########........#####..#####",
+      "###%%%%%%%%%%####...########........#####..#####",
+      "###%%%%%%%%%%####...#####################..#####",
+      "###%%~~~%%%%%####.........####.....######..#####",
+      "###%%~~~%%%%%####.........####.....######..#####",
+      "###%%%%%%~~%%####.........####.............#####",
+      "###%%%%%%%%%%########.......##.............#####",
+      "###%%%%%%%%%%########.......##.....#############",
+      "######################......##.....#############",
+      "#######################..#######################",
+      "#######################..#######################"
+    ],
+    "start": {
+      "x": 23,
+      "y": 34,
+      "note": "從太魯閣紅木橋進來的隧道口"
+    },
+    "exits": [
+      {
+        "x": 23,
+        "y": 35,
+        "to": "M29",
+        "tx": 20,
+        "ty": 13
+      },
+      {
+        "x": 24,
+        "y": 35,
+        "to": "M29",
+        "tx": 21,
+        "ty": 13
+      }
+    ],
+    "roadsigns": [],
+    "npcs": [],
+    "props": [],
+    "inn": null,
+    "shop": null,
+    "chests": [
+      {
+        "id": "C_M55_1",
+        "x": 27,
+        "y": 33,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 33,
+          "item": "guide"
+        }
+      },
+      {
+        "id": "C_M55_2",
+        "x": 3,
+        "y": 32,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 33,
+          "item": "grass_jelly"
+        }
+      },
+      {
+        "id": "C_M55_3",
+        "x": 35,
+        "y": 24,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 33,
+          "item": "eraser"
+        }
+      },
+      {
+        "id": "C_M55_4",
+        "x": 30,
+        "y": 33,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 33,
+          "item": "gear_qb_helmet"
+        }
+      },
+      {
+        "id": "C_M55_5",
+        "x": 9,
+        "y": 9,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 33,
+          "item": "grass_jelly"
+        }
+      },
+      {
+        "id": "C_M55_6",
+        "x": 3,
+        "y": 3,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 34,
+          "item": "guide"
+        }
+      },
+      {
+        "id": "C_M55_7",
+        "x": 45,
+        "y": 2,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 34,
+          "item": "mochi"
+        }
+      },
+      {
+        "id": "C_M55_8",
+        "x": 20,
+        "y": 3,
+        "subject": "數學",
+        "level": 3,
+        "reward": {
+          "gold": 25,
+          "exp": 34,
+          "item": "eraser"
+        }
+      }
+    ],
+    "spawns": [
+      {
+        "monster": "wx_wave_e",
+        "count": 2,
+        "area": [
+          3,
+          22,
+          12,
+          11
+        ],
+        "note": "南岸棧道西段＋壺穴溪灘"
+      },
+      {
+        "monster": "an_macaque",
+        "count": 1,
+        "area": [
+          20,
+          22,
+          18,
+          6
+        ],
+        "note": "南岸棧道東段＋溪畔平台"
+      },
+      {
+        "monster": "wx_rain_e",
+        "count": 2,
+        "area": [
+          29,
+          24,
+          15,
+          10
+        ],
+        "note": "水簾小洞"
+      },
+      {
+        "monster": "an_macaque",
+        "count": 2,
+        "area": [
+          3,
+          8,
+          13,
+          9
+        ],
+        "note": "大理石洞廳"
+      },
+      {
+        "monster": "wx_wave_e",
+        "count": 1,
+        "area": [
+          12,
+          12,
+          26,
+          7
+        ],
+        "note": "北岸棧道＋中央通道"
+      },
+      {
+        "monster": "an_macaque",
+        "count": 1,
+        "area": [
+          34,
+          2,
+          12,
+          15
+        ],
+        "note": "斷崖小徑＋觀景台"
+      },
+      {
+        "monster": "an_macaque",
+        "count": 1,
+        "area": [
+          18,
+          2,
+          12,
+          8
+        ],
+        "note": "霧瀑深潭"
+      },
+      {
+        "monster": "wx_wave_e",
+        "count": 1,
+        "area": [
+          18,
+          2,
+          12,
+          8
+        ],
+        "note": "霧瀑深潭"
+      },
+      {
+        "monster": "fob_gorgedragon",
+        "count": 1,
+        "area": [
+          23,
+          4,
+          1,
+          1
+        ],
+        "boss": true,
+        "field": true,
+        "note": "霧瀑深潭（野外特殊 BOSS，不綁委託；老闆 2026-11-15 選 V1 龍）"
+      }
+    ],
+    "landmarks": [
+      {
+        "name": "燕子崖棧道",
+        "area": [
+          3,
+          17,
+          42,
+          7
+        ]
+      },
+      {
+        "name": "壺穴溪灘",
+        "area": [
+          3,
+          24,
+          10,
+          9
+        ]
+      },
+      {
+        "name": "水簾小洞",
+        "area": [
+          29,
+          24,
+          15,
+          10
+        ]
+      },
+      {
+        "name": "大理石洞廳",
+        "area": [
+          3,
+          3,
+          13,
+          14
+        ]
+      },
+      {
+        "name": "霧瀑深潭",
+        "area": [
+          18,
+          2,
+          12,
+          8
+        ]
+      },
+      {
+        "name": "斷崖小徑",
+        "area": [
+          40,
+          2,
+          6,
+          15
+        ]
+      }
+    ],
+    "lights": [
+      {
+        "x": 18,
+        "y": 2,
+        "r": 1
+      },
+      {
+        "x": 28,
+        "y": 2,
+        "r": 1
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "r": 1
+      },
+      {
+        "x": 11,
+        "y": 8,
+        "r": 1
+      },
+      {
+        "x": 22,
+        "y": 16,
+        "r": 1
+      },
+      {
+        "x": 41,
+        "y": 16,
+        "r": 1
+      },
+      {
+        "x": 11,
+        "y": 17,
+        "r": 1
+      },
+      {
+        "x": 36,
+        "y": 17,
+        "r": 1
+      },
+      {
+        "x": 11,
+        "y": 22,
+        "r": 1
+      },
+      {
+        "x": 36,
+        "y": 22,
+        "r": 1
+      },
+      {
+        "x": 6,
+        "y": 24,
+        "r": 1
+      },
+      {
+        "x": 17,
+        "y": 24,
+        "r": 1
+      },
+      {
+        "x": 20,
+        "y": 27,
+        "r": 1
+      },
+      {
+        "x": 24,
+        "y": 27,
+        "r": 1
+      },
+      {
+        "x": 21,
+        "y": 33,
+        "r": 1
+      },
+      {
+        "x": 25,
+        "y": 33,
+        "r": 1
+      },
+      {
+        "x": 41,
+        "y": 6,
+        "r": 1
+      },
+      {
+        "x": 23,
+        "y": 2,
+        "r": 1.5,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 9,
+        "y": 12,
+        "r": 1.2,
+        "color": "#a8dcff"
+      },
+      {
+        "x": 41,
+        "y": 27,
+        "r": 1.2,
+        "color": "#a8dcff"
+      }
+    ]
   }
 };

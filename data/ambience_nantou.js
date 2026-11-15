@@ -35,6 +35,14 @@
         { landmark: '林間夜路', rect: [4, 33, 34, 24], layers: [{ id: 'amb_night', db: 0 }, { id: 'amb_forest', db: -8 }] }
       ],
       zones: [], viewpointAreas: [{ landmark: '大學池', rect: [13, 13, 13, 10] }]
+    },
+    // v4.2.3 合歡山隧道洞窟：洞口聽得到外面的風，越走越只剩滴水聲
+    M45: {
+      base: [{ id: 'amb_cave', db: 0 }, { id: 'amb_wind', db: -12 }],
+      areas: [
+        { landmark: '入口舊隧道', rect: [20, 26, 7, 10], layers: [{ id: 'amb_wind', db: -4 }, { id: 'amb_cave', db: -6 }] }
+      ],
+      zones: [], viewpointAreas: []
     }
   };
   if (typeof window !== 'undefined' && window.AMBIENCE && window.AMBIENCE.maps) {

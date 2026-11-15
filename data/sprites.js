@@ -324,6 +324,12 @@ window.SPRITES = {
   "frameW": 40,
   "frameH": 44
  },
+ "sign_ice": {
+  "file": "assets/ui/sign_ice.png",
+  "type": "single",
+  "frameW": 40,
+  "frameH": 44
+ },
  "mon_dango": {
   "file": "assets/monsters/mon_dango.png",
   "type": "single",
@@ -604,6 +610,30 @@ window.SPRITES = {
   "file": "assets/ui/ferry_boat.png",
   "type": "single",
   "frameW": 256,
+  "frameH": 96
+ },
+ "obj_police_car": {
+  "file": "assets/ui/obj_police_car.png",
+  "type": "single",
+  "frameW": 128,
+  "frameH": 64
+ },
+ "obj_traffic_cones": {
+  "file": "assets/ui/obj_traffic_cones.png",
+  "type": "single",
+  "frameW": 64,
+  "frameH": 64
+ },
+ "obj_sign_snow_chain": {
+  "file": "assets/ui/obj_sign_snow_chain.png",
+  "type": "single",
+  "frameW": 64,
+  "frameH": 96
+ },
+ "obj_telescope": {
+  "file": "assets/ui/obj_telescope.png",
+  "type": "single",
+  "frameW": 64,
   "frameH": 96
  },
  "npc_bookstore_m": {
@@ -2275,6 +2305,12 @@ window.SPRITES = {
  "frameW": 175,
  "frameH": 160
 },
+ "boss_wxb_snowking": {
+ "file": "assets/monsters/boss_wxb_snowking.png",
+ "type": "single",
+ "frameW": 162,
+ "frameH": 160
+},
  "mon_gh_lantern_f": {
  "file": "assets/monsters/mon_gh_lantern_f.png",
  "type": "single",
@@ -2717,6 +2753,18 @@ window.SPRITES = {
  "file": "assets/items/item_gear_z17_dawn.png",
  "type": "icon",
  "frameW": 38,
+ "frameH": 32
+},
+ "item_gear_hh_icesword": {
+ "file": "assets/items/item_gear_hh_icesword.png",
+ "type": "icon",
+ "frameW": 30,
+ "frameH": 32
+},
+ "item_gear_hh_vest": {
+ "file": "assets/items/item_gear_hh_vest.png",
+ "type": "icon",
+ "frameW": 30,
  "frameH": 32
 },
  "npc_tao_fisher": {
@@ -3748,6 +3796,42 @@ window.SPRITES = {
  "type": "strip",
  "frameW": 340,
  "frameH": 98,
+ "cols": 4,
+ "rows": 1
+},
+ // v4.2.3 峭壁谷（M55）：裝備圖示 2 張（美術 A2 重畫版）、峽谷霧龍單張＋4 格（美術定稿 boss_wxb_gorgedragon*.png，依技術長決定改名 boss_fob_gorgedragon）；mapH 80＝技術長 2026-11-15 先定的地圖高度
+ "item_gear_qb_helmet": {
+  "file": "assets/items/item_gear_qb_helmet.png",
+  "type": "icon",
+  "frameW": 35,
+  "frameH": 32
+ },
+ "item_gear_qb_pole": {
+  "file": "assets/items/item_gear_qb_pole.png",
+  "type": "icon",
+  "frameW": 25,
+  "frameH": 32
+ },
+ "boss_fob_gorgedragon": {
+ "file": "assets/monsters/boss_fob_gorgedragon.png",
+ "type": "single",
+ "frameW": 155,
+ "frameH": 160,
+ "mapH": 80
+},
+ "boss_fob_gorgedragon_anim": {
+ "file": "assets/monsters/boss_fob_gorgedragon_anim.png",
+ "type": "strip",
+ "frameW": 616,
+ "frameH": 160,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_wxb_snowking_anim": {
+ "file": "assets/monsters/boss_wxb_snowking_anim.png",
+ "type": "strip",
+ "frameW": 676,
+ "frameH": 160,
  "cols": 4,
  "rows": 1
 }

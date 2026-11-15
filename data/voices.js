@@ -297,6 +297,7 @@ window.VOICES = {
   // ═══ v4.2 第 4a 批 VOICES.monsters END ═══
     // v4.1 中橫・南投怪物的戰鬥音效。
     wx_snow: {"family":"slime","size":"s","mood":"頑皮","pitch_shift":7,"cry":"咕嚕咕嚕！"},
+    wxb_snowking: {"family":"slime","size":"boss","mood":"頑皮","pitch_shift":-5,"cry":"咕嚕——嚕！"},
     fo_puff: {"family":"spirit","size":"s","mood":"迷糊","pitch_shift":5,"cry":"噗噗……"},
     gh_bamboo: {"family":"plant","size":"s","mood":"頑皮","pitch_shift":5,"cry":"啵！啵！"},
     gh_cone: {"family":"plant","size":"s","mood":"迷糊","pitch_shift":6,"cry":"刺刺刺……"},
@@ -397,6 +398,8 @@ window.VOICES = {
     wx_wave_e: { family: "slime", size: "m", mood: "暴躁", pitch_shift: 2, cry: "嘩啦——！" },
     an_macaque: { family: "beast", size: "s", mood: "頑皮", pitch_shift: 6, cry: "吱吱吱！" },
     fob_balloon: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -7, cry: "呼嚕嚕……" },
-    wxb_whale: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -9, cry: "噗——呼——" }
+    wxb_whale: { family: "spirit", size: "boss", mood: "神祕", pitch_shift: -9, cry: "噗——呼——" },
+    // v4.2.3 峭壁谷（M55）野外特殊 BOSS（規格 8.1 #8）
+    fob_gorgedragon: { family: "slime", size: "boss", mood: "暴躁", pitch_shift: -8, cry: "嘩——轟！" }
   }
 };

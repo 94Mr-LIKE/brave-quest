@@ -207,8 +207,13 @@
     // v0.9.4 候車亭（station.shelter 左上角，3×3 格）：依 2.5D 規範只擋最下面一排（底座），上面兩排可以走到後面被遮住
     var sh = map.station && map.station.shelter;
     if (sh) for (var dx = 0; dx < 3; dx++) b[(sh.x + dx) + ',' + (sh.y + 2)] = true;
+    // v4.2.3 k1（審查 L-2）：中橫（M30）的警車 2 格、交通錐 1 格是實體物件，擋路（主角不能站到車上）；雪鏈告示牌維持可穿過
+    (map.props || []).forEach(function (p) {
+      if (BLOCKING_PROPS[p.id] && Array.isArray(p.cells)) p.cells.forEach(function (c) { b[c[0] + ',' + c[1]] = true; });
+    });
     return b;
   }
+  var BLOCKING_PROPS = { car_snow_chain: true, traffic_cones: true };
 
   function isWalkable(tilesets, map, x, y, block) {
     var s = size(map);

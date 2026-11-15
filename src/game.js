@@ -378,9 +378,10 @@
   };
 
   /** 播放 dialogs.js 的一段對話；找不到時用 fallback 句子 */
-  G.say = function (id, fallback) {
+  G.say = function (id, fallback, only) {
     var D = G.data.dialogs || {};
-    var lines = (id && D[id]) || fallback || [];
+    // v4.2.3 only：和 D[id] 句序對齊的句子（不播的句子放 null；例：委託進行中只播開始對話的一句），語音鍵照原句序
+    var lines = (id && D[id]) ? (only || D[id]) : (fallback || []);
     G.busy = true;
     var s = G.state.settings;
     return J.UI.dialog(lines, {
@@ -929,7 +930,11 @@
         J.UI.confirm('「' + q.title + '」：' + p.text + '。要繼續幫忙嗎？', '繼續幫忙', '等一下').then(function (y) { if (y) G.runHelp(f.id, npc, scene); });
         return;
       }
-      G.say(null, [{ who: npc.id, text: q.goal || q.title }]).then(function () { J.UI.toast('進度：' + J.QuestLog.progress(st, Q, f.id, G.data).text, 3500); });
+      // v4.2.3（老闆選 A）委託人說開始對話裡自己的最後一句台語（有字幕、有語音），下一頁旁白顯示目標與進度；沒有台語句的委託人照舊說目標
+      var pg = J.QuestLog.progress(st, Q, f.id, G.data).text;
+      var at = J.QuestLog.activeTalk(q, G.data.dialogs, npc.id, (q.goal ? '目標：' + q.goal + '　' : '') + '進度：' + pg);
+      G.lastActiveTalk = at ? { quest: f.id, dialog: at.id, index: at.index } : null;   // 測試用
+      (at ? G.say(at.id, [], at.lines) : G.say(null, [{ who: npc.id, text: q.goal || q.title }])).then(function () { J.UI.toast('進度：' + pg, 3500); });
       return;
     }
     if (f && f.status === 'available') {

@@ -36,8 +36,9 @@
   // v4.2 4c：雲上小舖招牌照賣的東西（晨光雲衣、星光劍、曙光之鎧）
   // v4.2.2：台北城三家店（item/weapon/armor_taipei）、基隆廟口與宜蘭老街的道具攤以前沒有對應，都退回「雜貨」的籃子圖（舊錯）
   var SIGN_KIND = { general: 'general', item: 'item', weapon: 'weapon', armor: 'armor', inn: 'inn', cloud_m42: 'armor', cloud_m43: 'weapon', cloud_m44: 'armor',
-    item_taipei: 'item', weapon_taipei: 'weapon', armor_taipei: 'armor', item_keelung: 'item', item_yilan: 'item' };
-  var SIGN_TEXT = { general: '雜貨', item: '道具', weapon: '武器', armor: '防具', inn: '旅店' };
+    item_taipei: 'item', weapon_taipei: 'weapon', armor_taipei: 'armor', item_keelung: 'item', item_yilan: 'item',
+    ice_gi: 'ice' };   // v4.2.3：綠島冰店改用剉冰招牌 sign_ice（以前退回「雜貨」的籃子圖）
+  var SIGN_TEXT = { general: '雜貨', item: '道具', weapon: '武器', armor: '防具', inn: '旅店', ice: '冰店' };
 
   /**
    * v4.2.2 匾額位置表（老闆 2026-11-14「招牌通通掛在房屋上面當匾額」）：每一家店都看過背景圖，指定招牌掛在它那棟房子的哪裡。
@@ -131,6 +132,52 @@
       var r = ruleSpot(map, s);
       return Object.assign(base, { x: r.x, y: r.y, onDoor: r.onDoor, onWall: r.onWall, fromTable: false });
     });
+  }
+
+  /**
+   * v4.2.3 招牌鏡頭（老闆 2026-11-15 選 B「靠近店家時鏡頭往上移」；實玩 DEF-02：匾額掛上屋簷後，講話時常被上方狀態列蓋住）。
+   * 做法和慈護宮的 shrineCamera 一樣（鏡頭 followOffset 往上），MapScene.shrineCamera 取兩者較大的偏移。
+   * 觸發範圍（格）：店主人左右 3 格、上 1 下 4 格（站在店主人面前講話），或匾額左右 3 格、往下 6 格（走近店門）。
+   * 已經在範圍裡的那一塊，離開時範圍多放寬 KEEP 格：在邊緣來回走不會一開一關（鏡頭不抖）。
+   */
+  var SIGN_CAM = { NEAR_X: 3, KEEPER_UP: 1, KEEPER_DOWN: 4, PLAQUE_DOWN: 6, KEEP: 1, MARGIN: 6, FOOT: 8 };
+  function signCamNear(s, tx, ty, pad) {
+    var nearKeeper = Math.abs(tx - s.npcX) <= SIGN_CAM.NEAR_X + pad && ty >= s.npcY - SIGN_CAM.KEEPER_UP - pad && ty <= s.npcY + SIGN_CAM.KEEPER_DOWN + pad;
+    var py = Math.floor(s.y);
+    var nearPlaque = Math.abs(tx - s.x) <= SIGN_CAM.NEAR_X + pad && ty >= py - pad && ty <= py + SIGN_CAM.PLAQUE_DOWN + pad;
+    return nearKeeper || nearPlaque;
+  }
+  /** spots＝[{ x, y, npcX, npcY, … }]（MapScene 傳畫出來的匾額；背景已畫招牌的不傳）。prev＝上一次選到的那一塊（同一個物件）。回傳靠近的那一塊或 null */
+  function signCamPick(spots, tx, ty, prev) {
+    if (!Array.isArray(spots) || !spots.length) return null;
+    if (prev && spots.indexOf(prev) >= 0 && signCamNear(prev, tx, ty, SIGN_CAM.KEEP)) return prev;
+    var best = null, bd = 1e9;
+    spots.forEach(function (s) {
+      if (!signCamNear(s, tx, ty, 0)) return;
+      var d = Math.abs(tx - s.npcX) + Math.abs(ty - s.npcY);
+      if (d < bd) { bd = d; best = s; }
+    });
+    return best;
+  }
+  /**
+   * 鏡頭要往上移多少（世界像素，0＝不移；正值＝鏡頭往上，和 Phaser followOffset.y 同方向）。
+   * o＝{ signTop：匾額上緣 y，playerY：主角腳底 y，targetY：鏡頭目標 y，viewH：畫面高（世界像素），mapH：地圖高，
+   *      hudH：上方狀態列佔掉的高度，bottomH：下方對話框佔掉的高度（沒有對話框時 0） }
+   * 想要的鏡頭上緣＝匾額上緣－狀態列－MARGIN；但主角的腳要留在對話框（或畫面下緣）上面 FOOT 像素，也不超出地圖上緣（不露黑邊）。
+   * 鏡頭本來就夠高（含被地圖下緣夾住的情形）就不移。
+   */
+  function signCamOffset(o) {
+    if (!o || !(o.viewH > 0)) return 0;
+    var raw = o.targetY - o.viewH / 2;
+    var base = Math.max(0, Math.min(raw, Math.max(0, (o.mapH || 0) - o.viewH)));   // 現在的鏡頭上緣（Phaser setBounds 夾過）
+    var want = Math.max(o.signTop - (o.hudH || 0) - SIGN_CAM.MARGIN, o.playerY - o.viewH + (o.bottomH || 0) + SIGN_CAM.FOOT, 0);
+    if (!(want < base)) return 0;
+    return Math.round((raw - want) * 10) / 10;
+  }
+  /** 每一幀往目標偏移靠近：一般每幀走 15%（和慈護宮一樣），差 0.5 像素內直接到；減少動態時直接切換 */
+  function camEase(cur, want, reduce) {
+    if (reduce || Math.abs(cur - want) <= 0.5) return want;
+    return cur + (want - cur) * 0.15;
   }
 
   // ---------------------------------------------------------------- 建議等級（v0.9.3，37_現行版等級與怪物數值調整.md 第 3 節）
@@ -529,7 +576,8 @@
 
   var MapInfo = { STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, SIGN_ABOVE_KEEPER: SIGN_ABOVE_KEEPER, SIGN_PLAQUES: SIGN_PLAQUES, SIGN_KIND: SIGN_KIND, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
     wanderTarget: wanderTarget, petSpot: petSpot, glowRgb: glowRgb, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
-    LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords };
+    LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords,
+    SIGN_CAM: SIGN_CAM, signCamPick: signCamPick, signCamOffset: signCamOffset, camEase: camEase };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.MapInfo = MapInfo; }
   if (typeof module !== 'undefined') module.exports = MapInfo;
 })();

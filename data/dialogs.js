@@ -110,6 +110,19 @@ window.DIALOGS = {
   D_ENGINEER_CC_IDLE: [
     {"who":"road_engineer_cc","emotion":"平靜","text":"上山要穿暖，出門前先看路況和天氣。","taigi":{"hanji":"上山愛穿予燒，出門先看路況佮天氣。","tailo":"Tsiūnn-suann ài tshīng hōo sio, tshut-mn̂g sing khuànn lōo-hóng kah thinn-khì.","huayu":"上山要穿暖，出門前先看路況和天氣。"}}
   ],
+  // v4.2.2 K（老闆 2026-11-15「這台車是??」）：大禹嶺管制站旁的小車與告示牌，走到旁邊按 Ⓐ 由番薯仔說明（華語）
+  // v4.2.3（老闆 2026-11-15「中橫的車子改成警車，表示有管制」）：小車換成警車、旁邊加交通錐（番薯仔說明，華語）
+  D_PROP_POLICE_CAR: [
+    {"who":"pet","emotion":"驚訝","text":"警車停在大禹嶺管制站旁——這段路有管制。"},
+    {"who":"pet","emotion":"平靜","text":"路面結冰會打滑，車子要照公告加雪鏈，才能安全上山。"}
+  ],
+  D_PROP_CONES: [
+    {"who":"pet","emotion":"平靜","text":"交通錐排在路邊：這裡有管制，車子要慢慢開。"}
+  ],
+  D_PROP_SNOW_SIGN: [
+    {"who":"pet","emotion":"平靜","text":"告示牌畫著套上雪鏈的輪胎。"},
+    {"who":"pet","emotion":"平靜","text":"意思是：路面結冰時，車子要加雪鏈喔！"}
+  ],
   D_CH_5A: [
     {"who":"lodge_keeper_hh","emotion":"擔心","text":"雪地上有幾顆雪球怪物，一直打轉。","taigi":{"hanji":"雪頂有幾粒雪球的怪物，一直踅。","tailo":"Seh tíng ū kuí lia̍p seh-kiû ê kuài-bu̍t, it-ti̍t se̍h.","huayu":"雪地上有幾顆雪球怪物，一直打轉。"}},
     {"who":"lodge_keeper_hh","emotion":"平靜","text":"讓怪物清醒，把 3 片雪花結晶找回來。","taigi":{"hanji":"予怪物清醒，共三片雪花揣轉來。","tailo":"Hōo kuài-bu̍t tshing-tshínn, kā sann phìnn seh-hue tshuē tńg--lâi.","huayu":"讓怪物清醒，把 3 片雪花結晶找回來。"}}

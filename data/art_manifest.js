@@ -115,6 +115,9 @@ window.ART = {
   "M54": {
    "bg": "bg_M54.webp"
   },
+  "M55": {
+   "bg": "bg_M55.webp"
+  },
   "MT1": {
    "bg": "bg_MT1.webp"
   },
@@ -162,6 +165,9 @@ window.ART = {
   },
   "M44": {
    "bg": "bg_M44.webp"
+  },
+  "M45": {
+   "bg": "bg_M45.webp"
   }
  },
  "battle": {
@@ -175,6 +181,7 @@ window.ART = {
   "coast": "bb_coast.png",
   "coldspring": "bb_coldspring.png",
   "fogcave": "bb_fogcave.png",
+  "qbgorge": "bb_qbgorge.png",
   "forest": "bb_forest.png",
   "grass": "bb_grass.png",
   "harbor": "bb_harbor.png",
@@ -209,8 +216,11 @@ window.ART = {
   "obj_bus_sign": "assets/ui/obj_bus_sign.png",
   "obj_mazu_statue": "assets/ui/obj_mazu_statue.png",
   "obj_road_sign": "assets/ui/obj_road_sign.png",
+  "obj_sign_snow_chain": "assets/ui/obj_sign_snow_chain.png",
+  "obj_telescope": "assets/ui/obj_telescope.png",
   "sign_armor": "assets/ui/sign_armor.png",
   "sign_general": "assets/ui/sign_general.png",
+  "sign_ice": "assets/ui/sign_ice.png",
   "sign_inn": "assets/ui/sign_inn.png",
   "sign_item": "assets/ui/sign_item.png",
   "sign_weapon": "assets/ui/sign_weapon.png",
