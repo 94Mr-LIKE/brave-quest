@@ -22,6 +22,8 @@
   function shopOpen(G) {
     var open = (G.data.jobRules && G.data.jobRules.open_jobs) || null;
     if (open && G.state.tierOpen && G.state.tierOpen.inter === true) open = open.concat(Object.keys(G.data.jobs).filter(function (j) { return G.data.jobs[j].tier === 'inter'; }));
+    // v4.2.5：到過鹿耳門聖母廟（tierOpen.adv）以後加上高級職業
+    if (open && G.state.tierOpen && G.state.tierOpen.adv === true) open = open.concat(Object.keys(G.data.jobs).filter(function (j) { return G.data.jobs[j].tier === 'adv'; }));
     return open;
   }
   /** 能用的職業頭像（通用不畫） */
@@ -536,13 +538,17 @@
   // ---------------------------------------------------------------- 職業公會、慈護宮神像（v1.0 48 號 1.4、1.5、2.4、F8）
   var TRAIT_TEXT = {
     // v2.1：有數字的特性照職業實際的數值寫（中級的倍率和初級不同）
-    power: function (v) { return '力量最大：所有攻擊傷害 ×' + v; }, dmgTaken: function (v) { return '被打到的傷害 −' + Math.round((1 - v) * 100) + '%'; }, critFrac: '會心一擊的時間比較長（前 2/5）',
+    // v4.2.5 第 6 輪（審查第二輪 S1）：power 只有全部職業裡最大的才說「力量最大」（劍士 1.15；神之手 1.1 不說）
+    power: function (v, D) { return (powerMax(D) <= v ? '力量最大：' : '') + '所有攻擊傷害 ×' + v; }, dmgTaken: function (v) { return '被打到的傷害 −' + Math.round((1 - v) * 100) + '%'; }, critFrac: '會心一擊的時間比較長（前 2/5）',
     skillPow: function (v) { return '攻擊技能威力 ×' + v; }, healPow: function (v) { return '回復技能效果 ×' + v; }, evade: '答錯時有時候會閃過攻擊',
-    time: function (v) { return '答題時間條 ×' + v + '；打倒怪物時比較容易拿到東西'; }, drop: null, mpRegen: '打贏後回復一點魔力',
+    time: function (v) { return '答題時間條 ×' + v; }, drop: '打倒怪物時比較容易拿到東西', mpRegen: '打贏後回復一點魔力',   // v4.2.5 第 5 輪：掉寶自己一項（高級一項一行）
     fleeSure: '逃跑一定成功（頭目戰不能逃）', petHit: '答對時番薯仔有時候會追加一擊', laugh: '答錯時怪物有時候會笑到忘了攻擊', friendCard: '打倒怪物有時候會拿到怪物朋友卡',
     gold: function (v) { return '戰鬥拿到的金幣 ×' + v; }, critMult: function (v) { return '會心一擊的傷害 ×' + v + '（一般是 ×1.5）'; }, bossPow: function (v) { return '打頭目的傷害 ×' + v; }
   };
-  function traitText(j) { return Object.keys(j.trait || {}).map(function (k) { var t = TRAIT_TEXT[k]; return typeof t === 'function' ? t(j.trait[k]) : t; }).filter(Boolean).join('；'); }
+  /** 全部職業 trait.power 的最大值（沒有資料時＝0，照舊說「力量最大」） */
+  function powerMax(D) { var js = (D && D.jobs) || {}; return Object.keys(js).reduce(function (m, id) { var t = js[id].trait || {}; return t.power > m ? t.power : m; }, 0); }
+  function traitList(j, D) { return Object.keys(j.trait || {}).map(function (k) { var t = TRAIT_TEXT[k]; return typeof t === 'function' ? t(j.trait[k], D) : t; }).filter(Boolean); }
+  function traitText(j, D) { return traitList(j, D).join('；'); }
   /** v2.1 中級職業的配方進度（69 號 5.2）：「劍士 Lv30 ✔、武鬥家 Lv12（要 30）」 */
   function recipeText(st, j, D) {
     return Object.keys(j.recipe || {}).map(function (id) {
@@ -550,20 +556,24 @@
       return lv >= need ? nm + ' Lv' + lv + ' ✔' : lv > 0 ? nm + ' Lv' + lv + '（要 ' + need + '）' : nm + ' 還沒當過（要 Lv' + need + '）';
     }).join('、');
   }
-  /** 這個職業在清單上的狀態：current、back（以前當過）、change（小考通過了）、trial（可以考）、today（明天再來）、level（見習還不到 10 級）、closed（即將開放） */
-  function jobState(G, id) {
+  /** 這個職業在清單上的狀態：current、back（以前當過）、change（小考通過了）、trial（可以考）、today（明天再來）、level（見習還不到 10 級）、closed（即將開放）、
+   *  place（v4.2.5：高級職業第一次只在南部 2 間轉，當過以後任何宮廟都能換回去；place＝轉職地點 id，沒給＝不檢查） */
+  function jobState(G, id, place) {
     var st = G.state, D = G.data;
     if (st.player.job === id) return { kind: 'current' };
     var c = J.Character.canChangeJob(st, id, D);
-    if (c.ok) return { kind: c.back ? 'back' : 'change' };
     if (c.reason === 'closed') return { kind: 'closed' };
     if (c.reason === 'recipe') return { kind: 'recipe', missing: c.missing };   // v2.1 中級：配方職業還沒全部 Lv30
+    // v4.2.5 第 4 輪（審查 S4）：地點排在配方之後——配方沒完成照樣說「配方還沒完成」，配方完成（或以前當過）才說「到鹿耳門聖母廟或佛光山轉」
+    //   （只是清單顯示的順序；真正擋地點的是 game.js 的 jobPick／doJobChange）
+    if (place && J.Character.placeAllows && !J.Character.placeAllows(D, place, id, st)) return { kind: 'place' };   // 第 5 輪：當過＋通過過小考＝任何宮廟都能換回去
+    if (c.ok) return { kind: c.back ? 'back' : 'change' };
     if (c.reason === 'level') return { kind: 'level', need: c.need };
     var t = J.JobTrial.canStart(st, id, D, Date.now());
     if (t.ok) return { kind: 'trial' };
     return { kind: t.reason === 'today' ? 'today' : t.reason === 'time' ? 'time' : 'trial', minutes: t.minutes };
   }
-  var JOB_BTN = { back: '換回去（免費）', change: '轉職', trial: '立志小考', today: '明天再來考', time: '今天時間不夠', level: '見習 10 級才能考', closed: '即將開放', recipe: '配方還沒完成' };
+  var JOB_BTN = { back: '換回去（免費）', change: '轉職', trial: '立志小考', today: '明天再來考', time: '今天時間不夠', level: '見習 10 級才能考', closed: '即將開放', recipe: '配方還沒完成', place: '到鹿耳門聖母廟或佛光山轉' };
 
   /**
    * 轉職清單。opts＝{ title, label, place（'temple'｜'guild'）, onPick(jobId, kind)：孩子按了按鈕（清單先關掉） }
@@ -581,15 +591,18 @@
       var need = (D.jobRules && D.jobRules.master_level && D.jobRules.master_level.novice) || 10;
       body.appendChild(h('p', { text: '見習冒險者 ' + need + ' 級以後，通過「立志小考」就能轉職；以前當過的職業可以免費換回去。轉職後等級從 1 開始，能力有保底，不用擔心。' }));
       body.appendChild(h('p.small', { text: '職業只改變戰鬥方式和外觀，所有委託一樣要五科都學喔！' }));
-      var list = h('ul.list.job-list'), interHead = false;   // v2.1：中級職業前面加一列標題
+      var list = h('ul.list.job-list'), interHead = false, advHead = false;   // v2.1：中級職業前面加一列標題；v4.2.5 高級也是
       Object.keys(D.jobs).forEach(function (id) {
-        var j = D.jobs[id], s = jobState(G, id);
+        var j = D.jobs[id], s = jobState(G, id, opts.place);
         if (j.tier === 'inter' && !interHead) { interHead = true; list.appendChild(h('li.tier-head', {}, [h('b', { text: '🏮 中級職業（2 轉）' }), h('span.small', { text: '　配方裡的初級職業都到 Lv30，再通過 2 轉立志小考（20 題答對 18 題）' })])); }
+        // v4.2.5（26 號 3.5 #12）高級職業＝頂尖榮譽職業：加一句「通過最難的立志小考才能成為」，避免孩子以為自己一開始就是勇者職業
+        if (j.tier === 'adv' && !advHead) { advHead = true; list.appendChild(h('li.adv-head', {}, [h('b', { text: '👑 高級職業（3 轉）' }), h('span.small', { text: '　頂尖榮譽職業：配方裡的中級職業都到 Lv50，再到鹿耳門聖母廟或佛光山，通過最難的 3 轉立志小考（20 題答對 16 題，時間很短，一天只能考一次）。當過以後，任何宮廟都能換回去' })])); }
         var key = J.Assets.heroKey(st.player.gender, id);
-        var inter = j.tier === 'inter', silhouette = s.kind === 'closed' && !inter, locked = inter && (s.kind === 'closed' || s.kind === 'recipe');   // v2.1 中級：一律顯示名字，沒開放／配方不夠是灰色
+        var adv = j.tier === 'adv';   // v4.2.5 高級：和中級一樣一律顯示名字，沒開放／配方不夠／不是南部 2 間是灰色
+        var inter = j.tier === 'inter' || adv, silhouette = s.kind === 'closed' && !inter, locked = inter && (s.kind === 'closed' || s.kind === 'recipe' || s.kind === 'place');   // v2.1 中級：一律顯示名字，沒開放／配方不夠是灰色
         var btn = s.kind === 'current' ? h('button.selected', { disabled: true }, ['目前的職業']) :
           h('button', { 'data-job': id, 'data-kind': s.kind, disabled: ['back', 'change', 'trial'].indexOf(s.kind) < 0, onclick: function () { handle.close(); if (opts.onPick) opts.onPick(id, s.kind); } },
-            [(inter && s.kind === 'closed' ? '到大甲鎮瀾宮以後開放' : JOB_BTN[s.kind]) || '不能轉']);
+            [(adv && s.kind === 'closed' ? '到鹿耳門聖母廟以後開放' : inter && s.kind === 'closed' ? '到大甲鎮瀾宮以後開放' : JOB_BTN[s.kind]) || '不能轉']);
         var lv = J.Character.jobLevel(st, id);
         var learned = (j.skills || []).map(function (sk) { return (lv >= sk.lv ? '✔' : 'Lv' + sk.lv) + ' ' + (J.SkillFx ? J.SkillFx.icon(sk) : '') + sk.name + '（魔力 ' + sk.mp + '）：' + sk.desc; });
         var gear = [];
@@ -599,7 +612,9 @@
         if (afs.length) gear.push('防具：' + J.Character.famNames(afs));
         var card = h('details.job-card', {}, [h('summary', { text: '說明卡' }),
           h('div.small', { text: j.desc || '' }),
-          traitText(j) ? h('div.small', { text: '特性：' + traitText(j) }) : null,
+          // v4.2.5 第 5 輪：高級職業的特性多（勇者 9 項），一項一行（給小三看）；初級、中級照舊一行
+          traitText(j, D) && j.tier === 'adv' ? h('div.small', { text: '特性：' }) : traitText(j, D) ? h('div.small', { text: '特性：' + traitText(j, D) }) : null,
+          traitText(j, D) && j.tier === 'adv' ? h('ul.small.job-traits', {}, traitList(j, D).map(function (t) { return h('li', { text: t }); })) : null,
           gear.length ? h('div.small', { text: gear.join('　') }) : null,
           h('ul.small.job-skills', {}, learned.map(function (t) { return h('li', { text: t }); }))]);
         list.appendChild(h('li', { 'data-job': id, class: silhouette ? 'soon' : locked ? 'inter-locked' : null }, [
@@ -613,6 +628,8 @@
       var hasInter = Object.keys(D.jobs).some(function (id) { return D.jobs[id].tier === 'inter'; });
       body.appendChild(h('p.small.inter-note', { text: hasInter ? (st.tierOpen && st.tierOpen.inter ? '🏮 中級職業：已經到過大甲鎮瀾宮。配方裡的初級職業都到 Lv30，就能在任何一間宮廟考 2 轉立志小考。' : '🏮 中級職業：到大甲鎮瀾宮以後開放。') :
         (st.tierOpen && st.tierOpen.inter ? '🏮 中級職業即將登場！（已經到過大甲鎮瀾宮）' : '🏮 中級職業：到大甲鎮瀾宮以後開放。') }));
+      // v4.2.5 高級職業（3 轉）：到過正統鹿耳門聖母廟以後開放，只在南部 2 間轉
+      if (Object.keys(D.jobs).some(function (id) { return D.jobs[id].tier === 'adv'; })) body.appendChild(h('p.small.adv-note', { text: st.tierOpen && st.tierOpen.adv ? '👑 高級職業：已經到過鹿耳門聖母廟。配方裡的中級職業都到 Lv50，就能在鹿耳門聖母廟或佛光山考 3 轉立志小考（一天只能考一次）。當過的高級職業，任何宮廟都能換回去。' : '👑 高級職業：到台南的鹿耳門聖母廟以後開放。' }));
     }
     render();
     return handle;

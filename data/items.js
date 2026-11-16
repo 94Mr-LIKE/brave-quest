@@ -74,6 +74,10 @@ window.ITEMS = {
   amulet_monster_hunter: { name: "魔物獵人的護身符", sprite: "item_amulet", kind: "key", price: 0, precious: true, desc: "通過立志小考（2 轉）的紀念。上面刻著「立志的魔物獵人」。" },
   amulet_pirate: { name: "海盜的護身符", sprite: "item_amulet", kind: "key", price: 0, precious: true, desc: "通過立志小考（2 轉）的紀念。上面刻著「立志的海盜」。" },
   amulet_ranger: { name: "遊俠的護身符", sprite: "item_amulet", kind: "key", price: 0, precious: true, desc: "通過立志小考（2 轉）的紀念。上面刻著「立志的遊俠」。" },
+  // v4.2.5 高級職業的 3 轉護身符（比照 2 轉；圖示共用 item_amulet）
+  amulet_god_hand: { name: "神之手的護身符", sprite: "item_amulet", kind: "key", price: 0, precious: true, desc: "通過立志小考（3 轉）的紀念。上面刻著「立志的神之手」。" },
+  amulet_thunder_sage: { name: "天地雷鳴士的護身符", sprite: "item_amulet", kind: "key", price: 0, precious: true, desc: "通過立志小考（3 轉）的紀念。上面刻著「立志的天地雷鳴士」。" },
+  amulet_hero: { name: "勇者的護身符", sprite: "item_amulet", kind: "key", price: 0, precious: true, desc: "通過立志小考（3 轉）的紀念。上面刻著「立志的勇者」。" },
   sticky_ball:  { name: "黏黏球",     sprite: "item_sticky_ball",  kind: "material", price: 0, desc: "迷糊團子身上掉下來的黏黏球，可以補洞。" },
   mushroom_cap: { name: "毒菇帽",     sprite: "item_mushroom_cap", kind: "material", price: 0, desc: "毒菇怪的帽子。精靈長老拿來研究霧。不能吃喔！" },
   feather:      { name: "羽毛",       sprite: "item_feather",      kind: "material", price: 0, desc: "白白的羽毛，可以做成羽毛筆。" },

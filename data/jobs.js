@@ -6,7 +6,7 @@
  *   基礎 PLAYER_BASE；成長 JOB_RULES.growth（所有職業一樣）；n＝已出師的職業數（不含目前職業；見習 Lv10、初級 Lv30 算出師）
  *   保底：每次轉職記下「轉職前能力（不含裝備）× floor_ratio」，各項取以前保底的較大值
  * 欄位：
- *   tier：novice（見習，技能職階係數 0.9）／basic（初級 1.0）／inter（中級 1.25；v2.1）
+ *   tier：novice（見習，技能職階係數 0.9）／basic（初級 1.0）／inter（中級 1.25；v2.1）／adv（高級 1.5；v4.2.5，配方＝各中級職業都要 Lv50）
  *   v2.1 中級：recipe＝配方（各初級職業都要 Lv30）、fav 兩個拿手科目、look＝還沒有走路圖時借哪個初級職業的圖；n 的出師：中級 Lv50
  *   mods：{hp, mp, atk, def} 職業倍率（48 號 2.2；劍士 1.20/0.60/1.40/1.10，老闆「物攻、力量調強」）
  *   fav：拿手科目（答對傷害 ×bonus）；trait：被動特性（48 號 2.5）
@@ -262,8 +262,60 @@ window.PLAYER_BASE = { hp: 30, mp: 10, atk: 6, def: 0 };
         S('ra_rain', 48, "萬箭穿雲", "multi", { p: 0.95, n: 5 }, 24, "好多箭穿過雲飛下來。", "arrow", "#C5E1A5", 1500)
       ],
       desc: "答題時間多兩成，掉寶機會變 1.5 倍，戰鬥拿到的金幣 ×1.1。拿手科目是數學和自然。"
-    })
+    }),
     // ── v2.1 中級職業：到這裡 ──
+    // ── v4.2.5 高級職業（3 轉；70 號 6.4、6.5，26 號第 4 節、技能 #83–94）──
+    // 頂尖榮譽職業（26 號 3.5）：配方裡的中級職業全部 Lv50、到過正統鹿耳門聖母廟（state.tierOpen.adv），只在南部 2 間宮廟轉（JOB_RULES.adv_places），
+    // 3 轉立志小考 20 題答對 16、時間 25%、3 星＋4 星、全範圍。技能威力寫原值，載入時（world.js normalizeSkill）乘高級職階係數 1.5。
+    // 走路圖：v4.2.5 第 2 輪美術交件（走路圖_v3，sprites.js hero_／heroM_＋職業 id），已拿掉借圖的 look
+    // 倍率（v4.2.5 第 2 輪，老闆 2026-11-16「3轉能力必然比2轉職業高，以2轉職業為基準乘上倍數」）：
+    //   每一項＝配方中級職業「現行」倍率取最大 ×1.05，取到 0.01 四捨五入；沒有嚴格大於中級就再 +0.01（tests/v425_adv_jobs.test.js Q2-a 自動檢查）
+    //   70 號 6.4 原值：神之手 1.30／1.15／1.40／1.25、天地雷鳴士 1.10／1.70／1.05／1.10、勇者 1.30／1.70／1.40／1.25（中級改強前算的）
+    // 第 3 輪（老闆 2026-11-16 18:40：魔力「1.7」；低於非配方中級「拉高」，「各職業本身都有強弱之分，所以某些屬性弱於部分職業是合理的／但同時強項的屬性也要有突出」）：
+    //   強項＝max(全部 8 個中級該項最大×1.05, 配方中級最大×1.05, 70 號原值)，且嚴格大於全部 8 個中級；弱項＝max(配方中級最大×1.05, 70 號原值)
+    //   強項：神之手＝體力、攻擊、防禦（弱項魔力）；天地雷鳴士＝魔力（弱項體力、攻擊、防禦）；勇者＝四項都是強項（強弱項清單寫在 tests/v425_adv_jobs.test.js 的 STRONG）
+    god_hand: J('god_hand', {
+      name: "神之手", tier: "adv", recipe: { battle_master: 50, paladin: 50 },
+      mods: { hp: 1.58, mp: 1.16, atk: 1.47, def: 1.37 }, fav: ["數學", "英語", "社會"], bonus: 1.5,   // 強項 體／攻／防，弱項 魔
+      // 特性（v4.2.5 第 5 輪，老闆 2026-11-16「特性可以同時具備，效果可以略降，但同時擁有，且再附加3轉職業特性」）：戰鬥大師會心 1.7＋聖騎士被打 −20%＋自己的攻擊傷害 ×1.1
+      trait: { critMult: 1.7, dmgTaken: 0.8, power: 1.1 }, wf: ["sword", "axe", "fist", "staff"], af: ["heavy", "light", "robe"],
+      skills: [
+        S('gh_perfect', 15, "天衣無縫", "crit", { p: 2.2 }, 10, "完美的一擊，一定會心。", "strike", "#FFE082", 800),
+        S('gh_diamond', 30, "金剛護體", "heal_guard", { r: 0.3, m: 0.4, t: 4 }, 14, "身體變得像金剛石一樣硬。", "buff", "#FFD54F", 1000),
+        S('gh_mountain', 45, "破山神拳", "hit", { p: 4 }, 22, "一拳可以打破一座山。", "strike", "#FFB300", 1200),
+        S('gh_myriad', 60, "萬象神拳", "multi", { p: 0.9, n: 6 }, 32, "拳頭像星星一樣多，打六下。", "strike", "#FFF59D", 1800)
+      ],
+      desc: "頂尖榮譽職業：通過最難的立志小考才能成為。有戰鬥大師和聖騎士的特性，攻擊傷害再 ×1.1。拿手科目是數學、英語和社會。"
+    }),
+    thunder_sage: J('thunder_sage', {
+      name: "天地雷鳴士", tier: "adv", recipe: { sage: 50, superstar: 50 },
+      mods: { hp: 1.16, mp: 1.70, atk: 1.05, def: 1.10 }, fav: ["社會", "自然", "國語", "數學"], bonus: 1.5,   // 強項 魔，弱項 體／攻／防
+      // 特性（第 5 輪）：自己的攻擊技能 ×1.2、打贏回魔 8%＋賢者回復技能（1.15→1.1）＋超級巨星閃過（0.15→0.1）
+      trait: { skillPow: 1.2, mpRegen: 0.08, healPow: 1.1, evade: 0.1 }, wf: ["staff", "dagger", "perform"], af: ["robe", "light"],
+      skills: [
+        S('ts_storm', 15, "呼風喚雨", "hit_weak", { p: 2.2, m: 0.75, t: 2 }, 10, "叫來風和雨，怪物變弱。", "wind", "#80DEEA", 900),
+        S('ts_thunder', 30, "天雷召喚", "hit", { p: 3.2 }, 15, "天上打下一道大雷。", "thunder", "#FFF176", 1000),
+        S('ts_earth', 45, "大地之息", "heal_mp", { r: 1, mp: 0.15 }, 20, "大地的力量讓你全滿。", "heal", "#AED581", 1300),
+        S('ts_resonance', 60, "天地共鳴", "hit", { p: 5.5 }, 34, "天空和大地一起發出大聲響。", "thunder", "#E1F5FE", 2000)
+      ],
+      desc: "頂尖榮譽職業：通過最難的立志小考才能成為。有賢者和超級巨星的特性，攻擊技能再 ×1.2。拿手科目是社會、自然、國語和數學。"
+    }),
+    hero: J('hero', {
+      name: "勇者", tier: "adv", recipe: { battle_master: 50, sage: 50, ranger: 50, superstar: 50 },
+      mods: { hp: 1.58, mp: 1.70, atk: 1.47, def: 1.37 }, fav: ["國語", "英語", "數學", "自然", "社會"], bonus: 1.5,   // 四項都是強項；拿手加成 1.3→1.5（老闆 2026-11-16「勇者職業比較難，加乘可以比較多」）
+      // 特性（第 5 輪，老闆「勇者比較特別…可以同時擁有…特性+勇者本身特性」「勇者太強? 不！它就是要強」）：配方 4 個中級的特性都有（略降）＋自己的被打 −15%
+      //   戰鬥大師會心 1.7→1.6；賢者技能、回復 1.15→1.1；遊俠時間 1.2→1.1、掉寶 1.5→1.3、金幣 1.1；超級巨星閃過 0.15→0.1、回魔 0.05
+      trait: { critMult: 1.6, skillPow: 1.1, healPow: 1.1, time: 1.1, drop: 1.3, gold: 1.1, evade: 0.1, mpRegen: 0.05, dmgTaken: 0.85 }, wf: ["sword", "axe", "fist", "staff", "dagger", "whip", "perform"], af: ["heavy", "light", "robe"],
+      skills: [
+        S('he_courage', 15, "勇氣之劍", "hit", { p: 2.3 }, 10, "鼓起勇氣砍下去。", "slash", "#E3F2FD", 800),
+        // 希望之光數值不改：老闆 2026-11-16「屬恢復技能，勇者主功能偏攻擊，恢復技能較弱可以」
+        S('he_hope', 30, "希望之光", "heal_guard", { r: 0.8, m: 0.5, t: 2 }, 16, "希望的光讓你恢復精神。", "heal", "#FFFDE7", 1200),
+        S('he_mistbreak', 45, "破霧閃光斬", "hit_stun", { p: 4.2, t: 1 }, 24, "光之劍劈開大霧。", "slash", "#FFFFFF", 1300),
+        S('he_fivelights', 60, "五光勇者劍", "hit", { p: 6 }, 36, "五道知識之光集合在劍上！", "light", "#FFFFFF", 2200)
+      ],
+      desc: "頂尖榮譽職業：通過最難的立志小考才能成為。五科都是拿手科目（×1.5）。有戰鬥大師、賢者、遊俠、超級巨星的特性。另外，被打的傷害少 15%。"
+    })
+    // ── v4.2.5 高級職業：到這裡 ──
   };
 })();
 
@@ -287,6 +339,7 @@ window.JOB_RULES = {
     pet: { cheer: "D_TRIAL_CHEER", wrong: "D_TRIAL_WRONG", fail: "D_TRIAL_FAIL_PET", quit: "D_TRIAL_QUIT_PET" }
   },
   // v2.1：中級職業不放在 open_jobs，由 state.tierOpen.inter（到過鎮瀾宮）和配方決定（Character.isOpen、recipeStatus）
+  // v4.2.5：高級職業同樣不放在 open_jobs，由 state.tierOpen.adv（到過正統鹿耳門聖母廟）和配方決定
   open_jobs: ["novice", "swordsman", "fighter", "mage", "priest", "dancer", "archer", "bard", "sailor", "shepherd", "jester", "tamer", "merchant"],
   // 48 號 1.5（E3-A）：轉職地點（規則完全一樣）。npc＝和他說話就打開轉職；statue＝站在神像前按 A
   places: [
@@ -300,17 +353,23 @@ window.JOB_RULES = {
     { id: "temple_lk", map: "M19", kind: "npc", npc: "volunteer_lk", name: "鹿港天后宮" },
     { id: "temple_ct", map: "M20", kind: "npc", npc: "volunteer_ct", name: "朝天宮" },
     { id: "temple_wd", map: "M20", kind: "npc", npc: "volunteer_wd", name: "武德宮" },
-    // v3.0 南部（70 號 6.1）：志工主持（不畫神像、不點香、不擲筊、不收費）；opensTier: "adv"＝第一次和鹿耳門聖母廟志工說話就記「高級職業開放」（state.tierOpen.adv；高級職業 v3.2 才做）
+    // v3.0 南部（70 號 6.1）：志工主持（不畫神像、不點香、不擲筊、不收費）；opensTier: "adv"＝第一次和鹿耳門聖母廟志工說話就記「高級職業開放」（state.tierOpen.adv；v4.2.5 高級職業上線）
     { id: "temple_lem", map: "M22", kind: "npc", npc: "volunteer_lem", name: "正統鹿耳門聖母廟", opensTier: "adv" },
     { id: "temple_fgs", map: "M23", kind: "npc", npc: "volunteer_fgs", name: "佛光山" }
   ],
   growth: { hp: 8, mp: 2, atk: 2, def: 0.5 },   // 48 號 2.1：所有職業一樣
   floor_ratio: 0.5, transfer_step: 0.2,
-  master_level: { novice: 10, basic: 30, inter: 50 },   // 出師等級；見習出師才能考 1 轉；中級（v2.1）另看各職業的 recipe（配方職業全部 Lv30）
-  tier_mult: { novice: 0.9, basic: 1.0, inter: 1.25 },  // 26 號 5.2：技能職階係數
-  exp_mult: { novice: 1, basic: 1, inter: 1.25 },       // v2.1（26 號 2.4）升級需求的職階倍率（exp.js 的 TIER 同一組）
+  // 出師等級；見習出師才能考 1 轉；中級（v2.1）另看各職業的 recipe（配方職業全部 Lv30）；高級（v4.2.5）看 recipe（配方中級全部 Lv50）
+  //   adv: 60＝高級學會最後一個技能的等級（規格沒寫高級的出師等級；只影響「當過高級再轉別的職業」的 n，見變更說明）
+  master_level: { novice: 10, basic: 30, inter: 50, adv: 60 },
+  tier_mult: { novice: 0.9, basic: 1.0, inter: 1.25, adv: 1.5 },  // 26 號 5.2：技能職階係數
+  exp_mult: { novice: 1, basic: 1, inter: 1.25, adv: 1.5 },       // v2.1（26 號 2.4）升級需求的職階倍率（exp.js 的 TIER 同一組）
   // v2.1（26 號 3.4、69 號 5.2）2 轉立志小考：20 題（五科各 2 星 2 題＋3 星 2 題）、三上加三下、答對 18 題、時間 50%
-  trial_by_tier: { inter: { pass: 18, per_subject: { "2": 2, "3": 2 }, time_ratio: 0.5, term: ["三上", "三下"] } },
+  // v4.2.5（26 號 3.4、70 號 6.2）3 轉立志小考：20 題（五科各 3 星 2 題＋4 星 2 題）、全範圍（term: null）、答對 16 題、時間 25%（3 星 15 秒、4 星 22.5 秒）
+  trial_by_tier: { inter: { pass: 18, per_subject: { "2": 2, "3": 2 }, time_ratio: 0.5, term: ["三上", "三下"] },
+    adv: { pass: 16, per_subject: { "3": 2, "4": 2 }, time_ratio: 0.25, term: null } },
+  // v4.2.5（26 號 3.3【老闆定案】）高級職業第一次轉只在南部 2 間；第 5 輪（老闆 2026-11-16「可以指可在任何宮廟換」）：換回以前當過的高級職業，任何宮廟都可以（Character.placeAllows 傳 state）
+  adv_places: ["temple_lem", "temple_fgs"],
   skill_slots: 4,
   trial: { pass: 16, per_subject: { 1: 2, 2: 2 }, time_ratio: 0.75, term: "三上", min_minutes_left: 15 },
   change_map: "M10", change_npc: "guild", unlock_level: 10, change_cost: 0,

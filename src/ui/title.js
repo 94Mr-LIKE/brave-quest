@@ -35,7 +35,9 @@
       screen.appendChild(h('h1', { text: J.CONFIG.GAME_TITLE }));
       screen.appendChild(h('div.sub', { text: '國小三年級・學習冒險' }));
       if (o.counterEl) screen.appendChild(o.counterEl);   // v1.0.1「已有 N 位冒險者加入」（game.js 讀到數字才顯示；在副標題下面的天空，不擋角色和按鈕）
+      if (o.tiersEl) screen.appendChild(o.tiersEl);   // v4.2.5 AC「一轉 N 位 · 二轉 N 位」（game.js 讀到 tiers 才顯示）
       screen.appendChild(heroes);
+      if (J.JobTree) J.JobTree.mountButton(screen);   // v4.2.5 AC 右上角「職業樹 ›」（ui/jobtree.js）
       // v0.8 電腦版瀏覽器被縮放（同網域的其他網站縮小過）：提示一次 Ctrl＋0；關掉後這次開啟不再出現；平板不提示
       var z = J.Zoom ? J.Zoom.current() : { show: false };
       if (z.show && !window.__jqZoomHintClosed) {

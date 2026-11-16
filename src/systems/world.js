@@ -24,7 +24,7 @@
   // 初級效果加上 v2.1 中級的五種效果。
   var EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet', 'random', 'heal', 'guard', 'revive', 'stun', 'weaken', 'atk_up', 'charge', 'time_up', 'assist', 'heal_guard', 'shield', 'hit_heal', 'heal_mp'];
   var DAMAGE_EFFECTS = ['hit', 'multi', 'crit', 'hit_weak', 'hit_stun', 'hit_gold', 'steal', 'pet', 'hit_heal'];
-  var TIER_MULT = { novice: 0.9, basic: 1.0, inter: 1.25 };
+  var TIER_MULT = { novice: 0.9, basic: 1.0, inter: 1.25, adv: 1.5 };   // v4.2.5：高級 1.5（26 號 5.2）
 
   // 戰鬥背景別名：maps.js 的 battle_bg → 實際的背景圖
   var BG_ALIASES = { grass: 'grass', field: 'grass', forest: 'forest', swamp: 'swamp', cave: 'cave', town: 'town', castle: 'castle', rock: 'rock', harbor: 'harbor', castle_top: 'castle_top', volcano: 'volcano', badlands: 'badlands', rock_hill: 'rock' };
@@ -141,8 +141,9 @@
   /** JOB_RULES（48 號 F1）：沒寫的欄位用規格的預設值 */
   var DEFAULT_RULES = {
     open_jobs: ['novice'], places: [], growth: { hp: 8, mp: 2, atk: 2, def: 0.5 }, floor_ratio: 0.5, transfer_step: 0.2,
-    master_level: { novice: 10, basic: 30, inter: 50 }, tier_mult: TIER_MULT, skill_slots: 4,
-    exp_mult: { novice: 1, basic: 1, inter: 1.25 }, trial_by_tier: { inter: { pass: 18, per_subject: { 2: 2, 3: 2 }, time_ratio: 0.5, term: ['三上', '三下'] } },
+    master_level: { novice: 10, basic: 30, inter: 50, adv: 60 }, tier_mult: TIER_MULT, skill_slots: 4,
+    exp_mult: { novice: 1, basic: 1, inter: 1.25, adv: 1.5 }, trial_by_tier: { inter: { pass: 18, per_subject: { 2: 2, 3: 2 }, time_ratio: 0.5, term: ['三上', '三下'] },
+      adv: { pass: 16, per_subject: { 3: 2, 4: 2 }, time_ratio: 0.25, term: null } }, adv_places: ['temple_lem', 'temple_fgs'],
     trial: { pass: 16, per_subject: { 1: 2, 2: 2 }, time_ratio: 0.75, term: '三上', min_minutes_left: 15 },
     change_npc: 'guild', unlock_level: 10
   };

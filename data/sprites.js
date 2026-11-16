@@ -1800,6 +1800,78 @@ window.SPRITES = {
    "up"
   ]
  },
+ "hero_god_hand": {
+  "file": "assets/chars/hero_god_hand.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_god_hand": {
+  "file": "assets/chars/heroM_god_hand.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_thunder_sage": {
+  "file": "assets/chars/hero_thunder_sage.png",
+  "type": "walk",
+  "frameW": 38,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_thunder_sage": {
+  "file": "assets/chars/heroM_thunder_sage.png",
+  "type": "walk",
+  "frameW": 38,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "hero_hero": {
+  "file": "assets/chars/hero_hero.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
+ "heroM_hero": {
+  "file": "assets/chars/heroM_hero.png",
+  "type": "walk",
+  "frameW": 36,
+  "frameH": 50,
+  "rows": [
+   "down",
+   "left",
+   "right",
+   "up"
+  ]
+ },
  "mon_al_cypress": {
   "file": "assets/monsters/mon_al_cypress.png",
   "type": "single",

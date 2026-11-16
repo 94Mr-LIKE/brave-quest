@@ -18,8 +18,12 @@
   /** F0–F11（大結局腳本 2.1）；勇者時 F7 換成 F7H（5.7 節：大結局版沒有 H0） */
   var STEPS = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11'];
 
-  // 高級職業還沒進 jobs.js（70 號 6.4 的建議 id）：證書名牌先用大結局腳本 5.4 表的職業名
-  var ADV_NAMES = { god_hand: '神之手', thunder_sage: '天地雷鳴士', hero: '勇者' };
+  // v4.2.5：高級職業已經進 jobs.js，證書名牌的職業名一律從 jobs.js 讀（呼叫的人傳 G.data.jobs；沒傳就看瀏覽器載入的 window.JOBS）。
+  //   原本的暫代職業名表（god_hand 神之手、thunder_sage 天地雷鳴士、hero 勇者）拿掉，名字和 jobs.js 一樣，行為不變
+  function jobName(job, jobs) {
+    var all = jobs || (typeof window !== 'undefined' && window.JOBS) || {};
+    return (all[job] && all[job].name) || job;
+  }
   function obj(x) { return !!x && typeof x === 'object' && !Array.isArray(x); }
   /** 證書資料：呼叫的人傳的 A ＞ Ending.awards（node 測試用）＞ window.ENDING_AWARDS（docs/data/ending_awards.js） */
   function awardsOf(A) { return A || Ending.awards || (typeof window !== 'undefined' && window.ENDING_AWARDS) || { jobs: {}, order: [], metal_name: {}, tier_name: {} }; }
@@ -37,7 +41,7 @@
     A = awardsOf(A);
     var j = (A.jobs || {})[job];
     if (!j) { if (typeof console !== 'undefined') console.warn('[證書] ENDING_AWARDS 沒有職業 ' + job + '，先用銅'); j = { tier: 'basic', metal: 'copper', praise: '', medal: ['item_wood_sword'] }; }
-    var name = (jobs && jobs[job] && jobs[job].name) || ADV_NAMES[job] || job;
+    var name = jobName(job, jobs);
     var tierName = (A.tier_name || {})[j.tier] || '';
     var metalName = (A.metal_name || {})[j.metal] || j.metal;
     var fill = function (tpl, size) { return String(tpl || '').replace('{id}', job).replace('{metal}', j.metal).replace('{size}', size || ''); };

@@ -44,6 +44,8 @@
     G.provider = new J.SaveProvider.LocalSaveProvider(storage);
     // v1.0.2（老闆「舊玩家也要算進去」）：這台裝置已經有存檔、還沒送過 +1 → 啟動時送一次（非同步，不擋標題畫面；失敗不重送）
     if (J.Counter) setTimeout(function () { try { J.Counter.reportExisting(storage).then(function (r) { G.counterBoot = r; }); } catch (e) { G.counterBoot = 'skipped'; } }, 0);
+    // v4.2.5 AC 舊玩家補報轉數：這台裝置所有存檔裡最高的轉數 r → 1..r 沒送過的補送（旗標 bq_tier1～3；非同步、失敗不重送）
+    if (J.Counter) setTimeout(function () { try { J.Counter.reportSavedTiers(storage, G.data.jobs).then(function (r) { G.tierBoot = r; }); } catch (e) { G.tierBoot = 'skipped'; } }, 0);
     // 請瀏覽器把本站資料標成「持久保存」，降低存檔被自動清除的機會（不支援或被拒絕都不影響遊戲）
     try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (e) { /* 忽略 */ }
     J.UI.init();
@@ -73,11 +75,22 @@
     J.HUD.show(false);
     // v1.0.1 首頁「已有 N 位冒險者加入」：讀到數字才顯示（3 秒逾時、500、離線都不顯示）
     var counterEl = J.UI.h('p.title-count', { hidden: true, 'aria-live': 'polite' });
-    if (J.Counter) J.Counter.fetchCount().then(function (n) { G.counterShown = n; if (n !== null) { counterEl.textContent = J.Counter.label(n); counterEl.hidden = false; } });
+    // v4.2.5 AC 下面一條「一轉 N 位 · 二轉 N 位」（只放 Counter.TIER_SHOWN 的轉數）：同一次 GET /count；沒有 tiers、讀不到、逾時 → 整條不顯示，不影響總人數
+    var tiersEl = J.UI.h('p.title-tiers', { hidden: true, 'aria-live': 'polite' });
+    // 第二輪 S1：瀏覽器若拿到舊的 counter.js（快取，沒有 fetchStats／tierParts）→ 退回 fetchCount、不顯示膠囊，首頁照常
+    if (J.Counter) (J.Counter.fetchStats ? J.Counter.fetchStats() : J.Counter.fetchCount().then(function (c) { return { count: c, tiers: null }; })).then(function (st) {
+      var n = st.count, parts = n !== null && J.Counter.tierParts ? J.Counter.tierParts(st.tiers) : null;   // 第二輪 S3：總人數有顯示才放膠囊
+      G.counterShown = n; G.tiersShown = st.tiers;
+      if (n !== null) { counterEl.textContent = J.Counter.label(n); counterEl.hidden = false; }
+      if (parts) {   // 分隔點只給眼睛看；讀屏改讀逗號（兩段之間停一下）
+        parts.forEach(function (t, i) { if (i) { tiersEl.appendChild(J.UI.h('span', { 'aria-hidden': 'true', text: ' · ' })); tiersEl.appendChild(J.UI.h('span.sr-only', { text: '，' })); } tiersEl.appendChild(J.UI.h('span', { text: t })); });
+        tiersEl.hidden = false;
+      }
+    });
     Promise.all([G.provider.load(SLOT), G.provider.loadError(SLOT)]).then(function (r) {
       var s = r[0], err = r[1];
       var titleHandle = J.Title.show({
-        counterEl: counterEl,
+        counterEl: counterEl, tiersEl: tiersEl,
         summary: s ? { name: s.player.name, level: s.player.level, job: s.player.job } : null,
         loadError: s ? '' : err, migrated: !!(s && s.migratedFrom),
         onContinue: function () { G.state = s; G.startWorld(false); },
@@ -718,7 +731,7 @@
     var opens = plc.opensTier && !(G.state.tierOpen && G.state.tierOpen[plc.opensTier]) ? plc.opensTier : null;
     if (opens) { G.state.tierOpen = G.state.tierOpen || {}; G.state.tierOpen[opens] = true; G.tierOpenLog = (G.tierOpenLog || []).concat([opens]); G.save(); }
     return (first || opens ? G.say(TD.intro_place || npc.dialog, []) : Promise.resolve()).then(function () {
-      if (opens === 'adv') return G.say('D_ADV_OPEN', [{ who: 'narrator', text: '高級職業即將登場喔！' }]);   // v3.0（70 號 2.7）鹿耳門聖母廟
+      if (opens === 'adv') return G.say('D_ADV_OPEN', [{ who: 'narrator', text: '你到過鹿耳門聖母廟了！高級職業開放了！' }, { who: 'narrator', text: '把需要的中級職業都練到 50 級，就可以在這裡和佛光山挑戰。' }]);   // v3.0（70 號 2.7）鹿耳門聖母廟；v4.2.5 高級職業上線
       if (opens) return G.say('D_INTER_OPEN', [{ who: 'narrator', text: '從現在起，在任何一間宮廟都可以挑戰中級職業了！' }]);
     }).then(function () { return G.jobPlace(place); });
   };
@@ -734,11 +747,27 @@
     return r;
   };
 
+  /**
+   * v4.2.5 高級職業（3 轉）的台詞：trial_dialogs 裡有「○○3」就用；沒有就退到 2 轉的「○○2」，再沒有照 1 轉的（和 G.trial2 同一種退法）。
+   * 開場 intro 只認 intro3（2 轉開場寫的是「答對 18 題」，不能借）；沒有時是 null（jobPick 改說華語備用句）
+   */
+  G.trial3 = function (o) {
+    var r = {};
+    Object.keys(o || {}).forEach(function (k) { if (!/[23]$/.test(k)) r[k] = o[k + '3'] || o[k + '2'] || o[k]; });
+    r.intro = (o || {}).intro3 || null;
+    return r;
+  };
+
   /** 轉職清單上按了某個職業 */
   G.jobPick = function (place, jobId, kind) {
     var st = G.state, D = G.data, R = D.jobRules || {}, TD = (R.trial_dialogs || {})[place] || {}, PET = (R.trial_dialogs || {}).pet || {};
     var who = place === 'guild' ? 'guild' : place === 'temple' ? 'temple_keeper' : G.placeWho(place), name = D.jobs[jobId].name;
+    var tier = D.jobs[jobId].tier;
+    // v4.2.5（26 號 3.3）高級職業第一次只在南部 2 間轉：別的地點不考、不轉（清單上按鈕已經是灰的，這裡再擋一次）
+    //   第 5 輪（老闆「可在任何宮廟換」）：只有 back（以前當過＋通過過小考，placeAllows 傳 state 才會檢查）放行；change、trial 照舊擋
+    if (J.Character.placeAllows && !J.Character.placeAllows(D, place, jobId, kind === 'back' ? st : null)) return G.say(null, [{ who: who, text: '高級職業第一次要到鹿耳門聖母廟或佛光山才能轉喔。當過以後，任何宮廟都能換回去。' }]);
     if (D.jobs[jobId].tier === 'inter') { TD = G.trial2(TD); PET = G.trial2(PET); }   // v2.1：2 轉台詞（有就用，沒有照 1 轉；開場另有備用句）
+    if (tier === 'adv') { TD = G.trial3(TD); PET = G.trial3(PET); }     // v4.2.5：3 轉台詞（有就用，沒有退 2 轉、再退 1 轉；開場另有備用句）
     if (kind === 'back') return G.say(TD.back, [{ who: who, text: '以前當過「' + name + '」，免費換回去！' }]).then(function () { return G.doJobChange(place, jobId); });
     if (kind === 'change') return G.say(TD.lv1, [{ who: who, text: '換了職業，等級會從 1 開始，能力有保底，不用擔心。' }]).then(function () { return G.doJobChange(place, jobId); });
     var c = J.JobTrial.canStart(st, jobId, D, Date.now());
@@ -750,11 +779,18 @@
     // v2.1（69 號 5.2）中級職業＝2 轉：20 題答對 18 題、時間 50%、2–3 星、三上加三下。宮廟的開場台詞寫的是 1 轉的「16 題」：
     //   劇本組的 2 轉開場（trial_dialogs 的 intro2，G.trial2 已經換進 TD.intro）有就用；沒有（TD.intro＝null）才說下面的備用句（只有華語）
     var TR2 = D.jobs[jobId].tier === 'inter' ? J.JobTrial.rules(D, jobId) : null;
+    //   v4.2.5 高級＝3 轉：20 題答對 16 題、時間 25%、3–4 星、全範圍。劇本組還沒寫 3 轉開場（intro3）：先說下面的華語備用句（待老闆試聽清單見變更說明）
+    var TR3 = tier === 'adv' ? J.JobTrial.rules(D, jobId) : null;
     //   備用句＝劇本組 D_TRIAL2_INTRO_* 的華語（2026-11-01 dialogs_trial2.js；台詞 id 缺了說的話也一樣）
+    var say3 = TR3 ? function () {
+      return G.say(TD.intro, [{ who: who, text: '想當高級職業，要通過最難的立志小考喔。' }, { who: who, text: '總共 20 題，五科每科 4 題，答對 ' + TR3.pass + ' 題才過關。' },
+        { who: who, text: '題目最難，每題的時間也最短喔。' }, { who: who, text: '題目會念給你聽，念完才開始算時間。' }, { who: who, text: '提示和卡片不能用；中途離開也算考一次。' },
+        { who: 'pet', text: '題目有 3 顆星和 4 顆星，三上、三下都有。沒過也沒關係，一起加油！' }]);
+    } : null;
     var intro = TR2 ? G.say(TD.intro, [{ who: who, text: '想當中級職業，也要先考立志小考喔。' }, { who: who, text: '總共 20 題，五科每科 4 題，答對 ' + TR2.pass + ' 題才過關。' },
       { who: who, text: '題目比較難，每題的時間也比較短喔。' }, { who: who, text: '題目會念給你聽，念完才開始算時間。' }, { who: who, text: '提示和卡片不能用；中途離開也算考一次。' },
       { who: 'pet', text: '題目有 2 顆星和 3 顆星，三上、三下都有。一起加油！' }])
-      : G.say(TD.intro, [{ who: who, text: '立志小考有 20 題，答對 16 題就通過。' }]);
+      : say3 ? say3() : G.say(TD.intro, [{ who: who, text: '立志小考有 20 題，答對 16 題就通過。' }]);
     return intro.then(function () {
       return J.TrialUI.run(G, jobId, place);
     }).then(function (res) {
@@ -773,8 +809,11 @@
   /** 轉職：換職業（自動換裝）→ 換主角圖 → 光芒 → 慈護宮的祝福台詞；回傳 Promise */
   G.doJobChange = function (place, jobId) {
     var st = G.state, D = G.data, R = D.jobRules || {};
+    if (J.Character.placeAllows && !J.Character.placeAllows(D, place, jobId, st)) return Promise.resolve({ ok: false, reason: 'place' });   // v4.2.5 高級第一次只在南部 2 間；第 5 輪：當過＋通過過小考＝任何宮廟都能換回去
     var r = J.Character.changeJob(st, jobId, D);
     if (!r.ok) return Promise.resolve(r);
+    // v4.2.5 AC 轉職人數：新職業的轉數 r → 1..r 沒送過的都送（非同步、不擋轉職；localStorage 不能用就不送）
+    if (J.Counter) { try { J.Counter.reportJobChange(window.localStorage, jobId, D.jobs).then(function (x) { G.tierReport = x; }); } catch (e) { G.tierReport = 'skipped'; } }
     J.Audio.play('levelup');
     J.UI.toast('轉職成「' + D.jobs[jobId].name + '」了！' + (r.back ? '（等級 ' + st.player.level + '）' : '等級從 1 開始。'), 4000);
     if (r.gear && r.gear.on.length) setTimeout(function () { J.UI.toast('換上了' + r.gear.on.map(function (id) { return (D.items[id] || {}).name || id; }).join('、') + '！', 3500); }, 600);
@@ -1560,7 +1599,7 @@
       // v0.9.6（45 號 F5）答題時間「關閉」時，弓箭手的特色改成：每場戰鬥可以閃過一次答錯後的攻擊
       if (!(b.fx && b.fx.shield > 0) && J.Battle.dodgeOnWrong(b, st.settings.answerTime, s.timeMult)) {
         ctx.dodged = (ctx.dodged || 0) + 1;   // 測試用
-        G.bmsg('沒打中……但是弓箭手身手敏捷，閃過了這次攻擊！（每場戰鬥一次）');
+        G.bmsg('沒打中……但是' + s.jobName + '身手敏捷，閃過了這次攻擊！（每場戰鬥一次）');   // v4.2.5 第 5 輪：勇者（時間特性）也會用到，改說職業名
         setTimeout(function () { G.bcommands(true); }, G.bwait(700));
         return;
       }
@@ -1646,7 +1685,15 @@
     switch (use.eff) {
       case 'heal': return n + '體力回復了 ' + use.heal + ' 點。';
       case 'heal_mp': return n + '回復體力和魔力了！';
-      case 'heal_guard': return n + '體力全滿！接下來三次被打都減半。';
+      case 'heal_guard': {   // v4.2.5 第 2 輪：照 arg（全能祈福 r1／3 次／減半＝原句；希望之光 80%／2 次；金剛護體 30%／4 次／四成）
+        // 第 4 輪（審查 L2）：防護會疊加（battle.js guard 取最多次數、最小倍率），次數與倍率讀戰鬥裡實際生效的值；沒有戰鬥狀態才照 arg
+        //   （審查 L1）m＝0 說「都不會受傷」；不是整成的倍率說「傷害變成 X 倍」
+        var CN = ['零', '一', '兩', '三', '四', '五', '六', '七', '八', '九', '十'], fx = (G.battleCtx.b && G.battleCtx.b.fx) || {};
+        var gt = fx.guard > 0 ? fx.guard : (a.t || 3), gm = fx.guard > 0 ? fx.guardM : (a.m === undefined ? 0.5 : a.m), g10 = Math.round(gm * 10);
+        return n + (a.r === undefined || a.r >= 1 ? '體力全滿！' : '體力回復了 ' + use.heal + ' 點。') +
+          '接下來' + (CN[gt] || gt) + '次被打' + (gm === 0.5 ? '都減半。' : gm === 0 ? '都不會受傷。' :
+          Math.abs(gm * 10 - g10) < 1e-9 && g10 >= 1 && g10 <= 9 ? '，傷害都只剩' + CN[g10] + '成。' : '，傷害變成 ' + gm + ' 倍。');
+      }
       case 'shield': return n + '接下來答錯兩次，都不會受傷。';
       case 'assist': return n + '下一題會幫你刪掉一個錯選項。有計時的題目，時間也會變長！';
       case 'revive': return n + '這場累倒時，會馬上站起來。';

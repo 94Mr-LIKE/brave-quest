@@ -7,6 +7,7 @@
  * - 時間：標準時間 × 75%（1 星 22.5 秒、2 星 30 秒）；不受家長的「答題時間」設定影響。語音讀題、英語朗讀時不計時（畫面負責）。
  * - 答對 16 題以上及格；沒通過要隔天（台灣時間跨日，Daily.dateKey）才能再考，整場重考。
  * - v2.1 中級二轉：配方職業全部 Lv30 且職階已開放；同樣 20 題，改為每科 2 星 2 題＋3 星 2 題、三上加三下、18 題及格、時間 50%（2 星 20 秒、3 星 30 秒）。
+ * - v4.2.5 高級三轉：配方中級職業全部 Lv50 且 tierOpen.adv；同樣 20 題，每科 3 星 2 題＋4 星 2 題、全範圍、16 題及格、時間 25%（3 星 15 秒、4 星 22.5 秒）。
  * - 開始時先存 inProgress；中途關掉＝考過一次、沒通過（讀檔時 recover）。
  * - 今天剩不到 15 分鐘不能開始；考試中不會被每日上限打斷（畫面負責）。
  * - 獎勵：稱號「立志的＋職業名」＋護身符「職業名＋的護身符」（珍貴道具，不能賣），不加能力、不給經驗值和金幣；記進家長報表。
@@ -25,10 +26,11 @@
   var DEFAULT = { pass: 16, per_subject: { 1: 2, 2: 2 }, time_ratio: 0.75, term: '三上', min_minutes_left: 15, cheer_every: 5 };
   var LOG_MAX = 30;
 
-  /** 傳入目標職業時，二轉只覆寫及格題數與計時比例，其餘沿用原流程。 */
+  /** 傳入目標職業時，二轉、三轉只覆寫及格題數、星等、範圍與計時比例，其餘沿用原流程。 */
   function rules(data, jobId) {
     var jr = (data && data.jobRules) || {}, job = data && data.jobs && data.jobs[jobId];
-    var tier = job && job.tier, extra = tier === 'inter' ? { pass: 18, per_subject: { 2: 2, 3: 2 }, time_ratio: 0.5, term: ['三上', '三下'] } : {};   // v2.1（26 號 3.4）
+    var tier = job && job.tier, extra = tier === 'inter' ? { pass: 18, per_subject: { 2: 2, 3: 2 }, time_ratio: 0.5, term: ['三上', '三下'] }   // v2.1（26 號 3.4）
+      : tier === 'adv' ? { pass: 16, per_subject: { 3: 2, 4: 2 }, time_ratio: 0.25, term: null } : {};   // v4.2.5 3 轉（26 號 3.4）：3 星＋4 星、全範圍
     return Object.assign({}, DEFAULT, jr.trial || {}, extra, (jr.trial_by_tier && jr.trial_by_tier[tier]) || {});
   }
   function total(R) { var n = 0; Object.keys(R.per_subject).forEach(function (k) { n += Number(R.per_subject[k]) || 0; }); return n * SUBJECTS.length; }
@@ -60,8 +62,13 @@
     var r = rec(state, jobId);
     if (r && r.passedAt) return { ok: false, reason: 'passed' };
     var need = (JR.master_level && JR.master_level.novice) || JR.unlock_level || 10;
-    if (data.jobs[jobId].tier !== 'inter' && noviceLevel(state) < need) return { ok: false, reason: 'level', need: need };
+    if (data.jobs[jobId].tier !== 'inter' && data.jobs[jobId].tier !== 'adv' && noviceLevel(state) < need) return { ok: false, reason: 'level', need: need };
     if (r && r.lastFailDate && r.lastFailDate === Daily.dateKey(now)) return { ok: false, reason: 'today' };
+    // v4.2.5 第 5 輪（審查 S1，老闆「皆按照建議」）：3 轉一天只能考一次——任何一個高級職業今天沒通過（含中途離開），今天所有高級職業都不能再考；1 轉、2 轉照舊各記各的
+    if (data.jobs[jobId].tier === 'adv' && Object.keys(state.trial || {}).some(function (id) {
+      var x = state.trial[id];
+      return data.jobs[id] && data.jobs[id].tier === 'adv' && x && x.lastFailDate && x.lastFailDate === Daily.dateKey(now);
+    })) return { ok: false, reason: 'today' };
     var left = state.playtime ? Playtime.remainingMin(state.playtime, state.settings, now) : Infinity;
     if (left < R.min_minutes_left) return { ok: false, reason: 'time', minutes: left };
     return { ok: true };
@@ -139,8 +146,8 @@
   function finish(state, jobId, answers, now, data) {
     var R = rules(data, jobId), r = ensure(state, jobId);
     var correct = (answers || []).filter(function (a) { return a && a.correct; }).length;
-    var inter = data && data.jobs && data.jobs[jobId] && data.jobs[jobId].tier === 'inter';
-    var pass = correct >= R.pass && (!inter || (answers || []).length === total(R));
+    var tierJ = data && data.jobs && data.jobs[jobId] && data.jobs[jobId].tier, needFull = tierJ === 'inter' || tierJ === 'adv';   // v4.2.5：3 轉一樣要考滿 20 題
+    var pass = correct >= R.pass && (!needFull || (answers || []).length === total(R));
     var units = [];
     (answers || []).forEach(function (a) { if (a && !a.correct) { var u = (a.subject ? a.subject + '：' : '') + (a.term ? a.term + ' ' : '') + (a.unit || '（沒有單元名稱）');   /* v2.2.1（v21 L5）：寫出三上／三下 */ if (units.indexOf(u) < 0) units.push(u); } });
     r.inProgress = null;

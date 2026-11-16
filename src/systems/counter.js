@@ -94,7 +94,149 @@
   /** 首頁的文字 */
   function label(n) { return '已有 ' + n + ' 位冒險者加入'; }
 
+  /*
+   * v4.2.5 AC（老闆 2026-11-16）：轉職人數。後端 GET /count 多回 "tiers": {"1": a, "2": b, "3": c}；POST /tier/1|2|3 各 +1。
+   * - 每台裝置每一轉只送一次（旗標 bq_tier1～3，和 bq_counted 完全分開）；比照 reportNew：先記旗標再送、失敗不重送、不擋遊戲、不印主控台。
+   * - 首頁只顯示 TIER_SHOWN 裡的轉數；之後要顯示 3 轉，只改 TIER_SHOWN。
+   * 上面的 bq_counted、/new、reportNew、reportExisting、label() 是老闆的決定 1，一行都不改（tests/v425_tiers_tree.test.js「人數 T9」釘住）。
+   */
+  var TIER_RANK = { basic: 1, inter: 2, adv: 3 };
+  var TIER_SHOWN = [1, 2];
+  var TIER_MAX = 3;
+  var TIER_NAMES = { 1: '一轉', 2: '二轉', 3: '三轉' };
+
+  function tierFlag(rank) { return 'bq_tier' + rank; }
+
+  /** 職業的轉數：jobs.js 的 tier → 1／2／3；見習、查不到 → 0 */
+  function tierOf(jobs, jobId) {
+    var j = jobs && Object.prototype.hasOwnProperty.call(jobs, jobId) ? jobs[jobId] : null;
+    return j && Object.prototype.hasOwnProperty.call(TIER_RANK, j.tier) ? TIER_RANK[j.tier] : 0;
+  }
+
+  /** 這一轉還沒送過就送一次 +1。回傳 Promise<'sent'|'already'|'skipped'>（做法同 reportNew，旗標不同） */
+  function reportTier(storage, rank, opts) {
+    opts = opts || {};
+    if (typeof rank !== 'number' || rank < 1 || rank > TIER_MAX || Math.floor(rank) !== rank) return Promise.resolve('skipped');
+    var key = tierFlag(rank);
+    try { if (storage.getItem(key)) return Promise.resolve('already'); } catch (e) { return Promise.resolve('skipped'); }
+    if (!opts.fetch && !canFetch()) return Promise.resolve('skipped');
+    try { storage.setItem(key, '1'); } catch (e) { return Promise.resolve('skipped'); }   // 記不住旗標就不送（免得每次都 +1）
+    return request('/tier/' + rank, { method: 'POST', keepalive: true }, opts.timeoutMs, opts.fetch).then(function () { return 'sent'; });
+  }
+
+  /** 1..r 之中還沒送過的都送。回傳 Promise<{1:'sent'|'already'|'skipped', …}>（r＝0 → {}） */
+  function reportUpTo(storage, r, opts) {
+    var ranks = [];
+    for (var i = 1; i <= Math.min(r, TIER_MAX); i++) ranks.push(i);
+    return Promise.all(ranks.map(function (k) { return reportTier(storage, k, opts); })).then(function (res) {
+      var out = {};
+      ranks.forEach(function (k, i) { out[k] = res[i]; });
+      return out;
+    });
+  }
+
+  /** 轉職成功（Character.changeJob 回 ok）之後呼叫：新職業的轉數＝r → 1..r 沒送過的都送（3 轉也照常送，首頁不顯示） */
+  function reportJobChange(storage, jobId, jobs, opts) {
+    return reportUpTo(storage, tierOf(jobs, jobId), opts);
+  }
+
+  /** 存檔字串 → 存檔物件。預設用專案的 Save.validateState＋Save.migrate（和讀檔同一套升級，升級後 player.jobs 一定有目前職業）；不合格回 null */
+  function parseSave(raw) {
+    var Save = null;
+    try { Save = typeof window !== 'undefined' && window.JQ && window.JQ.Save ? window.JQ.Save : (typeof require === 'function' ? require('./save.js') : null); } catch (e) { Save = null; }
+    var obj = JSON.parse(raw);
+    if (!Save) return obj;
+    if (Save.validateState(obj)) return null;
+    return Save.migrate(obj);
+  }
+
+  /**
+   * 一份存檔裡最高的轉數：player.jobs 中 lv > 0 的職業（目前職業不在 jobs 裡也算）；沒有 player.jobs → 0
+   * 第二輪審查 L1：實際上線走的預設解析（parseSave）會先經過 Save.migrate，裡面的 repairJobs 會把 lv: 0 補成 1，
+   * 所以「lv > 0」只在不經過 migrate 的路徑（測試傳 opts.parse＝JSON.parse）才會擋掉東西。遊戲本身不會寫出 lv 0 的紀錄
+   * （changeJob 換到新職業一律從 Lv1 開始），實際影響很小；這裡保留條件只當作防呆。
+   */
+  function saveTier(s, jobs) {
+    var p = s && typeof s === 'object' ? s.player : null;
+    if (!p || typeof p !== 'object' || !p.jobs || typeof p.jobs !== 'object' || Array.isArray(p.jobs)) return 0;
+    var best = 0;
+    Object.keys(p.jobs).forEach(function (id) {
+      var r = p.jobs[id];
+      if (r && typeof r.lv === 'number' && r.lv > 0) best = Math.max(best, tierOf(jobs, id));
+    });
+    if (typeof p.job === 'string' && typeof p.level === 'number' && p.level > 0) best = Math.max(best, tierOf(jobs, p.job));
+    return best;
+  }
+
+  /** 這台裝置所有存檔（bq_save、bq_save:<欄位>；不含 :__probe、bq_save_v2_backup 等備份）裡最高的轉數；讀不到、壞檔都略過 */
+  function maxSavedTier(storage, jobs, parse) {
+    var keys = [], best = 0;
+    try {
+      if (typeof storage.length === 'number' && typeof storage.key === 'function') { for (var i = 0; i < storage.length; i++) keys.push(storage.key(i)); }
+      else if (storage._m) keys = Object.keys(storage._m);
+      if (!keys.length && storage.getItem('bq_save') !== null) keys.push('bq_save');
+    } catch (e) { return 0; }
+    keys.forEach(function (k) {
+      k = String(k);
+      if (k !== 'bq_save' && k.indexOf('bq_save:') !== 0) return;
+      if (/:__probe$/.test(k)) return;
+      try {
+        var raw = storage.getItem(k);
+        if (!raw) return;
+        best = Math.max(best, saveTier((parse || parseSave)(raw), jobs));
+      } catch (e) { /* 壞檔略過 */ }
+    });
+    return best;
+  }
+
+  /** 遊戲啟動時（reportExisting 之後）呼叫：舊玩家補報。存檔裡最高轉數＝r → 1..r 沒送過的補送。opts.parse＝測試換解析函式 */
+  function reportSavedTiers(storage, jobs, opts) {
+    opts = opts || {};
+    var r = 0;
+    try { r = storage ? maxSavedTier(storage, jobs, opts.parse) : 0; } catch (e) { r = 0; }
+    return reportUpTo(storage, r, opts);
+  }
+
+  /** 合理的轉職人數：tiers 是物件，1～3 都是 0 以上的整數 → {1:a, 2:b, 3:c}；否則 null（後端還沒更新、格式不對） */
+  function validTiers(j) {
+    var t = j && j.tiers;
+    if (!t || typeof t !== 'object' || Array.isArray(t)) return null;
+    var out = {};
+    for (var k = 1; k <= TIER_MAX; k++) {
+      var n = validCount({ count: t[k] });
+      if (n === null) return null;
+      out[k] = n;
+    }
+    return out;
+  }
+
+  /** 首頁的人數＋轉職人數（同一次 GET /count）。回傳 Promise<{count: number|null, tiers: {1,2,3}|null}> */
+  function fetchStats(opts) {
+    opts = opts || {};
+    if (!opts.fetch && !canFetch()) return Promise.resolve({ count: null, tiers: null });
+    return request('/count', { method: 'GET' }, opts.timeoutMs, opts.fetch).then(function (j) {
+      var n = validCount(j);
+      return { count: n, tiers: n === null ? null : validTiers(j) };   // 第二輪 S3：總人數讀不到就不給 tiers（首頁不會只剩膠囊）
+    });
+  }
+
+  /** 首頁膠囊的每一段：只放 TIER_SHOWN 裡的轉數，例如 ['一轉 45 位', '二轉 12 位']；缺數字 → null（整條隱藏）。數字格式同 label() */
+  function tierParts(tiers) {
+    if (!tiers || typeof tiers !== 'object' || Array.isArray(tiers)) return null;
+    var out = [];
+    for (var i = 0; i < TIER_SHOWN.length; i++) {
+      var k = TIER_SHOWN[i], n = validCount({ count: tiers[k] });
+      if (n === null || !TIER_NAMES[k]) return null;
+      out.push(TIER_NAMES[k] + ' ' + n + ' 位');
+    }
+    return out.length ? out : null;
+  }
+  function tierLabel(tiers) { var p = tierParts(tiers); return p ? p.join(' · ') : null; }
+
   var Counter = { URL: URL, FLAG_KEY: FLAG_KEY, TIMEOUT_MS: TIMEOUT_MS, fetchCount: fetchCount, reportNew: reportNew, reportExisting: reportExisting, hasSave: hasSave, label: label, validCount: validCount };
+  Counter.TIER_RANK = TIER_RANK; Counter.TIER_SHOWN = TIER_SHOWN; Counter.tierFlag = tierFlag; Counter.tierOf = tierOf;
+  Counter.reportTier = reportTier; Counter.reportJobChange = reportJobChange; Counter.reportSavedTiers = reportSavedTiers; Counter.maxSavedTier = maxSavedTier;
+  Counter.fetchStats = fetchStats; Counter.validTiers = validTiers; Counter.tierParts = tierParts; Counter.tierLabel = tierLabel;
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Counter = Counter; }
   if (typeof module !== 'undefined') module.exports = Counter;
 })();

@@ -86,6 +86,9 @@ button[aria-pressed="true"], button.selected { background: #f2c14e; color: #2a1e
 /* v1.0.1 已遊玩人數：副標題下面的小字（天空那一帶，不擋角色、開始按鈕、聯絡作者） */
 .title-screen .title-count { margin: -10px 0 10px; padding: 3px 12px; border-radius: 999px; font-size: 16px; color: #fffbe8; background: rgba(11, 18, 54, .55); text-shadow: 0 1px 2px #0b1236; flex: none; }
 .title-screen .title-count[hidden] { display: none; }
+.title-screen .title-tiers { margin: -6px 0 10px; padding: 2px 12px; border-radius: 999px; font-size: 14px; color: #ffe08a; background: rgba(11, 18, 54, .75); text-shadow: 0 1px 2px #0b1236; flex: none; }
+.title-screen .title-tiers[hidden] { display: none; }   /* v4.2.5 AC「一轉 N 位 · 二轉 N 位」：總人數下面，小一號、淡金；底色同系列但深一點（淡金字在最亮的天空上對比也 ≥ 4.5） */
+.title-screen.has-art .title-tiers:not([hidden]) ~ .menu { margin-top: calc(30vh - 27px); }   /* 膠囊多佔的 27px（-6＋高 23＋10）從選單上方的空白扣回來：選單、存檔提醒、聯絡作者的位置和沒有膠囊時一樣 */
 .title-screen .tap { font-size: 28px; padding: 16px 36px; animation: pulse 1.4s infinite; }
 .title-screen .menu { display: flex; flex-direction: column; gap: 12px; width: min(420px, 90vw); }
 .title-screen .note { font-size: 20px; color: #e6eeff; margin-top: 14px; max-width: 640px; }
@@ -357,6 +360,96 @@ body.modal-open #toasts .toast.bg { display: none; }
 .title-screen .save-tip .save-tip-icon { font-size: 24px; flex: none; }
 .title-screen .save-tip .save-tip-close { min-height: 44px; min-width: 44px; padding: 4px 12px; font-size: 18px; flex: none; }
 @media (orientation: landscape) and (max-height: 500px) { .title-screen .save-tip { font-size: 15px; margin-top: 8px; } }
+/* ==================== v4.2.5 AC 職業樹（ui/jobtree.js；附圖 A、E、F）開始 ==================== */
+/* 首頁右上角「職業樹 ›」：樣式同 .title-count 的膠囊；看得到的膠囊 32px 高，::before 把點擊範圍撐到 44px */
+.title-screen .jt-open { position: absolute; z-index: 2; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right));
+  min-height: 32px; min-width: 0; padding: 3px 14px; border: 0; border-radius: 999px; font-size: 16px; color: #fffbe8;
+  background: rgba(11, 18, 54, .55); text-shadow: 0 1px 2px #0b1236; box-shadow: none; }
+.title-screen .jt-open::before { content: ""; position: absolute; inset: -6px -4px; }
+.title-screen .jt-open:hover { background: rgba(11, 18, 54, .8); }
+/* 面板：沿用 .win.panel（深藍底），框換成存檔提醒的金色；橫式（預設）整棵樹塞進一個畫面 */
+.jobtree { --cw: 15%; --s: .6; width: min(1180px, 97vw); height: min(97vh, 900px); height: min(97dvh, 900px); max-height: none; overflow: hidden;
+  display: flex; flex-direction: column; padding: 6px 14px 10px; border-color: var(--accent); }
+.jobtree .jt-head { position: relative; display: flex; align-items: center; justify-content: space-between; min-height: 50px; flex: none; }
+.jobtree .jt-title { position: absolute; left: 50%; transform: translateX(-50%); margin: 0; font-size: 26px; color: var(--accent); pointer-events: none; white-space: nowrap; }
+.jobtree .jt-gender { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: #0b1236; }
+.jobtree .jt-gender button { min-height: 44px; min-width: 52px; padding: 2px 14px; font-size: 20px; border: 0; border-radius: 999px; background: transparent; box-shadow: none; }
+.jobtree .jt-gender button[aria-pressed="true"] { background: #f2c14e; color: #2a1e22; font-weight: bold; }
+.jobtree .jt-close { min-width: 48px; min-height: 48px; padding: 0; font-size: 26px; line-height: 1; background: transparent; border-color: var(--accent); box-shadow: none; }
+.jobtree .jt-bodywrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.jobtree .jt-body { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.jobtree .jt-cols { position: relative; flex: none; height: 26px; }
+.jobtree .jt-col, .jobtree .jt-card, .jobtree .jt-note { position: absolute; width: var(--cw); left: calc(var(--col) * (100% - var(--cw)) / 3); }
+.jobtree .jt-col { top: 0; text-align: center; font-size: 19px; font-weight: bold; color: #fffbe8; }
+.jobtree .jt-stage { position: relative; flex: 1; min-height: 0; }
+.jobtree .jt-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+.jobtree .jt-lines path { fill: none; stroke: #7383c2; stroke-width: 1.5; }
+.jobtree .jt-lines path.is-on { stroke: var(--accent); stroke-width: 4; }
+.jobtree .jt-card { z-index: 1; top: calc(var(--y) * 100% / var(--rows) + 2px); height: calc(100% / var(--rows) - 4px); min-height: 0; min-width: 0;
+  display: flex; align-items: center; gap: 6px; padding: 0 8px; border: 2px solid #6676b8; border-radius: 8px; background: #2c3c84; box-shadow: none;
+  color: var(--text); font-size: 16px; font-weight: bold; line-height: 1.1; text-align: left; white-space: nowrap; overflow: hidden; }
+.jobtree .jt-card:hover { background: #3a4c9c; }
+.jobtree .jt-card.is-next { border: 3px solid var(--accent); }
+.jobtree .jt-card.is-on, .jobtree .jt-card.is-on:hover { background: #f2c14e; color: #2a1e22; border-color: #fff3d6; }
+.jobtree .jt-card.is-sel, .jobtree .jt-card.is-sel:hover { border: 4px solid #fff; box-shadow: 0 0 0 2px #2a1e22; }
+.jobtree .jt-ico { flex: none; display: flex; align-items: center; justify-content: center; width: calc(38px * var(--s)); height: calc(50px * var(--s)); }
+.jobtree .jt-spr { display: block; flex: none; width: calc(var(--fw) * var(--s) * 1px); height: calc(var(--fh) * var(--s) * 1px); background-repeat: no-repeat;
+  background-size: calc(var(--cols) * var(--fw) * var(--s) * 1px) calc(var(--srows) * var(--fh) * var(--s) * 1px);
+  background-position: calc(var(--c) * var(--fw) * var(--s) * -1px) calc(var(--r) * var(--fh) * var(--s) * -1px); image-rendering: pixelated; }
+.jobtree .jt-spr.jt-ph { width: calc(33px * var(--s)); height: calc(50px * var(--s)); border-radius: 4px; background: #6a6f8a; color: #fff; font-size: 14px; text-align: center; line-height: calc(50px * var(--s)); }
+.jobtree .jt-name, .jobtree .jt-full { overflow: hidden; text-overflow: ellipsis; }
+.jobtree .jt-short { display: none; }
+.jobtree .jt-note { top: calc((var(--y) + 1) * 100% / var(--rows)); text-align: center; font-size: 16px; color: var(--muted); }
+.jobtree .jt-more { display: none; }
+.jobtree p.jt-info { flex: none; margin: 6px auto 0; width: min(900px, 100%); min-height: 44px; padding: 9px 14px; display: block;
+  border: 2px solid var(--accent); border-radius: 10px; background: #111a44; color: #fff3c8; font-size: 17px; line-height: 1.4; text-align: center; }
+/* 高一點的橫式（iPad、桌機）：圖示、字放大 */
+@media (orientation: landscape) and (min-height: 740px) { .jobtree { --s: .8; --cw: 16%; } .jobtree .jt-card { font-size: 18px; } .jobtree .jt-col { font-size: 21px; } }
+@media (orientation: landscape) and (min-height: 900px) { .jobtree { --s: .96; } .jobtree .jt-card { font-size: 20px; } }
+/* 矮的橫式（手機橫放）：一格至少 34px，放不下時面板內上下捲動 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .jobtree { --s: .56; --cw: 19%; padding: 4px 10px 6px; }
+  .jobtree .jt-head { min-height: 46px; }
+  .jobtree .jt-title { font-size: 22px; }
+  .jobtree .jt-cols { position: sticky; top: 0; z-index: 3; background: #22336f; }
+  .jobtree .jt-body { overflow-y: auto; overscroll-behavior: contain; }
+  .jobtree .jt-stage { flex: none; height: calc(var(--rows) * 34px); }
+  .jobtree .jt-card { font-size: 14px; padding: 0 4px; gap: 4px; }
+  .jobtree p.jt-info { font-size: 14px; min-height: 0; padding: 4px 10px; margin-top: 4px; }
+  .jobtree .jt-more { display: block; }
+}
+/* 直式：卡片圖上字下、四欄並排、面板上下捲動；說明列固定在面板底部；「往下滑看更多」 */
+@media (orientation: portrait) {
+  .jobtree { --cw: 23%; --s: 1; --pitch: 100px; width: 97vw; height: 97vh; height: 97dvh; padding: 6px 8px 8px; }
+  .jobtree .jt-body { overflow-y: auto; overscroll-behavior: contain; }
+  .jobtree .jt-cols { position: sticky; top: 0; z-index: 3; height: 32px; background: #22336f; }
+  .jobtree .jt-col { top: 4px; }
+  .jobtree .jt-stage { flex: none; height: calc(var(--rows) * var(--pitch)); }
+  .jobtree .jt-card { top: calc(var(--y) * var(--pitch) + 4px); height: calc(var(--pitch) - 8px); flex-direction: column; justify-content: center; gap: 4px;
+    padding: 4px 2px; font-size: 15px; text-align: center; }
+  .jobtree .jt-card .jt-name, .jobtree .jt-card .jt-short { max-width: 100%; }
+  .jobtree .jt-card .jt-full { display: none; }
+  .jobtree .jt-card .jt-short { display: inline; }
+  .jobtree .jt-note { top: calc((var(--y) + 1) * var(--pitch)); font-size: 15px; }
+  /* 直式照附圖 F：見習放在上面（不用捲到中間才看到）；連線照實際位置畫 */
+  .jobtree .jt-card.jt-novice, .jobtree .jt-note { --y: 1 !important; }
+  .jobtree .jt-more { display: block; }
+  .jobtree p.jt-info { font-size: 16px; }
+  /* 第二輪審查 L6：直式欄距只有約 7px，亮起來的配方連線加粗到填滿欄距，才看得見（版面不變） */
+  .jobtree .jt-lines path.is-on { stroke-width: 7; }
+}
+@media (orientation: portrait) and (max-width: 420px) { .jobtree { --cw: 23.5%; } .jobtree .jt-card { font-size: 14px; padding: 4px 0; } }
+@media (orientation: portrait) and (min-width: 600px) { .jobtree { --cw: 20%; --s: 1.2; --pitch: 124px; } .jobtree .jt-card { font-size: 19px; } }
+.jobtree .jt-more { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; padding: 22px 0 6px; text-align: center; font-size: 18px; color: #e6eeff;
+  background: linear-gradient(rgba(29, 43, 94, 0), #1d2b5e 60%); pointer-events: none; }
+.jobtree .jt-more[hidden] { display: none; }
+/* 顏色變化淡入；「減少動態效果」（家長設定 .rm 或系統設定）時完全不動 */
+.jobtree .jt-card { transition: background-color .15s, border-color .15s; }
+.jobtree .jt-lines path { transition: stroke .15s; }
+.jobtree.rm .jt-card, .jobtree.rm .jt-lines path { transition: none; }
+.jobtree.rm button:active { transform: none; }
+@media (prefers-reduced-motion: reduce) { .jobtree .jt-card, .jobtree .jt-lines path { transition: none; } .jobtree button:active { transform: none; } }
+/* ==================== v4.2.5 AC 職業樹 結束 ==================== */
 .title-screen .zoom-hint .zoom-close { min-height: 36px; min-width: 36px; padding: 2px 8px; font-size: 18px; flex: none; }
 
 /* ---------------- v0.9 試玩稽核：版面修正 ---------------- */
@@ -537,6 +630,7 @@ jq-nb { white-space: nowrap; }
 
 /* v2.1 中級職業（69 號 5.2）：轉職清單的中級標題列、沒開放／配方不夠是灰色、配方進度 */
 .job-list li.tier-head { display: block; border-top: 2px solid #ffd34d; padding-top: 6px; }
+.job-list li.adv-head { display: block; border-top: 2px solid #ffb300; padding-top: 6px; }   /* v4.2.5 高級職業（3 轉）標題列 */
 .job-list li.inter-locked { opacity: 0.6; }
 .job-list .recipe { color: #ffd34d; }
 

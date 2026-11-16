@@ -3356,8 +3356,8 @@ window.DIALOGS = {
     { who: "volunteer_fgs", emotion: "開心", text: "一路平安，佛祖也會保佑。", taigi: { hanji: "一路平安，佛祖嘛會保庇。", tailo: "Tsi̍t-lōo pîng-an, Pu̍t-tsóo mā ē pó-pì.", huayu: "一路平安，佛祖也會保佑。" } }
   ],
   D_ADV_OPEN: [
-    { who: "narrator", emotion: "開心", text: "你到過鹿耳門聖母廟了！高級職業即將登場喔！", huayu_only: true },
-    { who: "narrator", emotion: "平靜", text: "登場以後，要先把需要的中級職業練到 50 級。", huayu_only: true }
+    { who: "narrator", emotion: "開心", text: "你到過鹿耳門聖母廟了！高級職業開放了！", huayu_only: true },
+    { who: "narrator", emotion: "平靜", text: "把需要的中級職業都練到 50 級，就可以在這裡和佛光山挑戰。", huayu_only: true }
   ],
   D_LAMP_AUTO: [
     { who: "narrator", emotion: "開心", text: "遠方的金包里，一盞燈亮了。" },

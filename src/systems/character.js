@@ -14,7 +14,7 @@
   function rules(data) { return (data && data.jobRules) || {}; }
   function growth(data) { return Object.assign({}, GROWTH, rules(data).growth || {}); }
   function masterLevel(data, job) {
-    var m = Object.assign({ novice: JOB_LEVEL, basic: 30, inter: 50 }, rules(data).master_level || {});
+    var m = Object.assign({ novice: JOB_LEVEL, basic: 30, inter: 50, adv: 60 }, rules(data).master_level || {});
     return m[(job && job.tier) || 'basic'] || 30;
   }
   function jobOf(data, id) { return (data && data.jobs && data.jobs[id]) || { id: id, tier: id === 'novice' ? 'novice' : 'basic', mods: { hp: 1, mp: 1, atk: 1, def: 1 }, trait: {}, wf: [], af: [], skills: [], bonus: 1 }; }
@@ -214,22 +214,39 @@
   }
 
   // ---- 職業（48 號 2.4）
-  /** 初級看 open_jobs；中級由存檔的職階旗標開放，缺少旗標一律關閉。 */
+  /** 初級看 open_jobs；中級、高級（v4.2.5）由存檔的職階旗標開放（tierOpen.inter／tierOpen.adv），缺少旗標一律關閉。 */
   function isOpen(data, jobId, state) {
-    if (jobOf(data, jobId).tier === 'inter') return !!(state && state.tierOpen && state.tierOpen.inter === true);
+    var tier = jobOf(data, jobId).tier;
+    if (tier === 'inter' || tier === 'adv') return !!(state && state.tierOpen && state.tierOpen[tier] === true);
     var open = rules(data).open_jobs;
     return jobId === 'novice' || !Array.isArray(open) || open.indexOf(jobId) >= 0;
   }
-  /** 中級配方逐項檢查；目前職業以 player.level 為準。回傳缺少的職業及等級。 */
+  /** 配方的職階：中級＝初級職業都要 Lv30；高級（v4.2.5，26 號 3.1）＝中級職業都要 Lv50 */
+  var RECIPE_OF = { inter: { tier: 'basic', need: 30 }, adv: { tier: 'inter', need: 50 } };
+  /** 中級、高級配方逐項檢查；目前職業以 player.level 為準。回傳缺少的職業及等級。 */
   function recipeStatus(state, jobId, data) {
-    var job = jobOf(data, jobId);
-    if (job.tier !== 'inter') return { ok: true };
+    var job = jobOf(data, jobId), rt = RECIPE_OF[job.tier];
+    if (!rt) return { ok: true };
     var recipe = job.recipe || {}, ids = Object.keys(recipe), missing = [];
     ids.forEach(function (id) {
       var need = Number(recipe[id]);
-      if (!(need >= 30) || !(data.jobs[id] && data.jobs[id].tier === 'basic') || jobLevel(state, id) < need) missing.push({ job: id, need: need || 30 });
+      if (!(need >= rt.need) || !(data.jobs[id] && data.jobs[id].tier === rt.tier) || jobLevel(state, id) < need) missing.push({ job: id, need: need || rt.need });
     });
-    return ids.length && !missing.length ? { ok: true } : { ok: false, reason: 'recipe', need: 30, missing: missing };
+    return ids.length && !missing.length ? { ok: true } : { ok: false, reason: 'recipe', need: rt.need, missing: missing };
+  }
+  /**
+   * v4.2.5（26 號 3.3【老闆定案】）這個轉職地點能不能轉這個職業：高級職業第一次轉只在 JOB_RULES.adv_places（南部 2 間）；其他職階哪裡都可以。
+   * 第 5 輪（老闆 2026-11-16「可以指可在任何宮廟換」）：有傳 state、而且以前真的當過（player.jobs[id]）又通過過 3 轉小考（trial[id].passedAt）＝換回去，任何宮廟都可以。
+   *   呼叫的人只在「換回去」時傳 state（jobPick 的 back、doJobChange、清單）；沒傳 state＝照第一次轉的規則
+   */
+  function heldAdv(state, jobId) {
+    var p = state && state.player, t = state && state.trial && state.trial[jobId];
+    return !!(p && p.jobs && p.jobs[jobId] && p.jobs[jobId].lv > 0 && t && t.passedAt);
+  }
+  function placeAllows(data, place, jobId, state) {
+    if (jobOf(data, jobId).tier !== 'adv') return true;
+    var list = rules(data).adv_places || ['temple_lem', 'temple_fgs'];
+    return list.indexOf(place) >= 0 || (state ? heldAdv(state, jobId) : false);
   }
   /**
    * 能不能轉成 jobId。回傳 { ok, reason, need, back }：
@@ -246,7 +263,7 @@
     var held = jobId === 'novice' || !!(p.jobs && p.jobs[jobId]);
     if (held) return { ok: true, back: true };
     var need = masterLevel(data, jobOf(data, 'novice'));
-    if (j.tier !== 'inter' && jobLevel(state, 'novice') < need) return { ok: false, reason: 'level', need: need };
+    if (j.tier !== 'inter' && j.tier !== 'adv' && jobLevel(state, 'novice') < need) return { ok: false, reason: 'level', need: need };
     var tr = state.trial && state.trial[jobId];
     if (!(tr && tr.passedAt)) return { ok: false, reason: 'trial' };
     return { ok: true, back: false };
@@ -357,7 +374,8 @@
   }
 
   var Character = { pl: pl, FAM_NAME: FAM_NAME, famNames: famNames, equipFams: equipFams, GROWTH: GROWTH, baseStats: baseStats, ensureJobs: ensureJobs, jobLevel: jobLevel, needsJobHint: needsJobHint, mastered: mastered, usable: usable, usableJobs: usableJobs, isOpen: isOpen, gearValue: gearValue, autoEquip: autoEquip, learnedSkills: learnedSkills, slotSkills: slotSkills, setSkillSlots: setSkillSlots, compareEquip: compareEquip, BASE: BASE, PER_LEVEL: PER_LEVEL, JOB_LEVEL: JOB_LEVEL, stats: stats, clampVitals: clampVitals, restoreFull: restoreFull, count: count, addItem: addItem, removeItem: removeItem, useItem: useItem, equip: equip, unequip: unequip, canChangeJob: canChangeJob, changeJob: changeJob, setInn: setInn, rest: rest, knockout: knockout, onLevelUp: onLevelUp };
-  Character.recipeStatus = recipeStatus;   // v2.1 中級職業的配方進度
+  Character.recipeStatus = recipeStatus;   // v2.1 中級職業的配方進度（v4.2.5 高級也用）
+  Character.placeAllows = placeAllows;     // v4.2.5 高級職業只在南部 2 間轉
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.Character = Character; }
   if (typeof module !== 'undefined') module.exports = Character;
 })();

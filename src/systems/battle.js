@@ -190,7 +190,8 @@
         out.mp = Math.floor((ctx.maxMp || 0) * (a.mp || 0.1));
         break;
       case 'heal_guard':
-        out.heal = ctx.maxHp || 0;
+        // v4.2.5：回復量照 arg.r（金剛護體 30%、希望之光 80%）；沒寫 r＝全滿（全能祈福 r＝1，結果和以前一樣）
+        out.heal = Math.floor((ctx.maxHp || 0) * (a.r === undefined ? 1 : a.r));
         guard(fx, a.m === undefined ? 0.5 : a.m, a.t || 3);
         break;
       case 'shield': fx.shield = Math.max(fx.shield || 0, a.t || 2); break;
