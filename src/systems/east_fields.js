@@ -230,9 +230,14 @@
   function puzzleVisible(state, P, pz) { return pz.appearsAfter !== 'trial_lamps_all' || trialLampsAll(state, P); }
   function bossesDone(state, P) { return P.bosses.length > 0 && P.bosses.every(function (b) { return !!(state && state.bosses && state.bosses[b]); }); }
   /** v4.2 4c：M41 雲階開了沒（cloud_stairs.requires，預設 ending_done）；給 x、y 時再看那一格是不是雲階 */
+  /** v4.2.4（老闆 2026-11-16「玉山雲上洞窟在哪? 做好入口了嗎?」）：測試模式開著時雲階當成已開（和 World.exitOpen「出口不擋」同一個寫法；不寫任何旗標進存檔） */
+  function testModeOn() {
+    var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (typeof window === 'undefined' && typeof require === 'function' ? require('./testmode.js') : null);
+    return !!(TM && TM.on());
+  }
   function cloudStairsOpen(state, P, x, y) {
     var cs = P && P.cloudStairs;
-    if (!cs || !cs.cells.length || !requirementMet(cs.requires, state, { P: P })) return false;
+    if (!cs || !cs.cells.length || !(testModeOn() || requirementMet(cs.requires, state, { P: P }))) return false;
     return x === undefined ? true : cs.cells.some(function (c) { return c[0] === x && c[1] === y; });
   }
 

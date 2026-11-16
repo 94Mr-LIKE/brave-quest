@@ -6946,7 +6946,7 @@ window.MAPS = {
     "spawns": [
       {
         "monster": "fo_puff",
-        "count": 1,
+        "count": 2,
         "area": [
           0,
           6,
@@ -6957,7 +6957,7 @@ window.MAPS = {
       },
       {
         "monster": "fo_puff",
-        "count": 1,
+        "count": 2,
         "area": [
           0,
           26,
@@ -7154,7 +7154,7 @@ window.MAPS = {
     "spawns": [
       {
         "monster": "fo_puff_cave",
-        "count": 1,
+        "count": 2,
         "area": [
           0,
           27,
@@ -7165,7 +7165,7 @@ window.MAPS = {
       },
       {
         "monster": "fo_puff_cave",
-        "count": 1,
+        "count": 2,
         "area": [
           36,
           23,
@@ -7176,7 +7176,7 @@ window.MAPS = {
       },
       {
         "monster": "fo_echo",
-        "count": 1,
+        "count": 2,
         "area": [
           16,
           8,
@@ -7515,7 +7515,7 @@ window.MAPS = {
     "spawns": [
       {
         "monster": "fo_frost",
-        "count": 1,
+        "count": 3,
         "area": [
           52,
           27,
@@ -7526,7 +7526,7 @@ window.MAPS = {
       },
       {
         "monster": "fo_puff_cave",
-        "count": 1,
+        "count": 2,
         "area": [
           20,
           33,

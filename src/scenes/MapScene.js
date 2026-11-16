@@ -368,10 +368,11 @@
 
     /** 出口的傳送光圈 */
     buildExits() {
-      var self = this, st = G().state;
+      var self = this, st = G().state, tmOn = !!(J.TestMode && J.TestMode.on());
       (this.map.exits || []).forEach(function (e) {
         // v4.2 第 4c 批：M41 雲階（requires 含 ending_done）結局前是雲海，不畫傳送光圈
-        if ([].concat(e.requires || []).indexOf('ending_done') >= 0 && !(st && st.flags && st.flags.ending_done === true)) return;
+        // v4.2.4：測試模式開著時雲階當成已開，光圈照畫（和 World.exitOpen 一樣看 TestMode；不改存檔）
+        if (!tmOn && [].concat(e.requires || []).indexOf('ending_done') >= 0 && !(st && st.flags && st.flags.ending_done === true)) return;
         var img = self.add.image(e.x * T, e.y * T, self.tex, self.frameOf('warp_a')).setOrigin(0, 0).setScale(S).setDepth(0.5).setAlpha(0.9);
         self.anims_.push({ img: img, a: self.frameOf('warp_a'), b: self.frameOf('warp_b') });
       });

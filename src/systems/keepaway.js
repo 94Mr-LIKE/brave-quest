@@ -14,7 +14,16 @@
     var done = function (id) { var r = st.quests[id]; return !!(r && r.status === 'done'); };
     return (!a.show.after || done(a.show.after)) && !(a.show.until && done(a.show.until));
   }
-  function areas(map, state) { return map && Array.isArray(map.keepaway) ? map.keepaway.filter(function (a) { return shown(a, state); }) : []; }
+  /** v4.2.4（老闆 2026-11-14「我是測試模式，要打開所有地圖都能跑！」）：測試模式開著時，有 show 條件的保護區（M34 黑熊：Q_YS_1～Q_YS_2 之間會擋住往 M35 的步道）不擋路；
+   *  一直都在的保護區（黑面琵鷺、綠蠵龜、帝雉…，不會隔開區域）照舊。動物本身照常顯示（shown 不變），不寫存檔 */
+  function testModeOn() {
+    var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (typeof window === 'undefined' && typeof require === 'function' ? require('./testmode.js') : null);
+    return !!(TM && TM.on());
+  }
+  function areas(map, state) {
+    var tm = testModeOn();
+    return map && Array.isArray(map.keepaway) ? map.keepaway.filter(function (a) { return shown(a, state) && !(tm && a.show); }) : [];
+  }
   function validArea(a) {
     return a && Number.isInteger(a.x) && Number.isInteger(a.y) && Number.isInteger(a.radius) && a.radius >= 1 && a.radius <= 8;
   }
