@@ -44,7 +44,7 @@
       this.startFacing = data.facing || 'down';
       this.map = G().data.maps[this.mapId];
       // 場景重新開始時物件會留著上一張地圖的值：車站要先清掉（不然沒有車站的地圖會顯示上一張的「在○○站搭車」）
-      this.station = null; this.stationSign = null; this.stationLabel = null; this.stationLabelInfo = null; this.stationShelter = null;
+      this.station = null; this.stationSign = null; this.stationLabel = null; this.stationLabelInfo = null; this.stationLabelLock = null; this.stationLabelLockSize = null; this.stationLabelMoves = 0; this.stationShelter = null;
       // 上一張地圖的 hasBg、主角狀態也不要留著（create 之前讀到舊值會誤判「新地圖已經好了」）
       this.hasBg = false; this.p = null;
       this.safePts = null;   // 同樣的原因：下車點安全範圍是每張地圖各自算的
@@ -92,6 +92,9 @@
       });
       // v4.2 第六座燈座（金色燈）、大結局過場的鎮民
       if ((map.lamps || []).some(function (l) { return l.subject === '曙光'; })) ['lamp_dawn_on', 'lamp_dawn_off'].forEach(function (k) { if (A.has(k)) A.queue(self, k); });
+      // v4.2.6 地圖修正：知識燈改用美術燈 obj_lamp_*（32×48）；其他模組要預先載入的圖（例如山屋小燈）掛在 MapScene.preloadHooks
+      if ((map.lamps || []).length) { var LA = J.MapInfo.LAMP_ART; [LA.off, LA.on, LA.dawn_off, LA.dawn_on].forEach(function (k) { if (A.has(k)) A.queue(self, k); }); }
+      (MapScene.preloadHooks || []).forEach(function (f) { f(self, map); });
       if (Array.isArray(g.endingExtras) && g.endingExtrasMap === this.mapId) g.endingExtras.forEach(function (e) { if (A.has(e.sprite)) A.queue(self, e.sprite); });
       // v0.9.3 會走動的動物（黃牛）：美術還沒畫時用暫代圖（四方向走路格式）
       J.MapInfo.animalSpecs(map).forEach(function (a) { A.queue(self, a.sprite, a.name); });
@@ -496,9 +499,12 @@
           var lab = this.stationLabelTexture(stn.name);
           this.stationLabel = this.add.image(stn.x * T + T / 2, stn.y * T + T - this.stationSign.displayHeight - 2, lab.key)
             .setOrigin(0.5, 1).setScale(1 / lab.res).setDepth(LABEL_DEPTH);
+          // v4.2.6 地圖修正（QA-M41-02：鏡頭頂到地圖上緣時站名被上方狀態列整個蓋住）：每幀看站名會不會落在狀態列底下，
+          // 會的話改畫在站牌右邊；右邊也被蓋就畫在站牌腳下（placeStationLabel）
+          this.stationLabelMode = 'above';
           // ↑ 真正切字的原因：M04 站名的左半邊壓到上層格（'U'，從背景切出來畫在角色上方，深度 40000），被背景蓋住。
           //   站名是要給人看的字，一律畫在上層格之上（LABEL_DEPTH）
-          this.stationLabelInfo = { text: stn.name, textW: lab.textW, boxW: lab.boxW, displayW: this.stationLabel.displayWidth, depth: LABEL_DEPTH, fgDepth: FG_CELL_DEPTH };   // 測試用
+          this.stationLabelInfo = { text: stn.name, textW: lab.textW, boxW: lab.boxW, displayW: this.stationLabel.displayWidth, depth: LABEL_DEPTH, fgDepth: FG_CELL_DEPTH, res: lab.res, fontPx: lab.fontPx };   // 測試用
         }
       }
       // v0.9.4 B17（老闆 D17「每個車站都可以有」）：背景沒有畫站房的車站旁放候車亭（maps.js station.shelter = 左上角格子，3×3 格；只擋最下面一排）
@@ -540,10 +546,16 @@
       (this.map.lamps || []).forEach(function (l) {
         if (!self.lampShown(l)) return;   // v4.2 第六座燈座：結局前不顯示
         var lit = !!st.lamps[l.subject];
-        var dawn = self.dawnLampArt(l);
-        var img = dawn ? self.add.image(l.x * T + T / 2, l.y * T + T, J.Assets.texKey(lit ? 'lamp_dawn_on' : 'lamp_dawn_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T)
+        var isDawn = l.subject === '曙光', art = self.lampArt(isDawn);
+        var dawn = !art && self.dawnLampArt(l);
+        // v4.2.6 地圖修正（老闆「這個燈....重畫」）：美術燈 obj_lamp_*（32×48）原尺寸、腳底貼格子下緣中央，不再把 16×16 圖塊拉長；
+        // 美術燈沒讀到才退回舊畫法（曙光 lamp_dawn_*、五盞用圖塊，放大 2×3.2）
+        var img = art ? self.add.image(l.x * T + T / 2, l.y * T + T, J.Assets.texKey(J.MapInfo.lampArtKey(isDawn, lit))).setOrigin(0.5, 1).setDepth((l.y + 1) * T)
+          : dawn ? self.add.image(l.x * T + T / 2, l.y * T + T, J.Assets.texKey(lit ? 'lamp_dawn_on' : 'lamp_dawn_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T)
           : self.add.image(l.x * T + T / 2, l.y * T + T, self.tex, self.frameOf(lit ? 'lamp_on' : 'lamp_off')).setOrigin(0.5, 1).setScale(S, S * 1.6).setDepth((l.y + 1) * T);
-        self.lamps.push({ data: l, img: img, dawn: dawn });
+        if (art && img.setDisplaySize) img.setDisplaySize(J.MapInfo.LAMP_ART.W, J.MapInfo.LAMP_ART.H);
+        if (l.draw === false) img.setVisible(false);   // 背景已經畫了燈（maps.js lamps[].draw:false）：不畫圖，只留互動格與光暈
+        self.lamps.push({ data: l, img: img, dawn: dawn, art: art, isDawn: isDawn });
       });
       this.buildEndingExtras();   // v4.2 大結局：海風公園來歡迎的鎮民（只在過場出現、不說話）
       this.buildMapProps();   // v4.1 中橫：小車與雪鏈圖案告示牌
@@ -710,6 +722,8 @@
     }
     /** 第六座燈座用金色的 lamp_dawn_on／off（美術 R5：程式調色）；圖沒讀到就照五盞燈的圖塊畫 */
     dawnLampArt(l) { return !!l && l.subject === '曙光' && this.hasArt('lamp_dawn_on') && this.hasArt('lamp_dawn_off'); }
+    /** v4.2.6 美術燈 obj_lamp_*（沒亮／點亮兩張都讀到才用；dawn＝金色曙光款） */
+    lampArt(dawn) { return this.hasArt(J.MapInfo.lampArtKey(dawn, false)) && this.hasArt(J.MapInfo.lampArtKey(dawn, true)); }
     /** v4.2 大結局 F6–F10：G.endingExtras＝[{ sprite, x, y, mood }]（鎮民、里長伯；不擋路、不能說話，頭上冒「！」或「♪」） */
     buildEndingExtras() {
       var self = this, list = G().endingExtras;
@@ -745,6 +759,16 @@
       var self = this, st = G().state;
       this.lamps.forEach(function (l) {
         var lit = !!st.lamps[l.data.subject];
+        if (l.art) {   // v4.2.6 美術燈：換圖；光暈、閃光對準火焰（腳底上方 LAMP_ART.GLOW_Y）
+          var gy = l.img.y - J.MapInfo.LAMP_ART.GLOW_Y, onK = J.Assets.texKey(J.MapInfo.lampArtKey(l.isDawn, true));
+          var wasA = l.img.texture.key === onK;
+          l.img.setTexture(lit ? onK : J.Assets.texKey(J.MapInfo.lampArtKey(l.isDawn, false)));
+          if (l.img.setDisplaySize) l.img.setDisplaySize(J.MapInfo.LAMP_ART.W, J.MapInfo.LAMP_ART.H);
+          if (lit && !wasA) self.sparkle(l.img.x, gy, l.isDawn ? 0xffd36a : 0xfff3a0);
+          if (lit && !l.glow) l.glow = self.addGlow(l.img.x, gy, l.isDawn ? 1.2 : 1.1);
+          if (!lit && l.glow) { self.removeGlow(l.glow); l.glow = null; }
+          return;
+        }
         if (l.dawn) {   // v4.2 第六座燈座（金色）
           var wasD = l.img.texture.key === J.Assets.texKey('lamp_dawn_on');
           l.img.setTexture(J.Assets.texKey(lit ? 'lamp_dawn_on' : 'lamp_dawn_off'));
@@ -876,12 +900,16 @@
     }
 
     /**
-     * v0.9.6 站名小牌：白底藍字。用同一個畫布量字寬再畫，框寬＝字寬＋左右各 5px（不會切字）。
-     * 畫布用 2 倍解析度畫（res），顯示時縮回 1 倍，字比較清楚。回傳 { key, textW, boxW, res }（textW、boxW 是 1 倍的像素）
+     * v0.9.6 站名小牌：白底藍字。用同一個畫布量字寬再畫，框寬＝字寬＋左右各 padX（不會切字）。回傳 { key, textW, boxW, res, fontPx }（textW、boxW 是 1 倍的像素）
+     * v4.2.6 地圖修正（老闆「玉山車站的『玉』有問題」；QA-M41-01「玉」最上一橫變淡、點糊成一撇）：
+     *   根因：遊戲畫面是 640×360 的像素畫布（pixelArt，最近鄰），2 倍解析度的字貼圖縮回 0.5 倍時，每兩列像素只留一列，細橫線會整條不見。
+     *   改成 1 倍解析度（res 1，貼圖像素＝畫面像素，不縮放；畫布放大到螢幕時只會放大、不會丟線），字級 13 → 16px
      */
     stationLabelTexture(name) {
-      var res = 2, padX = 5, h = 19;
-      var font = 'bold 13px "Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
+      // v4.2.6 W1c（QA-M41-R01：390×844、裝置倍率 1 時「玉」三橫糊掉）：字貼圖固定用 3 倍解析度畫，貼上時縮回 1/3，
+      // 這張貼圖單獨用線性濾鏡（其他像素圖照舊最近鄰）→ 縮小時是平均而不是丟列；筆畫外加同色細描邊加粗一點，畫面再被縮小也留得住
+      var res = 3, padX = 6, h = 22, fontPx = 16;
+      var font = 'bold ' + fontPx + 'px "Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
       var key = 'ui:stationlabel:' + name;
       var m = document.createElement('canvas').getContext('2d'); m.font = font;
       var textW = Math.ceil(m.measureText(name).width), boxW = textW + padX * 2;
@@ -890,10 +918,52 @@
         var g = c.getContext('2d'); g.scale(res, res);
         g.fillStyle = '#f4f4f0'; g.fillRect(0, 0, boxW, h);
         g.font = font; g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = '#1e4a8a';
+        g.lineWidth = 0.9; g.strokeStyle = '#1e4a8a'; g.lineJoin = 'round'; g.strokeText(name, padX, h / 2 + 1);
         g.fillText(name, padX, h / 2 + 1);   // 從左邊 padX 開始畫，整行都在框裡
-        this.textures.addCanvas(key, c);
+        var tx = this.textures.addCanvas(key, c);
+        if (tx && tx.setFilter && Phaser.Textures && Phaser.Textures.FilterMode) tx.setFilter(Phaser.Textures.FilterMode.LINEAR);
       }
-      return { key: key, textW: textW, boxW: boxW, res: res };
+      return { key: key, textW: textW, boxW: boxW, res: res, fontPx: fontPx };
+    }
+    /** v4.2.6 站名小牌的位置：站牌上方 → 被上方狀態列蓋住時改右邊 → 還是蓋住就畫在站牌腳下（MapInfo.stationLabelSpot 算） */
+    placeStationLabel() {
+      var l = this.stationLabel, sg = this.stationSign, cam = this.cameras && this.cameras.main;
+      if (!l || !sg || !cam || !J.MapInfo.stationLabelSpot) return null;
+      var viewH = cam.worldView.height || (cam.height / (cam.zoom || 1));
+      var opt = { signX: sg.x, signFoot: sg.y, signW: sg.displayWidth, signH: sg.displayHeight, labelW: l.displayWidth, labelH: l.displayHeight,
+        camTop: cam.worldView.y, hudH: this.signCamDom().hud * viewH, mapW: this.size ? this.size.w * T : 0, mapH: this.size ? this.size.h * T : 0 };
+      // v4.2.6 W1e（QA-ST-R01：進站時站名為了閃橫幅先跑到右邊／腳下，橫幅淡掉又跳回去）：
+      //   常駐的遮擋物（狀態卡、右上按鈕、小地圖）→ 用候選位置（上方→右→左→腳下）避開，選定後就固定，
+      //     只有「固定的位置被常駐遮擋物蓋到」或畫布大小改變時才重選；
+      //   會消失的遮擋物（地名橫幅 .map-banner）→ 不換位置，蓋到時站名先藏起來（alpha 0），橫幅消失後在原位淡入（約 200ms）。
+      //   這樣任何時候都不會「站名只露出一部分」，也不會跳來跳去。
+      var spot = this.stationLabelLock || J.MapInfo.stationLabelSpot(opt), alphaWant = 1;
+      if (J.MapInfo.stationLabelCandidates && typeof document !== 'undefined' && this.sys && this.sys.game && this.sys.game.canvas) {
+        var cv = this.sys.game.canvas.getBoundingClientRect(), wv = cam.worldView;
+        if (cv.width && wv.width && wv.height) {
+          var kx = cv.width / wv.width, ky = cv.height / wv.height, sizeKey = Math.round(cv.width) + 'x' + Math.round(cv.height);
+          var toScreen = function (r) { return { left: cv.left + (r.x - wv.x) * kx, top: cv.top + (r.y - wv.y) * ky, right: cv.left + (r.x + r.w - wv.x) * kx, bottom: cv.top + (r.y + r.h - wv.y) * ky }; };
+          var rectsOf = function (sel) { var out = []; Array.prototype.forEach.call(document.querySelectorAll(sel) || [], function (el) { var b = el.getBoundingClientRect(); if (b.width && b.height && getComputedStyle(el).visibility !== 'hidden' && getComputedStyle(el).display !== 'none') out.push(b); }); return out; };
+          var hits = function (sr, list) { return list.some(function (b) { return sr.left < b.right && sr.right > b.left && sr.top < b.bottom && sr.bottom > b.top; }); };
+          var blockers = rectsOf(MapScene.LABEL_BLOCKERS_FIXED);
+          var lock = this.stationLabelLock;
+          if (!lock || this.stationLabelLockSize !== sizeKey || hits(toScreen(lock.rect), blockers)) {
+            var pick = J.MapInfo.stationLabelPick(J.MapInfo.stationLabelCandidates(opt), toScreen, blockers);
+            if (pick) { this.stationLabelLock = lock = pick; this.stationLabelLockSize = sizeKey; this.stationLabelMoves = (this.stationLabelMoves || 0) + 1; }
+          }
+          if (lock) { spot = lock; if (hits(toScreen(lock.rect), rectsOf(MapScene.LABEL_BLOCKERS_TEMP))) alphaWant = 0; }
+        }
+      }
+      if (l.x !== spot.x || l.y !== spot.y) l.setPosition(spot.x, spot.y);
+      if (l.originX !== spot.ox || l.originY !== spot.oy) l.setOrigin(spot.ox, spot.oy);
+      var now = this.time ? this.time.now : Date.now(), dt = Math.min(100, Math.max(0, now - (this.stationLabelT || now)));
+      this.stationLabelT = now;
+      var a = alphaWant === 0 ? 0 : Math.min(1, (l.alpha === undefined ? 1 : l.alpha) + (this.reduceMotionNow && this.reduceMotionNow() ? 1 : dt / 200));
+      if (l.alpha !== a) l.setAlpha(a);
+      this.stationLabelMode = spot.mode;
+      this.stationLabelHidden = alphaWant === 0;   // 測試用
+      if (this.stationLabelInfo) this.stationLabelInfo.mode = spot.mode;
+      return spot;
     }
 
     /** v0.9.5 地標匾額：紅底金字、金色外框（比照店家招牌的大小，字橫寫；不畫神像、不畫香火） */
@@ -1802,6 +1872,7 @@
     update(time, delta) {
       var g = G(), p = this.p;
       if (!p || this.transitioning) return;
+      if (this.stationLabel) this.placeStationLabel();   // v4.2.6 站名不要被上方狀態列蓋住
       var blocked = J.UI.blocksMove() || g.busy;   // v0.9.3 放大地圖開著時也能走（passMove 視窗不擋）
       if (p.moving) {
         p.t += delta;
@@ -2223,5 +2294,8 @@
     }
     return null;
   };
+  MapScene.LABEL_BLOCKERS = '#ui > .map-banner, #hud .hud-card, #hud .hud-buttons, .minimap';   // v4.2.6 W1d：站名小牌要避開的 DOM
+  MapScene.LABEL_BLOCKERS_FIXED = '#hud .hud-card, #hud .hud-buttons, .minimap';   // v4.2.6 W1e：常駐的（用候選位置避開）
+  MapScene.LABEL_BLOCKERS_TEMP = '#ui > .map-banner';   // v4.2.6 W1e：會消失的（蓋到時站名先藏、不換位置）
   window.JQ.MapScene = MapScene;
 })();

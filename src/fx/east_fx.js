@@ -30,6 +30,8 @@
   var MEMORY_SHOW_MS = 1000, MEMORY_EXTRA_MS = 1000;   // 不一樣的兩張開 1 秒再蓋回去；減少動態效果多開 1 秒
   var BREATH_MS = 1400;                                // 呼吸動畫一次 2.8 秒（遠低於每秒 3 次）
   var FONT = '"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif';
+  var LA = (J.MapInfo && J.MapInfo.LAMP_ART) || { W: 32, H: 48, GLOW_Y: 24 };
+  var LAMP_W = LA.W, LAMP_H = LA.H, LAMP_GLOW_Y = LA.GLOW_Y;
   var ADD = (typeof Phaser !== 'undefined' && Phaser.BlendModes) ? Phaser.BlendModes.ADD : 1;
   var EastFx = { log: [], arrows: 0 };
 
@@ -83,6 +85,8 @@
   }
   var SHAPE_COLOR = { '紅': '#e0473a', '藍': '#3d7be0' };
   function shapeTex(scene, label, slab) {
+    var sa = art2(scene, shapeArtKey(label, slab));   // v4.2.6 W1c：圖形石板／答案地板用美術圖
+    if (sa) return sa;
     var color = SHAPE_COLOR[label.charAt(0)] || '#888', shape = label.slice(1);
     return tex(scene, 'east:shape:' + label + (slab ? ':slab' : ''), 32, 32, function (g) {
       g.fillStyle = slab ? '#5d6470' : '#3b4252'; g.fillRect(2, 2, 28, 28);
@@ -95,6 +99,8 @@
     });
   }
   function plateTex(scene, label, on) {
+    var pa = /^[ABC]$/.test(label) ? art2(scene, 'obj_plate_' + label + '_' + (on ? 'on' : 'off')) : null;   // v4.2.6 W1c：A／B／C 踏板用美術圖
+    if (pa) return pa;
     return tex(scene, 'east:plate:' + label + ':' + (on ? 1 : 0), 32, 32, function (g) {
       g.fillStyle = on ? '#ffe9a0' : '#6d7487'; g.beginPath(); g.ellipse(16, 18, 13, 9, 0, 0, Math.PI * 2); g.fill();
       g.strokeStyle = on ? '#fff7d6' : '#2b3040'; g.lineWidth = 2; g.stroke();
@@ -102,12 +108,16 @@
     });
   }
   function lampDotTex(scene, on, color) {
+    var la = art2(scene, on ? 'obj_lamp_dot_on' : 'obj_lamp_dot_off');   // v4.2.6 W1c
+    if (la) return la;
     return tex(scene, 'east:lampdot:' + (on ? color : 'off'), 14, 14, function (g) {
       g.fillStyle = on ? color : '#2b3040'; g.beginPath(); g.arc(7, 7, 6, 0, Math.PI * 2); g.fill();
       g.strokeStyle = on ? '#fffbe8' : '#9aa3b8'; g.lineWidth = 1.5; g.stroke();
     });
   }
   function blockTex(scene, kind) {
+    var ak = art2(scene, { door: 'obj_gate_stone', ice: 'obj_gate_ice', wood: 'obj_gate_wood', scale: 'obj_scale' }[kind]);   // v4.2.6 W1c：門、冰門、木柵、天平用美術圖
+    if (ak) return ak;
     var C = { door: ['#6b7280', '#3a3f4b'], echo: ['#6f7a8f', '#3a4252'], ice: ['#bfe8ff', '#6fb8e0'], wood: ['#9a6a3a', '#5a3a1c'], box_ice: ['#d6f1ff', '#7ab9db'],
       box_stone: ['#9b8f80', '#5e5448'], wallstone: ['#6c6560', '#3d3834'], rock: ['#e8f7ff', '#8cc6e6'], scale: ['#c9a76a', '#6a5126'] }[kind] || ['#888', '#444'];
     var tall = kind === 'door' || kind === 'echo' || kind === 'ice' || kind === 'wood';
@@ -118,18 +128,223 @@
       if (kind === 'ice' || kind === 'box_ice' || kind === 'rock') { g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(6, 6, 6, 3); }
     });
   }
-  function softCloudTex(scene) {
-    return tex(scene, 'east:cloud:soft', 40, 40, function (g) {
-      g.fillStyle = 'rgba(255,255,255,0.55)';
-      [[14, 22, 10], [24, 18, 11], [20, 26, 9]].forEach(function (c) { g.beginPath(); g.arc(c[0], c[1], c[2], 0, Math.PI * 2); g.fill(); });
-      g.strokeStyle = 'rgba(160,180,220,0.7)'; g.setLineDash && g.setLineDash([3, 3]); g.strokeRect(2, 2, 36, 36);
-    });
-  }
   function starTex(scene, on) {
     return tex(scene, 'east:star:' + (on ? 1 : 0), 24, 24, function (g) {
       g.fillStyle = on ? '#fff3a0' : '#c8cde0'; g.beginPath();
       for (var i = 0; i < 10; i++) { var r = i % 2 ? 4.5 : 10, a = -Math.PI / 2 + i * Math.PI / 5; g.lineTo(12 + Math.cos(a) * r, 12 + Math.sin(a) * r); }
       g.closePath(); g.fill();
+    });
+  }
+  /**
+   * v4.2.6 地圖修正（老闆「這個燈....重畫，太醜了」）：山屋小燈改用美術燈（和知識燈同一款，32×48）。
+   * 山屋小燈一直亮著 → 點亮圖；最後一盞（final）→ 金色曙光款。回傳貼圖 key；美術圖沒讀到回傳 null（退回 lodgeLampTex 程式畫）
+   */
+  function lodgeLampArt(scene, kind) {
+    var MI = J.MapInfo, k = MI && MI.lampArtKey ? MI.lampArtKey(kind === 'final', true) : null;
+    return k && hasArt(scene, k) ? J.Assets.texKey(k) : null;
+  }
+  /** sprites.js 有登記、而且真的載入成功（不是佔位圖）：同 MapScene.hasArt */
+  function hasArt(scene, k) {
+    var A = J.Assets;
+    if (!A || !A.has || !A.has(k)) return false;
+    return !!(scene.textures && scene.textures.exists(A.texKey(k))) && !(A.isPlaceholder && A.isPlaceholder(scene, k));
+  }
+  /** v4.2.6 記號燈的圖案（71 號 2.5 D：畫旁邊書架的圖案）：不再有木牌，改成燈上方的小圓牌（2 倍解析度畫、縮回 22×22） */
+  function lampBadgeTex(scene, icon) {
+    var R = 2;
+    var k = tex(scene, 'east:lampbadge:' + icon, 22 * R, 22 * R, function (g, w, h) {
+      g.fillStyle = '#1e1a2e'; g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 1, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#fff6d8'; g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 1 - 2 * R, 0, Math.PI * 2); g.fill();
+      g.font = (13 * R) + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(icon, w / 2, h / 2 + R);
+    });
+    return k;
+  }
+  /**
+   * v4.2.6 地圖修正：東部程式畫的物件「有美術圖就用美術圖」。檔名、尺寸照 AUD 的 W2_需要的物件圖規格.md（美術 ART-OBJ 照這份畫）。
+   * 圖放進 assets/ui/ 並在 sprites.js 登記後就會自動換上；還沒有圖（sprites.js 沒登記）時用下面程式畫的版本。
+   */
+  var ART = {
+    flame: 'obj_trial_flame',                         // M40 試煉燈座的火焰 32×40（取代 🔥）
+    plate: 'obj_constellation_plate',                 // M43 星座牌 32×24（v4.2.6 W1c；牌面空白，星數由程式疊）
+    frost: 'obj_frost_arrow',                         // M38 霜箭頭 32×32（畫朝上，程式轉向）
+    box_stone: 'obj_box_stone', box_ice: 'obj_box_ice',       // 推箱的箱子 32×40
+    wallstone: 'obj_wall_stone', wall_ice: 'obj_wall_ice',   // 推箱房內牆 32×40
+    pillar: 'obj_hanoi_pillar',                       // 疊石盤的柱子 32×48
+    disc0: 'obj_hanoi_disc_0', disc1: 'obj_hanoi_disc_1', disc2: 'obj_hanoi_disc_2',   // 石盤 16／24／30×9
+    star_off: 'obj_star_stone_off', star_on: 'obj_star_stone_on',   // M40 星石 32×32
+    cloud: 'obj_soft_cloud',                          // M42 軟雲 32×32（邊角版 obj_soft_cloud_n… 這一輪不用，全部同一張）
+    flame_2: 'obj_trial_flame_2',                     // 火焰第 2 幀（兩幀輪播約 4 fps）
+    goal_stone: 'obj_box_target_stone', goal_ice: 'obj_box_target_ice',   // 推箱目標格 32×32（取代黃框）
+    echo_open: 'obj_echo_door_open'                   // M37 回音謎門打開 56×56（關著時不畫，用背景的門）
+  };
+  // 美術 ART-OBJ 實際交的火焰是 44×48，腳底點＝石盆口內側前緣（物件圖清單.md：石環頂 y＋39；換算成燈座 seat 上緣往下 30 像素）
+  // 技術長決定：用五科顏色的火焰（obj_trial_flame_<科目>）與燈座正面的科目記號（obj_trial_mark_<科目>，7×7，形狀＋顏色）
+  var SUBJ_KEY = { '國語': 'kokugo', '英語': 'english', '數學': 'math', '自然': 'science', '社會': 'social' };
+  Object.keys(SUBJ_KEY).forEach(function (sj) {
+    var k = SUBJ_KEY[sj];
+    ART['flame_' + k] = 'obj_trial_flame_' + k; ART['flame_' + k + '_2'] = 'obj_trial_flame_' + k + '_2'; ART['mark_' + k] = 'obj_trial_mark_' + k;
+  });
+  var FLAME_FOOT_Y = 30, FLAME_FPS_MS = 250;
+  // 回音謎門打開圖：中心＝兩格門的中心，腳底＝門那一列下緣往下 18 像素（美術實測背景的門 y 220–271，圖腳底 274）
+  var ECHO_OPEN_FOOT = 18;
+  /** 有美術圖（sprites.js 登記且載入成功）就回傳美術圖的貼圖 key，沒有就回傳 fallback（程式畫的 key） */
+  function artOr(scene, name, fallback) {
+    var k = ART[name];
+    return k && hasArt(scene, k) ? J.Assets.texKey(k) : (typeof fallback === 'function' ? fallback() : fallback);
+  }
+  /** v4.2.6 W1c：第 2 輪美術圖（ART-OBJ 第2輪）。有登記、載入成功就用，否則回 null（呼叫的地方退回原本的程式畫法） */
+  var ART2 = ['obj_gate_stone', 'obj_gate_ice', 'obj_gate_wood', 'obj_scale', 'obj_weight_1', 'obj_weight_2', 'obj_weight_4', 'obj_weight_5', 'obj_num_pillar', 'obj_num_floor',
+    'obj_loan_desk', 'obj_light_source', 'obj_crystal_on', 'obj_crystal_off', 'obj_mirror_slash', 'obj_mirror_backslash', 'obj_hint_arrow', 'obj_lamp_dot_on', 'obj_lamp_dot_off',
+    'obj_plate_A_on', 'obj_plate_A_off', 'obj_plate_B_on', 'obj_plate_B_off', 'obj_plate_C_on', 'obj_plate_C_off', 'obj_card_back'];
+  var CARD_ART = { 橡皮擦: 'eraser', 雨傘: 'umbrella', 鑰匙: 'key', 手帕: 'handkerchief' }, SHAPE_ART = { 紅: 'red', 藍: 'blue', 圓: 'circle', 三角: 'triangle', 方: 'square' };
+  ART2.push('obj_shelf_sign_fish');
+  for (var hci = 1; hci <= 12; hci++) ART2.push('obj_hard_cloud_SC' + hci);   // v4.2.6 W1d：M42 整朵硬雲
+  ['eraser', 'umbrella', 'key', 'handkerchief'].forEach(function (k) { ART2.push('obj_card_' + k + '_open', 'obj_card_' + k + '_matched'); });
+  ['wall', 'floor'].forEach(function (w) { ART2.push('obj_shape_' + w + '_blank'); ['red', 'blue'].forEach(function (c) { ['circle', 'triangle', 'square'].forEach(function (sh) { ART2.push('obj_shape_' + w + '_' + c + '_' + sh); }); }); });
+  // M42 軟雲／硬雲九宮格版（QB-M42-R02、R03）：檔名後綴＝露在外面的邊（n s w e 的順序），四邊都接著別格＝沒有後綴
+  ['soft', 'hard'].forEach(function (kd) { ['', '_n', '_s', '_w', '_e', '_ns', '_we', '_nw', '_ne', '_sw', '_se', '_nsw', '_nse', '_nwe', '_swe', '_nswe'].forEach(function (sf) { ART2.push('obj_' + kd + '_cloud' + sf); }); });
+  /** 一朵雲（同一組 cells）裡，這一格哪幾邊沒有接著同一朵雲的格子 */
+  function cloudEdgeKey(kind, cells, p, ground) {
+    // ground(x,y)：背景本來就能走的雲格也算鄰居（硬雲接到實心雲時，接縫不多畫一道邊；技術長 W1c 第 4 點）
+    var has = function (x, y) { return cells.some(function (q) { return q[0] === x && q[1] === y; }) || !!(ground && ground(x, y)); };
+    var sf = (has(p[0], p[1] - 1) ? '' : 'n') + (has(p[0], p[1] + 1) ? '' : 's') + (has(p[0] - 1, p[1]) ? '' : 'w') + (has(p[0] + 1, p[1]) ? '' : 'e');
+    return 'obj_' + kind + '_cloud' + (sf ? '_' + sf : '');
+  }
+  function art2(scene, k) { return k && hasArt(scene, k) ? J.Assets.texKey(k) : null; }
+  function shapeArtKey(label, slab) {
+    var c = SHAPE_ART[label.charAt(0)], sh = SHAPE_ART[label.slice(1)];
+    return 'obj_shape_' + (slab ? 'wall' : 'floor') + '_' + (c && sh ? c + '_' + sh : 'blank');
+  }
+  /** 美術底圖＋程式疊的數字（數字柱、數字地板）：美術沒讀到回 null */
+  function numOverlay(fx, x, y, artKey, n, stand) {
+    var k = art2(fx.scene, artKey);
+    if (!k) return null;
+    var base = stand ? fx.stand(x, y, k) : fx.ground(x, y, k);
+    var ty = stand ? (y + 1) * T - 40 + 24 : y * T + 15;   // 美術清單：數字柱牌面中心 (16,24)／40 高；地板中心 (16,15)
+    var num = fx.image(x * T + T / 2, ty, textTex(fx.scene, 'east:numov:' + n + (stand ? ':p' : ':f'), String(n), 26, 18, '#fffbe8', null, 13), (stand ? (y + 1) * T : y * T + T / 2) + 1, 0.5, 0.5);
+    return [base, num];
+  }
+  /** v4.2.6 試煉燈座的火焰（QB-M40-06）：程式畫的像素火焰（下寬上尖、白芯黃身橘邊），取代 🔥 表情符號 */
+  function flameTex(scene, color) {
+    return tex(scene, 'east:flame2:' + (color || ''), 32, 40, function (g) {
+      function drop(cx, by, w, h, c) {
+        g.fillStyle = c; g.beginPath(); g.moveTo(cx, by - h);
+        g.bezierCurveTo(cx + w * 0.15, by - h * 0.6, cx + w / 2, by - h * 0.45, cx + w / 2, by - h * 0.22);
+        g.arc(cx, by - h * 0.22, w / 2, 0, Math.PI);
+        g.bezierCurveTo(cx - w / 2, by - h * 0.45, cx - w * 0.15, by - h * 0.6, cx, by - h); g.fill();
+      }
+      drop(16, 39, 28, 39, '#1e1a2e');
+      drop(16, 38, 25, 36, '#ff7a2a'); drop(16, 37, 18, 27, '#ffc94a'); drop(16, 36, 10, 16, '#fff4c2');
+    });
+  }
+  /** v4.2.6 霜箭頭（QB-M38-03）：粗的冰藍箭頭＋深藍外框（白冰地上也看得到），畫朝上，程式轉向 */
+  function frostArrowTex(scene) {
+    return tex(scene, 'east:frost2', 32, 32, function (g) {
+      g.beginPath(); g.moveTo(16, 3); g.lineTo(28, 15); g.lineTo(21, 15); g.lineTo(21, 29); g.lineTo(11, 29); g.lineTo(11, 15); g.lineTo(4, 15); g.closePath();
+      g.fillStyle = 'rgba(122,200,255,0.92)'; g.fill(); g.lineJoin = 'round'; g.lineWidth = 2.5; g.strokeStyle = '#123a6a'; g.stroke();
+      g.fillStyle = 'rgba(255,255,255,0.85)'; g.fillRect(14, 9, 3, 16);
+    });
+  }
+  /** v4.2.6 W1b（技術長：「↺」「oo」不要像佔位圖）：冰房重來點＝冰藍圓章＋用線條畫的迴轉箭頭（不用字型），風格同霜箭頭（冰藍底、深藍外框、白高光） */
+  function iceResetTex(scene) {
+    return tex(scene, 'east:reset2', 30, 30, function (g) {
+      g.beginPath(); g.arc(15, 15, 13, 0, Math.PI * 2); g.fillStyle = 'rgba(122,200,255,0.88)'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = '#123a6a'; g.stroke();
+      g.beginPath(); g.arc(15, 15, 7, Math.PI * 0.15, Math.PI * 1.75); g.lineWidth = 3; g.strokeStyle = '#ffffff'; g.lineCap = 'round'; g.stroke();
+      g.beginPath(); g.moveTo(21.5, 6.5); g.lineTo(22.5, 13.5); g.lineTo(15.5, 11.5); g.closePath(); g.fillStyle = '#ffffff'; g.fill();
+      g.lineWidth = 1; g.strokeStyle = '#123a6a'; g.stroke();
+    });
+  }
+  /** v4.2.6 W1b：冰柱上的點數牌（P2-3 提示）＝冰晶小牌（圓角、冰藍漸層、深藍外框），點數畫成菱形冰晶（不用「•」字） */
+  function iceDotsTex(scene, n) {
+    return tex(scene, 'east:icedots2:' + n, 32, 20, function (g, w, h) {
+      var r = 5; g.beginPath(); g.moveTo(r + 1, 1); g.lineTo(w - r - 1, 1); g.quadraticCurveTo(w - 1, 1, w - 1, r + 1); g.lineTo(w - 1, h - r - 1); g.quadraticCurveTo(w - 1, h - 1, w - r - 1, h - 1);
+      g.lineTo(r + 1, h - 1); g.quadraticCurveTo(1, h - 1, 1, h - r - 1); g.lineTo(1, r + 1); g.quadraticCurveTo(1, 1, r + 1, 1); g.closePath();
+      var gr = g.createLinearGradient ? g.createLinearGradient(0, 0, 0, h) : null;
+      if (gr) { gr.addColorStop(0, '#d8f2ff'); gr.addColorStop(1, '#7ec4ef'); g.fillStyle = gr; } else g.fillStyle = '#a8dcf7';
+      g.fill(); g.lineWidth = 2; g.strokeStyle = '#123a6a'; g.stroke();
+      var gap = 8, x0 = w / 2 - (n - 1) * gap / 2;
+      for (var i = 0; i < n; i++) { var cx = x0 + i * gap; g.beginPath(); g.moveTo(cx, 5); g.lineTo(cx + 3.5, 10); g.lineTo(cx, 15); g.lineTo(cx - 3.5, 10); g.closePath(); g.fillStyle = '#ffffff'; g.fill(); g.lineWidth = 1.2; g.strokeStyle = '#123a6a'; g.stroke(); }
+    });
+  }
+  /** v4.2.6 推箱的箱子與內牆（QB-M40-09）：箱子＝木框箱（亮、十字木條、提把），內牆＝深色粗石柱（暗、頂面平、有裂紋），一眼分得出 */
+  function crateTex(scene, ice) {
+    return tex(scene, 'east:block:box_' + (ice ? 'ice' : 'stone'), 32, 40, function (g) {
+      var face = ice ? '#cfeeff' : '#c79a5e', dark = ice ? '#5c9cc4' : '#6b4521', top = ice ? '#eef9ff' : '#e0b778';
+      g.fillStyle = '#1e1a2e'; g.fillRect(3, 9, 26, 30); g.fillRect(4, 5, 24, 6);
+      g.fillStyle = top; g.fillRect(5, 6, 22, 6);
+      g.fillStyle = face; g.fillRect(5, 12, 22, 25);
+      g.strokeStyle = dark; g.lineWidth = 3; g.beginPath(); g.moveTo(6, 13); g.lineTo(26, 36); g.moveTo(26, 13); g.lineTo(6, 36); g.stroke();
+      g.lineWidth = 2; g.strokeRect(6, 13, 20, 23);
+      g.fillStyle = dark; g.fillRect(13, 7, 6, 3);
+    });
+  }
+  function wallRockTex(scene, ice) {
+    return tex(scene, ice ? 'east:block:wall_ice' : 'east:block:wallstone', 32, 40, function (g) {
+      var face = ice ? '#7fa9c8' : '#4a4440', top = ice ? '#a9cbe2' : '#6c6560', crack = ice ? '#3d6a8c' : '#24201e';
+      g.fillStyle = '#121018'; g.fillRect(1, 2, 30, 38);
+      g.fillStyle = top; g.fillRect(2, 3, 28, 9);
+      g.fillStyle = face; g.fillRect(2, 12, 28, 27);
+      g.strokeStyle = crack; g.lineWidth = 2; g.beginPath(); g.moveTo(9, 13); g.lineTo(12, 22); g.lineTo(8, 30); g.moveTo(22, 14); g.lineTo(19, 25); g.lineTo(24, 37); g.moveTo(2, 25); g.lineTo(30, 25); g.stroke();
+    });
+  }
+  /** v4.2.6 疊石盤的柱子（QB-M40-11）：寬石座＋細石柱，三根都畫（空柱也看得到） */
+  function pillarTex(scene) {
+    return tex(scene, 'east:hanoi:pillar', 32, 48, function (g) {
+      g.fillStyle = '#1e1a2e'; g.fillRect(2, 38, 28, 10); g.fillRect(13, 4, 6, 36);
+      g.fillStyle = '#9aa2b4'; g.fillRect(3, 39, 26, 8); g.fillStyle = '#c3c9d6'; g.fillRect(3, 39, 26, 2);
+      g.fillStyle = '#b4bccb'; g.fillRect(14, 5, 4, 34); g.fillStyle = '#e1e5ee'; g.fillRect(14, 5, 1, 34);
+    });
+  }
+  /** v4.2.6 石盤（小 16、中 24、大 30 寬，9 高；金、銀、銅），外框深色 */
+  // 燈座在背景切出來的上層格（深度 40000，畫在角色上面）裡：火焰要畫在上層格之上才看得到（舊的 🔥 就是被盆緣蓋掉大半）；夜路藍色層 40002 之下
+  var FLAME_DEPTH = 40001;
+  var DISC_W = [16, 24, 30], DISC_H = 9, DISC_STEP = 8;
+  function discTex(scene, size) {
+    var w = DISC_W[size] || 20;
+    return tex(scene, 'east:disc2:' + size, w, DISC_H, function (g) {
+      var c = [['#ffe07a', '#c8962a'], ['#e6ebf2', '#8a93a6'], ['#d29a6a', '#7a4a2a']][size] || ['#bbb', '#666'];
+      g.fillStyle = '#1e1a2e'; g.fillRect(0, 0, w, DISC_H);
+      g.fillStyle = c[1]; g.fillRect(1, 1, w - 2, DISC_H - 2);
+      g.fillStyle = c[0]; g.fillRect(1, 1, w - 2, 3);
+    });
+  }
+  /** v4.2.6 M40 星石（QB-M40-07）：嵌在地上的五角星石＋號碼；沒亮灰藍、亮金黃（取代灰／黃色橢圓字牌） */
+  function starStoneTex(scene, label, on) {
+    return tex(scene, 'east:starstone:' + label + ':' + (on ? 1 : 0), 32, 32, function (g) {
+      g.beginPath();
+      for (var i = 0; i < 10; i++) { var r = i % 2 ? 6.5 : 15, a = -Math.PI / 2 + i * Math.PI / 5; g.lineTo(16 + Math.cos(a) * r, 17 + Math.sin(a) * r); }
+      g.closePath(); g.fillStyle = on ? '#ffd84a' : '#7d86a0'; g.fill(); g.lineWidth = 2; g.strokeStyle = on ? '#fff6c8' : '#2b3040'; g.stroke();
+      g.font = 'bold 11px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = on ? '#5a3a00' : '#eef1f8'; g.fillText(label, 16, 18);
+    });
+  }
+  /** 星石：美術 obj_star_stone_on／off 優先（號碼由程式另外疊在上面），沒有就用程式畫的五角星石 */
+  function starStone(scene, label, on) {
+    var ak = ART[on ? 'star_on' : 'star_off'];
+    if (!hasArt(scene, ak)) return starStoneTex(scene, label, on);
+    // 美術星石（星中央是平的）＋程式疊號碼：粗體 12px、深色描邊，32×32 下看得清楚（技術長：用清楚的字）
+    var src = scene.textures.get(J.Assets.texKey(ak)).getSourceImage();
+    return tex(scene, 'east:starstoneart:' + label + ':' + (on ? 1 : 0), 32, 32, function (g) {
+      g.drawImage(src, 0, 0);
+      g.font = 'bold 12px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.lineWidth = 3; g.strokeStyle = on ? '#fff6c8' : '#1e1a2e'; g.strokeText(label, 16, 17);
+      g.fillStyle = on ? '#5a3a00' : '#ffffff'; g.fillText(label, 16, 17);
+    });
+  }
+  /** 硬雲（M41 雲階；v4.2.6 起 M42 軟雲答對變硬後也畫這張，不靠背景） */
+  function hardCloudTex(scene) {
+    return tex(scene, 'east:cloud:hard', 40, 40, function (g) {
+      g.fillStyle = 'rgba(255,255,255,0.95)';
+      [[12, 24, 11], [24, 20, 12], [30, 27, 9], [18, 29, 10]].forEach(function (c) { g.beginPath(); g.arc(c[0], c[1], c[2], 0, Math.PI * 2); g.fill(); });
+      g.strokeStyle = 'rgba(190,205,235,0.9)'; g.lineWidth = 2; g.beginPath(); g.moveTo(4, 34); g.lineTo(36, 34); g.stroke();
+    });
+  }
+  /** v4.2.6 M42 軟雲（QB-M42-02）：淡紫灰、半透明、蓬鬆＋細風紋，沒有虛線外框；一格一張、相鄰接得起來，和背景的實心白雲明顯不同 */
+  function softCloudTex2(scene) {
+    return tex(scene, 'east:cloud:soft', 32, 32, function (g) {   // v4.2.6：沿用舊的貼圖名稱（v40_ch7 S40-6 檢查程式備援圖有畫）
+      g.fillStyle = 'rgba(196,184,236,0.55)';
+      [[6, 18, 9], [16, 13, 10], [26, 18, 9], [16, 22, 10]].forEach(function (c) { g.beginPath(); g.arc(c[0], c[1], c[2], 0, Math.PI * 2); g.fill(); });
+      g.strokeStyle = 'rgba(120,104,190,0.7)'; g.lineWidth = 1.5;
+      g.beginPath(); g.moveTo(5, 14); g.quadraticCurveTo(13, 10, 20, 14); g.moveTo(11, 23); g.quadraticCurveTo(19, 19, 27, 23); g.stroke();
     });
   }
   function lodgeLampTex(scene, kind, icon) {
@@ -207,13 +422,31 @@
     var self = this, P = this.P, st = this.state();
     EF.progress(st);
     // 山屋小燈（回復＋存檔；71 號 2.1、2.12）
+    self.imgs.lamps = [];
     P.lamps.forEach(function (l) {
-      self.stand(l.x, l.y, lodgeLampTex(self.scene, l.kind, l.icon));
-      if (self.scene.addGlow) self.scene.addGlow(l.x * T + T / 2, l.y * T + T / 2 - 8, 0.6);   // 光暈由 MapScene 管
+      // v4.2.6：美術燈（32×48，腳底貼格子下緣中央）優先；沒讀到才用程式畫的。draw:false＝背景已畫燈，不畫圖、只留互動格與光暈
+      var art = lodgeLampArt(self.scene, l.kind), img = null;
+      if (l.draw !== false) {
+        img = self.stand(l.x, l.y, art || lodgeLampTex(self.scene, l.kind, l.icon));
+        if (art && img.setDisplaySize) img.setDisplaySize(LAMP_W, LAMP_H);
+      }
+      var badge = null;
+      if (art && l.icon) {   // 記號燈：圖案畫在燈的上方（美術燈沒有木牌）；背景燈也一樣畫在燈頂上方
+        badge = self.image(l.x * T + T / 2, (l.y + 1) * T - LAMP_H - 1, lampBadgeTex(self.scene, l.icon), (l.y + 1) * T - 1, 0.5, 1);
+        if (badge.setScale) badge.setScale(0.5);
+      }
+      self.imgs.lamps.push({ lamp: l, img: img, art: !!art, badge: badge });
+      // 光暈由 MapScene 管：美術燈對準火焰（腳底上方 GLOW_Y）；程式畫的舊燈照舊（格子中心上方 8 像素）
+      if (self.scene.addGlow) self.scene.addGlow(l.x * T + T / 2, art || l.draw === false ? (l.y + 1) * T - LAMP_GLOW_Y : l.y * T + T / 2 - 8, art || l.draw === false ? 0.8 : 0.6);
       self.objs[key(l.x, l.y)] = { kind: 'east', what: 'lamp', lamp: l, prompt: l.kind === 'marker' ? '點亮記號燈（回復、存檔）' : '點亮山屋小燈（回復、存檔）' };
     });
     if (P.echoDoor) {
-      this.imgs.echo = P.echoDoor.cells.map(function (c) { return self.stand(c[0], c[1], blockTex(self.scene, 'echo')); });
+      // v4.2.6 地圖修正（QB-M37-01：背景畫好的「大嘴巴」回音謎門被兩塊灰方塊整個蓋住）：不畫方塊，用背景的門（只擋路、可互動）
+      this.imgs.echo = [];
+      var ex = P.echoDoor.cells.map(function (c) { return c[0]; }), ey = P.echoDoor.cells.map(function (c) { return c[1]; });
+      var eo = artOr(self.scene, 'echo_open', null);
+      this.imgs.echoOpen = eo ? this.image((Math.min.apply(null, ex) + Math.max.apply(null, ex) + 1) / 2 * T, (Math.max.apply(null, ey) + 1) * T + ECHO_OPEN_FOOT, eo, (Math.max.apply(null, ey) + 1) * T - 1, 0.5, 1) : null;
+      if (this.imgs.echoOpen && this.imgs.echoOpen.setVisible) this.imgs.echoOpen.setVisible(EF.has(st, 'done', 'echo_' + P.id));
       P.echoDoor.cells.forEach(function (c) { self.objs[key(c[0], c[1])] = { kind: 'east', what: 'echo', prompt: '摸摸回音謎門' }; });
     }
     // 每一道各自建：資料有問題的那一道略過（不能玩、也不擋路），其他照常；主控台寫原因
@@ -230,11 +463,20 @@
     });
     this.buildIce();
     P.decals.forEach(function (d) {
-      if (d.type === 'ice_pillar_dots') self.stand(d.x, d.y, textTex(self.scene, 'east:icedots:' + d.dots, new Array(d.dots + 1).join('•'), 32, 20, '#e8f7ff', 'rgba(111,184,224,.85)', 16));
-      else self.ground(d.x, d.y, textTex(self.scene, 'east:frost:' + d.dir, { N: '⇧', S: '⇩', E: '⇨', W: '⇦' }[d.dir] || '❄', 32, 32, '#e8f7ff', null, 22));
+      if (d.type === 'ice_pillar_dots') self.stand(d.x, d.y, iceDotsTex(self.scene, d.dots));   // v4.2.6 W1b：冰晶小牌（不再是字型「•」）
+      else {   // v4.2.6（QB-M38-03）：霜箭頭改成粗的冰藍箭頭（美術 obj_frost_arrow 優先），依方向轉
+        var fa = self.ground(d.x, d.y, artOr(self.scene, 'frost', function () { return frostArrowTex(self.scene); }));
+        if (fa.setAngle) fa.setAngle({ N: 0, E: 90, S: 180, W: 270 }[d.dir] || 0);
+      }
     });
     // 書架的圖案牌（放大 1.5 倍、從遠處看得到；71 號 2.5、2.12）
+    // v4.2.6 地圖修正（QB-M39-03：背景已在每座書架上畫了分類木牌，程式又疊一塊白底圖示牌）：背景牌已經清楚，不再疊。
+    // 地圖資料 shelves[].draw_sign === true（背景沒畫牌的書架）才照舊畫
     P.shelves.forEach(function (s) {
+      if (s.drawSign !== true) return;
+      // v4.2.6 W1c（QB-M39-R01：動物書架背景沒畫牌）：美術 obj_shelf_sign_<icon>（和背景同款的吊牌）掛在書架頂板正中，比照背景的食物牌位置
+      var sk = art2(self.scene, 'obj_shelf_sign_' + s.icon);
+      if (sk) { self.image((s.area[0] + s.area[2] + 1) / 2 * T, s.area[1] * T + 8, sk, (s.area[3] + 1) * T, 0.5, 0); return; }
       var img = self.image((s.area[0] + s.area[2] + 1) / 2 * T, s.area[1] * T + 2, emojiTex(self.scene, 'east:shelf:' + s.icon, s.emoji, 30, 26, function (g, w, h) { g.fillStyle = '#7a5230'; g.fillRect(0, 0, w, h); g.fillStyle = '#f3e1b5'; g.fillRect(2, 2, w - 4, h - 4); }), (s.area[3] + 1) * T, 0.5, 0);
       if (img.setScale) img.setScale(1.5);
     });
@@ -255,7 +497,10 @@
       this.imgs.night = this.add(this.scene.add.rectangle(a[0] * T, a[1] * T, a[2] * T, a[3] * T, 0x1a2a6a, 0.32).setOrigin(0, 0).setDepth(DEPTH.NIGHT));
     }
     P.signs.forEach(function (s) {
-      self.stand(s.x, s.y, textTex(self.scene, 'east:sign:' + s.id, '木牌', 30, 22, '#fffbe8', '#8a5a30', 12));
+      // v4.2.6 地圖修正（QB-M44-01：入口木牌畫成黑框寫「木牌」兩個字＝佔位字）：改用路牌的美術圖 obj_road_sign（32×48）；
+      // 沒讀到才用 MapScene 程式畫的路牌（roadSignTexture，同一個木樁＋橫木牌的樣子）。字只在按 A 看木牌時出現
+      var sk = hasArt(self.scene, 'obj_road_sign') ? J.Assets.texKey('obj_road_sign') : (self.scene.roadSignTexture ? self.scene.roadSignTexture() : null);
+      if (sk) self.stand(s.x, s.y, sk);
       self.objs[key(s.x, s.y)] = { kind: 'east', what: 'sign', sign: s, prompt: '看看木牌' };
     });
     this.buildCloudStairs();
@@ -327,14 +572,15 @@
           I.door = door.map(function (c) { return self.stand(c[0], c[1], blockTex(sc, 'door')); });
           // 門上的燈平均排在門的正中間（門 1–3 格寬都不會疊在一起；燈之間 10px）
           var dcx = door.reduce(function (s, c) { return s + c[0]; }, 0) / door.length * T + T / 2, dcy = door[0][1];
-          for (var i = 0; i < pz.def.data.n; i++) I.dots.push(this.image(dcx + (i - (pz.def.data.n - 1) / 2) * Math.min(T, Math.max(12, door.length * T / pz.def.data.n)), dcy * T + 6, lampDotTex(sc, false), (dcy + 1) * T + 1, 0.5, 0.5));
+          for (var i = 0; i < pz.def.data.n; i++) I.dots.push(this.image(dcx + (i - (pz.def.data.n - 1) / 2) * Math.min(T, Math.max(12, door.length * T / pz.def.data.n)), dcy * T + (art2(sc, 'obj_gate_stone') ? -7 : 6), lampDotTex(sc, false), (dcy + 1) * T + 1, 0.5, 0.5));
           // 踏板和燈之間的發光線
           var gl = this.add(sc.add.graphics().setDepth(DEPTH.BEAM));
           if (gl.lineStyle) gl.lineStyle(2, 0x9fe8ff, 0.45);
           keys.forEach(function (k) { var p0 = C.plates[k]; tg[k].forEach(function (li) { var d = I.dots[li]; if (d && gl.lineBetween) gl.lineBetween(p0[0] * T + T / 2, p0[1] * T + T / 2, d.x, d.y); }); });
           I.lines = gl;
         }
-        keys.forEach(function (k) { var c = C.plates[k]; I.plates[k] = self.ground(c[0], c[1], plateTex(sc, k, false)); });
+        I.star = !door.length;   // v4.2.6（QB-M40-07）：五角星盤的星石畫成五角星石（美術 obj_star_stone_* 優先）
+        keys.forEach(function (k) { var c = C.plates[k]; I.plates[k] = self.ground(c[0], c[1], I.star ? starStone(sc, k, false) : plateTex(sc, k, false)); });
         if (!door.length) {   // 五角星盤：相鄰的星石之間畫淡淡的線（看得出「左右兩顆」）
           var g2 = this.add(sc.add.graphics().setDepth(DEPTH.GROUND - 0.5));
           if (g2.lineStyle) g2.lineStyle(2, 0xc8b8ff, 0.4);
@@ -354,10 +600,10 @@
       }
       case 'numseq': {
         var ns = CP.numSeq(pz.def, pz.def.data.length);
-        (C.pillars || []).forEach(function (c, i5) { self.stand(c[0], c[1], textTex(sc, 'east:num:pillar:' + ns[i5], String(ns[i5]), 30, 30, '#0b3a5a', '#d6f1ff', 15)); });
+        (C.pillars || []).forEach(function (c, i5) { if (!numOverlay(self, c[0], c[1], 'obj_num_pillar', ns[i5], true)) self.stand(c[0], c[1], textTex(sc, 'east:num:pillar:' + ns[i5], String(ns[i5]), 30, 30, '#0b3a5a', '#d6f1ff', 15)); });   // v4.2.6 W1c：美術數字柱＋程式疊數字
         (C.floors || []).forEach(function (c, i6) {
           var n = pz.def.data.options[i6];
-          self.ground(c[0], c[1], textTex(sc, 'east:num:floor:' + n, String(n), 30, 30, '#fffbe8', '#4a78a8', 15));
+          if (!numOverlay(self, c[0], c[1], 'obj_num_floor', n, false)) self.ground(c[0], c[1], textTex(sc, 'east:num:floor:' + n, String(n), 30, 30, '#fffbe8', '#4a78a8', 15));
           self.objs[key(c[0], c[1])] = { kind: 'east', what: 'floor', pz: pz, idx: i6, prompt: '選 ' + n };
         });
         I.gate = (C.gate || []).map(function (c) { return self.stand(c[0], c[1], blockTex(sc, 'ice')); });
@@ -366,38 +612,52 @@
       case 'memory': {
         I.cards = (C.cards || []).map(function (c, i7) {   // 石牌平放在地上（不擋路；站上去或站在旁邊按 A 翻牌）
           self.objs[key(c[0], c[1])] = { kind: 'east', what: 'card', pz: pz, idx: i7, prompt: '翻第 ' + (i7 + 1) + ' 張石牌' };   // 提示文字要不一樣（HUD.prompt 文字相同時不換按的對象）
-          return self.ground(c[0], c[1], textTex(sc, 'east:card:back', '？', 28, 30, '#fffbe8', '#5d6470', 16));
+          return self.ground(c[0], c[1], art2(sc, 'obj_card_back') || textTex(sc, 'east:card:back', '？', 28, 30, '#fffbe8', '#5d6470', 16));   // v4.2.6 W1c：美術翻牌
         });
         break;
       }
       case 'balance': {
         if (C.scale) {
           I.scale = this.stand(C.scale[0], C.scale[1], blockTex(sc, 'scale'));
-          I.scaleText = this.image(C.scale[0] * T + T / 2, C.scale[1] * T - 2, textTex(sc, 'east:scale:7|0', '7｜0', 44, 18, '#fffbe8', 'rgba(11,18,54,.75)', 12), (C.scale[1] + 1) * T + 2);
+          if (art2(sc, 'obj_scale')) {   // v4.2.6 W1c：美術天平 56×44（腳底＝格下緣中央）：左盤數字 (11,21)、右盤 (45,21)（圖內像素）
+            var sx0 = C.scale[0] * T + T / 2 - 28, sy0 = (C.scale[1] + 1) * T - 44, dep = (C.scale[1] + 1) * T + 2;
+            I.scaleL = this.image(sx0 + 11, sy0 + 21, textTex(sc, 'east:scaleN:' + pz.def.data.left + ':w', String(pz.def.data.left), 16, 14, '#fffbe8', null, 9), dep, 0.5, 0.5);
+            I.scaleR = this.image(sx0 + 45, sy0 + 21, textTex(sc, 'east:scaleN:0:w', '0', 16, 14, '#fffbe8', null, 9), dep, 0.5, 0.5);
+          } else I.scaleText = this.image(C.scale[0] * T + T / 2, C.scale[1] * T - 2, textTex(sc, 'east:scale:7|0', '7｜0', 44, 18, '#fffbe8', 'rgba(11,18,54,.75)', 12), (C.scale[1] + 1) * T + 2);
         }
         I.stones = (C.stones || []).map(function (c, i8) {
           var kg = pz.def.data.stones[i8];
           self.objs[key(c[0], c[1])] = { kind: 'east', what: 'stone', pz: pz, idx: i8, prompt: '把 ' + kg + ' 公斤的石頭放上天平（或拿下來）' };
+          var wk = art2(sc, 'obj_weight_' + kg), WC = { 1: [15, 26], 2: [16, 25], 4: [14, 23], 5: [16, 20] }[kg];
+          if (wk && WC) {   // v4.2.6 W1c：美術砝碼石（越重越大）＋程式在牌面寫數字（美術清單的牌面中心，圖內像素）
+            var wimg = self.stand(c[0], c[1], wk);
+            wimg.__num = self.image(c[0] * T + WC[0], (c[1] + 1) * T - 32 + WC[1], textTex(sc, 'east:kgN:' + kg, String(kg), 12, 12, '#fffbe8', null, kg === 1 ? 7 : 8), (c[1] + 1) * T, 0.5, 0.5);
+            return wimg;
+          }
           return self.stand(c[0], c[1], textTex(sc, 'east:kg:' + kg, kg + 'kg', 28, 22, '#fffbe8', '#7a7064', 11));
         });
         break;
       }
       case 'sokoban': {
-        var Pp = CP.sokoParse(pz.def.data.rows), o = pz.origin, boxK = blockTex(sc, this.mapId === 'M38' ? 'box_ice' : 'box_stone');
-        Pp.goals.forEach(function (g3) { self.ground(o[0] + g3[0], o[1] + g3[1], tex(sc, 'east:goal', 32, 32, function (g) { g.fillStyle = 'rgba(255,230,120,.45)'; g.fillRect(3, 3, 26, 26); g.strokeStyle = '#ffe9a0'; g.lineWidth = 2; g.strokeRect(4, 4, 24, 24); })); });
+        // v4.2.6（QB-M40-09、QB-M38-07）：箱子像箱子、內牆像石柱（美術 obj_box_*／obj_wall_* 優先）
+        var iceRoom = this.mapId === 'M38';
+        var Pp = CP.sokoParse(pz.def.data.rows), o = pz.origin, boxK = artOr(sc, iceRoom ? 'box_ice' : 'box_stone', function () { return crateTex(sc, iceRoom); });
+        var wallK = artOr(sc, iceRoom ? 'wall_ice' : 'wallstone', function () { return wallRockTex(sc, iceRoom); });
+        var goalK = artOr(sc, iceRoom ? 'goal_ice' : 'goal_stone', function () { return tex(sc, 'east:goal', 32, 32, function (g) { g.fillStyle = 'rgba(255,230,120,.45)'; g.fillRect(3, 3, 26, 26); g.strokeStyle = '#ffe9a0'; g.lineWidth = 2; g.strokeRect(4, 4, 24, 24); }); });
+        Pp.goals.forEach(function (g3) { self.ground(o[0] + g3[0], o[1] + g3[1], goalK); });
         // 背景沒畫的內牆（P4-1 的 (54,39)、(53–55,41)）：程式畫成石塊（地圖格子本來就不能走）
-        Object.keys(Pp.walls).forEach(function (k) { var a = k.split(',').map(Number); if (a[0] > 0 && a[1] > 0 && a[0] < Pp.w - 1 && a[1] < Pp.h - 1) self.stand(o[0] + a[0], o[1] + a[1], blockTex(sc, 'wallstone')); });
+        Object.keys(Pp.walls).forEach(function (k) { var a = k.split(',').map(Number); if (a[0] > 0 && a[1] > 0 && a[0] < Pp.w - 1 && a[1] < Pp.h - 1) self.stand(o[0] + a[0], o[1] + a[1], wallK); });
         I.boxes = this.boxCells(pz).map(function (c) { return self.stand(c[0], c[1], boxK); });
         if (C.door && this.mapId === 'M40') this.ground(C.door[0], C.door[1], textTex(sc, 'east:doormark:box', '▣', 30, 30, '#ffe9a0', null, 18));   // 71 號 2.12：小石室門口畫箱子圖案
         I.arrows = [];
         break;
       }
       case 'mirror': {
-        I.source = this.stand(C.source[0], C.source[1], textTex(sc, 'east:source', '☀', 28, 28, '#ffd34d', '#3a3f4b', 18));
-        I.crystal = this.stand(C.crystal[0], C.crystal[1], textTex(sc, 'east:crystal:' + (solved ? 1 : 0), '◆', 28, 30, solved ? '#fff3a0' : '#9fd8ff', '#2b3a55', 18));
+        I.source = this.stand(C.source[0], C.source[1], art2(sc, 'obj_light_source') || textTex(sc, 'east:source', '☀', 28, 28, '#ffd34d', '#3a3f4b', 18));   // v4.2.6 W1c：美術光源、水晶、鏡子
+        I.crystal = this.stand(C.crystal[0], C.crystal[1], art2(sc, solved ? 'obj_crystal_on' : 'obj_crystal_off') || textTex(sc, 'east:crystal:' + (solved ? 1 : 0), '◆', 28, 30, solved ? '#fff3a0' : '#9fd8ff', '#2b3a55', 18));
         I.mirrors = C.mirrors.map(function (c, i9) {
           self.objs[key(c[0], c[1])] = { kind: 'east', what: 'mirror', pz: pz, idx: i9, prompt: '轉動第 ' + (i9 + 1) + ' 面鏡子' };
-          return self.stand(c[0], c[1], textTex(sc, 'east:mirror:/', '／', 28, 32, '#e8f7ff', '#4a5878', 20));
+          return self.stand(c[0], c[1], art2(sc, 'obj_mirror_slash') || textTex(sc, 'east:mirror:/', '／', 28, 32, '#e8f7ff', '#4a5878', 20));
         });
         I.beam = this.add(sc.add.graphics().setDepth(40001));
         break;
@@ -414,7 +674,7 @@
       }
       case 'symbol': {
         if (C.desk) {
-          this.stand(C.desk[0], C.desk[1], textTex(sc, 'east:dial', '🔢', 28, 26, '#fff', 'rgba(90,58,34,.85)', 16));
+          this.stand(C.desk[0], C.desk[1], art2(sc, 'obj_loan_desk') || textTex(sc, 'east:dial', '🔢', 28, 26, '#fff', 'rgba(90,58,34,.85)', 16));   // v4.2.6 W1c：美術借書台（不再是表情符號）
           this.objs[key(C.desk[0], C.desk[1])] = { kind: 'east', what: 'desk', pz: pz, prompt: '轉動借書台的密碼盤' };
         }
         I.gate = (C.gate || []).map(function (c) { return self.stand(c[0], c[1], blockTex(sc, 'wood')); });
@@ -423,6 +683,9 @@
       case 'hanoi': {
         if (C.door) this.ground(C.door[0], C.door[1], textTex(sc, 'east:doormark:disc', '◎', 30, 30, '#ffe9a0', null, 18));   // 71 號 2.12：門口畫石盤圖案
         I.discs = [];
+        // v4.2.6（QB-M40-11：空柱子什麼都沒畫卻擋路）：三根柱子都畫（美術 obj_hanoi_pillar 優先）
+        var pk = artOr(sc, 'pillar', function () { return pillarTex(sc); });
+        I.pillars = C.pillars.map(function (c) { return self.stand(c[0], c[1], pk); });
         C.pillars.forEach(function (c) { self.objs[key(c[0], c[1])] = { kind: 'east', what: 'hanoi', pz: pz, prompt: '搬石盤' }; });
         break;
       }
@@ -439,7 +702,7 @@
         var show = EF.puzzleVisible(st, this.P, pz), keys = CP.lightKeys(pz.def), on = solved ? pz.def.data.goal || [] : rt.on, onDoor = !!(C.door && C.door.length);
         keys.forEach(function (k, i) {
           var p = I.plates[k];
-          if (p) { if (p.setTexture) p.setTexture(plateTex(sc, k, !onDoor && !!on[i])); vis(p, show); }
+          if (p) { if (p.setTexture) p.setTexture(I.star ? starStone(sc, k, !!on[i]) : plateTex(sc, k, !onDoor && !!on[i])); vis(p, show); }
         });
         (I.dots || []).forEach(function (d, i) { if (d.setTexture) d.setTexture(lampDotTex(sc, solved || !!on[i], '#ffd34d')); });
         (I.door || []).forEach(function (d) { vis(d, !solved); });
@@ -450,12 +713,14 @@
       case 'memory': (I.cards || []).forEach(function (c, i) {
         var up = solved || rt.matched.indexOf(i) >= 0 || rt.open.indexOf(i) >= 0 || self.revealing;
         var m = rt.matched.indexOf(i) >= 0 || solved;   // 配對好的（黃底）和翻開中的（米色）用不同的貼圖
-        if (c.setTexture) c.setTexture(up ? textTex(sc, 'east:card:' + rt.cards[i] + (m ? ':m' : ':o'), rt.cards[i], 28, 30, '#2a1e22', m ? '#ffe9a0' : '#f3e1b5', 9) : textTex(sc, 'east:card:back', '？', 28, 30, '#fffbe8', '#5d6470', 16));
+        var ca = CARD_ART[rt.cards[i]], upK = ca && art2(sc, 'obj_card_' + ca + (m ? '_matched' : '_open')), backK = art2(sc, 'obj_card_back');   // v4.2.6 W1c：美術翻牌（物品圖，翻開／配對兩種）
+        if (c.setTexture) c.setTexture(up ? (upK || textTex(sc, 'east:card:' + rt.cards[i] + (m ? ':m' : ':o'), rt.cards[i], 28, 30, '#2a1e22', m ? '#ffe9a0' : '#f3e1b5', 9)) : (backK || textTex(sc, 'east:card:back', '？', 28, 30, '#fffbe8', '#5d6470', 16)));
       }); break;
       case 'balance': {
         var d = pz.def.data, onSet = solved ? (CP.balanceAnswers(pz.def)[0] || []).map(function (kg) { return d.stones.indexOf(kg); }) : rt.on;
-        (I.stones || []).forEach(function (s, i) { vis(s, onSet.indexOf(i) < 0); });
+        (I.stones || []).forEach(function (s, i) { vis(s, onSet.indexOf(i) < 0); vis(s.__num, onSet.indexOf(i) < 0); });
         var sum = onSet.reduce(function (s2, i) { return s2 + d.stones[i]; }, 0);
+        if (I.scaleR && I.scaleR.setTexture) I.scaleR.setTexture(textTex(sc, 'east:scaleN:' + sum + (sum === d.left ? ':g' : ':w'), String(sum), 16, 14, sum === d.left ? '#7be08a' : '#fffbe8', null, 9));
         if (I.scaleText && I.scaleText.setTexture) I.scaleText.setTexture(textTex(sc, 'east:scale:' + d.left + '|' + sum, d.left + '｜' + sum, 44, 18, sum === d.left ? '#7be08a' : '#fffbe8', 'rgba(11,18,54,.75)', 12));
         break;
       }
@@ -466,7 +731,7 @@
       }
       case 'mirror': {
         var m = solved ? (CP.solve(pz.def).winning_states[0] || rt.m) : rt.m;
-        (I.mirrors || []).forEach(function (img, i) { if (img.setTexture) img.setTexture(textTex(sc, 'east:mirror:' + m[i], m[i] === '/' ? '／' : '＼', 28, 32, '#e8f7ff', '#4a5878', 20)); });
+        (I.mirrors || []).forEach(function (img, i) { if (img.setTexture) img.setTexture(art2(sc, m[i] === '/' ? 'obj_mirror_slash' : 'obj_mirror_backslash') || textTex(sc, 'east:mirror:' + m[i], m[i] === '/' ? '／' : '＼', 28, 32, '#e8f7ff', '#4a5878', 20)); });
         var b = CP.beam(pz.def, m), o = pz.origin, g = I.beam;
         if (g && g.clear) {
           g.clear(); g.lineStyle(4, 0xffe27a, 0.85);
@@ -474,7 +739,7 @@
           for (var i = 1; i < pts.length; i++) g.lineBetween(pts[i - 1][0] * T + T / 2, pts[i - 1][1] * T + T / 2, pts[i][0] * T + T / 2, pts[i][1] * T + T / 2);
           g.lineBetween(C.source[0] * T + T / 2, C.source[1] * T + T / 2, C.beamStart[0] * T + T / 2, C.beamStart[1] * T + T / 2);
         }
-        if (I.crystal && I.crystal.setTexture) I.crystal.setTexture(textTex(sc, 'east:crystal:' + (b.hit ? 1 : 0), '◆', 28, 30, b.hit ? '#fff3a0' : '#9fd8ff', '#2b3a55', 18));
+        if (I.crystal && I.crystal.setTexture) I.crystal.setTexture(art2(sc, b.hit ? 'obj_crystal_on' : 'obj_crystal_off') || textTex(sc, 'east:crystal:' + (b.hit ? 1 : 0), '◆', 28, 30, b.hit ? '#fff3a0' : '#9fd8ff', '#2b3a55', 18));
         this.beamPath = b.path;   // 測試用
         break;
       }
@@ -499,7 +764,9 @@
           var c = C.pillars[pi];
           stack.forEach(function (size, h) {
             var w = 12 + size * 7;
-            I.discs.push(self.image(c[0] * T + T / 2, (c[1] + 1) * T - 4 - h * 7, tex(sc, 'east:disc:' + size, w, 7, function (g) { g.fillStyle = ['#e0b040', '#b0b8c8', '#8a6a4a'][size] || '#999'; g.fillRect(0, 0, w, 7); g.strokeStyle = '#2b2b2b'; g.strokeRect(0.5, 0.5, w - 1, 6); }), (c[1] + 1) * T + h, 0.5, 1));
+            // v4.2.6：石盤放大（16／24／30 寬、9 高），套在柱子上從石座往上疊（美術 obj_hanoi_disc_* 優先）
+            var dk = artOr(sc, 'disc' + size, function () { return discTex(sc, size); });
+            I.discs.push(self.image(c[0] * T + T / 2, (c[1] + 1) * T - 5 - h * DISC_STEP, dk, (c[1] + 1) * T + h, 0.5, 1));
           });
         });
         break;
@@ -533,8 +800,9 @@
   Fx.prototype.buildIce = function () {
     var self = this, sc = this.scene;
     this.P.iceRooms.forEach(function (r) {
-      r.rocks.forEach(function (c) { self.stand(c[0], c[1], blockTex(sc, 'rock')); });   // 冰石（格子本來就不能走；背景沒畫，程式畫）
-      if (r.reset) self.ground(r.reset[0], r.reset[1], textTex(sc, 'east:reset', '↺', 30, 30, '#e8f7ff', 'rgba(61,123,224,.55)', 18));
+      var rockK = artOr(sc, 'wall_ice', function () { return blockTex(sc, 'rock'); });   // v4.2.6 W1b：擋住滑行的冰岩用美術 obj_wall_ice（沒讀到才用程式方塊）
+      r.rocks.forEach(function (c) { self.stand(c[0], c[1], rockK); });   // 冰石（格子本來就不能走；背景沒畫）
+      if (r.reset) self.ground(r.reset[0], r.reset[1], iceResetTex(sc));   // v4.2.6 W1b：冰藍圓章＋線條迴轉箭頭（不再是字型「↺」）
     });
   };
 
@@ -560,9 +828,21 @@
   Fx.prototype.buildTrialLamps = function () {
     var self = this, sc = this.scene;
     this.imgs.trial = this.P.trialLamps.map(function (t) {
-      var x = (t.seat[0] + t.seat[2] + 1) / 2 * T, y = t.seat[1] * T + 4;
-      return { t: t, x: x, y: y, img: self.image(x, y, emojiTex(sc, 'east:flame:' + t.subject, '🔥', 22, 22), (t.seat[3] + 1) * T + 1, 0.5, 1), glow: null };
+      // v4.2.6（QB-M40-06：🔥 表情符號小、不在盆子正中、點亮前後差很少）：火焰圖（美術 obj_trial_flame 優先，沒有就用程式畫的像素火焰 32×40），
+      // seat＝[x0, y0, x1, y1]：腳底在石盆口（水平＝燈座中心，垂直＝seat 上緣往下 FLAME_FOOT_Y）。位置從 seat 算，不寫死背景像素（M40 背景重畫後燈座會搬）
+      var x = EF.flameX ? EF.flameX(t, T) : (t.seat[0] + t.seat[2] + 1) / 2 * T, y = t.seat[1] * T + FLAME_FOOT_Y, sk = SUBJ_KEY[t.subject];
+      var f1 = sk && hasArt(sc, ART['flame_' + sk]) ? J.Assets.texKey(ART['flame_' + sk]) : artOr(sc, 'flame', function () { return flameTex(sc); });
+      var f2 = sk && hasArt(sc, ART['flame_' + sk + '_2']) ? J.Assets.texKey(ART['flame_' + sk + '_2']) : (hasArt(sc, ART.flame_2) && f1 === J.Assets.texKey(ART.flame) ? J.Assets.texKey(ART.flame_2) : null);
+      // 科目記號（7×7）：貼在燈座石台正面中央（seat 下緣往上 10 像素），沒亮也看得到形狀
+      if (sk && hasArt(sc, ART['mark_' + sk])) self.image(x, (t.seat[3] + 1) * T - 10, J.Assets.texKey(ART['mark_' + sk]), FLAME_DEPTH, 0.5, 0.5);
+      return { t: t, x: x, y: y, f1: f1, f2: f2, img: self.image(x, y, f1, FLAME_DEPTH, 0.5, 1), glow: null };
     });
+    // 火焰兩幀輪播（約 4 fps；減少動態效果時不播）
+    var flick = (this.imgs.trial || []).filter(function (o) { return o.f2; });
+    if (flick.length && !this.reduced && sc.time && sc.time.addEvent) {
+      var fr = 0;
+      this.flameTimer = sc.time.addEvent({ delay: FLAME_FPS_MS, loop: true, callback: function () { fr = 1 - fr; flick.forEach(function (o) { if (o.img.setTexture && o.img.visible) o.img.setTexture(fr ? o.f2 : o.f1); }); } });
+    }
     this.redrawTrial();
   };
   /** 燈座：打倒霧影就亮（戰鬥回來時 onWake 再畫一次）；五燈全亮後五角星盤出現 */
@@ -571,7 +851,7 @@
     (this.imgs.trial || []).forEach(function (o) {
       var lit = EF.trialLampLit(st, o.t);
       if (o.img.setVisible) o.img.setVisible(lit);
-      if (lit && !o.glow && sc.addGlow) o.glow = sc.addGlow(o.x, o.y, 0.9, LAMP_COLOR[o.t.subject]);   // 光暈由 MapScene 管（場景關掉時一起清掉）
+      if (lit && !o.glow && sc.addGlow) o.glow = sc.addGlow(o.x, o.y - 14, 0.8, LAMP_COLOR[o.t.subject]);   // 光暈由 MapScene 管（場景關掉時一起清掉）
       if (!lit && o.glow && sc.removeGlow) { sc.removeGlow(o.glow); o.glow = null; }
     });
     var self = this;
@@ -597,10 +877,23 @@
 
   // ───────── 雲之深層：軟雲（M42）、星星與星座（M43）─────────
   Fx.prototype.buildClouds = function () {
-    var self = this, sc = this.scene, st = this.state(), k = this.P.softClouds.length ? softCloudTex(sc) : null;
-    this.imgs.clouds = {};
+    // v4.2.6（QB-M42-02：一格一格的白圓點＋虛線方框，像泡泡牆）：改成淡紫灰蓬鬆雲（美術 obj_soft_cloud 優先）
+    var self = this, sc = this.scene, st = this.state(), k = this.P.softClouds.length ? artOr(sc, 'cloud', function () { return softCloudTex2(sc); }) : null;
+    this.imgs.clouds = {}; this.imgs.hardClouds = {};
+    // v4.2.6（技術長）：軟雲答對變硬後，那幾格一律畫實心硬雲（不再只是把軟雲藏起來、露出背景；中路 SC3–SC5 的背景是天空）
+    var hk = this.P.softClouds.length ? hardCloudTex(sc) : null;
+    var Wd = J.World, ts = G() && G().data && G().data.tilesets, map = this.map, allSoft = {};
+    this.P.softClouds.forEach(function (c2) { c2.cells.forEach(function (q) { allSoft[key(q[0], q[1])] = true; }); });
+    var groundCloud = function (x, y) { return !!allSoft[key(x, y)] || !!(Wd && ts && Wd.isWalkable(ts, map, x, y, null)); };   // 實心雲或相鄰的另一朵軟雲（相鄰兩朵都變硬時中間不畫邊）
     this.P.softClouds.forEach(function (c, ci) {
-      var imgs = c.cells.map(function (p) { var img = self.ground(p[0], p[1], k); if (img.setDepth) img.setDepth((p[1] + 1) * T - 2); if (img.setAlpha) img.setAlpha(0.75); return img; });
+      // v4.2.6 W1d（技術長）：變硬後有整朵的美術圖 obj_hard_cloud_<id> 就畫一張（畫布＝外接矩形×32 四邊各多 8px，左上＝外接矩形左上 −(8,8)），讀不到才退回九宮格磚
+      var whole = art2(sc, 'obj_hard_cloud_' + c.id);
+      if (whole) {
+        var xs0 = Math.min.apply(null, c.cells.map(function (q) { return q[0]; })), ys0 = Math.min.apply(null, c.cells.map(function (q) { return q[1]; }));
+        var wimg = self.image(xs0 * T - 8, ys0 * T - 8, whole, DEPTH.PATH, 0, 0); if (wimg.setVisible) wimg.setVisible(false);
+        self.imgs.hardClouds[c.id] = [wimg];
+      } else self.imgs.hardClouds[c.id] = c.cells.map(function (p) { var img = self.ground(p[0], p[1], art2(sc, cloudEdgeKey('hard', c.cells, p, groundCloud)) || hk); if (img.setDepth) img.setDepth(DEPTH.PATH); if (img.setVisible) img.setVisible(false); return img; });
+      var imgs = c.cells.map(function (p) { var img = self.ground(p[0], p[1], art2(sc, cloudEdgeKey('soft', c.cells, p)) || k); if (img.setDepth) img.setDepth((p[1] + 1) * T - 2); if (img.setAlpha) img.setAlpha(0.75); return img; });
       self.imgs.clouds[c.id] = imgs;
       if (!self.reduced && imgs.length) self.tween({ targets: imgs, alpha: 0.55, duration: BREATH_MS * 1.5, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
       c.cells.forEach(function (p) { self.objs[key(p[0], p[1])] = { kind: 'east', what: 'cloud', cloud: c, prompt: '答題讓第 ' + (ci + 1) + ' 朵軟雲變硬' }; });
@@ -612,18 +905,18 @@
     var self = this, cs = this.P.cloudStairs;
     this.imgs.stairs = [];
     if (!cs || !EF.cloudStairsOpen(this.state(), this.P)) return;
-    var k = tex(this.scene, 'east:cloud:hard', 40, 40, function (g) {
-      g.fillStyle = 'rgba(255,255,255,0.95)';
-      [[12, 24, 11], [24, 20, 12], [30, 27, 9], [18, 29, 10]].forEach(function (c) { g.beginPath(); g.arc(c[0], c[1], c[2], 0, Math.PI * 2); g.fill(); });
-      g.strokeStyle = 'rgba(190,205,235,0.9)'; g.lineWidth = 2; g.beginPath(); g.moveTo(4, 34); g.lineTo(36, 34); g.stroke();
-    });
+    var k = hardCloudTex(this.scene);
     cs.cells.forEach(function (p) { var img = self.ground(p[0], p[1], k); if (img.setDepth) img.setDepth(DEPTH.PATH); self.imgs.stairs.push(img); });
   };
   /** 這一格因為東部欄位「變成可以走」（目前只有開了的雲階） */
   Fx.prototype.opens = function (x, y) { return !!this.P.cloudStairs && EF.cloudStairsOpen(this.state(), this.P, x, y); };
   Fx.prototype.redrawClouds = function () {
     var self = this, st = this.state();
-    this.P.softClouds.forEach(function (c) { var hard = EF.has(st, 'clouds', c.id); (self.imgs.clouds[c.id] || []).forEach(function (img) { if (img.setVisible) img.setVisible(!hard); }); });
+    this.P.softClouds.forEach(function (c) {
+      var hard = EF.has(st, 'clouds', c.id);
+      (self.imgs.clouds[c.id] || []).forEach(function (img) { if (img.setVisible) img.setVisible(!hard); });
+      ((self.imgs.hardClouds || {})[c.id] || []).forEach(function (img) { if (img.setVisible) img.setVisible(hard); });
+    });
   };
   Fx.prototype.buildStars = function () {
     var self = this, sc = this.scene;
@@ -633,7 +926,14 @@
       self.objs[key(s.x, s.y)] = { kind: 'east', what: 'star', star: s, prompt: '撿起第 ' + (s.i + 1) + ' 顆星星' };
     });
     this.P.constellations.forEach(function (c) {
-      self.imgs.consts[c.id] = self.image(c.x * T + T / 2, c.y * T + 2, textTex(sc, 'east:const:0', '☆☆☆', 44, 16, '#fff3a0', 'rgba(11,18,54,.7)', 12), (c.y + 2) * T, 0.5, 1);
+      // v4.2.6 W1c（QB-M43-03）：美術星座牌 obj_constellation_plate（32×24，牌面空白）立在圓台正前方中央（maps.js constellations[].plate＝腳底像素），
+      // 星數（★／☆）由程式疊在牌面；圖沒讀到才退回舊的黑底字標籤
+      var pk = artOr(sc, 'plate', null);
+      if (pk && Array.isArray(c.plate)) {
+        var px = c.plate[0], py = c.plate[1];
+        // v4.2.6 W1e（QB-M43-R07：牌面上的星數太小數不出來）：星數改畫在牌子正上方，15px 金字＋深色描邊
+        self.imgs.consts[c.id] = { plate: self.image(px, py, pk, py, 0.5, 1), stars: self.image(px, py - 24 - 9, textTex(sc, 'east:constp2:0', '☆☆☆', 50, 18, '#ffd34d', null, 15), py + 1, 0.5, 0.5) };
+      } else self.imgs.consts[c.id] = self.image(c.x * T + T / 2, c.y * T + 2, textTex(sc, 'east:const:0', '☆☆☆', 44, 16, '#fff3a0', 'rgba(11,18,54,.7)', 12), (c.y + 2) * T, 0.5, 1);
       [key(c.x, c.y), key(c.x, c.y + 1)].forEach(function (k) { self.objs[k] = { kind: 'east', what: 'constellation', con: c, prompt: '看看' + c.region + '的星座' }; });
     });
     this.redrawStars();
@@ -643,7 +943,9 @@
     this.P.stars.forEach(function (s) { var img = self.imgs.stars[s.i]; if (img && img.setVisible) img.setVisible(!EF.has(st, 'stars', String(s.i))); });
     this.P.constellations.forEach(function (c) {
       var n = fill[c.id] || 0, img = self.imgs.consts[c.id];
-      if (img && img.setTexture) img.setTexture(textTex(sc, 'east:const:' + n, new Array(n + 1).join('★') + new Array(EF.STARS_PER_CONSTELLATION - n + 1).join('☆'), 44, 16, '#fff3a0', 'rgba(11,18,54,.7)', 12));
+      var label = new Array(n + 1).join('★') + new Array(EF.STARS_PER_CONSTELLATION - n + 1).join('☆');
+      if (img && img.stars && img.stars.setTexture) img.stars.setTexture(textTex(sc, 'east:constp2:' + n, label, 50, 18, '#ffd34d', null, 15));
+      else if (img && img.setTexture) img.setTexture(textTex(sc, 'east:const:' + n, label, 44, 16, '#fff3a0', 'rgba(11,18,54,.7)', 12));
     });
   };
 
@@ -785,7 +1087,12 @@
     I.arrows = [];
     var o = pz.origin, P0 = CP.sokoParse(pz.def.data.rows), x = o[0] + P0.player[0], y = o[1] + P0.player[1];
     moves.forEach(function (m, i) {
-      var d = CP.DIRS[m], a = self.image(x * T + T / 2, y * T + T / 2, textTex(sc, 'east:hint:' + m + ':' + (i + 1), { up: '↑', down: '↓', left: '←', right: '→' }[m] + (i + 1), 30, 30, '#ffe27a', 'rgba(11,18,54,.55)', 13), DEPTH.PATH, 0.5, 0.5);
+      var d = CP.DIRS[m], hk = art2(sc, 'obj_hint_arrow'), a;
+      if (hk) {   // v4.2.6 W1c：美術提示箭頭（畫朝上、程式轉向），步數小字疊在右上
+        a = self.image(x * T + T / 2, y * T + T / 2, hk, DEPTH.PATH, 0.5, 0.5);
+        if (a.setAngle) a.setAngle({ up: 0, right: 90, down: 180, left: 270 }[m] || 0);
+        I.arrows.push(self.image(x * T + 26, y * T + 25, textTex(sc, 'east:hintn:' + (i + 1), String(i + 1), 14, 12, '#ffe27a', null, 10), DEPTH.PATH + 0.1, 0.5, 0.5));
+      } else a = self.image(x * T + T / 2, y * T + T / 2, textTex(sc, 'east:hint:' + m + ':' + (i + 1), { up: '↑', down: '↓', left: '←', right: '→' }[m] + (i + 1), 30, 30, '#ffe27a', 'rgba(11,18,54,.55)', 13), DEPTH.PATH, 0.5, 0.5);
       I.arrows.push(a);
       x += d[0]; y += d[1];
     });
@@ -1199,6 +1506,7 @@
       EF.mark(st, 'done', 'echo_' + P.id);
       self.refreshBlocks();
       (self.imgs.echo || []).forEach(function (im) { if (im.setVisible) im.setVisible(false); });
+      if (self.imgs.echoOpen && self.imgs.echoOpen.setVisible) self.imgs.echoOpen.setVisible(true);   // v4.2.6 打開的門（美術 obj_echo_door_open）
       banner('回音謎門打開了！');
       G().save();
       return true;
@@ -1269,6 +1577,7 @@
   Fx.prototype.destroy = function () {
     if (this.tools && this.tools.parentNode) this.tools.parentNode.removeChild(this.tools);
     this.tools = null;
+    if (this.flameTimer && this.flameTimer.remove) { this.flameTimer.remove(); this.flameTimer = null; }   // v4.2.6 火焰輪播
     this.all.forEach(function (o) { try { if (o && o.destroy) o.destroy(); } catch (e) { /* 場景關掉時物件可能已經被 Phaser 清掉 */ } });
     this.all = []; this.dots = []; this.arrow = null;
   };
@@ -1338,6 +1647,29 @@
     return true;
   }
 
+  /**
+   * v4.2.6 地圖修正：東部物件的美術圖在 MapScene.preload 時一起排進載入（sprites.js 有登記才載；沒登記、沒檔案就照舊程式畫）。
+   * 山屋小燈：點亮款（final＝金色曙光款）
+   */
+  function preload(scene, map) {
+    var A = J.Assets, MI = J.MapInfo;
+    if (!A || !A.has || !A.queue || !EF || !EF.hasEast || !EF.hasEast(map)) return [];
+    var keys = ART2.slice();   // v4.2.6 W1c：第 2 輪美術圖（沒登記的下面會濾掉）
+    var lamps = (map.lodge_lamps || []).concat((map.heal_points || []).filter(function (h) { return h.kind === 'lodge_lamp' || !h.kind; }));
+    if ((map.signs || []).length) keys.push('obj_road_sign');   // M44 入口木牌（QB-M44-01）
+    if (lamps.length && MI && MI.lampArtKey) {
+      keys.push(MI.lampArtKey(false, true));
+      if (lamps.some(function (l) { return l.kind === 'final'; })) keys.push(MI.lampArtKey(true, true));
+    }
+    Object.keys(ART).forEach(function (n) { keys.push(ART[n]); });   // 美術還沒交的不在 sprites.js，下一行會濾掉
+    keys = keys.filter(function (k) { return A.has(k); });
+    keys.forEach(function (k) { A.queue(scene, k); });
+    return keys;
+  }
+  EastFx.preload = preload;
+  // MapScene.preload 透過 MapScene.preloadHooks 呼叫（MapScene.js 原文不寫東部的程式，v40_ch7 S40-6）
+  if (J.MapScene) (J.MapScene.preloadHooks = J.MapScene.preloadHooks || []).push(preload);
+  EastFx.ART = ART;
   EastFx.askFilter = askFilter;   // v4.2 測試用（N-Q-4）
   EastFx.Fx = Fx; EastFx.attach = attach; EastFx.hook = hook; EastFx.reduced = reduced; EastFx.speaker = speaker;
   EastFx.BREATH_MS = BREATH_MS; EastFx.MEMORY_SHOW_MS = MEMORY_SHOW_MS; EastFx.MEMORY_EXTRA_MS = MEMORY_EXTRA_MS; EastFx.COMPASS_DOT_MAPS = COMPASS_DOT_MAPS; EastFx.DEPTH = DEPTH;

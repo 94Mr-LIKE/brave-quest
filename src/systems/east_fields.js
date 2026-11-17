@@ -37,7 +37,7 @@
   var SHELF_ICON = { pencil: '✏️', umbrella: '☂️', shirt: '👕', blocks: '🧱', apple: '🍎', fish: '🐟', flower: '🌸', cloud_sun: '⛅' };
   var ARROW_MS = 30000;   // 番薯仔的找路箭頭 30 秒後消失（71 號 2.12）
   /** 記號燈旁邊是哪一座書架（71 號 2.5 D、2.12；地圖組的 json 只寫在 note 裡）。地圖組在 lodge_lamps 加 "shelf" 以後以 json 為準 */
-  var MARKER_SHELF = { 'M39:14,20': '文具', 'M39:44,21': '天氣' };
+  var MARKER_SHELF = { 'M39:15,18': '文具', 'M39:45,17': '天氣' };   // v4.2.6：記號燈改用背景提燈 (15,18)(45,17)（maps.js 也寫了 shelf，以 maps.js 為準）
 
   function isObj(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
   function isPt(p) { return Array.isArray(p) && p.length === 2 && Number.isInteger(p[0]) && Number.isInteger(p[1]); }
@@ -145,8 +145,9 @@
     var issues = [], o = { id: mapId || map.map || null, noMinimap: map.no_minimap === true, fog: map.fog_mask === true, issues: issues };
     var size = map.size ? { w: map.size[0], h: map.size[1] } : { w: (map.grid && map.grid[0] || '').length, h: (map.grid || []).length };
     o.size = size;
-    var lamps = (map.lodge_lamps || []).map(function (l) { return { x: l.x, y: l.y, kind: l.kind || 'lodge', id: l.id || 'obj_lodge_lamp' }; })
-      .concat((map.heal_points || []).filter(function (h) { return h.kind === 'lodge_lamp' || !h.kind; }).map(function (h) { return { x: h.x, y: h.y, kind: 'lodge', id: 'obj_lodge_lamp' }; }));
+    // v4.2.6 地圖修正：draw:false＝背景已經畫了燈（燈座、燈台），程式不畫燈圖，只留互動格、擋格與光暈
+    var lamps = (map.lodge_lamps || []).map(function (l) { return { x: l.x, y: l.y, kind: l.kind || 'lodge', id: l.id || 'obj_lodge_lamp', draw: l.draw !== false }; })
+      .concat((map.heal_points || []).filter(function (h) { return h.kind === 'lodge_lamp' || !h.kind; }).map(function (h) { return { x: h.x, y: h.y, kind: 'lodge', id: 'obj_lodge_lamp', draw: h.draw !== false }; }));
     o.lamps = lamps;
     o.echoDoor = map.echo_door ? { cells: (map.echo_door.cells || []).map(pt), dialog: map.echo_door.dialog || 'D_ECHO_DOOR' } : null;
     o.puzzles = (map.puzzles || []).map(function (mp) { return mergePuzzle(mp, PUZ || {}, issues); }).filter(Boolean);
@@ -162,7 +163,7 @@
     }).map(function (d) { return d.type === 'frost_arrow' ? { type: d.type, x: d.x, y: d.y, dir: d.dir } : { type: d.type, x: d.x, y: d.y, dots: d.dots || 1 }; });
     var rect4 = function (a) { return Array.isArray(a) && a.length === 4 && a.every(Number.isInteger); };
     o.shelves = (map.shelves || []).filter(function (s) { if (s && rect4(s.area) && s.cat) return true; issues.push('書架 ' + JSON.stringify(s) + '：要有 cat 和 area [x0, y0, x1, y1]'); return false; })
-      .map(function (s) { return { cat: s.cat, icon: s.icon, emoji: SHELF_ICON[s.icon] || '📚', area: s.area.slice() }; });
+      .map(function (s) { return { cat: s.cat, icon: s.icon, emoji: SHELF_ICON[s.icon] || '📚', area: s.area.slice(), drawSign: s.draw_sign === true }; });   // v4.2.6：draw_sign＝背景沒畫分類牌、要程式畫
     var shelfCats = o.shelves.map(function (s) { return s.cat; });
     o.lostItems = (map.lost_items || []).filter(function (it) { if (it && it.id && Number.isInteger(it.x) && Number.isInteger(it.y)) return true; issues.push('遺失物 ' + JSON.stringify(it) + '：要有 id、x、y'); return false; }).map(function (it) {
       var info = (items || {})[it.id] || {};
@@ -184,9 +185,9 @@
       if (best) { l.icon = best.emoji; l.shelf = best.cat; }
     });
     o.trialLamps = (map.trial_lamps || []).filter(function (t) { if (t && rect4(t.seat) && t.subject) return true; issues.push('燈座 ' + JSON.stringify(t) + '：要有 subject 和 seat [x0, y0, x1, y1]'); return false; })
-      .map(function (t) { return { subject: t.subject, seat: t.seat.slice(), boss: t.boss || null }; });
+      .map(function (t) { var o2 = { subject: t.subject, seat: t.seat.slice(), boss: t.boss || null }; if (isPt(t.bowl)) o2.bowl = t.bowl.slice(); return o2; });   // v4.2.6 W1c：bowl＝背景盆口中心（像素）
     o.softClouds = (map.soft_clouds || []).map(function (c, i) { return { id: c.id || ('SC' + (i + 1)), cells: (c.cells || []).filter(isPt).map(pt), subject: SUBJECTS[i % SUBJECTS.length] }; });
-    o.constellations = (map.constellations || []).map(function (c) { return { id: c.id, x: c.x, y: c.y, region: c.region || '' }; });
+    o.constellations = (map.constellations || []).map(function (c) { var o2 = { id: c.id, x: c.x, y: c.y, region: c.region || '' }; if (isPt(c.plate)) o2.plate = c.plate.slice(); return o2; });   // v4.2.6 W1c：plate＝星座牌腳底像素
     o.stars = (map.stars || []).filter(function (s) { return isPt(Array.isArray(s) ? s : [s && s.x, s && s.y]); }).map(function (s, i) { var p = Array.isArray(s) ? s : [s.x, s.y]; return { i: i, x: p[0], y: p[1], constellation: o.constellations.length ? o.constellations[Math.floor(i / STARS_PER_CONSTELLATION) % o.constellations.length].id : null }; });
     if (o.stars.length && o.constellations.length && o.stars.length !== o.constellations.length * STARS_PER_CONSTELLATION) issues.push('星星 ' + o.stars.length + ' 顆，星座 ' + o.constellations.length + ' 個（每個 ' + STARS_PER_CONSTELLATION + ' 顆）');
     o.lightPillar = map.light_pillar ? { cells: (map.light_pillar.cells || []).filter(isPt).map(pt) } : null;
@@ -227,6 +228,8 @@
   function hasCompass(state) { return !!(state && state.inventory && state.inventory[COMPASS_ITEM] > 0); }
   /** 遺失物現在看得到嗎（藏在選做機關後面的，要先解開那一道） */
   function lostVisible(state, it) { return !it.hidden || CavePuzzle.solved(state, it.hidden); }
+  /** v4.2.6 W1c（QB-M40-06）：燈座火焰的 x（像素）＝背景盆口中心 trial_lamps[].bowl[0]（seat 是擋格範圍，不一定是盆子中心）；沒寫 bowl 才用 seat 中心 */
+  function flameX(t, T) { return t && Array.isArray(t.bowl) && typeof t.bowl[0] === 'number' ? t.bowl[0] : (t.seat[0] + t.seat[2] + 1) / 2 * (T || 32); }
   function puzzleVisible(state, P, pz) { return pz.appearsAfter !== 'trial_lamps_all' || trialLampsAll(state, P); }
   function bossesDone(state, P) { return P.bosses.length > 0 && P.bosses.every(function (b) { return !!(state && state.bosses && state.bosses[b]); }); }
   /** v4.2 4c：M41 雲階開了沒（cloud_stairs.requires，預設 ending_done）；給 x、y 時再看那一格是不是雲階 */
@@ -330,7 +333,7 @@
     if (!hasWayfinding(P) || !hero) return null;
     ctx = ctx || {};
     var reach = ctx.reach || function () { return true; };
-    var north = (ctx.exits || []).filter(function (e) { return e.y === 0; })[0];
+    var north = (ctx.exits || []).filter(function (e) { return e.y === 0 || e.north === true; })[0];   // v4.2.6 W1：出口移到門檻（M40、M39）時用 exits[].north 標
     var northT = north ? { x: north.x, y: north.y + 1, label: '往上的樓梯' } : null;
     function near(list) {
       var best = null, bd = Infinity;
@@ -425,7 +428,7 @@
     return pick;
   }
 
-  var EastFields = { FIELDS: FIELDS, SUBJECTS: SUBJECTS, FOG: FOG, COMPASS_ITEM: COMPASS_ITEM, NO_MAP_TIP: NO_MAP_TIP, SIGN_TEXT: SIGN_TEXT, SHELF_ICON: SHELF_ICON, ARROW_MS: ARROW_MS,
+  var EastFields = { flameX: flameX, FIELDS: FIELDS, SUBJECTS: SUBJECTS, FOG: FOG, COMPASS_ITEM: COMPASS_ITEM, NO_MAP_TIP: NO_MAP_TIP, SIGN_TEXT: SIGN_TEXT, SHELF_ICON: SHELF_ICON, ARROW_MS: ARROW_MS,
     STARS_PER_CONSTELLATION: STARS_PER_CONSTELLATION, WAY_MAPS: WAY_MAPS, hasEast: hasEast, hasWayfinding: hasWayfinding, parse: parse, mergePuzzle: mergePuzzle, inRect: inRect, inXYWH: inXYWH, key: key,
     progress: progress, mark: mark, has: has, trialLampLit: trialLampLit, trialLampsAll: trialLampsAll, lostReturned: lostReturned, lostVisible: lostVisible,
     starsCollected: starsCollected, constellationFill: constellationFill, constellationsDone: constellationsDone, hasCompass: hasCompass, puzzleVisible: puzzleVisible,

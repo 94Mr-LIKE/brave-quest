@@ -537,6 +537,59 @@
    * v0.9.5 廟內的神像（MT1）：maps.js 的 statue、altar 都是 { x, y }（不可走的擺設）。面對任一個按 A 都是向神像祈求（轉職）。
    * 回傳 [{ kind: 'statue'|'altar', x, y }]
    */
+  // v4.2.6 地圖修正（老闆 2026-11-17「這個燈....重畫，太醜了」）：知識燈、山屋小燈共用一款美術燈（32×48，腳底貼圖片下緣、中心線 x=16）。
+  // 檔名和版本無關：老闆換版只要換 assets/ui/obj_lamp_*.png。GLOW_Y＝火焰中心在腳底上方幾像素（光暈、閃光對這裡）
+  var LAMP_ART = { off: 'obj_lamp_off', on: 'obj_lamp_on', dawn_off: 'obj_lamp_dawn_off', dawn_on: 'obj_lamp_dawn_on', W: 32, H: 48, GLOW_Y: 24 };
+  /** 燈要用的美術圖 key：dawn＝金色曙光款；lit＝點亮 */
+  function lampArtKey(dawn, lit) { return LAMP_ART[(dawn ? 'dawn_' : '') + (lit ? 'on' : 'off')]; }
+  /**
+   * v4.2.6 站名小牌放哪裡（QA-M41-02：站牌在畫面上緣時，站名被上方狀態列蓋住）。單位都是世界像素。
+   * o＝{ signX（站牌中心 x）, signFoot（站牌腳底 y）, signW, signH, labelW, labelH, camTop（鏡頭上緣 y）, hudH（狀態列佔掉的高度）, mapW }
+   * 依序試：above 站牌上方（原本的位置）→ side 站牌右邊（貼在站牌上半段；右邊超出地圖就放左邊）→ below 站牌腳下。
+   * 回傳 { mode, x, y, ox, oy }（ox、oy＝setOrigin）
+   */
+  function stationLabelSpot(o) {
+    var safe = (o.camTop || 0) + (o.hudH || 0) + 2, top = o.signFoot - o.signH;
+    if (top - 2 - o.labelH >= safe) return { mode: 'above', x: o.signX, y: top - 2, ox: 0.5, oy: 1 };
+    var sy = Math.max(top + 4, Math.round(safe));
+    if (sy + o.labelH <= o.signFoot) {
+      var right = o.signX + o.signW / 2 + 2;
+      if (!o.mapW || right + o.labelW <= o.mapW) return { mode: 'side', x: right, y: sy, ox: 0, oy: 0 };
+      return { mode: 'side', x: o.signX - o.signW / 2 - 2, y: sy, ox: 1, oy: 0 };
+    }
+    return { mode: 'below', x: o.signX, y: o.signFoot + 2, ox: 0.5, oy: 0 };
+  }
+  /**
+   * v4.2.6 W1d（技術長：進站當下地名橫幅蓋住「玉山站」的「玉」）：站名小牌的候選位置，第一個是 stationLabelSpot 選的，
+   * 其後依序上方、站牌右邊、站牌左邊、站牌腳下。每個候選附世界座標矩形 rect（x, y, w, h）
+   */
+  function stationLabelCandidates(o) {
+    var top = o.signFoot - o.signH, first = stationLabelSpot(o), sy = Math.max(top + 4, Math.round((o.camTop || 0) + (o.hudH || 0) + 2));
+    if (sy + o.labelH > o.signFoot) sy = top + 4;
+    var list = [first,
+      { mode: 'above', x: o.signX, y: top - 2, ox: 0.5, oy: 1 },
+      { mode: 'side', x: o.signX + o.signW / 2 + 2, y: sy, ox: 0, oy: 0 },
+      { mode: 'side', x: o.signX - o.signW / 2 - 2, y: sy, ox: 1, oy: 0 },
+      { mode: 'below', x: o.signX, y: o.signFoot + 2, ox: 0.5, oy: 0 }];
+    var out = [], seen = {};
+    list.forEach(function (c) {
+      var k = c.x + ',' + c.y + ',' + c.ox + ',' + c.oy;
+      if (seen[k]) return; seen[k] = 1;
+      var r = { x: c.x - c.ox * o.labelW, y: c.y - c.oy * o.labelH, w: o.labelW, h: o.labelH };
+      if (r.x < 0 || r.y < 0 || (o.mapW && r.x + r.w > o.mapW) || (o.mapH && r.y + r.h > o.mapH)) return;
+      c.rect = r; out.push(c);
+    });
+    return out;
+  }
+  /** 選第一個「螢幕矩形不碰到任何遮擋物」的候選；toScreen(rect)→螢幕矩形 {left, top, right, bottom}；blockers＝螢幕矩形陣列。都碰到就回第一個 */
+  function stationLabelPick(cands, toScreen, blockers) {
+    var hit = function (a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; };
+    for (var i = 0; i < cands.length; i++) {
+      var sr = toScreen(cands[i].rect);
+      if (!(blockers || []).some(function (b) { return hit(sr, b); })) return cands[i];
+    }
+    return cands[0] || null;
+  }
   var STATUE_SPRITE = 'obj_mazu_statue', STATUE_NAME = '媽祖神像';
   function shrineSpots(map) {
     var out = [];
@@ -574,7 +627,7 @@
     return { x: view.x + Math.min(view.w - 1, Math.floor(px / cssW * view.w)), y: view.y + Math.min(view.h - 1, Math.floor(py / cssH * view.h)) };
   }
 
-  var MapInfo = { STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, SIGN_ABOVE_KEEPER: SIGN_ABOVE_KEEPER, SIGN_PLAQUES: SIGN_PLAQUES, SIGN_KIND: SIGN_KIND, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+  var MapInfo = { stationLabelSpot: stationLabelSpot, stationLabelCandidates: stationLabelCandidates, stationLabelPick: stationLabelPick, LAMP_ART: LAMP_ART, lampArtKey: lampArtKey, STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, SIGN_ABOVE_KEEPER: SIGN_ABOVE_KEEPER, SIGN_PLAQUES: SIGN_PLAQUES, SIGN_KIND: SIGN_KIND, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
     wanderTarget: wanderTarget, petSpot: petSpot, glowRgb: glowRgb, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
     LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords,
     SIGN_CAM: SIGN_CAM, signCamPick: signCamPick, signCamOffset: signCamOffset, camEase: camEase };
