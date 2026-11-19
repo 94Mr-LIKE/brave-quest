@@ -1654,7 +1654,10 @@
   function preload(scene, map) {
     var A = J.Assets, MI = J.MapInfo;
     if (!A || !A.has || !A.queue || !EF || !EF.hasEast || !EF.hasEast(map)) return [];
-    var keys = ART2.slice();   // v4.2.6 W1c：第 2 輪美術圖（沒登記的下面會濾掉）
+    // v4.2.8（v4.2.6 審查 L1：每張東部地圖都排整份 ART2）：雲的圖（軟雲／硬雲九宮格 32 張、整朵硬雲 obj_hard_cloud_<id>）只有這張圖有 soft_clouds 才排，
+    //   整朵硬雲只排這張圖有的 id（id 規則同 east_fields.js：沒寫 id＝SC<序號>）。其他謎題的圖照舊全排（只在 drawClouds 用的才濾，不會漏圖）
+    var sc0 = (map.soft_clouds || []).map(function (c, i) { return 'obj_hard_cloud_' + (c.id || ('SC' + (i + 1))); });
+    var keys = ART2.filter(function (k) { return /^obj_(soft|hard)_cloud(_[nswe]+)?$/.test(k) ? sc0.length > 0 : /^obj_hard_cloud_/.test(k) ? sc0.indexOf(k) >= 0 : true; });   // v4.2.6 W1c：第 2 輪美術圖（沒登記的下面會濾掉）
     var lamps = (map.lodge_lamps || []).concat((map.heal_points || []).filter(function (h) { return h.kind === 'lodge_lamp' || !h.kind; }));
     if ((map.signs || []).length) keys.push('obj_road_sign');   // M44 入口木牌（QB-M44-01）
     if (lamps.length && MI && MI.lampArtKey) {

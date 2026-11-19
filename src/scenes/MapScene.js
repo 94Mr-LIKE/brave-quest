@@ -44,7 +44,7 @@
       this.startFacing = data.facing || 'down';
       this.map = G().data.maps[this.mapId];
       // 場景重新開始時物件會留著上一張地圖的值：車站要先清掉（不然沒有車站的地圖會顯示上一張的「在○○站搭車」）
-      this.station = null; this.stationSign = null; this.stationLabel = null; this.stationLabelInfo = null; this.stationLabelLock = null; this.stationLabelLockSize = null; this.stationLabelMoves = 0; this.stationShelter = null;
+      this.station = null; this.stationSign = null; this.stationLabel = null; this.stationLabelInfo = null; this.stationLabelLock = null; this.stationLabelLockSize = null; this.stationLabelMoves = 0; this.labelDomCache = null; this.stationShelter = null;
       // 上一張地圖的 hasBg、主角狀態也不要留著（create 之前讀到舊值會誤判「新地圖已經好了」）
       this.hasBg = false; this.p = null;
       this.safePts = null;   // 同樣的原因：下車點安全範圍是每張地圖各自算的
@@ -567,6 +567,8 @@
       var self = this;
       this.mapProps = [];
       (this.map.props || []).forEach(function (p) {
+        // v4.2.8 E3（老闆 2026-11-19「按建議」）：背景已經畫好的告示牌（M34 熊鈴、結伴、垃圾帶下山）不再畫一張，只登記成可以按 Ⓐ 看說明
+        if (MapScene.PROP_PAINTED[p.id]) { if (Array.isArray(p.cells) && p.cells.length) self.mapProps.push({ data: p, img: null, art: false, painted: true }); return; }
         if (p.id !== 'car_snow_chain' && p.id !== 'sign_snow_chain' && p.id !== 'traffic_cones') return;
         if (!Array.isArray(p.cells) || !p.cells.length) return;
         var x = Math.min.apply(null, p.cells.map(function (c) { return c[0]; }));
@@ -848,12 +850,14 @@
     /**
      * v0.9.6（47 號 B05）慈護宮正殿：站到供桌、拜墊附近時，鏡頭往上移，讓神像露在 HUD 下面（神像在地圖最上方，鏡頭跟著主角時看不到）。
      * 鏡頭上緣對準神像上方一點（不超出地圖），主角仍在畫面裡；離開供桌一帶慢慢回到正常跟隨。
+     * v4.2.8 老闆選 (c)（2026-11-19，原則「人物在一般畫面要置中」）：平常走路不移（主角置中），只有在神像前按 Ⓐ 打開轉職畫面（轉職流程進行中）時才往上移，
+     * 關掉後平順回到置中（減少動態時直接切換）。偏移量算法照舊，只多一個條件 shrineCamJob()。
      */
     shrineCamera() {
       var st = this.map.statue, cam = this.cameras.main;
       if (!this.player || !cam) return;
       var want = 0;
-      if (st && this.p && this.p.ty <= st.y + 7) {
+      if (st && this.p && this.p.ty <= st.y + 7 && this.shrineCamJob()) {   // v4.2.8 老闆選 (c)：只在轉職畫面打開時才看神像
         var viewH = cam.worldView.height || (cam.height / (cam.zoom || 1));
         var top = Math.max(0, (st.y - 4.5) * T);   // 神像腳底在 (st.y+1)*T、約 3 格高；上緣再多留一點給 HUD
         // 鏡頭上緣＝top，但主角的腳要留在畫面裡（離下緣至少 1.2 格）
@@ -864,6 +868,18 @@
       var cur = cam.followOffset.y, next = J.MapInfo.camEase(cur, want, this.reduceMotionNow());   // 減少動態：直接切換
       if (next !== cur) cam.setFollowOffset(0, next);
       this.shrineCamOffset = cam.followOffset.y;   // 測試用
+    }
+
+    /**
+     * v4.2.8 老闆選 (c)：慈護宮神像鏡頭只在「轉職畫面打開」時用——主角站在拜墊那一列、面前就是供桌／神像（按 Ⓐ 會出現「在神像前轉職」的格子，J.MapInfo.shrineAt），
+     * 而且轉職流程正在進行：有擋住走路的視窗開著（轉職清單、廟公台詞、立志小考；J.UI.blocksMove()，和招牌鏡頭同一個條件），
+     * 或轉職後場景重新開始、放祝福光芒那一下（G.busy，doJobChange 設的）。平常走路、和廟公（不在拜墊那一列）講話都不移。
+     */
+    shrineCamJob() {
+      var p = this.p;
+      if (!p || !J.MapInfo.shrineAt(this.map, p.tx, p.ty - 1)) return false;
+      var g = G();
+      return this.signCamTalking() || !!(g && g.busy);
     }
 
     /**
@@ -880,10 +896,17 @@
       }
       var hit = MI.signCamPick(this.signCamSpots, p.tx, p.ty, this.signCamSpot);
       this.signCamSpot = hit;
-      if (!hit) return 0;
+      if (!hit || !this.signCamTalking()) return 0;   // v4.2.8 老闆「人物在一般畫面要置中」：平常走路不移，只有和店家講話（視窗開著）時才往上移
       var viewH = cam.worldView.height || (cam.height / (cam.zoom || 1)), dom = this.signCamDom();
       return MI.signCamOffset({ signTop: hit.top, playerY: this.player.y, targetY: this.camTarget ? this.camTarget.y : this.player.y, viewH: viewH,
         mapH: this.size ? this.size.h * T : 0, hudH: dom.hud * viewH, bottomH: dom.bottom * viewH });
+    }
+    /**
+     * v4.2.8（老闆 2026-11-19「北港旅店這個位置不對，人物在一般畫面要置中」）：招牌鏡頭只在「和店家講話」時用——
+     * 有擋住走路的視窗開著（對話框、住宿／買賣選項、商店視窗；放大地圖這類 passMove 視窗不算）。沿用 J.UI.blocksMove()，和走路判斷同一個條件。
+     */
+    signCamTalking() {
+      return !!(J.UI && J.UI.blocksMove && J.UI.blocksMove());
     }
     /** 上方狀態列底、下方對話框頂各佔畫布高度的幾成（量 DOM；200 毫秒量一次） */
     signCamDom() {
@@ -939,11 +962,16 @@
       //   這樣任何時候都不會「站名只露出一部分」，也不會跳來跳去。
       var spot = this.stationLabelLock || J.MapInfo.stationLabelSpot(opt), alphaWant = 1;
       if (J.MapInfo.stationLabelCandidates && typeof document !== 'undefined' && this.sys && this.sys.game && this.sys.game.canvas) {
-        var cv = this.sys.game.canvas.getBoundingClientRect(), wv = cam.worldView;
+        // v4.2.8（v4.2.6 審查 R1：每一幀量 DOM，低階平板多掉幀）：畫布矩形與常駐遮擋物的矩形快取 200 毫秒（同 signCamDom），視窗大小一變就重量；
+        //   地名橫幅（LABEL_BLOCKERS_TEMP）不快取、每幀照量——橫幅一出現站名就要立刻藏，否則會露出半塊（W1f 實測報告的風險）
+        var w0 = typeof window !== 'undefined' ? window : {}, now0 = Date.now(), winKey = (w0.innerWidth || 0) + 'x' + (w0.innerHeight || 0), dc = this.labelDomCache;
+        if (!dc || now0 - dc.at >= MapScene.LABEL_DOM_TTL || dc.win !== winKey) dc = this.labelDomCache = { at: now0, win: winKey, cv: this.sys.game.canvas.getBoundingClientRect(), fixed: null };
+        var cv = dc.cv, wv = cam.worldView;
         if (cv.width && wv.width && wv.height) {
           var kx = cv.width / wv.width, ky = cv.height / wv.height, sizeKey = Math.round(cv.width) + 'x' + Math.round(cv.height);
           var toScreen = function (r) { return { left: cv.left + (r.x - wv.x) * kx, top: cv.top + (r.y - wv.y) * ky, right: cv.left + (r.x + r.w - wv.x) * kx, bottom: cv.top + (r.y + r.h - wv.y) * ky }; };
-          var rectsOf = function (sel) { var out = []; Array.prototype.forEach.call(document.querySelectorAll(sel) || [], function (el) { var b = el.getBoundingClientRect(); if (b.width && b.height && getComputedStyle(el).visibility !== 'hidden' && getComputedStyle(el).display !== 'none') out.push(b); }); return out; };
+          var measure = function (sel) { var out = []; Array.prototype.forEach.call(document.querySelectorAll(sel) || [], function (el) { var b = el.getBoundingClientRect(); if (b.width && b.height && getComputedStyle(el).visibility !== 'hidden' && getComputedStyle(el).display !== 'none') out.push(b); }); return out; };
+          var rectsOf = function (sel) { if (sel !== MapScene.LABEL_BLOCKERS_FIXED) return measure(sel); return dc.fixed || (dc.fixed = measure(sel)); };   // 只有常駐的走快取
           var hits = function (sr, list) { return list.some(function (b) { return sr.left < b.right && sr.right > b.left && sr.top < b.bottom && sr.bottom > b.top; }); };
           var blockers = rectsOf(MapScene.LABEL_BLOCKERS_FIXED);
           var lock = this.stationLabelLock;
@@ -2284,8 +2312,14 @@
   MapScene.PROP_INFO = {
     car_snow_chain: { prompt: '看看警車', dialog: 'D_PROP_POLICE_CAR', fallback: '警車停在大禹嶺管制站旁——這段路有管制。' },
     sign_snow_chain: { prompt: '看看雪鏈告示牌', dialog: 'D_PROP_SNOW_SIGN', fallback: '告示牌：路面結冰時，車子要加雪鏈。' },
-    traffic_cones: { prompt: '看看交通錐', dialog: 'D_PROP_CONES', fallback: '交通錐排在路邊：這裡有管制，車子要慢慢開。' }
+    traffic_cones: { prompt: '看看交通錐', dialog: 'D_PROP_CONES', fallback: '交通錐排在路邊：這裡有管制，車子要慢慢開。' },
+    // v4.2.8 E3：M34 玉山步道背景畫好的三塊圖案告示牌（番薯仔講華語）
+    sign_bear_bell: { prompt: '看看告示牌', dialog: 'D_PROP_SIGN_BEAR_BELL', fallback: '這裡是黑熊的家，走山路要帶熊鈴，叮噹響讓黑熊先避開。' },
+    sign_buddy: { prompt: '看看告示牌', dialog: 'D_PROP_SIGN_BUDDY', fallback: '爬山要和家人朋友結伴同行，不要一個人走，互相照顧。' },
+    sign_trash: { prompt: '看看告示牌', dialog: 'D_PROP_SIGN_TRASH', fallback: '垃圾不要留在山上，自己裝好帶下山，保護山林。' }
   };
+  // v4.2.8 E3：背景已經畫好、不由程式畫的 prop（只做按 Ⓐ 說明，碰撞照地圖格子）
+  MapScene.PROP_PAINTED = { sign_bear_bell: true, sign_buddy: true, sign_trash: true };
   MapScene.propAt = function (list, x, y) {
     list = list || [];
     for (var i = 0; i < list.length; i++) {
@@ -2297,5 +2331,7 @@
   MapScene.LABEL_BLOCKERS = '#ui > .map-banner, #hud .hud-card, #hud .hud-buttons, .minimap';   // v4.2.6 W1d：站名小牌要避開的 DOM
   MapScene.LABEL_BLOCKERS_FIXED = '#hud .hud-card, #hud .hud-buttons, .minimap';   // v4.2.6 W1e：常駐的（用候選位置避開）
   MapScene.LABEL_BLOCKERS_TEMP = '#ui > .map-banner';   // v4.2.6 W1e：會消失的（蓋到時站名先藏、不換位置）
+  // v4.2.6 審查 L2：橫幅必須從 DOM 移除（不能只是 opacity 0），否則站名會一直藏著；v4.2.8：橫幅這一項每幀量、不快取
+  MapScene.LABEL_DOM_TTL = 200;   // v4.2.8 審查 R1：畫布與常駐遮擋物矩形的快取毫秒
   window.JQ.MapScene = MapScene;
 })();

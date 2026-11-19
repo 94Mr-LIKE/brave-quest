@@ -1663,6 +1663,7 @@
       // v4.2 佛格：進入新階段時換階段圖（phase_sprites）、播那一階段的台詞（phase_dialogs；第 3 階段那段說「這一段不計時。」）
       var phDlg = hr.phaseUp && mon.phase_dialogs && mon.phase_dialogs[b.phase];
       if (hr.phaseUp && mon.phase_sprites && mon.phase_sprites[b.phase] && sc.setPhaseSprite) sc.setPhaseSprite(mon.phase_sprites[b.phase]);
+      else if (hr.phaseUp && mon.phase_sprites && sc.stopPhaseAnim) sc.stopPhaseAnim();   // v4.2.8 沒有階段圖的階段（佛格第 3 階段）：多幀圖停在上一張單張圖（和改版前一樣）
       if (b.over) setTimeout(G.bvictory, G.bwait(700));
       else if (phDlg && (G.data.dialogs || {})[phDlg]) { ctx.phaseDialogs = (ctx.phaseDialogs || []).concat([phDlg]); setTimeout(function () { G.say(phDlg, []).then(function () { G.bcommands(true); }); }, G.bwait(900)); }   // 測試用 phaseDialogs
       else setTimeout(function () { G.bcommands(true); }, G.bwait(500));

@@ -139,6 +139,7 @@
    * 做法和慈護宮的 shrineCamera 一樣（鏡頭 followOffset 往上），MapScene.shrineCamera 取兩者較大的偏移。
    * 觸發範圍（格）：店主人左右 3 格、上 1 下 4 格（站在店主人面前講話），或匾額左右 3 格、往下 6 格（走近店門）。
    * 已經在範圍裡的那一塊，離開時範圍多放寬 KEEP 格：在邊緣來回走不會一開一關（鏡頭不抖）。
+   * v4.2.8（老闆「人物在一般畫面要置中」）：在範圍裡還要「和店家講話」（MapScene.signCamTalking：有擋住走路的視窗開著）才移；平常走路鏡頭置中。
    */
   var SIGN_CAM = { NEAR_X: 3, KEEPER_UP: 1, KEEPER_DOWN: 4, PLAQUE_DOWN: 6, KEEP: 1, MARGIN: 6, FOOT: 8 };
   function signCamNear(s, tx, ty, pad) {

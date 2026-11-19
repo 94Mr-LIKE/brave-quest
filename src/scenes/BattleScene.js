@@ -5,6 +5,7 @@
 (function () {
   'use strict';
   var J = window.JQ;
+  var PHASE_TOP = 46;   // v4.2.8 階段多幀圖最高可以到的 y（遊戲座標；頭目體力框下緣約 41＋5 的空隙）
 
   class BattleScene extends Phaser.Scene {
     constructor() { super('Battle'); }
@@ -16,22 +17,66 @@
       J.Assets.queueBattleBg(this, this.data_.bg);
       J.Assets.queue(this, this.data_.mon.sprite, this.data_.mon.name);
       var ps = this.data_.mon.phase_sprites || {}, self = this;   // v4.2 佛格的階段圖（第 2、4 階段）
-      Object.keys(ps).forEach(function (k) { if (J.Assets.has(ps[k])) J.Assets.queue(self, ps[k], self.data_.mon.name); });
+      Object.keys(ps).forEach(function (k) {
+        if (J.Assets.has(ps[k])) J.Assets.queue(self, ps[k], self.data_.mon.name);
+        if (J.Assets.has(ps[k] + '_anim')) J.Assets.queue(self, ps[k] + '_anim');   // v4.2.8 階段多幀圖（佛格 p2／p4，tools/mob_anim_import.js 匯入）
+      });
     }
 
-    /** v4.2 頭目換階段圖（遺忘霧王‧佛格 p2／p4）：同一個位置、同樣高度，圖讀不到就不換 */
+    /** 換貼圖、維持顯示高度（以原本的高度重新算縮放）；frame 省略＝單張圖 */
+    swapTexture(tk, frame) {
+      var m = this.monster, h = this.wantH || m.height * this.baseScale;
+      this.wantH = h;   // 原本的顯示高度（多幀圖被下面那條壓低時，換回單張圖仍用原本的高度）
+      m.setTexture(tk, frame);
+      var s = h / Math.max(1, m.height);
+      // v4.2.8 多幀圖的畫填滿整格（佛格 p2 第 2 格的皇冠頂到格子最上緣）：最高點（含上下飄 5px）不超過頭目體力框下緣（遊戲座標約 41），否則皇冠被蓋住
+      if (frame !== undefined && this.footY) s = Math.min(s, (this.footY - 5 - PHASE_TOP) / Math.max(1, m.height));
+      m.setScale(s); this.baseScale = s;
+      if (this.shadow) this.shadow.width = m.displayWidth * 0.7;
+    }
+
+    /**
+     * v4.2 頭目換階段圖（遺忘霧王‧佛格 p2／p4）：同一個位置、同樣高度，圖讀不到就不換
+     * v4.2.8（老闆 C1「按建議完成」）：那一階段有多幀圖（<key>_anim，type strip）而且每一格都切好 → 換成多幀圖，update() 換格；沒有就照舊單張圖
+     */
     setPhaseSprite(key) {
       var tk = J.Assets.texKey(key), m = this.monster, self = this;
       if (!m || !this.textures.exists(tk) || J.Assets.isPlaceholder(this, key)) return false;
-      // 等「生氣了」的脹大動畫（phaseEffect 約 0.65 秒）結束再換，換完以原本的高度重新算縮放
+      var ak = key + '_anim', ainf = J.Assets.info(ak), atk = J.Assets.texKey(ak);
+      var n = ainf && ainf.type === 'strip' && this.textures.exists(atk) && this.textures.get(atk).has(ainf.cols - 1) ? ainf.cols : 0;
+      // 等「生氣了」的脹大動畫（phaseEffect 約 0.65 秒）結束再換
       this.time.delayedCall(700, function () {
-        var h = m.height * self.baseScale;
-        m.setTexture(tk);
-        var s = h / Math.max(1, m.height);
-        m.setScale(s); self.baseScale = s;
-        if (self.shadow) self.shadow.width = m.displayWidth * 0.7;
+        if (!self.monster) return;
+        self.phaseKey = key;
+        self.phaseAnim = n ? { n: n, f: 0, kind: J.SpriteAnim ? J.SpriteAnim.animKind(self.data_.mon.id) : 'float' } : null;
+        self.swapTexture(n ? atk : tk, n ? 0 : undefined);
       });
       return true;
+    }
+
+    /** v4.2.8 進入沒有階段圖的階段（佛格第 3 階段）：停止換格、回到上一張階段單張圖（和改版前一樣） */
+    stopPhaseAnim() {
+      var self = this;
+      if (!this.phaseAnim) return false;
+      this.time.delayedCall(700, function () {
+        if (!self.phaseAnim || !self.monster) return;
+        self.phaseAnim = null;
+        self.swapTexture(J.Assets.texKey(self.phaseKey));
+      });
+      return true;
+    }
+
+    /** v4.2.8 階段多幀圖換格：格序、每格毫秒照地圖野怪（SpriteAnim.animFrame；佛格是漂浮類 200 毫秒一格）；「減少動態效果」→ 只顯示第 1 格 */
+    update(time) {
+      var a = this.phaseAnim;
+      if (!a || !this.monster || !J.SpriteAnim) return;
+      if (!this.rmAt || time - this.rmAt > 1000) {
+        this.rmAt = time;
+        var st = J.Game && J.Game.state;
+        this.rmVal = J.Motion ? J.Motion.reduceMotion(st && st.settings, window.matchMedia && window.matchMedia.bind(window)) : false;
+      }
+      var f = J.SpriteAnim.animFrame(a.kind, time, NaN, 0, a.n, this.rmVal);
+      if (f !== a.f) { a.f = f; this.monster.setFrame(f); }
     }
 
     create() {
@@ -57,6 +102,7 @@
       var mon = this.data_.mon;
       var tk = J.Assets.texKey(mon.sprite);
       var footY = bgH - 8;
+      this.footY = footY;
       this.monster = this.add.image(W / 2, footY, tk).setOrigin(0.5, 1);
       // 怪物圖用原始尺寸（sprites.js 定義：一般約 96px、頭目約 160px）；佔位圖放大到同樣高度；太大才縮小
       var s = 1;

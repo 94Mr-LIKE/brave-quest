@@ -4056,7 +4056,7 @@ window.SPRITES = {
  "mon_gt_steam_anim": {
  "file": "assets/monsters/mon_gt_steam_anim.png",
  "type": "strip",
- "frameW": 328,
+ "frameW": 352,
  "frameH": 98,
  "cols": 4,
  "rows": 1
@@ -4136,8 +4136,8 @@ window.SPRITES = {
  "mon_mc_roaster_anim": {
  "file": "assets/monsters/mon_mc_roaster_anim.png",
  "type": "strip",
- "frameW": 360,
- "frameH": 103,
+ "frameW": 408,
+ "frameH": 98,
  "cols": 4,
  "rows": 1
 },
@@ -4304,7 +4304,7 @@ window.SPRITES = {
  "mon_pib_anchor_anim": {
  "file": "assets/monsters/mon_pib_anchor_anim.png",
  "type": "strip",
- "frameW": 540,
+ "frameW": 544,
  "frameH": 131,
  "cols": 4,
  "rows": 1
@@ -4328,7 +4328,7 @@ window.SPRITES = {
  "mon_seagull_anim": {
  "file": "assets/monsters/mon_seagull_anim.png",
  "type": "strip",
- "frameW": 500,
+ "frameW": 436,
  "frameH": 99,
  "cols": 4,
  "rows": 1
@@ -4726,6 +4726,22 @@ window.SPRITES = {
  "type": "strip",
  "frameW": 676,
  "frameH": 160,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_king_p2_anim": {
+ "file": "assets/monsters/boss_fob_king_p2_anim.png",
+ "type": "strip",
+ "frameW": 752,
+ "frameH": 238,
+ "cols": 4,
+ "rows": 1
+},
+ "boss_fob_king_p4_anim": {
+ "file": "assets/monsters/boss_fob_king_p4_anim.png",
+ "type": "strip",
+ "frameW": 768,
+ "frameH": 234,
  "cols": 4,
  "rows": 1
 }

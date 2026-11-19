@@ -136,6 +136,24 @@
     return name;
   }
 
+  /** 直接用到它的下一階職業（配方裡有它的），照職階、一轉順序排 */
+  function nextOf(jobs, id) {
+    if (!id) return [];
+    return Object.keys(jobs).filter(function (k) { return recipeOf(jobs[k]).some(function (r) { return r[0] === id; }); }).sort(sorter(jobs));
+  }
+
+  /**
+   * v4.2.8 直式配方列（手機直式欄距太窄、看不出連線）：{ src [{id, lv}]（由哪些職業轉來）, dst（選的）, next [id]（可以再轉成）, anyBasic（見習：任選一轉） }
+   * 一轉的來源是見習（等級讀 JOB_RULES.master_level.novice，缺值 → lv null）；全部從 jobs.js 算，不寫死
+   */
+  function recipeStrip(jobs, rules, id) {
+    if (!id || !jobs || !jobs[id]) return null;
+    var job = jobs[id], src = recipeOf(job).filter(function (r) { return jobs[r[0]]; }).map(function (r) { return { id: r[0], lv: r[1] }; });
+    var novice = idsOfTier(jobs, 'novice')[0];
+    if (!src.length && job.tier === 'basic' && novice) src = [{ id: novice, lv: noviceLv(rules) }];
+    return { src: src, dst: id, next: nextOf(jobs, id), anyBasic: job.tier === 'novice' };
+  }
+
   /** 圖示切哪一格：J.Assets.info(key) → {file, fw, fh, cols, rows, col（中間格）, row（down 列）}；沒有圖 → null */
   function iconSpec(inf) {
     if (!inf || !inf.file) return null;
@@ -210,7 +228,10 @@
     var body = h('div.jt-body', {}, [labels, stage]);
     var more = h('div.jt-more', { 'aria-hidden': 'true', text: '▼ 往下滑看更多' });
     var info = h('p.jt-info', { role: 'status', 'aria-live': 'polite', text: HINT });
-    var panel = h('div.win.panel.jobtree' + (reduce ? '.rm' : ''), {}, [head, h('div.jt-bodywrap', {}, [body, more]), info]);
+    // v4.2.8：直式配方列（圖示＋名稱：「戰鬥大師＋聖騎士 → 神之手」「可以再轉成 → …」）；只在手機直式顯示（CSS），讀屏照舊讀 .jt-info
+    var strip = h('div.jt-recipe', { 'aria-hidden': 'true' });
+    strip.hidden = true;
+    var panel = h('div.win.panel.jobtree' + (reduce ? '.rm' : ''), {}, [head, h('div.jt-bodywrap', {}, [body, more]), strip, info]);
 
     var handle = J().UI.open(panel, { label: '職業樹', focus: closeBtn, onClose: function () {
       cleanup();
@@ -237,26 +258,56 @@
         c.spr.style.backgroundImage = url ? 'url("' + String(url).replace(/["\\\n\r]/g, encodeURIComponent) + '")' : '';
         if (spec) setVars(c.spr, { '--fw': spec.fw, '--fh': spec.fh, '--cols': spec.cols, '--srows': spec.rows, '--c': spec.col, '--r': spec.row });
       });
+      renderStrip();
+    }
+
+    // v4.2.8 直式配方列：圖示用卡片上同一個圖（複製節點，性別切換時重畫）
+    function chip(id, kind, lv) {
+      var c = cards[id], ico = h('span.jt-ico');
+      if (c) ico.appendChild(c.spr.cloneNode(true));
+      var kids = [ico, h('span.jt-cname', { text: c ? c.name : nameOf(jobs, id) })];
+      if (lv) kids.push(h('span.jt-clv', { text: 'Lv' + lv }));
+      return h('span.jt-chip.jt-chip-' + kind, {}, kids);
+    }
+    function op(t) { return h('span.jt-op', { text: t }); }
+    function renderStrip() {
+      while (strip.firstChild) strip.removeChild(strip.firstChild);
+      var r = recipeStrip(jobs, rules, selected);
+      strip.hidden = !r;
+      if (!r) return;
+      var row1 = h('div.jt-rrow');
+      r.src.forEach(function (s, i) { if (i) row1.appendChild(op('＋')); row1.appendChild(chip(s.id, 'src', s.lv)); });
+      if (r.src.length) row1.appendChild(op('→'));
+      row1.appendChild(chip(r.dst, 'sel'));
+      if (r.anyBasic) { row1.appendChild(op('→')); row1.appendChild(h('span.jt-rtxt', { text: (mlv ? 'Lv' + mlv + ' 出師後，' : '') + '任選一個' + TIER_LABEL.basic + '職業' })); }
+      strip.appendChild(row1);
+      if (r.next.length) strip.appendChild(h('div.jt-rrow', {}, [h('span.jt-rtxt', { text: '可以再轉成' }), op('→')].concat(r.next.map(function (n) { return chip(n, 'next'); }))));
+      else if (!r.anyBasic) strip.appendChild(h('div.jt-rrow', {}, [h('span.jt-rtxt', { text: '這是最高階的職業' })]));
     }
 
     var paths = [];
     function select(id) {
       selected = id;
-      var lit = {}, next = {};
-      if (id) { lit[id] = true; trace(jobs, id).all.forEach(function (k) { lit[k] = true; }); descendants(jobs, id).forEach(function (k) { next[k] = true; }); }
+      var lit = {}, next = {}, nx1 = {};
+      if (id) { lit[id] = true; trace(jobs, id).all.forEach(function (k) { lit[k] = true; }); descendants(jobs, id).forEach(function (k) { next[k] = true; }); nextOf(jobs, id).forEach(function (k) { nx1[k] = true; }); }
       Object.keys(cards).forEach(function (k) {
         var b = cards[k].btn;
         b.classList.toggle('is-on', !!lit[k]);
         b.classList.toggle('is-sel', k === id);
         b.classList.toggle('is-next', !!next[k]);
+        b.classList.toggle('is-nx1', !!nx1[k]);   // v4.2.8：直接可以再轉成的（直式配色用）
         b.setAttribute('aria-pressed', String(k === id));
       });
       paths.forEach(function (p) {
         var on = !!(p.recipe && lit[p.from] && lit[p.to]);
+        var nx = !!(p.recipe && p.from === id && nx1[p.to]);   // v4.2.8：選的 → 下一階（只有直式的 CSS 會上色）
         p.el.classList.toggle('is-on', on);
-        if (on) svg.appendChild(p.el);   // 亮的線畫在最上面
+        p.el.classList.toggle('is-nx', nx);
+        if (on || nx) svg.appendChild(p.el);   // 亮的線畫在最上面
       });
+      panel.classList.toggle('has-sel', !!id);
       info.textContent = infoText(jobs, rules, id);
+      renderStrip();
     }
 
     function portrait() { return !!(mm && mm('(orientation: portrait)').matches); }
@@ -319,7 +370,7 @@
   }
 
   var JobTree = { TIERS: TIERS, TIER_LABEL: TIER_LABEL, BASIC_ORDER: BASIC_ORDER, GAP: GAP, HINT: HINT,
-    recipeOf: recipeOf, build: build, layoutColumn: layoutColumn, trace: trace, descendants: descendants, infoText: infoText, iconSpec: iconSpec,
+    recipeOf: recipeOf, nextOf: nextOf, recipeStrip: recipeStrip, build: build, layoutColumn: layoutColumn, trace: trace, descendants: descendants, infoText: infoText, iconSpec: iconSpec,
     defaultGender: defaultGender, savedSettings: savedSettings, mountButton: mountButton, open: open };
   if (typeof window !== 'undefined' && window) { window.JQ = window.JQ || {}; window.JQ.JobTree = JobTree; }
   if (typeof module !== 'undefined') module.exports = JobTree;

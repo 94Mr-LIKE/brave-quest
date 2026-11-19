@@ -440,6 +440,30 @@ body.modal-open #toasts .toast.bg { display: none; }
 }
 @media (orientation: portrait) and (max-width: 420px) { .jobtree { --cw: 23.5%; } .jobtree .jt-card { font-size: 14px; padding: 4px 0; } }
 @media (orientation: portrait) and (min-width: 600px) { .jobtree { --cw: 20%; --s: 1.2; --pitch: 124px; } .jobtree .jt-card { font-size: 19px; } }
+/* v4.2.8（老闆 B7「要」）：手機直式欄距只剩約 7px、看不出連線 → 選了職業後：相關卡片亮（黃＝要先練、青＝可以再轉成）、其餘變暗；
+   底部配方列用圖示＋名稱寫「A＋B → C」「可以再轉成 → …」。只在手機直式（寬 < 600px）生效，橫式、平板不變 */
+.jobtree .jt-recipe { display: none; }
+@media (orientation: portrait) and (max-width: 599px) {
+  .jobtree.has-sel .jt-card:not(.is-on):not(.is-next) { opacity: .28; filter: grayscale(.9); }
+  .jobtree.has-sel .jt-note { opacity: .28; }
+  .jobtree.has-sel .jt-lines path:not(.is-on):not(.is-nx) { opacity: .12; }
+  .jobtree .jt-card.is-next, .jobtree .jt-card.is-next:hover { background: #b6ecff; color: #0e2a3c; border: 3px solid #e9fbff; }
+  .jobtree .jt-card.is-nx1, .jobtree .jt-card.is-nx1:hover { background: #63d4f7; }
+  .jobtree .jt-lines path.is-nx { stroke: #63d4f7; stroke-width: 7; }
+  .jobtree .jt-recipe:not([hidden]) { display: flex; flex: none; flex-direction: column; gap: 4px; margin-top: 6px; padding: 6px 6px; border: 2px solid var(--accent);
+    border-radius: 10px; background: #111a44; color: #fff3c8; font-size: 14px; font-weight: bold; }
+  .jobtree .jt-rrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 3px 4px; }
+  .jobtree .jt-chip { --s: .6; display: inline-flex; align-items: center; gap: 2px; padding: 1px 6px 1px 2px; border-radius: 8px; white-space: nowrap; }
+  .jobtree .jt-chip .jt-ico { width: calc(38px * var(--s)); height: calc(50px * var(--s)); }
+  .jobtree .jt-chip-src { background: #f2c14e; color: #2a1e22; }
+  .jobtree .jt-chip-sel { background: #f2c14e; color: #2a1e22; box-shadow: 0 0 0 3px #fff; }
+  .jobtree .jt-chip-next { background: #63d4f7; color: #0e2a3c; }
+  .jobtree .jt-clv { font-size: 12px; margin-left: 2px; }
+  .jobtree .jt-op { font-size: 18px; color: #fff; }
+  .jobtree .jt-rtxt { color: #fff3c8; }
+  /* 選了職業時說明列改由配方列呈現（讀屏照舊讀說明列的文字） */
+  .jobtree.has-sel p.jt-info { position: absolute; width: 1px; height: 1px; min-height: 0; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); }
+}
 .jobtree .jt-more { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; padding: 22px 0 6px; text-align: center; font-size: 18px; color: #e6eeff;
   background: linear-gradient(rgba(29, 43, 94, 0), #1d2b5e 60%); pointer-events: none; }
 .jobtree .jt-more[hidden] { display: none; }

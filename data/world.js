@@ -36,7 +36,7 @@ window.WORLD = {
   regions: [
     { id: "R_JINBAOLI", name: "金包里",     real_ref: "新北市金山區",                         map_entry: "M01", tx: 46, ty: 17,  x: 0.82, y: 0.03, unlock_quest: null },
     { id: "R_SHANCHENG", name: "山城市集",  real_ref: "新北市瑞芳九份",                       map_entry: "M09", tx: 41,  ty: 45, x: 0.884, y: 0.075, unlock_quest: null, unlock_visit: "M09" },
-    { id: "R_SHENMU",   name: "神木森林",   real_ref: "嘉義阿里山",                           map_entry: "M04", tx: 34, ty: 53, x: 0.40, y: 0.53, unlock_quest: null, unlock_visit: "M04" },
+    { id: "R_SHENMU",   name: "神木森林",   real_ref: "嘉義阿里山",                           map_entry: "M04", tx: 34, ty: 54, x: 0.40, y: 0.53, unlock_quest: null, unlock_visit: "M04" },
     { id: "R_FUCHENG",  name: "府城古城",   real_ref: "台南府城",                             map_entry: "M10", tx: 17,  ty: 51, x: 0.255, y: 0.583, unlock_quest: null, unlock_visit: "M10" },
     { id: "R_MANGROVE", name: "紅樹林濕地", real_ref: "臺北市北投區關渡",   map_entry: "M05", tx: 55, ty: 49, x: 0.74, y: 0.05, unlock_quest: null, unlock_visit: "M05" },
     { id: "R_MOON",     name: "月世界",     real_ref: "高雄田寮月世界",                       map_entry: "M08", tx: 12,  ty: 46, x: 0.328, y: 0.677, unlock_quest: null, unlock_visit: "M08" },

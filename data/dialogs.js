@@ -123,6 +123,16 @@ window.DIALOGS = {
     {"who":"pet","emotion":"平靜","text":"告示牌畫著套上雪鏈的輪胎。"},
     {"who":"pet","emotion":"平靜","text":"意思是：路面結冰時，車子要加雪鏈喔！"}
   ],
+  // v4.2.8 E3（老闆 2026-11-19「按建議」：M34 玉山步道三塊告示牌留著、按 Ⓐ 補一句說明；番薯仔講華語）
+  D_PROP_SIGN_BEAR_BELL: [
+    {"who":"pet","emotion":"平靜","text":"這裡是黑熊的家，走山路要帶熊鈴，叮噹響讓黑熊先避開。"}
+  ],
+  D_PROP_SIGN_BUDDY: [
+    {"who":"pet","emotion":"平靜","text":"爬山要和家人朋友結伴同行，不要一個人走，互相照顧。"}
+  ],
+  D_PROP_SIGN_TRASH: [
+    {"who":"pet","emotion":"平靜","text":"垃圾不要留在山上，自己裝好帶下山，保護山林。"}
+  ],
   D_CH_5A: [
     {"who":"lodge_keeper_hh","emotion":"擔心","text":"雪地上有幾顆雪球怪物，一直打轉。","taigi":{"hanji":"雪頂有幾粒雪球的怪物，一直踅。","tailo":"Seh tíng ū kuí lia̍p seh-kiû ê kuài-bu̍t, it-ti̍t se̍h.","huayu":"雪地上有幾顆雪球怪物，一直打轉。"}},
     {"who":"lodge_keeper_hh","emotion":"平靜","text":"讓怪物清醒，把 3 片雪花結晶找回來。","taigi":{"hanji":"予怪物清醒，共三片雪花揣轉來。","tailo":"Hōo kuài-bu̍t tshing-tshínn, kā sann phìnn seh-hue tshuē tńg--lâi.","huayu":"讓怪物清醒，把 3 片雪花結晶找回來。"}}
