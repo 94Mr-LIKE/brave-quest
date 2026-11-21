@@ -504,7 +504,7 @@
           this.stationLabelMode = 'above';
           // ↑ 真正切字的原因：M04 站名的左半邊壓到上層格（'U'，從背景切出來畫在角色上方，深度 40000），被背景蓋住。
           //   站名是要給人看的字，一律畫在上層格之上（LABEL_DEPTH）
-          this.stationLabelInfo = { text: stn.name, textW: lab.textW, boxW: lab.boxW, displayW: this.stationLabel.displayWidth, depth: LABEL_DEPTH, fgDepth: FG_CELL_DEPTH, res: lab.res, fontPx: lab.fontPx };   // 測試用
+          this.stationLabelInfo = { text: stn.name, textW: lab.textW, boxW: lab.boxW, displayW: this.stationLabel.displayWidth, depth: LABEL_DEPTH, fgDepth: FG_CELL_DEPTH, res: lab.res, fontPx: lab.fontPx, scale: 1 };   // 測試用（v4.2.9 A2：scale＝放大倍數，手機直放 1.5）
         }
       }
       // v0.9.4 B17（老闆 D17「每個車站都可以有」）：背景沒有畫站房的車站旁放候車亭（maps.js station.shelter = 左上角格子，3×3 格；只擋最下面一排）
@@ -883,6 +883,18 @@
     }
 
     /**
+     * v4.2.9 A2c：神像右緣在螢幕上的 x（CSS 像素）；沒有神像或量不到時 null。
+     * menus.js 轉職清單（.shrine-list）用它算手機橫放時清單最多能多寬，讓神像整尊露在清單左邊。只讀，不動鏡頭。
+     */
+    statueScreenRight() {
+      var s = this.statueImg, cam = this.cameras && this.cameras.main, cv = this.sys && this.sys.game && this.sys.game.canvas;
+      if (!s || !cam || !cv || !cv.getBoundingClientRect) return null;
+      var r = cv.getBoundingClientRect(), wv = cam.worldView;
+      if (!wv || !wv.width || !r.width) return null;
+      return r.left + (s.x + s.displayWidth * (1 - s.originX) - wv.x) * (r.width / wv.width);
+    }
+
+    /**
      * v4.2.3（老闆 2026-11-15 選 B；實玩 DEF-02）：主角靠近有匾額的店家（站在店主人面前、走近店門）時，鏡頭要往上移多少，
      * 讓匾額整塊落在上方狀態列下面；主角的腳留在對話框上面。範圍與算法在 MapInfo.signCamPick／signCamOffset。
      */
@@ -948,13 +960,24 @@
       }
       return { key: key, textW: textW, boxW: boxW, res: res, fontPx: fontPx };
     }
+    /** v4.2.9 A2：手機直放（畫布縮得小）站名放大一級（MapInfo.stationLabelScale）；倍數一變就重選位置。畫布矩形用 placeStationLabel 同一份 200ms 快取，不多量 DOM */
+    fitStationLabelScale(l, cam) {
+      var dc = this.labelDomCache;
+      if (!J.MapInfo.stationLabelScale || !l.setScale || !dc || !dc.cv || !cam.worldView.width) return;
+      var res0 = (this.stationLabelInfo && this.stationLabelInfo.res) || 3, mul = J.MapInfo.stationLabelScale(dc.cv.width / cam.worldView.width);
+      if (Math.abs(l.scaleX - mul / res0) < 1e-6) return;
+      l.setScale(mul / res0); this.stationLabelLock = null;
+      if (this.stationLabelInfo) { this.stationLabelInfo.scale = mul; this.stationLabelInfo.displayW = l.displayWidth; }
+    }
     /** v4.2.6 站名小牌的位置：站牌上方 → 被上方狀態列蓋住時改右邊 → 還是蓋住就畫在站牌腳下（MapInfo.stationLabelSpot 算） */
     placeStationLabel() {
       var l = this.stationLabel, sg = this.stationSign, cam = this.cameras && this.cameras.main;
       if (!l || !sg || !cam || !J.MapInfo.stationLabelSpot) return null;
+      this.fitStationLabelScale(l, cam);   // v4.2.9 A2：手機直放放大一級
       var viewH = cam.worldView.height || (cam.height / (cam.zoom || 1));
       var opt = { signX: sg.x, signFoot: sg.y, signW: sg.displayWidth, signH: sg.displayHeight, labelW: l.displayWidth, labelH: l.displayHeight,
-        camTop: cam.worldView.y, hudH: this.signCamDom().hud * viewH, mapW: this.size ? this.size.w * T : 0, mapH: this.size ? this.size.h * T : 0 };
+        camTop: cam.worldView.y, hudH: this.signCamDom().hud * viewH, mapW: this.size ? this.size.w * T : 0, mapH: this.size ? this.size.h * T : 0,
+        avoid: this.stationShelter ? J.MapInfo.stationShelterRect(this.station, T) : null };   // v4.2.9 A2：避開候車亭
       // v4.2.6 W1e（QA-ST-R01：進站時站名為了閃橫幅先跑到右邊／腳下，橫幅淡掉又跳回去）：
       //   常駐的遮擋物（狀態卡、右上按鈕、小地圖）→ 用候選位置（上方→右→左→腳下）避開，選定後就固定，
       //     只有「固定的位置被常駐遮擋物蓋到」或畫布大小改變時才重選；
@@ -970,7 +993,7 @@
         if (cv.width && wv.width && wv.height) {
           var kx = cv.width / wv.width, ky = cv.height / wv.height, sizeKey = Math.round(cv.width) + 'x' + Math.round(cv.height);
           var toScreen = function (r) { return { left: cv.left + (r.x - wv.x) * kx, top: cv.top + (r.y - wv.y) * ky, right: cv.left + (r.x + r.w - wv.x) * kx, bottom: cv.top + (r.y + r.h - wv.y) * ky }; };
-          var measure = function (sel) { var out = []; Array.prototype.forEach.call(document.querySelectorAll(sel) || [], function (el) { var b = el.getBoundingClientRect(); if (b.width && b.height && getComputedStyle(el).visibility !== 'hidden' && getComputedStyle(el).display !== 'none') out.push(b); }); return out; };
+          var measure = function (sel) { var out = []; Array.prototype.forEach.call(document.querySelectorAll(sel) || [], function (el) { var b = el.classList && el.classList.contains('hud-tuck') ? MapScene.layoutRect(el) : el.getBoundingClientRect();   /* v4.2.9 A2：按鈕列收起時照原本大小算，站名不會跟著跳 */ if (b.width && b.height && getComputedStyle(el).visibility !== 'hidden' && getComputedStyle(el).display !== 'none') out.push(b); }); return out; };
           var rectsOf = function (sel) { if (sel !== MapScene.LABEL_BLOCKERS_FIXED) return measure(sel); return dc.fixed || (dc.fixed = measure(sel)); };   // 只有常駐的走快取
           var hits = function (sr, list) { return list.some(function (b) { return sr.left < b.right && sr.right > b.left && sr.top < b.bottom && sr.bottom > b.top; }); };
           var blockers = rectsOf(MapScene.LABEL_BLOCKERS_FIXED);
@@ -1982,13 +2005,21 @@
       var sx = cv.width / wv.width, sy = cv.height / wv.height;
       var px = cv.left + (this.player.x - wv.x) * sx, py = cv.top + (this.player.y - wv.y) * sy;
       var hw = T * 0.6 * sx, top = Math.max(cv.top, py - T * 1.6 * sy), bottom = Math.min(cv.top + cv.height, py), out = {};
+      // v4.2.9 A2（方案 C，老闆「手機上出口被右上按鈕蓋住」）：主角疊到右上按鈕列時，按鈕列除了 .hud-fade 再加 .hud-tuck
+      //   （style.css：更淡、縮小到右上角、點不到 → 那一塊的點擊落到地圖上，不會誤開選單；鍵盤 Tab 到按鈕時 :focus-within 整排恢復）。
+      //   縮小後 getBoundingClientRect 會變小，所以重疊判斷改用「沒縮小的版面位置」（MapScene.layoutRect），不會一縮一放來回閃。
+      //   左上狀態卡同樣處理（實機：電腦版上緣出口多在畫面正中，主角是被狀態卡蓋住；.3 半透明時字仍壓在主角與出口光圈上）→ 也加 .hud-tuck，縮到左上角。
+      //   減少動態效果：#hud 加 .hud-rm，淡出、縮小都不做動畫直接切換。
+      var hud = document.querySelector && document.querySelector('#hud');
+      if (hud && hud.classList) { var rm = !!(this.reduceMotionNow && this.reduceMotionNow()); if (rm !== hud.classList.contains('hud-rm')) hud.classList.toggle('hud-rm', rm); }
       // v2.2.1（v20 缺陷 11、v21 L7）：委託完成的大橫幅、「下一步」「轉職成…」提示泡泡蓋到主角時也變淡
-      [['#hud .hud-card', 'hud-fade'], ['#hud .hud-buttons', 'hud-fade'], ['#ui > .map-banner', 'hero-under'], ['#ui > .big-banner', 'hero-under'], ['#toasts > .toast', 'hero-under']].forEach(function (p) {
+      [['#hud .hud-card', 'hud-fade', 'hud-tuck'], ['#hud .hud-buttons', 'hud-fade', 'hud-tuck'], ['#ui > .map-banner', 'hero-under'], ['#ui > .big-banner', 'hero-under'], ['#toasts > .toast', 'hero-under']].forEach(function (p) {
         out[p[0]] = false;
         Array.prototype.forEach.call(document.querySelectorAll(p[0]) || [], function (el) {
-          var r = el.getBoundingClientRect();
+          var r = p[2] ? MapScene.layoutRect(el) : el.getBoundingClientRect();
           var hit = !!r.width && bottom > top && px + hw > r.left && px - hw < r.right && bottom > r.top && top < r.bottom;
           if (hit !== el.classList.contains(p[1])) el.classList.toggle(p[1], hit);
+          if (p[2] && hit !== el.classList.contains(p[2])) el.classList.toggle(p[2], hit);
           if (hit) out[p[0]] = true;
         });
       });
@@ -2333,5 +2364,15 @@
   MapScene.LABEL_BLOCKERS_TEMP = '#ui > .map-banner';   // v4.2.6 W1e：會消失的（蓋到時站名先藏、不換位置）
   // v4.2.6 審查 L2：橫幅必須從 DOM 移除（不能只是 opacity 0），否則站名會一直藏著；v4.2.8：橫幅這一項每幀量、不快取
   MapScene.LABEL_DOM_TTL = 200;   // v4.2.8 審查 R1：畫布與常駐遮擋物矩形的快取毫秒
+  /**
+   * v4.2.9 A2：元素「沒套 transform 時」的螢幕矩形（offsetLeft／offsetTop／offsetWidth／offsetHeight 不受 transform 影響，加上 offsetParent 的位置）。
+   * 右上按鈕列收起（.hud-tuck 縮小）時，重疊判斷與站名避讓仍用原本的大小。沒有 offsetParent（隱藏、測試替身）就用 getBoundingClientRect
+   */
+  MapScene.layoutRect = function (el) {
+    var op = el && el.offsetParent;
+    if (!op || typeof el.offsetWidth !== 'number' || !op.getBoundingClientRect) return el.getBoundingClientRect();
+    var pr = op.getBoundingClientRect(), l = pr.left + (op.clientLeft || 0) + el.offsetLeft, t = pr.top + (op.clientTop || 0) + el.offsetTop;
+    return { left: l, top: t, right: l + el.offsetWidth, bottom: t + el.offsetHeight, width: el.offsetWidth, height: el.offsetHeight };
+  };
   window.JQ.MapScene = MapScene;
 })();

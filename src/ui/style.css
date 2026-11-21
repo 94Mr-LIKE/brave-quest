@@ -649,6 +649,18 @@ body.banner-on #toasts .toast { visibility: hidden; }
 jq-nb { white-space: nowrap; }
 /* ===== v1.4.1 END ===== */
 
+/* v4.2.9 A2（方案 C，老闆「手機上出口被右上按鈕蓋住」）：主角疊到右上四個按鈕時（MapScene.fadeOverlays 加 .hud-tuck），整排更淡、縮到右上角、點不到
+   （那一塊的點擊落到地圖上，不會誤開選單）；離開就恢復。鍵盤 Tab 到任何一顆按鈕時整排立刻恢復、可以按（:focus-within）；觸控另有 B 鍵開選單。
+   減少動態效果（系統設定或遊戲設定，MapScene 在 #hud 加 .hud-rm）：不做動畫，直接切換 */
+#hud .hud-buttons { transition: opacity .2s, transform .2s; transform-origin: top right; }
+#hud .hud-buttons.hud-tuck { opacity: .2; transform: scale(.5); pointer-events: none; }
+#hud .hud-buttons.hud-tuck:focus-within { opacity: 1; transform: none; pointer-events: auto; }
+/* 左上狀態卡同樣：主角疊到時（電腦版上緣出口多在畫面正中，就是狀態卡底下）更淡、縮到左上角；狀態卡本來就不擋點擊（.hud-fade） */
+#hud .hud-card { transition: opacity .2s, transform .2s; transform-origin: top left; }
+#hud .hud-card.hud-tuck { opacity: .15; transform: scale(.5); }
+#hud.hud-rm .hud-card, #hud.hud-rm .hud-buttons { transition: none; }
+@media (prefers-reduced-motion: reduce) { #hud .hud-card, #hud .hud-buttons { transition: none; } }
+
 /* v2.0（老闆 2026-10-26）洞窟、迷宮不給小地圖：minimap.js 設 hidden（.minimap 本來是 display: flex，要蓋過去） */
 #hud .minimap[hidden] { display: none !important; }
 
@@ -792,3 +804,22 @@ jq-nb { white-space: nowrap; }
   #layer > .modal-back:has(> .choose-box), #layer > .modal-back:has(> .dialog) { padding-bottom: 0; padding-right: 0; }
 }
 /* ===== v4.2.4 手機對話框 END ===== */
+
+/* v4.2.9 A2（老闆「轉職清單蓋住神像」）：在神像前開的轉職清單（menus.js guild 的 opts.shrine → .shrine-list／.shrine-back）讓出神像。
+   橫的畫面（電腦、手機橫放）：清單靠右、上下撐滿可捲動，畫面中間的神像整尊露出；直放：清單放下半部（約六成高）可捲動，神像在上方狀態列下面。
+   遮罩變淡一點讓神像看得清楚；字級、內容、按鈕、焦點順序都不變。府城職業公會沒有 .shrine-list，照舊置中 */
+#layer > .modal-back.shrine-back { background: rgba(6, 10, 30, .2); justify-content: flex-end; align-items: stretch; }
+#layer > .modal-back.shrine-back > .panel.shrine-list,
+body.panel-open #pad:not([hidden]) ~ #layer > .modal-back.shrine-back > .panel.shrine-list { width: min(520px, 44vw); max-height: 100%; }   /* v4.2.9 A2b 技術長：和神像多留一點距離（原 min(540px, 46vw)） */
+@media (orientation: portrait) {
+  #layer > .modal-back.shrine-back { justify-content: center; align-items: flex-end; }
+  #layer > .modal-back.shrine-back > .panel.shrine-list,
+  body.panel-open #pad:not([hidden]) ~ #layer > .modal-back.shrine-back > .panel.shrine-list { width: min(920px, 96vw); max-height: 58%; }
+}
+/* v4.2.9 A2c：手機橫放（橫的、高 ≤ 500px）時 44vw 仍蓋到神像右邊（844×390：神像右緣 489、清單左緣 463）。
+   清單寬再加一個上限 --shrine-room＝遮罩內容右緣 −（神像右緣＋12px），開清單時由 menus.js shrineRoom 依實際畫面量出；量不到就照舊 44vw。
+   電腦（高 > 500）與直放不套這條，版面不變 */
+@media (orientation: landscape) and (max-height: 500px) {
+  #layer > .modal-back.shrine-back > .panel.shrine-list,
+  body.panel-open #pad:not([hidden]) ~ #layer > .modal-back.shrine-back > .panel.shrine-list { width: min(520px, 44vw, var(--shrine-room, 44vw)); }
+}

@@ -698,6 +698,7 @@
       : hintCh1 ? G.say('D_TEMPLE_HINT_CH1', [{ who: 'temple_keeper', text: '換了職業，等級會從 1 開始。' }, { who: 'temple_keeper', text: '也可以先讓漁港的大章魚清醒，再回來換職業喔。' }]) : Promise.resolve();   // 備用文字和 dialogs.js 的 D_TEMPLE_HINT_CH1 一致（用「清醒」）
     return intro.then(function () {
       J.Menus.guild(G, { place: place, title: place === 'guild' ? '⚔️ 職業公會' : place === 'temple' ? '✨ 慈護宮・轉職' : '✨ ' + G.placeName(place) + '・轉職', label: place === 'guild' ? '職業公會' : place === 'temple' ? '慈護宮轉職' : G.placeName(place) + '轉職',
+        shrine: place === 'temple' && !!(G.mapScene && G.mapScene.map && J.MapInfo.shrineSpots(G.mapScene.map).length),   // v4.2.9 A2：在神像前開的清單，版面讓出神像（menus.js）
         onPick: function (jobId, kind) { G.jobPick(place, jobId, kind); } });
     });
   };

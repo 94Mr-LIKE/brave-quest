@@ -576,6 +576,21 @@
   var JOB_BTN = { back: '換回去（免費）', change: '轉職', trial: '立志小考', today: '明天再來考', time: '今天時間不夠', level: '見習 10 級才能考', closed: '即將開放', recipe: '配方還沒完成', place: '到鹿耳門聖母廟或佛光山轉' };
 
   /**
+   * v4.2.9 A2c：神像前的轉職清單最多能多寬＝遮罩內容區右緣 −（神像右緣螢幕座標＋12px 間距），寫到清單的 CSS 變數 --shrine-room。
+   * 只有 style.css 手機橫放（矮畫面）那條規則用它（width: min(520px, 44vw, var(--shrine-room))）；電腦、直放不看這個值。量不到神像就不設（照舊 44vw）。
+   */
+  var SHRINE_GAP = 12;
+  function shrineRoom(G, panel) {
+    var sc = G.mapScene, back = panel.parentNode;
+    var sr = sc && sc.statueScreenRight ? sc.statueScreenRight() : null;
+    if (sr == null || !back || !back.getBoundingClientRect) return null;
+    var br = back.getBoundingClientRect(), pad = parseFloat(getComputedStyle(back).paddingRight) || 0;
+    var room = Math.max(0, Math.floor(br.right - pad - (sr + SHRINE_GAP)));
+    panel.style.setProperty('--shrine-room', room + 'px');
+    return room;
+  }
+
+  /**
    * 轉職清單。opts＝{ title, label, place（'temple'｜'guild'）, onPick(jobId, kind)：孩子按了按鈕（清單先關掉） }
    * 每個職業一張說明卡：拿手科目、特性、能用的武器防具、4 個技能（學會的等級）。
    */
@@ -586,6 +601,10 @@
     var body = h('div');
     var panel = h('div.win.panel.guild-panel', {}, [h('button.close.ghost', { onclick: function () { handle.close(); }, 'aria-label': '關閉' }, ['✕ 關閉']), h('h2', { text: opts.title || '⚔️ 職業公會' }), body]);
     handle = J.UI.open(panel, { label: opts.label || '職業公會', onClose: function () { G.refreshHud(); } });
+    // v4.2.9 A2（老闆「轉職清單蓋住神像」）：在神像前開的清單（opts.shrine）加 .shrine-list，外層遮罩加 .shrine-back：
+    //   橫的畫面（電腦、手機橫放）清單靠右、直放放下半部可捲動，神像露在上方狀態列下面（style.css）。內容、按鈕、焦點順序都不變；府城公會沒有 shrine，照舊置中
+    if (opts.shrine) { panel.classList.add('shrine-list'); if (panel.parentNode && panel.parentNode.classList) panel.parentNode.classList.add('shrine-back'); }
+    if (opts.shrine) shrineRoom(G, panel);   // v4.2.9 A2c：手機橫放（矮畫面）清單收窄到神像右緣＋12px 之外（style.css 用 --shrine-room）
     function render() {
       body.innerHTML = '';
       var need = (D.jobRules && D.jobRules.master_level && D.jobRules.master_level.novice) || 10;

@@ -572,6 +572,36 @@
       { mode: 'side', x: o.signX + o.signW / 2 + 2, y: sy, ox: 0, oy: 0 },
       { mode: 'side', x: o.signX - o.signW / 2 - 2, y: sy, ox: 1, oy: 0 },
       { mode: 'below', x: o.signX, y: o.signFoot + 2, ox: 0.5, oy: 0 }];
+    // v4.2.9 A2（B8「站名疊在候車亭屋頂上」）：o.avoid＝候車亭的世界矩形（stationShelterRect）。有給時多兩個候選
+    //   「站牌上方、往候車亭的反方向靠」（站名的一邊對齊站牌的外緣：候車亭在右 → 站名在站牌左上），
+    //   並把會疊到候車亭的候選全部排到最後（順序：上方 → 上方靠反方向 → 站牌旁反方向 → 站牌旁另一邊 → 站牌腳下）。沒給 avoid 時和 v4.2.8 完全一樣
+    var av = o.avoid && o.avoid.w > 0 ? o.avoid : null;
+    if (av) {
+      var away = av.x + av.w / 2 >= o.signX ? -1 : 1;   // 候車亭中心在站牌右邊（或正上方）→ 往左
+      var edge = o.signX + away * o.signW / 2;
+      list.splice(2, 0, { mode: 'above', x: edge, y: top - 2, ox: away < 0 ? 1 : 0, oy: 1 });
+      if (away < 0) { var sl = list[4]; list[4] = list[3]; list[3] = sl; }   // 站牌旁：先放候車亭的反方向（左）
+    }
+    // v4.2.9 A2b（實機：M22、M26、M30 電腦版與 M06 手機直放的站名被選到「站牌腳下」，蓋住主角下車那一格）：
+    //   1. 上方靠反方向的候選超出地圖邊時，往地圖裡推回來（上方候選在站牌頂端之上，左右推一點不會碰到站牌）；
+    //   2. 站牌旁的候選只碰到候車亭底部（候車亭在站牌正上方）時，多一個「往下移到候車亭下緣之下、仍在站牌腳底以上」的候選；
+    //   3. 站牌腳下照舊最後才用（排在所有不疊候車亭的上方／站牌旁候選之後）。
+    if (av) {
+      list.forEach(function (c, i) {
+        if (c.mode === 'above' && i === 2) {
+          var rx = c.x - c.ox * o.labelW, nx = Math.max(0, o.mapW ? Math.min(rx, o.mapW - o.labelW) : rx);
+          if (nx !== rx) list[i] = { mode: 'above', x: nx + c.ox * o.labelW, y: c.y, ox: c.ox, oy: c.oy };
+        }
+      });
+      //   站名比較大（手機直放 1.5 倍）放不進站牌旁時：移到站牌那一欄的外面（左右隔一格的一半），可以往下伸進站牌腳下那一列，但不會蓋到站牌正下方（主角下車）那一格
+      var low = av.y + av.h + 2, half = (o.tile || 32) / 2, extra = [];
+      list.forEach(function (c) {
+        if (c.mode !== 'side' || c.y >= low) return;
+        if (low + o.labelH <= o.signFoot) extra.push({ mode: 'side', x: c.x, y: low, ox: c.ox, oy: c.oy });
+        else if (low + o.labelH <= o.signFoot + 2 * half) extra.push({ mode: 'side', x: o.signX + (c.ox ? -1 : 1) * (half + 2), y: low, ox: c.ox, oy: c.oy });
+      });
+      if (extra.length) Array.prototype.splice.apply(list, [list.length - 1, 0].concat(extra));
+    }
     var out = [], seen = {};
     list.forEach(function (c) {
       var k = c.x + ',' + c.y + ',' + c.ox + ',' + c.oy;
@@ -580,8 +610,31 @@
       if (r.x < 0 || r.y < 0 || (o.mapW && r.x + r.w > o.mapW) || (o.mapH && r.y + r.h > o.mapH)) return;
       c.rect = r; out.push(c);
     });
+    if (av) {
+      var ok = out.filter(function (c) { return !rectsMeet(c.rect, av); });
+      if (ok.length) out = ok.filter(function (c) { return c.mode !== 'below'; }).concat(ok.filter(function (c) { return c.mode === 'below'; }), out.filter(function (c) { return rectsMeet(c.rect, av); }));
+    }
     return out;
   }
+  function rectsMeet(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+  /**
+   * v4.2.9 A2：程式畫的候車亭（maps.js station.shelter＝左上角格子，圖 96×96＝3×3 格，腳底貼第 3 列下緣）在世界座標裡「畫得到東西」的矩形。
+   * 圖的上方 12 像素、左右各 2 像素是透明的（obj_bus_shelter.png 量的），去掉；沒有候車亭回 null
+   */
+  var SHELTER_INSET = { l: 2, t: 12, r: 2, b: 0 };
+  function stationShelterRect(stn, T) {
+    var sh = stn && stn.shelter;
+    if (!sh || typeof sh.x !== 'number' || typeof sh.y !== 'number') return null;
+    T = T || 32;
+    var s = T / 32, x = sh.x * T + SHELTER_INSET.l * s, y = sh.y * T + SHELTER_INSET.t * s;
+    return { x: x, y: y, w: 3 * T - (SHELTER_INSET.l + SHELTER_INSET.r) * s, h: 3 * T - (SHELTER_INSET.t + SHELTER_INSET.b) * s };
+  }
+  /**
+   * v4.2.9 A2（B8「手機直放時站名只有約 37×13 像素」）：站名小牌的放大倍數。k＝畫布每 1 世界像素在螢幕上幾個 CSS 像素。
+   * 手機直放（390 寬的畫布顯示 640 世界像素，k≈0.61）站名 16px 只剩約 10 個 CSS 像素 → 放大一級（1.5 倍，約 15 個 CSS 像素）；電腦、橫放（k≥0.8）照舊 1 倍
+   */
+  var STATION_LABEL_BIG = 1.5;
+  function stationLabelScale(k) { return k > 0 && k < 0.8 ? STATION_LABEL_BIG : 1; }
   /** 選第一個「螢幕矩形不碰到任何遮擋物」的候選；toScreen(rect)→螢幕矩形 {left, top, right, bottom}；blockers＝螢幕矩形陣列。都碰到就回第一個 */
   function stationLabelPick(cands, toScreen, blockers) {
     var hit = function (a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; };
@@ -628,7 +681,7 @@
     return { x: view.x + Math.min(view.w - 1, Math.floor(px / cssW * view.w)), y: view.y + Math.min(view.h - 1, Math.floor(py / cssH * view.h)) };
   }
 
-  var MapInfo = { stationLabelSpot: stationLabelSpot, stationLabelCandidates: stationLabelCandidates, stationLabelPick: stationLabelPick, LAMP_ART: LAMP_ART, lampArtKey: lampArtKey, STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, SIGN_ABOVE_KEEPER: SIGN_ABOVE_KEEPER, SIGN_PLAQUES: SIGN_PLAQUES, SIGN_KIND: SIGN_KIND, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
+  var MapInfo = { stationLabelSpot: stationLabelSpot, stationLabelCandidates: stationLabelCandidates, stationLabelPick: stationLabelPick, stationShelterRect: stationShelterRect, stationLabelScale: stationLabelScale, LAMP_ART: LAMP_ART, lampArtKey: lampArtKey, STATUE_SPRITE: STATUE_SPRITE, STATUE_NAME: STATUE_NAME, shrineSpots: shrineSpots, shrineAt: shrineAt, plaqueSpots: plaqueSpots, landmarks: landmarks, landmarkAt: landmarkAt, placeLabels: placeLabels, tileFromMinimap: tileFromMinimap, ANIMAL_SAY: ANIMAL_SAY, animalSpecs: animalSpecs, animalTiles: animalTiles, awayTarget: awayTarget, REC_LEVEL: REC_LEVEL, recLevel: recLevel, levelText: levelText, nameWithLevel: nameWithLevel, innDialog: innDialog, innSpeaker: innSpeaker, innKeeperSprite: innKeeperSprite, innSpeakerSprite: innSpeakerSprite, innKeeperName: innKeeperName, SAFE_RADIUS: SAFE_RADIUS, safePoints: safePoints, inSafeZone: inSafeZone, upperCells: upperCells, rectHitsCells: rectHitsCells, signSpots: signSpots, SIGN_TEXT: SIGN_TEXT, SIGN_ABOVE_KEEPER: SIGN_ABOVE_KEEPER, SIGN_PLAQUES: SIGN_PLAQUES, SIGN_KIND: SIGN_KIND, bgmFor: bgmFor, battleBgm: battleBgm, MAP_BGM: MAP_BGM,
     wanderTarget: wanderTarget, petSpot: petSpot, glowRgb: glowRgb, lightSpots: lightSpots, scaleMap: scaleMap, scalePoint: scalePoint, snapCell: snapCell,
     LEGACY_DIMS: LEGACY_DIMS, currentDims: currentDims, remapPoint: remapPoint, migrateCoords: migrateCoords,
     SIGN_CAM: SIGN_CAM, signCamPick: signCamPick, signCamOffset: signCamOffset, camEase: camEase };
