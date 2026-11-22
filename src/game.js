@@ -649,13 +649,13 @@
     var m = questMarker(npc);
     // v1.3.1 可以挑錯的阿伯（收集到諺語、還沒答對、沒有委託要處理、不是旅店商店）：藍色「?」
     if (m || npc.virtual || !J.Proverbs || !G.mapScene || npcRole(npc, G.mapScene.map).role !== 'quest') return m;
-    var f = J.QuestLog.forNpc(G.state, G.data.quests, npc.id, questIds(npc));
+    var f = J.QuestLog.forNpc(G.state, G.data.quests, npc.id, questIds(npc), G.testModeOn());   // v4.2.10 T1b 測試模式：前置沒做完的委託也算可接
     if (f && (f.status === 'available' || f.status === 'active')) return null;
     return J.Proverbs.quizFor(G.state, npc.id, G.mapScene.mapId, window.PROVERB_QUIZ) ? 'proverb' : null;
   };
   function questMarker(npc) {
     if (npc.virtual) return null;
-    var f = J.QuestLog.forNpc(G.state, G.data.quests, npc.id, questIds(npc));
+    var f = J.QuestLog.forNpc(G.state, G.data.quests, npc.id, questIds(npc), G.testModeOn());   // v4.2.10 T1b 測試模式：頭頂、小地圖的「！」也顯示前置沒做完的委託
     if (!f) return null;
     if (f.status === 'available') return 'bang';
     var q = G.data.quests[f.id];
@@ -802,6 +802,7 @@
           .then(function () { return G.say(TD.lv1, [{ who: who, text: '換了職業，等級會從 1 開始，能力有保底，不用擔心。' }]); })
           .then(function () { return G.doJobChange(place, jobId); });
       }
+      if (G.testModeOn()) return G.say(null, [{ who: who, text: '這次還沒過。（測試模式：不限次數，可以馬上再考一次。）' }]);   // v4.2.10 T1：測試模式不說「明天再來」
       return G.say(TD.fail, [{ who: who, text: '這次還沒過，沒關係。明天可以再來考。' }])
         .then(function () { return G.say(PET.fail || 'D_TRIAL_FAIL_PET', [{ who: 'pet', text: '我們去做委託、開寶箱多練習，明天再來！' }]); });
     });
@@ -919,7 +920,8 @@
     var map = scene.map, st = G.state, Q = G.data.quests;
     var r = npcRole(npc, map);
     var ids = questIds(npc);
-    var f = ids.length ? J.QuestLog.forNpc(st, Q, npc.id, ids) : null;
+    var tmFree = G.testModeOn();   // v4.2.10 T1b 測試模式：接委託不看前置（QuestLog free）
+    var f = ids.length ? J.QuestLog.forNpc(st, Q, npc.id, ids, tmFree) : null;
     // v1.3.1 台語氣象諺語：第一次和這位阿伯說話，先說諺語（記成收集到；有委託要處理就接著原本的對話）；
     //   收集到以後、他沒有委託要處理時，出挑錯關卡（阿伯故意說錯，孩子挑出錯的那一句）
     if (J.Proverbs && !opts.service && !opts.quest && !opts.proverbDone) {
@@ -980,7 +982,7 @@
     if (f && f.status === 'available') {
       var q2 = Q[f.id];
       G.say(q2.dialog_start, [{ who: npc.id, text: q2.goal || q2.title }]).then(function () {
-        J.QuestLog.accept(st, Q, f.id);
+        J.QuestLog.accept(st, Q, f.id, tmFree);
         J.Audio.play('select');
         // v1.1 試玩建議 S7：答題委託（help）接下後馬上出題（題目框標題就是委託名稱）；不再跳「接下委託」泡泡——
         // 泡泡會排在答題後面，等委託完成才冒出來，看起來像又接了一次
@@ -995,7 +997,7 @@
       });
       return;
     }
-    var locked = J.QuestLog.firstLocked(st, Q, ids);
+    var locked = J.QuestLog.firstLocked(st, Q, ids, tmFree);
     var lq = locked && Q[locked];
     G.say(lq && lq.dialog_locked ? lq.dialog_locked : npc.dialog, [{ who: npc.id, text: '你好呀，' + st.player.name + '！' }]);
   };
@@ -1149,9 +1151,10 @@
    */
   G.runEvent = function (id, scene, opts) {
     var st = G.state, Q = G.data.quests, q = Q[id];
-    var s0 = q ? J.QuestLog.status(st, Q, id) : 'locked';
+    var tmFree = G.testModeOn();   // v4.2.10 T1b 測試模式：事件點（觸發格、回音謎門、遺失物、星星）接委託不看前置；進地圖自動開始的（enterEvents）只在照常可接時才會呼叫到這裡
+    var s0 = q ? J.QuestLog.status(st, Q, id, tmFree) : 'locked';
     if (s0 !== 'available' && s0 !== 'active') return Promise.resolve(false);
-    if (s0 === 'available') { J.QuestLog.accept(st, Q, id); G.lastAccepted = id; G.save(); if (scene && scene.refreshMarkers) scene.refreshMarkers(); }
+    if (s0 === 'available') { J.QuestLog.accept(st, Q, id, tmFree); G.lastAccepted = id; G.save(); if (scene && scene.refreshMarkers) scene.refreshMarkers(); }
     G.eventLog = (G.eventLog || []).concat([id]);   // 測試用
     if (opts && opts.noQuiz && s0 === 'active') return Promise.resolve(true);
     return G.say(q.dialog_start, [{ who: q.giver, text: q.goal || q.title }]).then(function () {
@@ -1167,9 +1170,9 @@
       var q = Q[k], t = q.trigger;
       if (q.kind !== 'event' || !t || t.map !== scene.mapId || !Array.isArray(t.cells)) return false;
       if (!t.cells.some(function (c) { return c[0] === x && c[1] === y; })) return false;
-      var s = J.QuestLog.status(st, Q, k);
+      var s = J.QuestLog.status(st, Q, k, G.testModeOn());   // v4.2.10 T1b 測試模式：前置委託、trigger.requires（例如 item:dawn_compass）都不擋
       if (s !== 'available' && s !== 'active') return false;
-      return !t.requires || !J.EastFields || J.EastFields.requirementMet(t.requires, st, {});
+      return !t.requires || G.testModeOn() || !J.EastFields || J.EastFields.requirementMet(t.requires, st, {});
     })[0];
     if (!id) return false;
     G.runEvent(id, scene);
@@ -1343,6 +1346,15 @@
   };
   /** v4.2.2 測試模式（大人試玩，只存在這台裝置）：碼頭的船不用票、不看前置委託 */
   G.testModeOn = function () { return !!(J.TestMode && J.TestMode.on()); };
+  /**
+   * v4.2.10 T1：這隻頭目是不是「測試模式特別放出來的」（地圖上寫了 quest、那個委託現在沒在進行）。
+   * 沒開測試模式時頭目只在委託進行中出現（buildMonsters、respawnBosses），所以一律是 false＝行為和以前一樣。
+   * 是的話打贏照樣拿經驗、金幣、掉寶，但不記 state.bosses、不推委託：之後真的接到委託時頭目還會出現（auto_accept 的五燈霧影、佛格不會因為「已打倒」卡住）
+   */
+  G.testOnlyBoss = function (mob) {
+    var s = mob && mob.spawn;
+    return !!(s && s.quest && G.state && G.data && J.QuestLog.status(G.state, G.data.quests, s.quest) !== 'active');
+  };
   G.pickBoatRoute = function (dock, scene) {
     J.Ferry.ensure(G.state);
     var tm = G.testModeOn();
@@ -1379,6 +1391,7 @@
 
   G.inspectLamp = function (lamp, scene) {
     var st = G.state;
+    if (G.testModeOn()) { G.say('D_LAMP_LIT', [{ who: 'pet', text: lamp.subject + '燈亮亮的，好溫暖！' }]); return; }   // v4.2.10 T1：測試模式燈都是亮的（只是畫面，不寫存檔）
     // v4.2 第六座燈座：還沒亮 → D_LAMP_DAWN_DARK（K12）；不說「要找回『曙光之光』」
     var dawn = J.EndingRules ? J.EndingRules.lampDialog(st, lamp.subject) : null;
     if (dawn === 'D_LAMP_DAWN_DARK') { G.lastLampDialog = dawn; G.say(dawn, [{ who: 'pet', text: '這座燈還暗暗的，好像在等天亮。' }]); return; }
@@ -1792,8 +1805,11 @@
     st.stats.battles.won = (st.stats.battles.won || 0) + 1;
     J.Bestiary.defeated(st, mon.id);   // 怪物名冊：打倒
     // v4.2 最終頭目（fob_king，ending＝Q_END_1）：不跳勝利結算畫面（經驗、金幣照算、直接入帳）→ D_FOG_KING_ASK → 選項 → D_FOG_KING_END → 結局 F1（大結局腳本 2.1 F0、〇節）
+    var tmOnly = G.testOnlyBoss(ctx.mob);   // v4.2.10 T1：測試模式特別放出來的頭目（委託沒在進行）→ 打贏後拿掉「已打倒」（它的委託沒在進行，onBossDefeated 不會完成它；免得之後委託卡住）
+    ctx.testOnly = tmOnly;   // 測試用
     if (mon.ending && J.Ending && J.EndingRules) {
-      var endDone = J.QuestLog.onBossDefeated(st, G.data.quests, mon.id, G.data);
+      var hadKing = !!st.bosses[mon.id], endDone = J.QuestLog.onBossDefeated(st, G.data.quests, mon.id, G.data);
+      if (tmOnly && !hadKing) delete st.bosses[mon.id];   // v4.2.10 T1
       J.EndingRules.afterFinalBoss(st, G.data.quests);   // 第九章、接下 Q_END_2
       ctx.won = true; ctx.endingQuests = endDone.map(function (r) { return r.id; });   // 測試用
       // 4b 夜班建議 5：結局分支照一般勝利補上升級提示（afterReward：onLevelUp＋橫幅）與回滿（打完佛格不帶著殘血進結局、回金包里）
@@ -1817,7 +1833,9 @@
     G.bmsg(lines.join('　'));
     G.refreshHud();
     var done = [];
+    var hadBoss = !!st.bosses[mon.id];   // v4.2.10 T1：測試模式放出來的頭目（tmOnly）打贏後把「已打倒」拿掉（它的委託沒在進行，onBossDefeated 不會完成它）
     if (mon.boss || mon.trial) done = J.QuestLog.onBossDefeated(st, G.data.quests, mon.id, G.data);   // v4.2（K7）五燈霧影 trial：也寫進 bosses、完成 Q_CV_3x
+    if (tmOnly && !hadBoss) delete st.bosses[mon.id];   // 之後真的接到委託時頭目還會出現（auto_accept 的五燈霧影不會因為「已打倒」卡住）
     // 打贏了：獎勵、頭目委託馬上寫入存檔（頭目戰後的對話很長，這段時間關掉分頁也不會白打）。
     // ctx.won 之後不會再有答題或攻擊，所以不會重複領獎；按「繼續」時 G.bend 再存一次。
     ctx.won = true;

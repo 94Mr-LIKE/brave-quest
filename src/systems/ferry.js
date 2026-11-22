@@ -85,7 +85,7 @@
     ensure(state);
     if (!validRoute(r)) return fail('route');
     if (busy(state, context)) return fail('busy');
-    if (!unlocked(state, r)) return fail('locked');
+    if (!unlocked(state, r) && !(context && typeof context.testModeOn === 'function' && context.testModeOn())) return fail('locked');   // v4.2.10 T1b 測試模式：買船票（Q_LQ_0／Q_GI_0／Q_LY_0）不看前置委託
     if (r.pending) return fail('pending');
     return { ok: true };
   }

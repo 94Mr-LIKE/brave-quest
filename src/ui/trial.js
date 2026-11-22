@@ -197,7 +197,8 @@
         stage.appendChild(h('p.trial-score', { text: '答對 ' + res.correct + ' 題／' + res.total + ' 題（' + res.need + ' 題以上就通過）' }));
         if (res.pass) stage.appendChild(h('p', { text: '🎉 通過了！得到稱號「' + res.title + '」和「' + ((D.items[res.amulet] || {}).name || '護身符') + '」。' }));
         else {
-          stage.appendChild(h('p', { text: '這次還沒過，沒關係。明天可以再來考一次！' }));
+          var tmOn = !!(J.TestMode && J.TestMode.on());   // v4.2.10 T1：測試模式不限次數，不說「明天再來」
+          stage.appendChild(h('p', { text: tmOn ? '這次還沒過。測試模式不限次數，可以馬上再考一次！' : '這次還沒過，沒關係。明天可以再來考一次！' }));
           if (res.wrongUnits.length) {
             stage.appendChild(h('p.small', { text: '可以再練習的單元：' }));
             stage.appendChild(h('ul.trial-units', {}, res.wrongUnits.map(function (u) { return h('li', { text: u }); })));

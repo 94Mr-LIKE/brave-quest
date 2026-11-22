@@ -545,7 +545,7 @@
       });
       (this.map.lamps || []).forEach(function (l) {
         if (!self.lampShown(l)) return;   // v4.2 第六座燈座：結局前不顯示
-        var lit = !!st.lamps[l.subject];
+        var lit = self.lampLit(l.subject);
         var isDawn = l.subject === '曙光', art = self.lampArt(isDawn);
         var dawn = !art && self.dawnLampArt(l);
         // v4.2.6 地圖修正（老闆「這個燈....重畫」）：美術燈 obj_lamp_*（32×48）原尺寸、腳底貼格子下緣中央，不再把 16×16 圖塊拉長；
@@ -720,7 +720,13 @@
     lampShown(l) {
       if (!l || l.subject !== '曙光') return true;
       var g = G();
+      if (g.testModeOn && g.testModeOn()) return true;   // v4.2.10 T1：測試模式第六座燈座也顯示（亮的，見 lampLit）
       return J.EndingRules ? J.EndingRules.dawnLampShown(g.state, !!g.endingDawnLamp) : !!(g.state && g.state.flags && g.state.flags.ending_done);
+    }
+    /** v4.2.10 T1（老闆「我要求的測試版是直接點好燈的狀態」）：知識燈、第六座曙光燈座亮不亮＝存檔的 lamps，或測試模式開著（只畫成亮的，不寫存檔；關掉恢復原樣） */
+    lampLit(subject) {
+      var g = G(), st = g.state;
+      return !!(st && st.lamps && st.lamps[subject]) || !!(g.testModeOn && g.testModeOn());
     }
     /** 第六座燈座用金色的 lamp_dawn_on／off（美術 R5：程式調色）；圖沒讀到就照五盞燈的圖塊畫 */
     dawnLampArt(l) { return !!l && l.subject === '曙光' && this.hasArt('lamp_dawn_on') && this.hasArt('lamp_dawn_off'); }
@@ -760,7 +766,7 @@
     updateLamps() {
       var self = this, st = G().state;
       this.lamps.forEach(function (l) {
-        var lit = !!st.lamps[l.data.subject];
+        var lit = self.lampLit(l.data.subject);
         if (l.art) {   // v4.2.6 美術燈：換圖；光暈、閃光對準火焰（腳底上方 LAMP_ART.GLOW_Y）
           var gy = l.img.y - J.MapInfo.LAMP_ART.GLOW_Y, onK = J.Assets.texKey(J.MapInfo.lampArtKey(l.isDawn, true));
           var wasA = l.img.texture.key === onK;
@@ -1314,10 +1320,11 @@
     /** v2.0（69 號 3.4）maps.js npcs[].show＝{ after, until }：after 完成以後、until 完成以前才出現（石虎寶寶）；沒出現時看不到、不擋路、不能說話、小地圖不畫 */
     updateNpcShow() {
       var g = G(), st = g.state, Q = (g.data && g.data.quests) || {}, self = this;
+      var tmOn = !!(g.testModeOn && g.testModeOn());   // v4.2.10 T1：測試模式不看 after（前置委託），NPC 都出現；until（做完就離開）照舊
       (this.npcs || []).forEach(function (n) {
         var s = n.data.show;
         if (!s) return;
-        var on = (!s.after || J.QuestLog.status(st, Q, s.after) === 'done') && !(s.until && J.QuestLog.status(st, Q, s.until) === 'done');
+        var on = (!s.after || tmOn || J.QuestLog.status(st, Q, s.after) === 'done') && !(s.until && J.QuestLog.status(st, Q, s.until) === 'done');
         n.hidden = !on;
         n.img.setVisible(on && n.inView !== false);
         (n.tw || []).forEach(function (t) { if (on && n.inView !== false) t.resume(); else t.pause(); });
@@ -1347,6 +1354,7 @@
     // ---------------------------------------------------------------- 怪物
     buildMonsters() {
       var self = this, g = G(), st = g.state;
+      var tmOn = !!(g.testModeOn && g.testModeOn());   // v4.2.10 T1（老闆「不能有任何地方被前置任務限制」）：測試模式開著時頭目、精英不看委託進行中（還沒打倒的都出現；不寫存檔）
       this.spawnSpreadStats = { relaxed: 0, r2: 0, r4: 0 };   // 本次進圖的放寬次數（含之後重生），不寫存檔
       var pending = [];
       (this.map.spawns || []).forEach(function (s, si) {
@@ -1354,9 +1362,9 @@
         if (!m) return;
         if (s.boss || m.boss) {
           if (st.bosses[s.monster]) return;
-          if (s.quest && J.QuestLog.status(st, g.data.quests, s.quest) !== 'active') return;
+          if (s.quest && !tmOn && J.QuestLog.status(st, g.data.quests, s.quest) !== 'active') return;
         }
-        if (s.elite && s.quest && J.QuestLog.status(st, g.data.quests, s.quest) !== 'active') return;   // v3.0 精英：只在委託進行中出現
+        if (!tmOn) { if (s.elite && s.quest && J.QuestLog.status(st, g.data.quests, s.quest) !== 'active') return; }   // v3.0 精英：只在委託進行中出現（v4.2.10 T1：測試模式不看）
         for (var i = 0; i < (s.count || 1); i++) {
           var mob = { spawn: s, mon: m, id: s.monster, idx: si * 10 + i, active: false, sprite: null, tx: 0, ty: 0, moving: false, nextMove: 0, respawnAt: 0, boss: !!(s.boss || m.boss) };
           pending.push(mob);

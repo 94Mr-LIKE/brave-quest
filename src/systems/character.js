@@ -243,8 +243,14 @@
     var p = state && state.player, t = state && state.trial && state.trial[jobId];
     return !!(p && p.jobs && p.jobs[jobId] && p.jobs[jobId].lv > 0 && t && t.passedAt);
   }
+  /** v4.2.10 T1（老闆「我是測試版，不能限制轉職任務次數，不能有任何地方被前置任務限制」）：測試模式開著時，職階開放、配方、見習等級、高級職業的地點都當成已達成（小考照考；不寫存檔） */
+  function testModeOn() {
+    var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (typeof window === 'undefined' && typeof require === 'function' ? require('./testmode.js') : null);
+    return !!(TM && TM.on());
+  }
   function placeAllows(data, place, jobId, state) {
     if (jobOf(data, jobId).tier !== 'adv') return true;
+    if (testModeOn()) return true;
     var list = rules(data).adv_places || ['temple_lem', 'temple_fgs'];
     return list.indexOf(place) >= 0 || (state ? heldAdv(state, jobId) : false);
   }
@@ -257,13 +263,14 @@
     var j = data.jobs[jobId], p = state.player;
     if (!j) return { ok: false, reason: 'unknown' };
     if (p.job === jobId) return { ok: false, reason: 'same' };
-    if (!isOpen(data, jobId, state)) return { ok: false, reason: 'closed' };
-    var recipe = recipeStatus(state, jobId, data);
+    var tm = testModeOn();
+    if (!tm && !isOpen(data, jobId, state)) return { ok: false, reason: 'closed' };
+    var recipe = tm ? { ok: true } : recipeStatus(state, jobId, data);
     if (!recipe.ok) return recipe;
     var held = jobId === 'novice' || !!(p.jobs && p.jobs[jobId]);
     if (held) return { ok: true, back: true };
     var need = masterLevel(data, jobOf(data, 'novice'));
-    if (j.tier !== 'inter' && j.tier !== 'adv' && jobLevel(state, 'novice') < need) return { ok: false, reason: 'level', need: need };
+    if (!tm && j.tier !== 'inter' && j.tier !== 'adv' && jobLevel(state, 'novice') < need) return { ok: false, reason: 'level', need: need };
     var tr = state.trial && state.trial[jobId];
     if (!(tr && tr.passedAt)) return { ok: false, reason: 'trial' };
     return { ok: true, back: false };

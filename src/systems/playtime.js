@@ -16,7 +16,13 @@
     if (pt.date !== key) { pt.date = key; pt.todayMs = 0; pt.continuousMs = 0; }
   }
 
+  /** v4.2.10 T1（技術長判斷，獨立一個 commit 方便拿掉）：測試模式開著時每日上限當成「不限」——不跳「今天冒險到這裡」、最終頭目與立志小考不看剩餘時間；家長設定的值不動、不寫存檔 */
+  function testModeOn() {
+    var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (typeof window === 'undefined' && typeof require === 'function' ? require('./testmode.js') : null);
+    return !!(TM && TM.on());
+  }
   function limitMs(settings) {
+    if (testModeOn()) return Infinity;
     var m = settings && typeof settings.dailyLimitMin === 'number' ? settings.dailyLimitMin : DEFAULT_LIMIT;
     return m > 0 ? m * 60000 : Infinity;
   }

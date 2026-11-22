@@ -214,7 +214,8 @@
   }
 
   // ═════════════════════ 狀態判斷 ═════════════════════
-  function trialLampLit(state, t) { return !!(state && t.boss && isObj(state.bosses) && state.bosses[t.boss]); }   // v4.2 定案 #16：五燈亮不亮只看 state.bosses（不開 trialLamps 欄位）
+  // v4.2.10 T1（老闆「我要求的測試版是直接點好燈的狀態」）：測試模式開著時五燈試煉的燈座一律亮（trial_lamps_all 跟著成立、五角星盤出現）；只是判斷，不寫存檔
+  function trialLampLit(state, t) { return testModeOn() || !!(state && t.boss && isObj(state.bosses) && state.bosses[t.boss]); }   // v4.2 定案 #16：五燈亮不亮只看 state.bosses（不開 trialLamps 欄位）
   function trialLampsAll(state, P) { return P.trialLamps.length > 0 && P.trialLamps.every(function (t) { return trialLampLit(state, t); }); }
   function lostReturned(state, P) { return P.lostItems.filter(function (it) { return has(state, 'lost', it.id); }).length; }
   function starsCollected(state, P) { return P.stars.filter(function (s) { return has(state, 'stars', String(s.i)); }).length; }

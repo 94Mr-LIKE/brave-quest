@@ -52,6 +52,23 @@
     return { dw: dw, dh: dh, top: Math.round((H - dh) / 2), start: -dw, cover: Math.round(SWEEP_COVER_FRAC * dw), end: W };
   }
   function leafSet(mapId) { return WARM_LEAF_MAPS.indexOf(mapId) >= 0 ? [0, 1, 2, 3] : [0, 1]; }
+  // v4.2.10 T2（老闆 11-22「光柱下為何有落葉?」）：上層格 U 不只是樹冠，也是拱門、屋簷、洞口、光柱。
+  // 沒有樹的地圖（洞窟、城、室內、雲上）不鋪地面樹影、不變暗、不掉落葉；光柱格（light_pillar）在任何地圖都不算樹。
+  // 樹冠局部透明（看得到主角）照舊，和地圖無關。
+  var NO_TREE_TILESETS = ['cave', 'castle'], NO_TREE_TYPES = ['dungeon', 'interior'], NO_TREE_BATTLE_BG = ['cloudsea'];
+  function treeless(map) {
+    map = map || {};
+    return NO_TREE_TILESETS.indexOf(map.tileset) >= 0 || NO_TREE_TYPES.indexOf(map.type) >= 0 || NO_TREE_BATTLE_BG.indexOf(map.battle_bg) >= 0;
+  }
+  /** 會掉落葉、鋪樹影的上層格：沒有樹的地圖＝空；其餘＝上層格扣掉光柱格 */
+  function treeCells(map, upperSet) {
+    var out = {};
+    if (treeless(map)) return out;
+    var skip = {};
+    ((map && map.light_pillar && map.light_pillar.cells) || []).forEach(function (c) { skip[c[0] + ',' + c[1]] = true; });
+    Object.keys(upperSet || {}).forEach(function (k) { if (upperSet[k] && !skip[k]) out[k] = true; });
+    return out;
+  }
   function reduceNow() {
     var J = typeof window !== 'undefined' && window.JQ;
     if (!J) return false;
@@ -117,7 +134,7 @@
   function build(scene) {
     var J = window.JQ;
     fallbackTextures(scene);
-    var up = J.MapInfo.upperCells(scene.map, J.Game.data.tilesets).set;
+    var up = treeCells(scene.map, J.MapInfo.upperCells(scene.map, J.Game.data.tilesets).set);   // v4.2.10 T2：只有樹冠格掉葉、鋪樹影
     scene.tfx = {
       up: up, faded: [], tint: 1, leaves: [], leafAt: 0, treeAt: {}, wasHit: false, shadows: {}, shadowAt: 0,
       cells: shadowCells(up, function (x, y) { return scene.walkable(x, y); }, scene.size.w, scene.size.h),
@@ -149,6 +166,8 @@
     if (!f || !scene.player) return;
     var T = J.CONFIG.TILE, pl = scene.player, reduce = reduceNow(), now = time || Date.now();
     var hit = !!(scene.ghost && scene.ghost.visible);
+    // v4.2.10 T2：變暗、落葉只在「碰到樹冠格」時（拱門、屋簷、光柱下不算）；樹冠透明仍看 hit
+    var treeHit = hit && !!(J.MapInfo && J.MapInfo.rectHitsCells) && J.MapInfo.rectHitsCells({ x: pl.x - pl.displayWidth / 2 + 4, y: pl.y - pl.displayHeight + 4, w: pl.displayWidth - 8, h: pl.displayHeight - 6 }, f.up, T);
     if (f.ghostOff && scene.ghost && scene.ghost.alpha !== 0) scene.ghost.setAlpha(0);
     // 樹冠局部透明（柔邊、淡入淡出）
     var bx = pl.x / T, by = (pl.y - pl.displayHeight * 0.5) / T, want = new Map();
@@ -168,7 +187,7 @@
     f.faded = keep;
     // 樹蔭變暗（別的效果把主角染色時不動它）
     var lastTint = grayTint(f.tint);
-    f.tint = approach(f.tint, hit ? SHADE : 1, delta, reduce, SHADE_MS / (1 - SHADE));   // 1 → 0.85 走 SHADE_MS 毫秒
+    f.tint = approach(f.tint, treeHit ? SHADE : 1, delta, reduce, SHADE_MS / (1 - SHADE));   // 1 → 0.85 走 SHADE_MS 毫秒
     if (!pl.isTinted || pl.tintTopLeft === lastTint) {
       if (f.tint >= 0.999) { if (pl.isTinted) pl.clearTint(); } else pl.setTint(grayTint(f.tint));
     }
@@ -191,22 +210,22 @@
     var ox = reduce ? 0 : now / 1000 * SHADOW_DRIFT[0], oy = reduce ? 0 : now / 1000 * SHADOW_DRIFT[1];
     Object.keys(f.shadows).forEach(function (k) { var ts = f.shadows[k]; ts.setTilePosition(ts.wx + ox, ts.wy + oy); });   // 用世界座標當樹影的位置：相鄰格子接得起來
     // 樹下沙沙聲（86 號 #7；冷卻規則在 ambience.js；減少動態效果也照播）
-    if (hit && !f.wasHit && J.Ambience) J.Ambience.rustle(Math.floor(pl.x / T) + ',' + Math.floor((pl.y - 1) / T), now);
+    if (treeHit && !f.wasHit && J.Ambience) J.Ambience.rustle(Math.floor(pl.x / T) + ',' + Math.floor((pl.y - 1) / T), now);
     // 落葉
-    if (reduce) { f.wasHit = hit; return; }
+    if (reduce) { f.wasHit = treeHit; return; }
     var cx = Math.floor(pl.x / T), cy = Math.floor((pl.y - 1) / T), cand = [];
     for (var yy = cy - 3; yy <= cy; yy++) for (var xx = cx - 2; xx <= cx + 2; xx++) if (f.up[xx + ',' + yy]) cand.push([xx, yy]);
     var free = function (c) { var t0 = f.treeAt[c[0] + ',' + c[1]]; return !t0 || now - t0 >= LEAF_TREE_COOLDOWN; };
-    if (hit && !f.wasHit && cand.length) {   // 剛走進樹冠：飄 2–3 片
+    if (treeHit && !f.wasHit && cand.length) {   // 剛走進樹冠：飄 2–3 片
       var nn = Math.min(LEAF_MAX - f.leaves.length, 2 + Math.floor(Math.random() * 2));
       for (var i = 0; i < nn; i++) { var c1 = cand[Math.floor(Math.random() * cand.length)]; if (!free(c1)) continue; f.treeAt[c1[0] + ',' + c1[1]] = now; dropLeaf(scene, f, c1, i * 260); }
       f.leafAt = now + LEAF_EVERY_MS[0];
-    } else if (hit && now >= f.leafAt && f.leaves.length < LEAF_MAX && cand.length) {   // 在樹下：偶爾再飄 1 片
+    } else if (treeHit && now >= f.leafAt && f.leaves.length < LEAF_MAX && cand.length) {   // 在樹下：偶爾再飄 1 片
       f.leafAt = now + LEAF_EVERY_MS[0] + Math.random() * (LEAF_EVERY_MS[1] - LEAF_EVERY_MS[0]);
       var c2 = cand[Math.floor(Math.random() * cand.length)];
       if (free(c2)) { f.treeAt[c2[0] + ',' + c2[1]] = now; dropLeaf(scene, f, c2, 0); }
     }
-    f.wasHit = hit;
+    f.wasHit = treeHit;
   }
   /** 換地圖前：葉叢從左邊滑進來蓋滿畫面，蓋滿時呼叫 done。減少動態效果時回傳 false（呼叫的人照舊淡出） */
   function sweepOut(scene, done) {
@@ -245,7 +264,7 @@
 
   var TreeFX = { CANOPY_MIN_ALPHA: CANOPY_MIN_ALPHA, CANOPY_R0: CANOPY_R0, CANOPY_R1: CANOPY_R1, FADE_MS: FADE_MS, SHADE: SHADE, SHADE_MS: SHADE_MS, SHADOW_ALPHA: SHADOW_ALPHA,
     SHADOW_DRIFT: SHADOW_DRIFT, LEAF_MAX: LEAF_MAX, SWEEP_OUT_MS: SWEEP_OUT_MS, SWEEP_IN_MS: SWEEP_IN_MS, SWEEP_SCALE_H: SWEEP_SCALE_H, BANYAN_SPEED: BANYAN_SPEED, ART: ART,
-    canopyAlpha: canopyAlpha, approach: approach, grayTint: grayTint, shadowCells: shadowCells, sweepPlan: sweepPlan, leafSet: leafSet,
+    canopyAlpha: canopyAlpha, approach: approach, treeless: treeless, treeCells: treeCells, grayTint: grayTint, shadowCells: shadowCells, sweepPlan: sweepPlan, leafSet: leafSet,
     preload: preload, build: build, update: update, sweepOut: sweepOut, sweepIn: sweepIn };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.TreeFX = TreeFX; }
   if (typeof module !== 'undefined') module.exports = TreeFX;

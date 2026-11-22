@@ -487,7 +487,20 @@
     if (P.lightPillar && P.lightPillar.cells.length) {
       var xs = P.lightPillar.cells.map(function (c) { return c[0]; }), ys = P.lightPillar.cells.map(function (c) { return c[1]; });
       var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
-      var beam = this.add(this.scene.add.rectangle((x0 + x1 + 1) / 2 * T, (y1 + 1) * T, (x1 - x0 + 1) * T, (y1 - y0 + 4) * T, 0xfff2b0, 0.25).setOrigin(0.5, 1).setDepth((y1 + 1) * T + 1));
+      // v4.2.10 T2（老闆 11-22 截圖：光柱中間一塊比較亮的長方形）：以前是硬邊的長方形；改成左右、上下都漸淡的柔光（同位置、同大小、同顏色）
+      var bw = (x1 - x0 + 1) * T, bh = (y1 - y0 + 4) * T;
+      var bk = tex(this.scene, 'east:pillar:beam:' + bw + 'x' + bh, bw, bh, function (g, w, h) {
+        var hz = g.createLinearGradient(0, 0, w, 0);
+        hz.addColorStop(0, 'rgba(255,242,176,0)'); hz.addColorStop(0.3, 'rgba(255,242,176,0.8)'); hz.addColorStop(0.5, 'rgba(255,242,176,1)');
+        hz.addColorStop(0.7, 'rgba(255,242,176,0.8)'); hz.addColorStop(1, 'rgba(255,242,176,0)');
+        g.fillStyle = hz; g.fillRect(0, 0, w, h);
+        g.globalCompositeOperation = 'destination-in';
+        var vt = g.createLinearGradient(0, 0, 0, h);
+        vt.addColorStop(0, 'rgba(0,0,0,0)'); vt.addColorStop(0.35, 'rgba(0,0,0,1)'); vt.addColorStop(0.85, 'rgba(0,0,0,1)'); vt.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = vt; g.fillRect(0, 0, w, h);
+        g.globalCompositeOperation = 'source-over';
+      });
+      var beam = this.add(this.scene.add.image((x0 + x1 + 1) / 2 * T, (y1 + 1) * T, bk).setOrigin(0.5, 1).setAlpha(0.25).setDepth((y1 + 1) * T + 1));
       if (beam.setBlendMode) beam.setBlendMode(ADD);
       this.imgs.pillar = beam;
       this.pillarGlow();
@@ -1236,6 +1249,7 @@
       if ((pz.type === 'pattern' || pz.type === 'numseq') && !self.picked) (pz.cells.floors || []).forEach(function (c, i) { if (c[0] === p.tx && c[1] === p.ty) self.pick(pz, i, true); });
     });
     if (this.P.lightPillar && this.P.lightPillar.cells.some(function (c) { return c[0] === p.tx && c[1] === p.ty; })) this.enterPillar();
+    else this.testPillarWait = false;   // v4.2.10 T1：走出光柱後，測試模式的頭目戰才會再觸發
     this.refreshDots();
   };
 
@@ -1432,7 +1446,7 @@
    *  v4.2：第一次碰遺失物＝開始 Q_CV_2（event，播 D_CV_2A）；每送回一件記一次進度，送滿 6 件委託完成（D_CV_2B） */
   Fx.prototype.returnLost = function (it) {
     var self = this, g = G(), Q = (g && g.data && g.data.quests) || {}, st = this.state();
-    if (Q.Q_CV_2 && g.runEvent && J.QuestLog.status(st, Q, 'Q_CV_2') === 'available') return g.runEvent('Q_CV_2', this.scene, { noQuiz: true }).then(function () { return self.returnLostItem(it); });
+    if (Q.Q_CV_2 && g.runEvent && J.QuestLog.status(st, Q, 'Q_CV_2', !!(g.testModeOn && g.testModeOn())) === 'available') return g.runEvent('Q_CV_2', this.scene, { noQuiz: true }).then(function () { return self.returnLostItem(it); });
     return this.returnLostItem(it);
   };
   Fx.prototype.returnLostItem = function (it) {
@@ -1497,7 +1511,7 @@
    *  v4.2：門＝Q_CV_1（event）的觸發點；委託可接或進行中時走 G.runEvent（D_ECHO_DOOR → 3 題 → D_CV_1B），門跟著打開 */
   Fx.prototype.echoDoor = function () {
     var self = this, st = this.state(), P = this.P, g = G(), Q = (g && g.data && g.data.quests) || {};
-    var qs = Q.Q_CV_1 && g.runEvent ? J.QuestLog.status(st, Q, 'Q_CV_1') : null;
+    var qs = Q.Q_CV_1 && g.runEvent ? J.QuestLog.status(st, Q, 'Q_CV_1', !!(g.testModeOn && g.testModeOn())) : null;   // v4.2.10 T1b 測試模式：碰門就接 Q_CV_1（不看前置）
     var run = qs === 'available' || qs === 'active' ? g.runEvent('Q_CV_1', this.scene) : say('喂——？喂——？（回音霧學著你說話）門上的大嘴巴說：「答對三題，我就讓你過去。」', 'narrator').then(function () {
       return self.ask({ subjects: ['國語'], levels: [2, 4], count: 3, units: ['第貳單元 臺灣風景畫', '第肆單元 奇幻故事屋'], title: '回音謎門' });
     });
@@ -1527,7 +1541,7 @@
    *  v4.2 第 4c 批：星星＝Q_POST_2（event）的進度；還沒接就先接下（播 D_POST_2A），15 顆都回去 → 委託完成（D_POST_2B） */
   Fx.prototype.takeStar = function (s) {
     var self = this, g = G(), Q = (g && g.data && g.data.quests) || {}, st = this.state();
-    if (Q.Q_POST_2 && g.runEvent && J.QuestLog.status(st, Q, 'Q_POST_2') === 'available') return g.runEvent('Q_POST_2', this.scene, { noQuiz: true }).then(function () { return self.takeStarQuiz(s); });
+    if (Q.Q_POST_2 && g.runEvent && J.QuestLog.status(st, Q, 'Q_POST_2', !!(g.testModeOn && g.testModeOn())) === 'available') return g.runEvent('Q_POST_2', this.scene, { noQuiz: true }).then(function () { return self.takeStarQuiz(s); });
     return this.takeStarQuiz(s);
   };
   Fx.prototype.takeStarQuiz = function (s) {
@@ -1551,6 +1565,8 @@
   /** 光柱（M44）：四隻曙光霧將都打倒後走進去 → 稱號「曙光的源頭」（紀念，不加數值），播 D_POST_END（71 號 2.10） */
   Fx.prototype.enterPillar = function () {
     var st = this.state();
+    // v4.2.10 T1（老闆「我要看見最後BOSS」）：測試模式開著時，四霧將沒打完、或光柱已經走過 → 直接進最後頭目（佛格）戰，不擋
+    if (this.testBossFight(st)) return true;
     if (!EF.bossesDone(st, this.P)) { if (!this.pillarHint) { this.pillarHint = true; toast('光柱還很微弱……先打倒四座小島上的霧將吧！', 4000); } return false; }
     if (EF.has(st, 'done', 'pillar_' + this.P.id)) return false;
     EF.mark(st, 'done', 'pillar_' + this.P.id);
@@ -1561,6 +1577,25 @@
     var g = G(), Q = (g.data && g.data.quests) || {};
     if (Q.Q_POST_3 && g.completeQuest && J.QuestLog.canComplete(st, Q, 'Q_POST_3', g.data)) { g.completeQuest('Q_POST_3', this.scene); return true; }
     G().say('D_POST_END', [{ who: 'narrator', text: '溫暖的光從腳下升起。大家的記憶，都在這道光裡。' }]);
+    return true;
+  };
+
+  /**
+   * v4.2.10 T1：測試模式的光柱 → 最後頭目戰。只有測試模式開著、而且光柱原本會擋（四霧將沒打完）或已經走過（原本什麼都不做）時才接手；
+   * 四霧將都打完、還沒走過光柱 → 照原本的流程（稱號、Q_POST_3）。頭目＝quests 裡 final:true 的 boss（佛格 fob_king），戰鬥照一般流程（MapScene.startBattle：每日時間檢查、BGM、結局）
+   */
+  var FINAL_BOSS_FALLBACK = 'fob_king';
+  Fx.prototype.testBossFight = function (st) {
+    var g = G(), sc = this.scene;
+    if (!g || !g.testModeOn || !g.testModeOn()) return false;
+    if (EF.bossesDone(st, this.P) && !EF.has(st, 'done', 'pillar_' + this.P.id)) return false;
+    var Q = (g.data && g.data.quests) || {}, qid = Object.keys(Q).filter(function (k) { return Q[k].final === true && Q[k].boss; })[0];
+    var mid = qid ? Q[qid].boss : FINAL_BOSS_FALLBACK, mon = g.data && g.data.monsters && g.data.monsters[mid];
+    if (!mon || !sc || typeof sc.startBattle !== 'function') return false;
+    if (this.testPillarWait) return true;   // 剛打完／逃開還站在光柱裡：先走出去再進來
+    this.testPillarWait = true;
+    g.testPillarFight = (g.testPillarFight || 0) + 1;   // 測試用
+    sc.startBattle({ spawn: { monster: mid, boss: true, quest: qid || null }, mon: mon, id: mid, idx: 98, active: false, sprite: null, boss: true });
     return true;
   };
 

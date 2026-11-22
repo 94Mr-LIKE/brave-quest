@@ -34,6 +34,10 @@
     return Object.assign({}, DEFAULT, jr.trial || {}, extra, (jr.trial_by_tier && jr.trial_by_tier[tier]) || {});
   }
   function total(R) { var n = 0; Object.keys(R.per_subject).forEach(function (k) { n += Number(R.per_subject[k]) || 0; }); return n * SUBJECTS.length; }
+  function testModeOn() {
+    var TM = (typeof window !== 'undefined' && window.JQ && window.JQ.TestMode) || (isNode ? require('./testmode.js') : null);
+    return !!(TM && TM.on());
+  }
   function rec(state, jobId) { state.trial = state.trial || {}; return state.trial[jobId] || null; }
   function ensure(state, jobId) { state.trial = state.trial || {}; return (state.trial[jobId] = state.trial[jobId] || { lastFailDate: '', tries: 0, lastQ: [], inProgress: null, passedAt: 0 }); }
 
@@ -55,6 +59,12 @@
   function canStart(state, jobId, data, now) {
     var R = rules(data, jobId), JR = (data && data.jobRules) || {};
     if (!data || !data.jobs || !data.jobs[jobId] || jobId === 'novice') return { ok: false, reason: 'unknown' };
+    // v4.2.10 T1（老闆「我是測試版，不能限制轉職任務次數」）：測試模式開著時不看職階開放、配方、見習等級、「今天考過了」（含 3 轉一天一次）、今天剩餘時間——沒過可以馬上再考；小考本身照常考、照常記錄
+    if (testModeOn()) {
+      if (state.player.jobs && state.player.jobs[jobId]) return { ok: false, reason: 'held' };
+      var tr = state.trial && state.trial[jobId];
+      return tr && tr.passedAt ? { ok: false, reason: 'passed' } : { ok: true };
+    }
     if (!Character.isOpen(data, jobId, state)) return { ok: false, reason: 'closed' };
     var recipe = Character.recipeStatus(state, jobId, data);
     if (!recipe.ok) return recipe;

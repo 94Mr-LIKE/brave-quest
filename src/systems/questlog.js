@@ -10,7 +10,16 @@
 
   function rec(state, id) { return state.quests[id] || null; }
 
-  function status(state, quests, id) {
+  /**
+   * v4.2.10 T1b（老闆「不能有任何地方被前置任務限制」；技術長裁定）：測試模式「接委託不看前置」。
+   * free＝呼叫的人確認測試模式開著、而且是玩家主動去接（和 NPC 說話、碰事件點）才傳 true：前置委託／requires_lights／requires_visit／legacy_requires 都當成達成。
+   * 不放行：auto_accept（走進地圖自動接，避免走路就改存檔）、retired（Q_LAMPS 退役，五燈亮自動完成）、TM_KEEP_LOCKED（亂序會卡死或壞檔的個案）。
+   * 已經有紀錄（進行中、完成）的照紀錄；沒傳 free（其他所有地方）＝和 v4.2.9 一樣。
+   */
+  var TM_KEEP_LOCKED = {};
+  function freeOk(quests, id) { var q = quests[id]; return !!q && !q.retired && !q.auto_accept && !TM_KEEP_LOCKED[id]; }
+
+  function status(state, quests, id, free) {
     var r = rec(state, id);
     if (r) return r.status;
     var q = quests[id];
@@ -20,26 +29,28 @@
     var ok = reqs.every(function (req) { var rr = rec(state, req); return rr && rr.status === 'done'; });
     var lightsOk = (q.requires_lights || []).every(function (l) { return state.lights && state.lights[l]; });
     var visitOk = !q.requires_visit || !!(state.visited && state.visited[q.requires_visit]);
+    if (free === true && !(ok && lightsOk && visitOk) && freeOk(quests, id)) return 'available';   // v4.2.10 T1b 測試模式
     return ok && lightsOk && visitOk ? 'available' : 'locked';
   }
 
   function giverMatches(q, npcId) { return q.giver === npcId; }
 
   /** 這位 NPC 現在最該處理的委託：進行中 > 可接 > null（依資料順序） */
-  function forNpc(state, quests, npcId, npcQuest) {
+  // v4.2.10 T1b free（測試模式）：事件委託（kind:event）不從 NPC 接，只在它自己的事件點放行
+  function forNpc(state, quests, npcId, npcQuest, free) {
     var ids = Object.keys(quests).filter(function (id) { return giverMatches(quests[id], npcId); });
     if (npcQuest) {
       (Array.isArray(npcQuest) ? npcQuest : [npcQuest]).forEach(function (id) { if (quests[id] && ids.indexOf(id) < 0) ids.push(id); });
     }
     var active = ids.filter(function (id) { return status(state, quests, id) === 'active'; });
     if (active.length) return { id: active[0], status: 'active' };
-    var avail = ids.filter(function (id) { return status(state, quests, id) === 'available'; });
+    var avail = ids.filter(function (id) { return status(state, quests, id, free === true && quests[id].kind !== 'event') === 'available'; });
     if (avail.length) return { id: avail[0], status: 'available' };
     return null;
   }
 
-  function accept(state, quests, id) {
-    if (status(state, quests, id) !== 'available') return false;
+  function accept(state, quests, id, free) {
+    if (status(state, quests, id, free) !== 'available') return false;
     state.quests[id] = { status: 'active', progress: 0 };
     return true;
   }
@@ -56,8 +67,8 @@
   }
 
   /** NPC 的所有委託裡，第一個「還鎖著」的（顯示 dialog_locked 用） */
-  function firstLocked(state, quests, ids) {
-    for (var i = 0; i < ids.length; i++) if (quests[ids[i]] && status(state, quests, ids[i]) === 'locked') return ids[i];
+  function firstLocked(state, quests, ids, free) {
+    for (var i = 0; i < ids.length; i++) if (quests[ids[i]] && status(state, quests, ids[i], free === true && quests[ids[i]].kind !== 'event') === 'locked') return ids[i];
     return null;
   }
 
@@ -245,7 +256,7 @@
     return 'ask';
   }
 
-  var QuestLog = { dawnShards: dawnShards, DAWN_SHARDS_TOTAL: DAWN_SHARDS_TOTAL, serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, activeTalk: activeTalk, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked, HUNT_PITY: HUNT_PITY, huntPity: huntPity };
+  var QuestLog = { dawnShards: dawnShards, DAWN_SHARDS_TOTAL: DAWN_SHARDS_TOTAL, serviceChoice: serviceChoice, status: status, forNpc: forNpc, accept: accept, recordHelp: recordHelp, progress: progress, activeTalk: activeTalk, canComplete: canComplete, complete: complete, onBossDefeated: onBossDefeated, onChestOpened: onChestOpened, journal: journal, bossTarget: bossTarget, chestTarget: chestTarget, helpCount: helpCount, helpSubject: helpSubject, firstLocked: firstLocked, freeOk: freeOk, TM_KEEP_LOCKED: TM_KEEP_LOCKED, HUNT_PITY: HUNT_PITY, huntPity: huntPity };
   if (typeof window !== 'undefined') { window.JQ = window.JQ || {}; window.JQ.QuestLog = QuestLog; }
   if (typeof module !== 'undefined') module.exports = QuestLog;
 })();
