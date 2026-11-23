@@ -2,9 +2,9 @@
  * 頭目與怪物的戰鬥演出：畫面（v1.4 桃竹章起）。規則在 systems/bossfx.js（JQ.BossFx，可以在 node 測試）。
  *
  * 掛法：這個檔在 game.js 之後、main.js 之前載入，把下面幾個方法「包一層」（不改原文；其他整合包改那些檔案不會互相蓋掉，同 v4.0 east_fx.js）：
- *   BattleScene：create（掛上演出）、hitEffect（主角打中）、hurtEffect（怪物攻擊）、phaseEffect（頭目換階段）、wakeEffect（打倒）
+ *   BattleScene：create（掛上演出）、hitEffect（主角打中）、hurtEffect（怪物攻擊）、phaseEffect（頭目變身＝換到下一條血）、wakeEffect（打倒）
  *   MapScene：create（M16 新竹風城的風）
- *   Game.bmsg：怪物攻擊訊息裡的「撞了過來！」換成這隻怪物的說法（只換字，傷害數字不變）；頭目換階段的訊息後面接一句說明（水門打開、齒輪露出）
+ *   Game.bmsg：怪物攻擊訊息裡的「撞了過來！」換成這隻怪物的說法（只換字，傷害數字不變）；頭目變身的訊息後面接一句說明（水門打開、齒輪露出）
  *   表上沒有的怪物、地圖：每個包裝都直接走原本的流程（畫面與行為完全不變）。
  *
  * 只改畫面與節奏：不讀寫存檔、不改戰鬥數值（只讀 battleCtx.b 的 phase）。
@@ -143,7 +143,7 @@
   Fx.prototype.playAttack = function (p) { this.play(p && p.cues); };
   Fx.prototype.phase = function (n) {
     var self = this, note = R.phaseNote(this.st, n);
-    // 換階段的說明接在緊接著的那一句戰鬥訊息後面（game.js：phaseEffect 之後馬上寫「生氣了！攻擊變強了！」）
+    // 變身的說明接在緊接著的那一句戰鬥訊息後面（game.js：phaseEffect 之後馬上寫「X 變身了！體力回滿，攻擊變強了！」）
     if (note) { this.pendingNote = note; setTimeout(function () { self.pendingNote = null; }, 0); }
     // 先讓原本的「生氣了」演完（閃一下、晃 0.4 秒），再換場景（關水門 → 放水花 → 齒輪露出）；演出狀態也等畫面換了才換
     if (this.reduced) this.play(R.onPhase(this.st, n)); else this.later(650, function () { self.play(R.onPhase(self.st, n)); });

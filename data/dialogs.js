@@ -994,7 +994,7 @@ window.DIALOGS = {
   D_MIGRATE_V3: [
     { who: "narrator", emotion: "開心", text: "勇者大冒險更新了！現在有更多職業和技能。" },
     { who: "narrator", emotion: "平靜", text: "你原本的職業和等級已經換算好，能力不會比以前低。" },
-    { who: "narrator", emotion: "平靜", text: "頭目每個階段都要答對 2 題，才會換到下一個階段。" }
+    { who: "narrator", emotion: "平靜", text: "頭目有三條血，打完一條會變身、體力回滿。" }
   ],
   D_MIGRATE_ROBE: [
     { who: "narrator", emotion: "平靜", text: "法袍不適合你現在的職業，已經換成同樣價錢的防具。" }

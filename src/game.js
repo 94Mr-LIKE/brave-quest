@@ -505,7 +505,7 @@
       G.migrateShown = mg;   // 測試用
       migrateV3Done = new Promise(function (res) {
         setTimeout(function () {
-          G.say('D_MIGRATE_V3', [{ who: 'narrator', text: '勇者大冒險更新了！頭目每個階段都要答對 2 題，才會換到下一個階段。' }]).then(function () {
+          G.say('D_MIGRATE_V3', [{ who: 'narrator', text: '勇者大冒險更新了！頭目有三條血，打完一條會變身、體力回滿。' }]).then(function () {
             if (mg.robe) return G.say(mg.robe.refund ? 'D_MIGRATE_ROBE_NOVICE' : 'D_MIGRATE_ROBE', [{ who: 'narrator', text: '法袍已經換成同樣價錢的防具。' }]);
           }).then(function () {
             if (G.state) { delete G.state.migratedV3; G.migrateDone = true; G.save(); }   // 看完了才清掉
@@ -1451,6 +1451,8 @@
   G.startBattle = function (mob, scene) {
     var map = scene.map, mon = J.Ch3Migrate ? J.Ch3Migrate.battleMonster(G.state, mob.mon, scene.mapId) : mob.mon;   // v1.3（62 號 5.4）舊紅樹林旗標
     if (J.SouthMigrate) mon = J.SouthMigrate.battleMonster(G.state, mon, scene.mapId);   // v3.0（70 號 5.1）舊南部旗標
+    // v4.2.11 舊數值（legacy／legacy_s 換掉了 hp）的頭目：照舊總血量、按三條血的比例重分，一樣是三條血
+    if (mon !== mob.mon && mon && mon.boss && Array.isArray(mon.bars) && mob.mon && mon.hp !== mob.mon.hp) mon = Object.assign({}, mon, { bars: J.Battle.splitBars(mon.hp, mob.mon.bars) });
     J.UI.closePassMove();   // v0.9.3 開著放大地圖走路時遇到怪物：先把地圖關掉
     G.battleCtx = { mob: mob, mon: mon, mapId: scene.mapId, over: false };
     var bg = G.battleBgFor(mon, scene.mapId);
@@ -1505,18 +1507,55 @@
     setTimeout(G.onResize, 0);   // v1.1 畫面品管 4：直放戰鬥換了版面（body.in-battle），畫面重新對齊
   };
 
+  /**
+   * v4.2.11 C2 頭目框要畫的「第幾條、這一條體力、是不是最後一題、打倒了沒」。hold＝打破一條血的那一下、打中特效還沒播完：
+   * 照舊畫上一條（體力 0、不是最後一題），finish 時才換成新的一條（變身演出和血條補滿同時發生）
+   */
+  G.barView = function (b, hold) {
+    if (!b || !b.bars) return { bar: 0, hp: b ? b.hp : 0, finalQ: false };
+    if (hold) return { bar: b.finalQ ? b.bar : Math.max(1, b.bar - 1), hp: 0, finalQ: false };
+    return { bar: b.bar, hp: b.hp, finalQ: !!b.finalQ, over: !!b.over };
+  };
+  /** v4.2.11 C2 三條血的小圓點：marks＝每一條 'done'（打掉了，✓）／'now'（現在這一條，●）／'next'（還沒到，○）；最後一題、打倒（over）＝全部 done。label＝讀屏念的字 */
+  G.barDots = function (n, bar, finalQ, over) {
+    var all = finalQ || over, marks = [], done = all ? n : Math.max(0, bar - 1);
+    for (var i = 1; i <= n; i++) marks.push(i <= done ? 'done' : i === bar ? 'now' : 'next');
+    var label = over ? n + ' 條血都打掉了' : finalQ ? n + ' 條血都打掉了，只剩最後一題' : '第 ' + bar + '／' + n + ' 條血：已打掉 ' + done + ' 條，還剩 ' + (n - done) + ' 條';
+    return { marks: marks, label: label };
+  };
+  /** v4.2.11 C2 減少動態效果（家長設定 settings.reduceMotion；auto＝跟系統） */
+  G.reduceMotionNow = function () {
+    return J.Motion ? !!J.Motion.reduceMotion(G.state && G.state.settings, typeof window.matchMedia === 'function' ? window.matchMedia.bind(window) : null) : false;
+  };
+
   G.brender = function () {
     var ctx = G.battleCtx, st = G.state, s = G.stats(), b = ctx.b, mon = ctx.mon, h = J.UI.h;
     var pct = function (a, m) { return Math.max(0, Math.min(100, Math.round(a / m * 100))); };
     ctx.el.top.innerHTML = '';
     // v0.9.3 頭目：寫出第幾階段、還剩幾個階段、這一階段還要答對幾題；體力條上畫出階段的分隔線
     var ph = Math.min(b.phase, b.phases), left = b.phases - ph;
-    var phaseText = b.boss ? '　第 ' + ph + '/' + b.phases + ' 階段' + (left ? '（還剩 ' + left + ' 個階段）' : '（最後階段）') : '';
+    // v4.2.11 三條血（b.bars）：「第 2／3 條血（還剩 1 條）」，最後一條寫「（最後一條）」；佛格最後一題寫「最後一題！」；體力條是「這一條」，不畫階段分隔線
+    // v4.2.11 C2：打破一條血的那一下，打中特效播完（finish）之前，框照舊顯示「上一條、體力 0」（ctx.holdBar，G.battack 設）；finish 才換成新的一條、從 0 補滿
+    var view = G.barView(b, ctx.holdBar);
+    var phaseText = !b.boss ? '' : b.bars ? (view.finalQ ? '　最後一題！' : '　第 ' + view.bar + '／' + b.bars.length + ' 條血' + (b.bars.length - view.bar ? '（還剩 ' + (b.bars.length - view.bar) + ' 條）' : '（最後一條）')) :
+      '　第 ' + ph + '/' + b.phases + ' 階段' + (left ? '（還剩 ' + left + ' 個階段）' : '（最後階段）');
     ctx.el.top.appendChild(h('div.boss-phase', { text: mon.name + phaseText }));
     var marks = [];
-    if (b.boss) for (var k = 1; k < b.phases; k++) marks.push(h('b.phase-mark', { style: { left: Math.round((1 - k / b.phases) * 100) + '%' } }));
-    var hpPct = b.hp > 0 ? Math.max(1, pct(b.hp, b.maxHp)) : 0;   // 還有體力時至少畫 1%，不會看起來是空的
-    ctx.el.top.appendChild(h('span.bar.boss', { role: 'progressbar', 'aria-label': mon.name + ' 的體力', 'aria-valuenow': String(hpPct), style: { width: '220px' } }, [h('i', { style: { width: hpPct + '%' } })].concat(marks)));
+    if (b.boss && !b.bars) for (var k = 1; k < b.phases; k++) marks.push(h('b.phase-mark', { style: { left: Math.round((1 - k / b.phases) * 100) + '%' } }));
+    var hpPct = view.hp > 0 ? Math.max(1, pct(view.hp, b.maxHp)) : 0;   // 還有體力時至少畫 1%，不會看起來是空的
+    // v4.2.11 C2 變身：新的一條血從 0 補滿（約 0.4 秒，style.css .bar.boss > i.refill）；減少動態效果時直接滿
+    var refill = !!(b.bars && ctx.refillBar && !G.reduceMotionNow());
+    ctx.refillBar = false;
+    var fill = h(refill ? 'i.refill' : 'i', { style: { width: (refill ? 0 : hpPct) + '%' } });
+    ctx.el.top.appendChild(h('span.bar.boss', { role: 'progressbar', 'aria-label': mon.name + ' 的體力', 'aria-valuenow': String(hpPct), style: { width: '220px' } }, [fill].concat(marks)));
+    if (refill) setTimeout(function () { fill.style.width = hpPct + '%'; }, 30);
+    // v4.2.11 C2 三條血的小圓點（體力條右邊）：打掉的＝✓、現在這一條＝●、還沒到的＝○（形狀不同，不只靠顏色）；讀屏念 aria-label
+    if (b.bars) {
+      var dots = G.barDots(b.bars.length, view.bar, view.finalQ, view.over);   // 打倒後三個都打勾
+      ctx.el.top.appendChild(h('span.boss-bars', { role: 'img', 'aria-label': dots.label }, dots.marks.map(function (m) {
+        return h('i.bb-dot.bb-' + m, { 'aria-hidden': 'true', text: m === 'done' ? '✓' : m === 'now' ? '●' : '○' });
+      })));
+    }
     var need = J.Battle.needCorrect(b);
     if (b.boss && !b.over && need > 0 && b.held) ctx.el.top.appendChild(h('div.small.boss-need', { text: '再答對 ' + need + ' 題' + (left ? '進入下一階段' : '就能打倒') }));
     // v1.0（48 號 2.7）回復、增益技能答對也算一題，但體力沒變不會換階段 → 題數夠了，要再打中一下
@@ -1659,7 +1698,14 @@
       shown = at.parts.map(function (p, j) { if (j === at.parts.length - 1) return Math.max(0, hr.dealt - acc); var v = Math.round(p * k); acc += v; return v; });
     }
     var left = b.phases - Math.min(b.phase, b.phases), mon = ctx.mon;
-    var msg = pre.concat([J.Battle.hitMessage({ crit: at.crit, favored: favored, first: true, dealt: hr.dealt, damage: at.total, phaseUp: hr.phaseUp, held: hr.held, over: b.over, hits: opt.hits, pet: at.pet }) +
+    // v4.2.11 三條血：變身時主角魔力回復最大魔力 × BOSS_TRANSFORM_MP_REGEN（不超過上限）
+    var mpGain = 0;
+    if (b.bars && hr.transformed) { mpGain = J.Battle.transformMp(st.player.mp, s.maxMp, C.BOSS_TRANSFORM_MP_REGEN); st.player.mp += mpGain; ctx.transformMp = (ctx.transformMp || []).concat([mpGain]); }   // 測試用 transformMp
+    var hitText = J.Battle.hitMessage({ crit: at.crit, favored: favored, first: true, dealt: hr.dealt, damage: at.total, phaseUp: hr.phaseUp, held: hr.held, over: b.over, hits: opt.hits, pet: at.pet, brokeBar: b.bars ? hr.brokeBar : 0 });
+    var msg = b.bars ? pre.concat([hitText +
+      (hr.transformed ? mon.name + '變身了！體力回滿，攻擊變強了！（第 ' + b.bar + '／' + b.bars.length + ' 條血）' + (mpGain > 0 ? '番薯仔幫你打氣，魔力回復了 ' + mpGain + ' 點！' : '') : '') +
+      (hr.finalQ ? mon.name + '只剩最後一題了！' : '')]).join(' ') :
+      pre.concat([hitText +
       (hr.phaseUp ? mon.name + '生氣了！攻擊變強了！（第 ' + Math.min(b.phase, b.phases) + '/' + b.phases + ' 階段' + (left ? '，還剩 ' + left + ' 個階段' : '，最後一個階段') + '）' : '') +
       (hr.held && !b.over ? mon.name + '撐住了！再答對 ' + J.Battle.needCorrect(b) + ' 題' + (b.phase >= b.phases ? '就能打倒它！' : '就會進入下一個階段！') : '')]).join(' ');
     var play = function (done) {
@@ -1672,16 +1718,29 @@
       })();
     };
     var finish = function () {
+      var phDlg = null;
+      if (b.bars) {
+        ctx.holdBar = false; ctx.refillBar = !!hr.transformed;   // v4.2.11 C2：框換成新的一條、血條從 0 補滿（brender）
+        // v4.2.11 三條血：變身＝phaseEffect（生氣演出）＋橫幅「X 變身了！」；換圖讀 bar_sprites、台詞讀 bar_dialogs（佛格第 2 條 P2、第 3 條 P3）；
+        //   佛格第 3 條打完（finalQ）不變身，只播 bar_dialogs.final（D_FOG_KING_P4「最後一題……」）
+        if (hr.transformed) { sc.phaseEffect(); J.UI.banner(mon.name + '變身了！', 'rage-banner'); }
+        G.brender(); G.bmsg(msg);
+        if (hr.transformed) phDlg = mon.bar_dialogs && mon.bar_dialogs[b.bar];
+        else if (hr.finalQ) phDlg = mon.bar_dialogs && mon.bar_dialogs.final;
+        if (hr.transformed && mon.bar_sprites && mon.bar_sprites[b.bar] && sc.setPhaseSprite) sc.setPhaseSprite(mon.bar_sprites[b.bar]);
+      } else {
       if (hr.phaseUp) { sc.phaseEffect(); J.UI.banner(mon.name + '生氣了！攻擊變強了！', 'rage-banner'); }   // v0.9.3 生氣了 = 進入下一階段、攻擊 +20%
       G.brender(); G.bmsg(msg);
       // v4.2 佛格：進入新階段時換階段圖（phase_sprites）、播那一階段的台詞（phase_dialogs；第 3 階段那段說「這一段不計時。」）
-      var phDlg = hr.phaseUp && mon.phase_dialogs && mon.phase_dialogs[b.phase];
+      phDlg = hr.phaseUp && mon.phase_dialogs && mon.phase_dialogs[b.phase];
       if (hr.phaseUp && mon.phase_sprites && mon.phase_sprites[b.phase] && sc.setPhaseSprite) sc.setPhaseSprite(mon.phase_sprites[b.phase]);
       else if (hr.phaseUp && mon.phase_sprites && sc.stopPhaseAnim) sc.stopPhaseAnim();   // v4.2.8 沒有階段圖的階段（佛格第 3 階段）：多幀圖停在上一張單張圖（和改版前一樣）
+      }
       if (b.over) setTimeout(G.bvictory, G.bwait(700));
       else if (phDlg && (G.data.dialogs || {})[phDlg]) { ctx.phaseDialogs = (ctx.phaseDialogs || []).concat([phDlg]); setTimeout(function () { G.say(phDlg, []).then(function () { G.bcommands(true); }); }, G.bwait(900)); }   // 測試用 phaseDialogs
       else setTimeout(function () { G.bcommands(true); }, G.bwait(500));
     };
+    ctx.holdBar = !!(b.bars && (hr.transformed || hr.finalQ));   // v4.2.11 C2：打中特效播完前，框照舊是上一條（體力 0）
     G.brender();
     if (skill) G.skillFx(skill, use, function () { play(finish); }); else play(finish);
   };
@@ -2046,7 +2105,7 @@
     },
     setQuest: function (id, status) { G.state.quests[id] = { status: status, progress: 0 }; G.save(); },
     setHp: function (hp) { G.state.player.hp = hp; G.refreshHud(); },
-    battle: function () { var c = G.battleCtx; return c && c.b ? { hp: c.b.hp, maxHp: c.b.maxHp, phase: c.b.phase, boss: c.b.boss, over: c.over } : null; },
+    battle: function () { var c = G.battleCtx; return c && c.b ? { hp: c.b.hp, maxHp: c.b.maxHp, phase: c.b.phase, boss: c.b.boss, over: c.over, bar: c.b.bar || 0, bars: c.b.bars ? c.b.bars.slice() : null, finalQ: !!c.b.finalQ } : null; },   // v4.2.11 三條血：bar＝第幾條、bars＝每條上限、finalQ＝佛格最後一題
     heroTexture: function () { return G.mapScene && G.mapScene.player.texture.key; },
     openWorldMap: function () { G.openWorldMap(); },
     /** 前景（上層格 'U'）示範：把主角所在格與上面兩格改成上層格，重新載入地圖，主角就會被前景擋住並顯示剪影 */

@@ -4,13 +4,14 @@
  *
  * 原則（63 號：只是演出，不改數值）：
  *   - 不讀寫存檔（state）、不改戰鬥狀態（Battle.create 的 b）：只讀 b.phase、b.over。傷害、題目、獎勵完全不動。
- *   - 每一場戰鬥一份演出狀態（create 回傳，掛在戰鬥場景上），打完、離開就丟掉；重新挑戰從第 1 階段開始。
+ *   - v4.2.11 頭目改成三條血：b.phase＝第幾條血（＝b.bar），演出表的 phase[n]＝第 n 條血；換條＝變身（phaseEffect）。下面註解的「階段」都是「第幾條血」。
+ *   - 每一場戰鬥一份演出狀態（create 回傳，掛在戰鬥場景上），打完、離開就丟掉；重新挑戰從第 1 條血開始。
  *   - 閃光每秒最多 3 次（同 skillfx.js：兩次之間至少 334 毫秒；和技能特效共用同一份紀錄）。
  *   - 「減少動態效果」（家長設定 settings.reduceMotion，或系統的 prefers-reduced-motion）由畫面那一層處理：不動、不閃，只顯示靜態圖與字。
  *
  * 之後中部、南部的頭目演出：在 SCRIPTS 加一筆（phase 1..n 的 enter／hit／attack 提示），畫法加在 bossfx_scene.js 的 DRAW。
  *
- * 演出提示（cue）：{ id, ... }。id 對到 bossfx_scene.js 的 DRAW[id]。換階段的說明（note）接在戰鬥訊息後面（畫面上方有「生氣了！」的橫幅，不另外疊字）。
+ * 演出提示（cue）：{ id, ... }。id 對到 bossfx_scene.js 的 DRAW[id]。變身（換到下一條血）的說明（note）接在戰鬥訊息後面（畫面上方有「X 變身了！」的橫幅，不另外疊字）。
  */
 (function () {
   'use strict';
@@ -22,7 +23,7 @@
   /**
    * 每隻怪物的演出。key＝monsters.js 的 id。
    *   boss：只有頭目戰才演（同一個 id 不是頭目時不演）
-   *   start：戰鬥開始時的提示；phase[n]：第 n 階段（enter＝進入時、hit＝主角打中時、attack＝怪物攻擊時、verb＝攻擊訊息的動詞、note＝換到這一階段時接在戰鬥訊息後面的說明）
+   *   start：戰鬥開始時的提示；phase[n]：第 n 條血（enter＝進入時、hit＝主角打中時、attack＝怪物攻擊時、verb＝攻擊訊息的動詞、note＝變身到這一條血時接在戰鬥訊息後面的說明）
    *   attack／verb／noFlash／noShake 寫在最外層＝每個階段都一樣（一般怪物只有一個階段）
    *   noFlash：怪物攻擊時不用原本的紅色閃光（改用自己的柔和閃光）；noShake：不用原本的畫面晃動（改用自己的動作）
    *   every：每第 n 次攻擊多演一次（雷咚咚「偶爾連打兩下」）
@@ -105,7 +106,7 @@
 
   /**
    * 主角打中（每一下都會叫；多段攻擊叫好幾次）。info＝{ crit, over }。
-   * 用「演出狀態的階段」判斷（換階段的那一擊，戰鬥狀態已經是下一階段，但畫面要等 phaseEffect 才換）。打倒的那一擊不演（交給 wake）。
+   * 用「演出狀態的第幾條」判斷（打破一條血的那一擊，戰鬥狀態已經是下一條，但畫面要等 phaseEffect 才換）。打倒的那一擊不演（交給 wake）。
    */
   function onHit(st, info) {
     if (!st || !st.script || st.woke) return [];
@@ -118,7 +119,7 @@
     return [{ id: h, crit: !!info.crit }];
   }
 
-  /** 頭目換階段：phase＝新的階段（Battle 的 b.phase）。跳過的階段（不會發生，保險）依序補演 */
+  /** 頭目變身（換到下一條血）：phase＝新的第幾條（Battle 的 b.phase＝b.bar）。跳過的（不會發生，保險）依序補演 */
   function onPhase(st, phase) {
     if (!st || !st.script || st.woke) return [];
     var to = Math.min(Math.max(1, Math.floor(Number(phase) || 1)), st.phases), out = [];
@@ -130,7 +131,7 @@
     return out;
   }
 
-  /** 換到第 n 階段時接在戰鬥訊息後面的說明（沒有＝null）。只查表，不改演出狀態 */
+  /** 變身到第 n 條血時接在戰鬥訊息後面的說明（沒有＝null）。只查表，不改演出狀態 */
   function phaseNote(st, n) {
     if (!st || !st.script || st.woke) return null;
     var p = Math.min(Math.max(1, Math.floor(Number(n) || 1)), st.phases);

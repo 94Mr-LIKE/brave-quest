@@ -106,6 +106,15 @@
     return out;
   }
 
+  /** v4.2.11 頭目的三條血：有寫 bars（正數）就照它；頭目沒寫＝hp 平分三條；不是頭目＝null（一條血＝hp） */
+  function normalizeBars(m) {
+    if (!m || !m.boss) return null;
+    var list = Array.isArray(m.bars) ? m.bars.map(function (v) { return Math.round(Number(v) || 0); }).filter(function (v) { return v > 0; }) : [];
+    if (list.length) return list;
+    var total = Math.max(1, Number(m.hp || 10)), a = Math.max(1, Math.round(total / 3)), c = Math.max(1, total - 2 * a);
+    return [a, a, c];
+  }
+
   function normalizeMonsters(raw) {
     var out = {};
     var src = raw || {};
@@ -131,6 +140,13 @@
         phase_sprites: m.phase_sprites ? Object.assign({}, m.phase_sprites) : null,
         phase_q_by: m.phase_q_by ? Object.assign({}, m.phase_q_by) : null,
         exact_phases: Array.isArray(m.exact_phases) ? m.exact_phases.slice() : null,
+        // v4.2.11 頭目三條血：bars＝[第1條, 第2條, 第3條]（頭目沒寫 bars＝把 hp 平分三條，遊戲裡的頭目一律三條血、沒有題數鎖）；
+        //   final_q＝第 3 條打完還有「最後一題」（佛格）；untimed_bars／bar_sprites／bar_dialogs 取代 untimed_phases／phase_sprites／phase_dialogs（舊欄位照舊帶進來）
+        bars: normalizeBars(m),
+        final_q: m.final_q === true,
+        untimed_bars: Array.isArray(m.untimed_bars) ? m.untimed_bars.slice() : null,
+        bar_sprites: m.bar_sprites ? Object.assign({}, m.bar_sprites) : null,
+        bar_dialogs: m.bar_dialogs ? Object.assign({}, m.bar_dialogs) : null,
         ending: m.ending || null, ref_mobs: Array.isArray(m.ref_mobs) ? m.ref_mobs.slice() : null,
         desc: m.desc || '', wake: m.wake || ((m.name || id) + '清醒了，開心地跑走了。')
       };

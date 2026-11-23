@@ -150,6 +150,16 @@ textarea { font-size: 20px; min-height: 120px; }
 .bar.boss > i { background: #ff8a6a; }
 .bar.boss > b.phase-mark { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #fff3c8; opacity: .85; }   /* v0.9.3 頭目階段分隔線 */
 .boss-need { color: #ffd34d; margin-top: 2px; }
+/* v4.2.11 C2 頭目三條血：變身時血條從 0 補滿；體力條右邊三個小圓點（✓ 打掉了／● 現在這一條，實心／○ 還沒到，空心：形狀不同、不只靠顏色） */
+.bar.boss > i.refill { transition: width .4s ease-out; }
+.boss-bars { display: inline-flex; gap: 4px; margin-left: 8px; vertical-align: middle; line-height: 1; }
+.boss-bars .bb-dot { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%; font-style: normal; font-size: 13px; font-weight: bold; overflow: hidden; }
+.boss-bars .bb-done { background: #fff3c8; color: #2a1e22; border: 2px solid #fff3c8; }
+.boss-bars .bb-now { background: #ff8a6a; color: transparent; border: 2px solid #fff; }
+.boss-bars .bb-next { background: transparent; color: transparent; border: 2px solid #fff; }
+/* 手機直放：框是 left:50% 的絕對定位，寬度只能長到畫面一半（390 寬時 195px），小圓點會被擠到下一行。給框自己的寬度（最多 92vw／360px），
+   體力條＋小圓點同一行、名字最多 2 行（和改版前一樣 3 行高） */
+@media (orientation: portrait) and (max-width: 680px) { .battle-top { width: max-content; max-width: min(92vw, 360px); box-sizing: border-box; } }
 .hud-buttons { display: flex; gap: 6px; }
 .hud-buttons button { padding: 4px 10px; font-size: 20px; white-space: nowrap; }
 .map-banner { position: absolute; left: 50%; top: 64px; transform: translateX(-50%); font-size: 26px; padding: 8px 24px; pointer-events: none; animation: fadeout 2.6s forwards; }

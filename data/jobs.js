@@ -282,8 +282,8 @@ window.PLAYER_BASE = { hp: 30, mp: 10, atk: 6, def: 0 };
       skills: [
         S('gh_perfect', 15, "天衣無縫", "crit", { p: 2.2 }, 10, "完美的一擊，一定會心。", "strike", "#FFE082", 800),
         S('gh_diamond', 30, "金剛護體", "heal_guard", { r: 0.3, m: 0.4, t: 4 }, 14, "身體變得像金剛石一樣硬。", "buff", "#FFD54F", 1000),
-        S('gh_mountain', 45, "破山神拳", "hit", { p: 4 }, 22, "一拳可以打破一座山。", "strike", "#FFB300", 1200),
-        S('gh_myriad', 60, "萬象神拳", "multi", { p: 0.9, n: 6 }, 32, "拳頭像星星一樣多，打六下。", "strike", "#FFF59D", 1800)
+        S('gh_mountain', 45, "破山神拳", "hit", { p: 4 }, 39, "一拳可以打破一座山。", "strike", "#FFB300", 1200),
+        S('gh_myriad', 60, "萬象神拳", "multi", { p: 0.9, n: 6 }, 56, "拳頭像星星一樣多，打六下。", "strike", "#FFF59D", 1800)
       ],
       desc: "頂尖榮譽職業：通過最難的立志小考才能成為。有戰鬥大師和聖騎士的特性，攻擊傷害再 ×1.1。拿手科目是數學、英語和社會。"
     }),
@@ -294,9 +294,9 @@ window.PLAYER_BASE = { hp: 30, mp: 10, atk: 6, def: 0 };
       trait: { skillPow: 1.2, mpRegen: 0.08, healPow: 1.1, evade: 0.1 }, wf: ["staff", "dagger", "perform"], af: ["robe", "light"],
       skills: [
         S('ts_storm', 15, "呼風喚雨", "hit_weak", { p: 2.2, m: 0.75, t: 2 }, 10, "叫來風和雨，怪物變弱。", "wind", "#80DEEA", 900),
-        S('ts_thunder', 30, "天雷召喚", "hit", { p: 3.2 }, 15, "天上打下一道大雷。", "thunder", "#FFF176", 1000),
+        S('ts_thunder', 30, "天雷召喚", "hit", { p: 3.2 }, 26, "天上打下一道大雷。", "thunder", "#FFF176", 1000),
         S('ts_earth', 45, "大地之息", "heal_mp", { r: 1, mp: 0.15 }, 20, "大地的力量讓你全滿。", "heal", "#AED581", 1300),
-        S('ts_resonance', 60, "天地共鳴", "hit", { p: 5.5 }, 34, "天空和大地一起發出大聲響。", "thunder", "#E1F5FE", 2000)
+        S('ts_resonance', 60, "天地共鳴", "hit", { p: 5.5 }, 60, "天空和大地一起發出大聲響。", "thunder", "#E1F5FE", 2000)
       ],
       desc: "頂尖榮譽職業：通過最難的立志小考才能成為。有賢者和超級巨星的特性，攻擊技能再 ×1.2。拿手科目是社會、自然、國語和數學。"
     }),
@@ -310,8 +310,8 @@ window.PLAYER_BASE = { hp: 30, mp: 10, atk: 6, def: 0 };
         S('he_courage', 15, "勇氣之劍", "hit", { p: 2.3 }, 10, "鼓起勇氣砍下去。", "slash", "#E3F2FD", 800),
         // 希望之光數值不改：老闆 2026-11-16「屬恢復技能，勇者主功能偏攻擊，恢復技能較弱可以」
         S('he_hope', 30, "希望之光", "heal_guard", { r: 0.8, m: 0.5, t: 2 }, 16, "希望的光讓你恢復精神。", "heal", "#FFFDE7", 1200),
-        S('he_mistbreak', 45, "破霧閃光斬", "hit_stun", { p: 4.2, t: 1 }, 24, "光之劍劈開大霧。", "slash", "#FFFFFF", 1300),
-        S('he_fivelights', 60, "五光勇者劍", "hit", { p: 6 }, 36, "五道知識之光集合在劍上！", "light", "#FFFFFF", 2200)
+        S('he_mistbreak', 45, "破霧閃光斬", "hit_stun", { p: 4.2, t: 1 }, 42, "光之劍劈開大霧。", "slash", "#FFFFFF", 1300),
+        S('he_fivelights', 60, "五光勇者劍", "hit", { p: 6 }, 63, "五道知識之光集合在劍上！", "light", "#FFFFFF", 2200)
       ],
       desc: "頂尖榮譽職業：通過最難的立志小考才能成為。五科都是拿手科目（×1.5）。有戰鬥大師、賢者、遊俠、超級巨星的特性。另外，被打的傷害少 15%。"
     })

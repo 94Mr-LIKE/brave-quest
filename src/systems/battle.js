@@ -12,6 +12,10 @@
  * - 怪物攻擊：max(1, 怪物 攻擊力 + 0~2 − 防禦力)
  * - 逃跑成功率 70%，頭目戰不能逃
  * - 頭目：3 個階段（體力 剩 2/3、1/3、0 換階段），每階段至少答對 2 題；最後一題是 L4
+ *   v4.2.11（老闆 2026-11-23「改掉現有模式，不分階段」）：怪物資料有 bars:[h1,h2,h3] 的頭目改成「三條血」——
+ *   一條打完就變身、下一條回滿，多出來的傷害不帶過去，沒有「每條至少答對幾題」；第 3 條打完才倒
+ *   （有 final_q 的佛格：第 3 條打完還有「最後一題」，答對就結束）。沒有 bars 的才走下面的舊階段規則（舊資料、舊測試相容）；
+ *   world.js 會幫每隻 boss 補上 bars，所以遊戲裡的頭目一律是三條血。
  *   v0.9.3：頭目每進入下一個階段，攻擊傷害 +20%（×1、×1.2、×1.4）；還沒答夠題數時體力停在門檻上方一小段（看得見），畫面寫「再答對 N 題」
  * - v0.9.3 親密度（番薯仔的愛心，最多 10 顆，隱藏屬性）：掉寶率、打倒怪物的經驗值都 ×（1＋N%）（不加金幣）
  * - 打倒＝怪物「清醒了，開心跑走」
@@ -97,13 +101,48 @@
     var list = b && b.monster && b.monster.exact_phases;
     return !!(b && b.boss && Array.isArray(list) && list.indexOf(Math.min(b.phase, b.phases)) >= 0);
   }
+  /** v4.2.11 這隻頭目的三條血（沒有 bars、不是頭目＝null）。只收正數，少於 1 條當沒有 */
+  function barsOf(monster) {
+    if (!monster || !monster.boss || !Array.isArray(monster.bars)) return null;
+    var list = monster.bars.map(function (v) { return Math.round(Number(v) || 0); }).filter(function (v) { return v > 0; });
+    return list.length ? list : null;
+  }
+  /**
+   * v4.2.11 把總血量 total 照 bars 的比例分成幾條（每條至少 1）：給舊數值（legacy／legacy_s 旗標）的戰鬥用，
+   * 舊存檔的孩子在舊地圖照舊總血量打，但一樣是三條血、沒有題數鎖。bars 沒給＝平分三條。
+   */
+  function splitBars(total, bars) {
+    total = Math.max(1, Math.round(Number(total) || 1));
+    var w = Array.isArray(bars) && bars.length ? bars.map(function (v) { return Math.max(0, Number(v) || 0); }) : [1, 1, 1];
+    var sum = w.reduce(function (a, v) { return a + v; }, 0), out = [], acc = 0;
+    w.forEach(function (v, i) {
+      var x = i === w.length - 1 ? total - acc : Math.round(total * (sum ? v / sum : 1 / w.length));
+      x = Math.max(1, x); out.push(x); acc += x;
+    });
+    return out;
+  }
   function create(monster) {
+    var bars = barsOf(monster);
+    if (bars) {
+      // v4.2.11 三條血：bar＝現在第幾條（1 起算），hp／maxHp＝這一條的現在血量與上限；phase 跟著 bar（phaseMult、bossfx 用）
+      return {
+        monster: monster, hp: bars[0], maxHp: bars[0], boss: true, bars: bars.slice(), bar: 1, finalQ: false,
+        phases: bars.length, perPhase: 0,
+        phase: 1, phaseCorrect: 0, over: false, result: null, turns: 0, timeBuff: 1, fx: newFx()
+      };
+    }
     var phases = monster.boss ? (monster.phases || BOSS_PHASES) : 1;
     return {
       monster: monster, hp: monster.hp, maxHp: monster.hp, boss: !!monster.boss,
       phases: phases, perPhase: perPhaseOf(monster, 1),
       phase: 1, phaseCorrect: 0, over: false, result: null, turns: 0, timeBuff: 1, fx: newFx()
     };
+  }
+  /** v4.2.11 變身時主角回復的魔力：最大魔力 × ratio（四捨五入），不超過上限。回傳實際回了幾點 */
+  function transformMp(mp, maxMp, ratio) {
+    var m = Math.max(0, Number(maxMp) || 0), cur = Math.max(0, Math.min(m, Number(mp) || 0));
+    var gain = Math.round(m * Math.max(0, Number(ratio) || 0));
+    return Math.max(0, Math.min(m - cur, gain));
   }
 
   // ---------------------------------------------------------------- v1.0 第一批：技能效果、職業特性（48 號 2.5–2.7、26 號 5.3）
@@ -143,7 +182,7 @@
   /** 頭目戰：答對但沒有造成傷害（回復、防護、增益、停止），這一階段也算答對一題（48 號 2.7）；體力沒變，所以不會跨過門檻 */
   function countCorrect(b) {
     if (!b.boss || b.over) return false;
-    b.phaseCorrect += 1;
+    if (!b.bars) b.phaseCorrect += 1;   // v4.2.11 三條血沒有題數鎖：只記答了幾題（turns）
     b.turns += 1;
     return true;
   }
@@ -321,7 +360,7 @@
   }
 
   /** 頭目第 k 階段結束時的 體力 門檻（剩 2/3、1/3、0） */
-  function threshold(b, k) { return Math.round(b.maxHp * (1 - k / b.phases)); }
+  function threshold(b, k) { if (b.bars) return 0; return Math.round(b.maxHp * (1 - k / b.phases)); }
 
   /**
    * 這一階段還沒答夠題數時，體力停在門檻上方多少：這一段體力的 10%（至少 1 點）。
@@ -329,13 +368,14 @@
    * 體力條看起來已經空了卻打不倒。改成留下看得見的一小段，並由畫面寫出「再答對 N 題」。
    */
   function holdMargin(b) {
+    if (b.bars) return 0;   // v4.2.11 三條血不會撐住
     var seg = b.maxHp / b.phases;
     return Math.max(1, Math.round(seg * 0.1));
   }
 
   /** 這一階段還要答對幾題（不管傷害）才能換階段／打倒；不是頭目回傳 0 */
   function needCorrect(b) {
-    if (!b.boss || b.over) return 0;
+    if (!b.boss || b.over || b.bars) return 0;   // v4.2.11 三條血沒有題數鎖
     return Math.max(0, b.perPhase - b.phaseCorrect);
   }
 
@@ -347,6 +387,7 @@
   function hit(b, dmg) {
     b.turns += 1;
     var before = b.hp;
+    if (b.boss && b.bars) return hitBars(b, dmg);
     if (b.boss) {
       b.phaseCorrect += 1;
       var th = threshold(b, b.phase);
@@ -373,10 +414,40 @@
   }
 
   /**
+   * v4.2.11 三條血的打中（hit 會先 turns+1 再呼叫這裡）。回傳 {defeated, phaseUp, transformed, finalQ, brokeBar, dealt}
+   * - 這一條打完、還有下一條：變身（bar+1、phase＝bar），下一條回滿；多出來的傷害不帶過去（dealt＝這一條剩下的血）。
+   * - 最後一條打完：沒有 final_q 就打倒；有 final_q（佛格）就進「最後一題」（finalQ＝true，hp 停在 0）。
+   * - 最後一題時答對打中：不看傷害，打倒（dealt 0）。
+   */
+  function hitBars(b, dmg) {
+    var before = b.hp, d = Math.max(0, Math.round(Number(dmg) || 0));
+    if (b.finalQ) { b.finalQ = false; b.hp = 0; b.over = true; b.result = 'win'; return { defeated: true, phaseUp: false, transformed: false, finalQ: false, dealt: 0 }; }
+    var dealt = Math.min(before, d);
+    b.hp = before - dealt;
+    if (b.hp > 0) return { defeated: false, phaseUp: false, transformed: false, finalQ: false, dealt: dealt };
+    var broke = b.bar;
+    if (b.bar < b.bars.length) {
+      b.bar += 1; b.phase = b.bar;
+      b.hp = b.maxHp = b.bars[b.bar - 1];
+      return { defeated: false, phaseUp: true, transformed: true, finalQ: false, brokeBar: broke, dealt: dealt };
+    }
+    b.hp = 0;
+    if (b.monster && b.monster.final_q) { b.finalQ = true; return { defeated: false, phaseUp: false, transformed: false, finalQ: true, brokeBar: broke, dealt: dealt }; }
+    b.over = true; b.result = 'win';
+    return { defeated: true, phaseUp: false, transformed: false, finalQ: false, brokeBar: broke, dealt: dealt };
+  }
+
+  /**
    * 頭目的「最後一題」要 L4：最後一個階段、這階段已答對 perPhase−1 題以上，
    * 而且以 L4 的傷害估計（estL4Dmg）這一擊就能結束戰鬥。沒給估計值時只看題數。
    */
   function needsFinalL4(b, estL4Dmg) {
+    if (b && b.boss && b.bars) {   // v4.2.11：佛格的最後一題；或最後一條、L4 估計一擊就能打完（沒給估計值＝最後一條就出 L4）
+      if (b.over) return false;
+      if (b.finalQ) return true;
+      if (b.bar !== b.bars.length) return false;
+      return estL4Dmg === undefined ? true : b.hp - estL4Dmg <= 0;
+    }
     if (!b.boss || b.phase !== b.phases || b.phaseCorrect < b.perPhase - 1) return false;
     if (exactPhase(b)) return true;   // v4.2 4c：答對這一題就結束（不看傷害），一定出 L4
     return estL4Dmg === undefined ? true : b.hp - estL4Dmg <= 0;
@@ -425,9 +496,15 @@
    * o = { crit, favored, first（這次答對的第一擊）, dealt, damage, phaseUp, held, over }
    */
   function hitMessage(o) {
+    if (o.brokeBar) {   // v4.2.11 三條血：打完一條說「打破了第 N 條血！」（溢出不帶過去，數字會比算出來的小，所以不寫數字）
+      var c = (o.crit ? '會心一擊！' : '') + (o.favored && o.first ? '拿手科目！' : '');
+      return c + (o.hits > 1 ? '連打 ' + o.hits + ' 下，' : '') + '打破了第 ' + o.brokeBar + ' 條血！' + (o.pet ? '番薯仔也衝上去咬了一口！' : '');
+    }
     var capped = o.dealt < o.damage && !o.over;
     var s = (o.crit && !capped ? '會心一擊！' : '') + (o.favored && o.first ? '拿手科目！' : '');
     if (capped && o.phaseUp) return s + '一口氣打到門檻！';
+    // v4.2.11 C2（實機看到「打出 0 點傷害！」）：佛格最後一題答對＝體力已經是 0、直接打倒（dealt 0），不寫數字
+    if (o.over && !(o.dealt > 0) && o.damage > 0) return s + (o.hits > 1 ? '連打 ' + o.hits + ' 下，' : '') + '最後一題答對了，打中了！' + (o.pet ? '番薯仔也衝上去咬了一口！' : '');
     return s + (o.hits > 1 ? '連打 ' + o.hits + ' 下，' : '') + '打出 ' + o.dealt + ' 點傷害！' + (o.pet ? '番薯仔也衝上去咬了一口！' : '');
   }
 
@@ -442,7 +519,12 @@
    * 傷害公式在 limitMs 0 時用標準時間當基準（damage），不用另外改。
    */
   function untimedPhase(b) {
-    var m = b && b.monster, list = m && m.untimed_phases;
+    var m = b && b.monster;
+    if (b && b.boss && b.bars) {   // v4.2.11 三條血讀 untimed_bars（佛格＝[3]，舊欄位 untimed_phases 相容）；最後一題照舊計時（原本第 4 階段就計時）
+      var ub = m && (m.untimed_bars || m.untimed_phases);
+      return !b.finalQ && Array.isArray(ub) && ub.indexOf(b.phase) >= 0;   // b.phase＝b.bar（hitBars 一起改）
+    }
+    var list = m && m.untimed_phases;
     return !!(b && b.boss && Array.isArray(list) && list.indexOf(Math.min(b.phase, b.phases)) >= 0);
   }
   /**
@@ -469,7 +551,7 @@
     DIFF: DIFF, TIME_SEC: TIME_SEC, MODE_MULT: MODE_MULT, CRIT_MULT: CRIT_MULT, FAVORED_MULT: FAVORED_MULT, FLEE_RATE: FLEE_RATE,
     BOSS_PHASES: BOSS_PHASES, PER_PHASE: PER_PHASE, PHASE_DMG_STEP: PHASE_DMG_STEP, BOND_MAX: BOND_MAX,
     timeLimitMs: timeLimitMs, damage: damage, monsterAttack: monsterAttack, phaseMult: phaseMult, bond: bond, bondExp: bondExp, tryFlee: tryFlee,
-    create: create, perPhaseOf: perPhaseOf, exactPhase: exactPhase, hit: hit, holdMargin: holdMargin, needCorrect: needCorrect, needsFinalL4: needsFinalL4, heroHurt: heroHurt,
+    create: create, barsOf: barsOf, splitBars: splitBars, transformMp: transformMp, hitBars: hitBars, perPhaseOf: perPhaseOf, exactPhase: exactPhase, hit: hit, holdMargin: holdMargin, needCorrect: needCorrect, needsFinalL4: needsFinalL4, heroHurt: heroHurt,
     dropRate: dropRate, rollDrops: rollDrops, victoryReward: victoryReward,
     createTimer: createTimer, tick: tick, tickFree: tickFree, expired: expired, remainingFrac: remainingFrac, pause: pause, resume: resume
   };

@@ -82,7 +82,7 @@ window.MONSTERS = {
   gh_umbrella_f: {"name":"森林傘傘紙傘妖","sprite":"mon_gh_umbrella_f","level":5,"hp":590,"atk":93,"subject":"英語","q_levels":[2,3],"exp":250,"gold":65,"drops":[{"item":"umbrella_rib","rate":0.4}],"boss":false,"desc":"竹青色的紙傘，傘骨像竹節，霧讓它在夜路亂跳。","wake":"森林傘傘紙傘妖清醒了，收起傘靠回竹林邊。"},
   gh_geta_f: {"name":"森林喀喀木屐","sprite":"mon_gh_geta_f","level":5,"hp":590,"atk":94,"subject":"數學","q_levels":[2,3],"exp":250,"gold":70,"drops":[{"item":"crystal","rate":0.3}],"boss":false,"desc":"綁著苔綠色帶子的木屐，霧讓它在夜路喀喀亂走。","wake":"森林喀喀木屐清醒了，排好放回屋簷下。"},
   gh_civet_f: {"name":"森林夜遊白鼻心","sprite":"mon_gh_civet_f","level":5,"hp":590,"atk":94,"subject":"社會","q_levels":[2,3],"exp":250,"gold":70,"drops":[{"item":"small_lantern","rate":0.7}],"boss":false,"dialog_after":"D_CIVET_AFTER","desc":"披著深綠斗篷、提著綠色小燈籠的白鼻心。","wake":"森林夜遊白鼻心清醒了，把小燈籠還給你，跑回樹林。"},
-  ghb_civetboss: {"name":"中橫頭目：夜遊團長","sprite":"boss_ghb_civetboss","level":5,"hp":2620,"atk":84,"subject":"混合","subjects":["國語","自然"],"q_levels":[2,4],"exp":2500,"gold":700,"drops":[{"item":"forest_lantern","rate":1}],"boss":true,"phases":3,"phase_q":2,"last_q_level":4,"ref_mobs":["gh_civet_f","gh_lantern_f"],"battle_bg":"forest","dialog_before":"D_BOSS_CIVET_A","dialog_after":"D_BOSS_CIVET_B","desc":"中橫頭目。把燈籠町的燈全藏起來的大白鼻心，斗篷上掛滿燈籠。","wake":"夜遊團長清醒了，把燈籠一盞盞掛回燈籠町。"},
+  ghb_civetboss: {"name":"中橫頭目：夜遊團長","sprite":"boss_ghb_civetboss","level":5,"hp":10740,"bars":[10740,16120,21490],"atk":178,"subject":"混合","subjects":["國語","自然"],"q_levels":[2,4],"exp":2500,"gold":700,"drops":[{"item":"forest_lantern","rate":1}],"boss":true,"phases":3,"phase_q":2,"last_q_level":4,"ref_mobs":["gh_civet_f","gh_lantern_f"],"battle_bg":"forest","dialog_before":"D_BOSS_CIVET_A","dialog_after":"D_BOSS_CIVET_B","desc":"中橫頭目。把燈籠町的燈全藏起來的大白鼻心，斗篷上掛滿燈籠。","wake":"夜遊團長清醒了，把燈籠一盞盞掛回燈籠町。"},
 
   // ── 地圖等級 1（M02 擎天草原）──
   dango: {
@@ -246,7 +246,7 @@ window.MONSTERS = {
   // ───────────────────────────── 頭目 ─────────────────────────────
   tree_king: {
     legacy_s: { level: 2, hp: 510, atk: 13, exp: 96, gold: 48, q_levels: [2, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
-    name: "枯萎樹王", sprite: "boss_tree", level: 5, hp: 1460, atk: 48, subject: "自然", q_levels: [2, 4],
+    name: "枯萎樹王", sprite: "boss_tree", level: 5, hp: 1730, bars: [1730, 2590, 3450], atk: 56, subject: "自然", q_levels: [2, 4],
     exp: 950, gold: 350, drops: [{ item: "herb", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["al_cypress", "owl"],
     dialog_before: "D_BOSS_TREE_A", dialog_after: "D_BOSS_TREE_B",
@@ -254,7 +254,7 @@ window.MONSTERS = {
     wake: "神木清醒了，枝頭冒出新的綠芽。"
   },
   fog_octopus: {
-    name: "迷霧章魚", sprite: "boss_octopus", level: 2, hp: 540, atk: 16, subject: "英語", q_levels: [2, 4],
+    name: "迷霧章魚", sprite: "boss_octopus", level: 2, hp: 310, bars: [310, 460, 620], atk: 18, subject: "英語", q_levels: [2, 4],
     exp: 136, gold: 64, drops: [{ item: "snack", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["crab", "seagull"],
     dialog_before: "D_BOSS_OCTO_A", dialog_after: "D_BOSS_OCTO_B",
@@ -263,7 +263,7 @@ window.MONSTERS = {
     wake: "迷霧章魚清醒了，揮揮觸手游回大海。"
   },
   mud_frog: {
-    name: "泥巴大蛙", sprite: "boss_frog", level: 4, hp: 860, atk: 27, subject: "數學", q_levels: [2, 4],
+    name: "泥巴大蛙", sprite: "boss_frog", level: 4, hp: 910, bars: [910, 1360, 1820], atk: 27, subject: "數學", q_levels: [2, 4],
     exp: 350, gold: 150, drops: [{ item: "gear", rate: 1 }], boss: true,
     legacy: { level: 3, hp: 750, atk: 16, exp: 160, gold: 80 },   // v1.3（62 號 3.3、5.4）建議 PL 17／轉職 Lv14
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["mudslime", "frog"],
@@ -272,7 +272,7 @@ window.MONSTERS = {
     wake: "泥巴大蛙清醒了，呱呱笑著跳回池塘。"
   },
   noise_bat: {
-    name: "噪音蝙蝠王", sprite: "boss_bat", level: 2, hp: 310, atk: 14, subject: "國語", q_levels: [1, 3],
+    name: "噪音蝙蝠王", sprite: "boss_bat", level: 2, hp: 180, bars: [180, 260, 350], atk: 13, subject: "國語", q_levels: [1, 3],
     exp: 96, gold: 48, drops: [{ item: "bat_wing", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["bat", "rock", "goblin"],
     dialog_before: "D_BOSS_BAT_A", dialog_after: "D_BOSS_BAT_B",
@@ -281,7 +281,7 @@ window.MONSTERS = {
   },
   angry_golem: {
     legacy_s: { level: 4, hp: 1200, atk: 21, exp: 350, gold: 150, q_levels: [3, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
-    name: "暴躁石像", sprite: "boss_golem", level: 5, hp: 1860, atk: 57, subject: "社會", q_levels: [2, 4],
+    name: "暴躁石像", sprite: "boss_golem", level: 5, hp: 3290, bars: [3290, 4930, 6580], atk: 60, subject: "社會", q_levels: [2, 4],
     exp: 1400, gold: 450, drops: [{ item: "crystal", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["boar", "mm_mudstone"],
     dialog_before: "D_BOSS_GOLEM_A", dialog_after: "D_BOSS_GOLEM_B",
@@ -290,7 +290,7 @@ window.MONSTERS = {
   },
   fog_demon: {
     legacy_s: { level: 5, hp: 1510, atk: 24, exp: 450, gold: 180, q_levels: [3, 4] },   // v3.0（70 號 3.3、5.1）舊南部旗標 legacySouth 時用的舊數值（套用前的數值）
-    name: "遺忘霧魔", sprite: "boss_fog", level: 5, hp: 1560, atk: 52, subject: "混合",
+    name: "遺忘霧魔", sprite: "boss_fog", level: 5, hp: 3070, bars: [3070, 4610, 6150], atk: 46, subject: "混合",
     subjects: ["國語", "英語", "數學", "自然"], q_levels: [2, 4],
     exp: 1100, gold: 350, drops: [{ item: "dawn_shard_s", rate: 1 }], boss: true,   // v3.0（70 號 2.5）：遺忘霧魔改成南霧將，不再是最終頭目（final 旗標拿掉；終章的遺忘霧王才標；v2.0 是「boss: true, final: true,」）
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["wisp", "armor"],
@@ -300,7 +300,7 @@ window.MONSTERS = {
   },
   // v1.1 第一章支線頭目（59 號 3.2 節）：金瓜石坑道最深處，只在 Q_JGS_3 進行中出現；建議 Lv10
   mnb_goldjaw: {
-    name: "金脈鐵顎王", sprite: "boss_mnb_goldjaw", level: 3, hp: 540, atk: 16, subject: "混合",
+    name: "金脈鐵顎王", sprite: "boss_mnb_goldjaw", level: 3, hp: 310, bars: [310, 460, 620], atk: 18, subject: "混合",
     subjects: ["數學", "自然"], q_levels: [2, 4],
     exp: 136, gold: 64, drops: [{ item: "crystal", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["mn_cart", "mn_ore", "mn_drill"],
@@ -343,7 +343,7 @@ window.MONSTERS = {
   },
   // v1.2 第二章章末頭目（61 號 3.2 節）：南方澳漁港堤防盡頭，只在 Q_YL_5 進行中出現；建議轉職 Lv11 以上（PL 14）。掉落雨後彩虹片（紀念品）
   wxb_raincloud: {
-    name: "黏黏雨雲王", sprite: "boss_wxb_raincloud", level: 3, hp: 760, atk: 23, subject: "自然", q_levels: [2, 4],
+    name: "黏黏雨雲王", sprite: "boss_wxb_raincloud", level: 3, hp: 770, bars: [770, 1150, 1540], atk: 22, subject: "自然", q_levels: [2, 4],
     exp: 250, gold: 120, drops: [{ item: "rainbow_piece", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["ly_bubble", "ly_mackerel"],
     dialog_before: "D_BOSS_RAINCLOUD_A", dialog_after: "D_BOSS_RAINCLOUD_B",
@@ -468,7 +468,7 @@ window.MONSTERS = {
     wake: "米粉飄飄獸清醒了，整整齊齊掛回曬架。"
   },
   mb_floodgate: {
-    name: "霧閘機將", sprite: "boss_mb_floodgate", level: 4, hp: 1000, atk: 32, subject: "混合",
+    name: "霧閘機將", sprite: "boss_mb_floodgate", level: 4, hp: 1080, bars: [1080, 1620, 2160], atk: 31, subject: "混合",
     subjects: ["自然", "數學"], q_levels: [2, 4],
     exp: 450, gold: 190, drops: [{ item: "dawn_shard_n", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["ty_tofu", "wx_thunder"],
@@ -505,7 +505,7 @@ window.MONSTERS = {
     wake: "搶搶獼猴清醒了，把便當還給你，跳回樹林。"
   },
   fob_balloon: {
-    name: "台東頭目：霧氣球大王", sprite: "boss_fob_balloon", level: 5, hp: 2270, atk: 72, subject: "混合",
+    name: "台東頭目：霧氣球大王", sprite: "boss_fob_balloon", level: 5, hp: 5440, bars: [5440, 8160, 10880], atk: 135, subject: "混合",
     subjects: ["自然", "數學"], q_levels: [2, 4],
     exp: 1850, gold: 550, drops: [{ item: "balloon_knot", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["wx_rain_e", "wx_rainbow"], battle_bg: "grass",
@@ -514,7 +514,7 @@ window.MONSTERS = {
     wake: "霧氣球大王清醒了，霧全部散掉，變回一顆彩色熱氣球。"
   },
   wxb_whale: {
-    name: "東霧將：雲鯨霧將", sprite: "boss_wxb_whale", level: 5, hp: 2410, atk: 79, subject: "混合",
+    name: "東霧將：雲鯨霧將", sprite: "boss_wxb_whale", level: 5, hp: 6390, bars: [6390, 9590, 12790], atk: 164, subject: "混合",
     subjects: ["自然", "英語"], q_levels: [2, 4],
     exp: 2200, gold: 600, drops: [{ item: "dawn_shard_e", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["wx_wave_e", "an_macaque"], battle_bg: "pacific_east",
@@ -558,7 +558,7 @@ window.MONSTERS = {
     wake: "錨錨船錨怪清醒了，沉穩地坐回碼頭邊。"
   },
   pib_anchor: {
-    name: "錨錨大副", sprite: "mon_pib_anchor", level: 5, hp: 880, atk: 57, subject: "數學", q_levels: [2, 3],
+    name: "錨錨大副", sprite: "mon_pib_anchor", level: 5, hp: 3420, atk: 59, subject: "數學", q_levels: [2, 3],
     subjects: ["數學", "社會"],   // 精英：數學、社會輪流（70 號 3.2）
     exp: 315, gold: 105, drops: [{ item: "sea_chart", rate: 1 }], boss: false, elite: true,
     dialog_before: "D_BOSS_ANCHOR_A", dialog_after: "D_BOSS_ANCHOR_B",   // 精英也播（game.js：boss 或 elite）
@@ -608,7 +608,7 @@ window.MONSTERS = {
     wake: "浪花花清醒了，嘩啦一聲回到大海。"
   },
   pib_ship: {
-    name: "霧帆號", sprite: "boss_pib_ship", level: 5, hp: 1990, atk: 67, subject: "混合",
+    name: "霧帆號", sprite: "boss_pib_ship", level: 5, hp: 3930, bars: [3930, 5900, 7870], atk: 78, subject: "混合",
     subjects: ["英語", "自然", "社會"], q_levels: [2, 4],
     exp: 1550, gold: 450, drops: [{ item: "memory_shell", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["pi_parrot", "pi_octo"], battle_bg: "pacific",
@@ -652,7 +652,7 @@ window.MONSTERS = {
     wake: "芋頭圓圓清醒了，滾回田裡的大葉子下面睡覺。"
   },
   mb_train: {
-    name: "迷路火車頭", sprite: "boss_mb_train", level: 5, hp: 1180, atk: 38, subject: "混合",
+    name: "迷路火車頭", sprite: "boss_mb_train", level: 5, hp: 1250, bars: [1250, 1870, 2490], atk: 36, subject: "混合",
     subjects: ["社會", "數學"], q_levels: [2, 4],
     exp: 650, gold: 250, drops: [{ item: "train_whistle", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["ml_signal", "dj_taro"], battle_bg: "railway",
@@ -685,7 +685,7 @@ window.MONSTERS = {
     wake: "夜遊白鼻心清醒了，把燈籠還回來，跑回森林。"
   },
   mb_lantern: {
-    name: "燈籠霧將", sprite: "boss_mb_lantern", level: 5, hp: 1350, atk: 44, subject: "混合",
+    name: "燈籠霧將", sprite: "boss_mb_lantern", level: 5, hp: 1670, bars: [1670, 2510, 3340], atk: 53, subject: "混合",
     subjects: ["國語", "自然"], q_levels: [2, 4],
     exp: 850, gold: 300, drops: [{ item: "dawn_shard_c", rate: 1 }], boss: true,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["gh_lantern", "gh_civet"], battle_bg: "levee",
@@ -830,8 +830,8 @@ window.MONSTERS = {
     "name": "霧影・噪音蝙蝠王",
     "sprite": "boss_fob_shadow_bat",
     "level": 5,
-    "hp": 1750,
-    "atk": 101,
+    "hp": 13220,
+    "atk": 190,
     "exp": 810,
     "gold": 210,
     "subject": "國語",
@@ -854,8 +854,8 @@ window.MONSTERS = {
     "name": "霧影・迷霧章魚",
     "sprite": "boss_fob_shadow_octo",
     "level": 5,
-    "hp": 1750,
-    "atk": 101,
+    "hp": 13220,
+    "atk": 190,
     "exp": 810,
     "gold": 210,
     "subject": "英語",
@@ -878,8 +878,8 @@ window.MONSTERS = {
     "name": "霧影・泥巴大蛙",
     "sprite": "boss_fob_shadow_frog",
     "level": 5,
-    "hp": 1750,
-    "atk": 101,
+    "hp": 13220,
+    "atk": 190,
     "exp": 810,
     "gold": 210,
     "subject": "數學",
@@ -902,8 +902,8 @@ window.MONSTERS = {
     "name": "霧影・枯萎樹王",
     "sprite": "boss_fob_shadow_tree",
     "level": 5,
-    "hp": 1750,
-    "atk": 101,
+    "hp": 13220,
+    "atk": 190,
     "exp": 810,
     "gold": 210,
     "subject": "自然",
@@ -926,8 +926,8 @@ window.MONSTERS = {
     "name": "霧影・暴躁石像",
     "sprite": "boss_fob_shadow_golem",
     "level": 5,
-    "hp": 1750,
-    "atk": 101,
+    "hp": 13220,
+    "atk": 190,
     "exp": 810,
     "gold": 210,
     "subject": "社會",
@@ -950,8 +950,9 @@ window.MONSTERS = {
     "name": "山嵐霧精",
     "sprite": "boss_fob_mist",
     "level": 5,
-    "hp": 2650,
-    "atk": 88,
+    "hp": 11070,
+    "bars": [11070, 16600, 22130],
+    "atk": 183,
     "exp": 2600,
     "gold": 700,
     "subject": "混合",
@@ -985,8 +986,9 @@ window.MONSTERS = {
     "name": "遺忘霧王‧佛格",
     "sprite": "boss_fob_king",
     "level": 5,
-    "hp": 3590,
-    "atk": 88,
+    "hp": 11750,
+    "bars": [11750, 17630, 23510],
+    "atk": 197,
     "exp": 2700,
     "gold": 700,
     "subject": "混合",
@@ -1033,6 +1035,19 @@ window.MONSTERS = {
     "phase_sprites": {
       "2": "boss_fob_king_p2",
       "4": "boss_fob_king_p4"
+    },
+    "final_q": true,
+    "untimed_bars": [
+      3
+    ],
+    "bar_sprites": {
+      "2": "boss_fob_king_p2",
+      "3": "boss_fob_king_p4"
+    },
+    "bar_dialogs": {
+      "2": "D_FOG_KING_P2",
+      "3": "D_FOG_KING_P3",
+      "final": "D_FOG_KING_P4"
     },
     "ending": "Q_END_1"
   },
@@ -1152,8 +1167,8 @@ window.MONSTERS = {
     "name": "星光黏黏雨雲王",
     "sprite": "boss_wxb_raincloud_s2",
     "level": 5,
-    "hp": 3388,
-    "atk": 122,
+    "hp": 36430,
+    "atk": 264,
     "exp": 2903,
     "gold": 285,
     "subject": "自然",
@@ -1175,8 +1190,8 @@ window.MONSTERS = {
     "name": "星光迷路火車頭",
     "sprite": "boss_mb_train_s2",
     "level": 5,
-    "hp": 3538,
-    "atk": 128,
+    "hp": 36430,
+    "atk": 264,
     "exp": 3105,
     "gold": 285,
     "subject": "混合",
@@ -1202,8 +1217,8 @@ window.MONSTERS = {
     "name": "星光霧氣球大王",
     "sprite": "boss_fob_balloon_s2",
     "level": 5,
-    "hp": 3700,
-    "atk": 133,
+    "hp": 36430,
+    "atk": 264,
     "exp": 3308,
     "gold": 300,
     "subject": "混合",
@@ -1229,8 +1244,8 @@ window.MONSTERS = {
     "name": "星光夜遊團長",
     "sprite": "boss_ghb_civetboss_s2",
     "level": 5,
-    "hp": 3850,
-    "atk": 139,
+    "hp": 36430,
+    "atk": 264,
     "exp": 3443,
     "gold": 300,
     "subject": "混合",
@@ -1256,8 +1271,8 @@ window.MONSTERS = {
     "name": "星光金脈鐵顎王",
     "sprite": "boss_mnb_goldjaw_s2",
     "level": 5,
-    "hp": 4000,
-    "atk": 145,
+    "hp": 36430,
+    "atk": 264,
     "exp": 3510,
     "gold": 300,
     "subject": "混合",
@@ -1283,8 +1298,8 @@ window.MONSTERS = {
     "name": "星光霧帆號",
     "sprite": "boss_pib_ship_s2",
     "level": 5,
-    "hp": 4163,
-    "atk": 151,
+    "hp": 36430,
+    "atk": 264,
     "exp": 3645,
     "gold": 315,
     "subject": "混合",
@@ -1311,8 +1326,9 @@ window.MONSTERS = {
     "name": "曙光霧閘機將",
     "sprite": "boss_mb_floodgate_s3",
     "level": 5,
-    "hp": 7575,
-    "atk": 176,
+    "hp": 66940,
+    "bars": [66940, 100410, 133880],
+    "atk": 421,
     "exp": 13275,
     "gold": 1100,
     "subject": "混合",
@@ -1353,8 +1369,9 @@ window.MONSTERS = {
     "name": "曙光燈籠霧將",
     "sprite": "boss_mb_lantern_s3",
     "level": 5,
-    "hp": 8063,
-    "atk": 188,
+    "hp": 66940,
+    "bars": [66940, 100410, 133880],
+    "atk": 421,
     "exp": 13950,
     "gold": 1150,
     "subject": "混合",
@@ -1395,8 +1412,9 @@ window.MONSTERS = {
     "name": "曙光遺忘霧魔",
     "sprite": "boss_fog_demon_s3",
     "level": 5,
-    "hp": 8550,
-    "atk": 200,
+    "hp": 66940,
+    "bars": [66940, 100410, 133880],
+    "atk": 421,
     "exp": 14850,
     "gold": 1150,
     "subject": "混合",
@@ -1439,8 +1457,9 @@ window.MONSTERS = {
     "name": "曙光雲鯨霧將",
     "sprite": "boss_wxb_whale_s3",
     "level": 5,
-    "hp": 9038,
-    "atk": 212,
+    "hp": 66940,
+    "bars": [66940, 100410, 133880],
+    "atk": 421,
     "exp": 15750,
     "gold": 1200,
     "subject": "混合",
@@ -1480,7 +1499,7 @@ window.MONSTERS = {
   // ═══ v4.2 第 4c 批 MONSTERS END ═══
   // ═══ v4.2.3 峭壁谷 MONSTERS（M55 野外特殊 BOSS，不綁委託、沒有對白；規格 7.4；老闆 2026-11-15 選 V1 龍）═══
   fob_gorgedragon: {
-    name: "峽谷霧龍", sprite: "boss_fob_gorgedragon", level: 5, hp: 2550, atk: 82, subject: "混合",
+    name: "峽谷霧龍", sprite: "boss_fob_gorgedragon", level: 5, hp: 6390, bars: [6390, 9590, 12790], atk: 164, subject: "混合",
     subjects: ["國語", "自然"], q_levels: [2, 4],
     exp: 2200, gold: 600, drops: [{ item: "gear_qb_pole", rate: 1 }], boss: true, final: false,
     phases: 3, phase_q: 2, last_q_level: 4, ref_mobs: ["an_macaque", "wx_wave_e"], battle_bg: "qbgorge",
@@ -1489,5 +1508,5 @@ window.MONSTERS = {
   },
   // ═══ v4.2.3 峭壁谷 MONSTERS END ═══
   // v4.2.3 M45 合歡山隧道洞窟的野外特殊頭目（不綁委託；老闆 2026-11-15「可以、照建議」：HP 2700、攻 86、打倒才拿得到合歡冰晶劍、打倒後不再出現、不加台詞）
-  wxb_snowking: {"name":"冰晶雪球大王","sprite":"boss_wxb_snowking","level":5,"hp":2700,"atk":86,"subject":"混合","subjects":["英語","自然"],"q_levels":[2,4],"exp":2500,"gold":700,"drops":[{"item":"gear_hh_icesword","rate":1}],"boss":true,"final":false,"phases":3,"phase_q":2,"last_q_level":4,"ref_mobs":["wx_snow","fo_puff"],"battle_bg":"fogcave","desc":"雪球寶寶的大王。隧道裡的霧讓牠頭昏昏，一直坐在冰晶王座上，守著隧道深處的寶物。","wake":"冰晶雪球大王清醒了，把王冠上的冰晶擦亮，坐回王座打起瞌睡。"},
+  wxb_snowking: {"name":"冰晶雪球大王","sprite":"boss_wxb_snowking","level":5,"hp":10740,"bars":[10740,16120,21490],"atk":178,"subject":"混合","subjects":["英語","自然"],"q_levels":[2,4],"exp":2500,"gold":700,"drops":[{"item":"gear_hh_icesword","rate":1}],"boss":true,"final":false,"phases":3,"phase_q":2,"last_q_level":4,"ref_mobs":["wx_snow","fo_puff"],"battle_bg":"fogcave","desc":"雪球寶寶的大王。隧道裡的霧讓牠頭昏昏，一直坐在冰晶王座上，守著隧道深處的寶物。","wake":"冰晶雪球大王清醒了，把王冠上的冰晶擦亮，坐回王座打起瞌睡。"},
 };
